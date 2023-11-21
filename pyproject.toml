@@ -1,0 +1,31 @@
+[project]
+name = "mgnify_pipelines_toolkit"
+version = "0.0.3"
+readme = "README.md"
+license = {text = "Apache Software License 2.0"}
+authors = [
+  { name = "MGnify team", email = "metagenomics-help@ebi.ac.uk" },
+]
+keywords = ["bioinformatics", "pipelines", "metagenomics"]
+description = "Collection of scripts and tools for MGnify pipelines"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "biopython==1.81",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mgnify_pipelines_toolkit"]
+
+[project.scripts]
+get_subunits = "mgnify_pipelines_toolkit.get_subunits:main"
+get_subunits_coords = "mgnify_pipelines_toolkit.get_subunits_coords:main"

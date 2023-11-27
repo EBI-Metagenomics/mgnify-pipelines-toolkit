@@ -27,21 +27,23 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["mgnify_pipelines_toolkit", 
-            "mgnify_pipelines_toolkit.v6",
-            "mgnify_pipelines_toolkit.v6.v6_amplicon"]
+            "mgnify_pipelines_toolkit.analysis",
+            "mgnify_pipelines_toolkit.analysis.shared",
+            "mgnify_pipelines_toolkit.analysis.amplicon"
+            ]
 
 [project.scripts]
-# v6
-get_subunits = "mgnify_pipelines_toolkit.v6.get_subunits:main"
-get_subunits_coords = "mgnify_pipelines_toolkit.v6.get_subunits_coords:main"
-mapseq2biom = "mgnify_pipelines_toolkit.v6.mapseq2biom:main"
-# v6_amplicon
-are_there_primers = "mgnify_pipelines_toolkit.v6.v6_amplicon.are_there_primers:main"
-assess_inflection_point_mcp = "mgnify_pipelines_toolkit.v6.v6_amplicon.assess_inflection_point_mcp:main"
-assess_mcp_proportions = "mgnify_pipelines_toolkit.v6.v6_amplicon.assess_mcp_proportions:main"
-classify_var_regions = "mgnify_pipelines_toolkit.v6.v6_amplicon.classify_var_regions:main"
-find_mcp_inflection_points = "mgnify_pipelines_toolkit.v6.v6_amplicon.find_mcp_inflection_points:main"
-make_asv_count_table = "mgnify_pipelines_toolkit.v6.v6_amplicon.make_asv_count_table:main"
-remove_ambiguous_reads = "mgnify_pipelines_toolkit.v6.v6_amplicon.remove_ambiguous_reads:main"
-rev_comp_se_primers = "mgnify_pipelines_toolkit.v6.v6_amplicon.rev_comp_se_primers:main"
-standard_primer_agrep = "mgnify_pipelines_toolkit.v6.v6_amplicon.standard_primer_agrep:main"
+# analysis.shared
+get_subunits = "mgnify_pipelines_toolkit.analysis.shared.get_subunits:main"
+get_subunits_coords = "mgnify_pipelines_toolkit.analysis.shared.get_subunits_coords:main"
+mapseq2biom = "mgnify_pipelines_toolkit.analysis.shared.mapseq2biom:main"
+# analysis.amplicon
+are_there_primers = "mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers:main"
+assess_inflection_point_mcp = "mgnify_pipelines_toolkit.analysis.amplicon.assess_inflection_point_mcp:main"
+assess_mcp_proportions = "mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions:main"
+classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"
+find_mcp_inflection_points = "mgnify_pipelines_toolkit.analysis.amplicon.find_mcp_inflection_points:main"
+make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"
+remove_ambiguous_reads = "mgnify_pipelines_toolkit.analysis.amplicon.remove_ambiguous_reads:main"
+rev_comp_se_primers = "mgnify_pipelines_toolkit.analysis.amplicon.rev_comp_se_primers:main"
+standard_primer_agrep = "mgnify_pipelines_toolkit.analysis.amplicon.standard_primer_agrep:main"

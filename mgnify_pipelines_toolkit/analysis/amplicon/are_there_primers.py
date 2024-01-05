@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from assess_mcp_proportions_MERGED import fetch_mcp
+from assess_mcp_proportions import fetch_mcp
 from utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
 
 def parse_args():

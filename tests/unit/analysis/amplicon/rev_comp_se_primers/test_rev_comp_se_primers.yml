@@ -1,0 +1,16 @@
+- name: test_wrong_args
+  tags:
+    - rev_comp_se_primers
+  exit_code: 2 
+  command: python mgnify_pipelines_toolkit/analysis/amplicon/rev_comp_se_primers.py --chromosome X
+  stderr:
+    contains:
+      - "error: the following arguments are required: -i/--input, -s/--sample, -o/--output"
+
+- name: test_correct_args
+  tags:
+    - rev_comp_se_primers
+  command: python mgnify_pipelines_toolkit/analysis/amplicon/rev_comp_se_primers.py -i tests/fixtures/sequences/f_and_r_primers.fasta -s sample -o ./
+  files:
+    - path: "sample_rev_comp_se_primers.fasta"
+      md5sum: aa3443aec8e07139360a77c35f69e326

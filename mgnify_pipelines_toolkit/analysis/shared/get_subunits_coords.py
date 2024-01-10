@@ -7,16 +7,16 @@ import gzip
 from Bio import SeqIO
 
 
-SSU_coords = "SSU_coords"
-LSU_coords = "LSU_coords"
-SSU_count = 0
-LSU_count = 0
-
 def main():
     parser = argparse.ArgumentParser(description="Extract lsu, ssu and 5s")
     parser.add_argument("-i", "--input", dest="input", help="Input fasta file", required=True)
     parser.add_argument("-l", "--lsu", dest="lsu", help="LSU pattern", required=True)
     parser.add_argument("-s", "--ssu", dest="ssu", help="SSU pattern", required=True)
+
+    SSU_coords = "SSU_coords"
+    LSU_coords = "LSU_coords"
+    SSU_count = 0
+    LSU_count = 0
 
     if len(sys.argv) == 1:
         parser.print_help()

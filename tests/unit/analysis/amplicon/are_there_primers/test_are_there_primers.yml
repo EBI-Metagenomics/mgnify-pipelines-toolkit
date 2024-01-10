@@ -1,0 +1,16 @@
+- name: are_there_primers test_wrong_args
+  tags:
+    - are_there_primers
+  exit_code: 2 
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers --chromosome X
+  stderr:
+    contains:
+      - "are_there_primers.py: error: the following arguments are required: -i/--input, -s/--sample, -o/--output"
+- name: are_there_primers test_correct_args
+  tags:
+    - are_there_primers
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers -i tests/fixtures/sequences/test.fastq.gz -s sample -o ./
+  files:
+    - path: "sample_general_primer_out.txt"
+      md5sum: f2160c8ffedf48068f2e1137e0a3a7e7
+      

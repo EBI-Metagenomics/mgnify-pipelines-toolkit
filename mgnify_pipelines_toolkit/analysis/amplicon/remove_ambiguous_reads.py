@@ -13,7 +13,7 @@ def parse_args(argv=None):
     parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to forward (or single-end) fastq file")
     parser.add_argument("-r", "--rev", required=False, type=str, help="Path to reverse fastq file")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     
     _FWD = args.fwd
     _REV = args.rev

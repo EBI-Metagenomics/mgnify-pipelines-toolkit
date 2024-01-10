@@ -4,17 +4,17 @@ from collections import defaultdict
 
 import numpy as np
 
-from assess_mcp_proportions import fetch_mcp
-from utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
+from mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions import fetch_mcp
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
 
-def parse_args():
+def parse_args(argv=None):
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--input", required=True, type=str, help="Path to fastq file to check for primers")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     
     _PATH = args.input
     _SAMPLE = args.sample
@@ -95,9 +95,9 @@ def save_out(results, sample_id, output):
         fw.write(f'{results[1]}\n')
 
 
-def main():
+def main(argv=None):
 
-    _PATH, _SAMPLE, _OUTPUT = parse_args()
+    _PATH, _SAMPLE, _OUTPUT = parse_args(argv)
 
     fwd_primer_flag = are_there_primers_in_this_sample(_PATH) # Check for general primers in fwd
     rev_primer_flag = are_there_primers_in_this_sample(_PATH, rev=True) # Check for general primers in rev

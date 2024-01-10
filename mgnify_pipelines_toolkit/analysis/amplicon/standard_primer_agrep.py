@@ -6,7 +6,7 @@ import subprocess
 
 from Bio.Seq import Seq
 
-from utils import primer_regex_query_builder, get_read_count
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import primer_regex_query_builder, get_read_count
 
 # Folder containing the library of standard primers as fasta files
 _STD_PRIMERS = "/hps/software/users/rdf/metagenomics/service-team/users/chrisata/asv_gen/data/standard_primers"

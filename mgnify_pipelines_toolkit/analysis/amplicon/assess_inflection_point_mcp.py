@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from assess_mcp_proportions import fetch_mcp
-from utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
 
 def parse_args():
 

@@ -6,7 +6,7 @@ import subprocess
 import pandas as pd
 import numpy as np
 
-from utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
 
 def parse_args():
 

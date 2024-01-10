@@ -6,7 +6,7 @@ import gzip
 
 from Bio import SeqIO, bgzf
 
-def parse_args():
+def parse_args(argv=None):
 
     parser = argparse.ArgumentParser()
 
@@ -22,9 +22,9 @@ def parse_args():
     return _FWD, _REV, _SAMPLE
 
 
-def main():
+def main(argv=None):
 
-    _FWD, _REV, _SAMPLE = parse_args()
+    _FWD, _REV, _SAMPLE = parse_args(argv)
 
     fwd_handle = gzip.open(_FWD, "rt")
     fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))

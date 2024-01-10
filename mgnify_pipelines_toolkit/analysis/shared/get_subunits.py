@@ -20,7 +20,7 @@ LSU_rRNA_bacteria = "LSU_rRNA_bacteria"
 LSU_rRNA_eukarya = "LSU_rRNA_eukarya"
 
 
-def set_model_names(prefix, name):
+def set_model_names(prefix, name, directory):
     pattern_dict = {}
     pattern_dict[SSU] = os.path.join(directory, f'{name}_SSU.fasta')
     pattern_dict[SSU_rRNA_archaea] = os.path.join(directory, f'{prefix}{name}_{SSU_rRNA_archaea}.RF01959.fa')
@@ -60,7 +60,7 @@ def main():
         os.makedirs(directory_ncRNA)
 
     print('Start fasta mode')
-    pattern_dict = set_model_names(prefix, name)
+    pattern_dict = set_model_names(prefix, name, directory)
     coding_rna = [SSU_rRNA_archaea, SSU_rRNA_bacteria, SSU_rRNA_eukarya, SSU_rRNA_microsporidia,
                   LSU_rRNA_archaea, LSU_rRNA_bacteria, LSU_rRNA_eukarya, Seq5S, Seq5_8S]
     open_files = {}

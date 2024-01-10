@@ -1,0 +1,16 @@
+- name: get_subunits test_wrong_args
+  tags:
+    - get_subunits
+  exit_code: 2 
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits --chromosome X
+  stderr:
+    contains:
+      - "get_subunits.py: error: the following arguments are required: -i/--input, -n/--name"
+- name: get_subunits test_correct_args
+  tags:
+    - get_subunits
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/sequences/test.fasta -n sample
+  files:
+    - path: "sequence-categorisation/sample_SSU.fasta"
+      md5sum: fb23f13526672a300845b767dbc5fd44
+      

@@ -5,8 +5,14 @@ on:
     types: [published]
     
 jobs:
+  pytest:
+    - name: Run pytest
+      uses: pavelzw/pytest-action@v2
+
   build:
     name: Build distribution 📦
+    needs:
+    - pytest
     runs-on: ubuntu-latest
 
     steps:

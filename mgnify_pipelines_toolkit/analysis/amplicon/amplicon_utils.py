@@ -127,3 +127,55 @@ def build_mcp_cons_dict_list(mcp_count_dict, mcp_len):
         mcp_cons_list.append(index_base_dict)
     
     return mcp_cons_list
+
+def fetch_mcp(fastq, prefix_len, start=1, rev=False):
+    """
+    Runs a the "find_most_common_prefixes.sh" script to generate the mcps from a fastq file.
+
+    Outputs dictionary containing counts for each generated MCP in the fastq.
+
+    """
+
+    start = str(start)
+    prefix_len = str(prefix_len)
+
+    # Check strand requested
+    if not rev:
+        rev = '0'
+    else:
+        rev = '1'
+
+    cmd = [
+        'bash',
+        './mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh',
+        '-i',
+        fastq,
+        '-l',
+        prefix_len,
+        '-c',
+        '10',
+        '-b',
+        start,
+        '-r',
+        rev
+    ]
+
+    # Run command
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    
+    # Capture stdout
+    output = stdout.decode('ascii')
+    output = output.strip()
+    output = output.split('\n')
+
+    mcp_count_dict = defaultdict(int)
+
+    # Process output into mcp count dictionary
+    for line in output:
+        line = line.strip()
+        temp_lst = line.split(' ')
+        if len(temp_lst) == 2:
+            mcp_count_dict[temp_lst[1]] = int(temp_lst[0])
+
+    return mcp_count_dict

@@ -6,6 +6,7 @@ import subprocess
 import pandas as pd
 import numpy as np
 
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import fetch_mcp
 from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
 
 def parse_args():
@@ -25,59 +26,6 @@ def parse_args():
     _OUTPUT = args.output
 
     return _PATH, _SAMPLE, _STRAND, _OUTPUT
-
-def fetch_mcp(fastq, prefix_len, start=1, rev=False):
-    """
-    Runs a the "find_most_common_prefixes.sh" script to generate the mcps from a fastq file.
-
-    Outputs dictionary containing counts for each generated MCP in the fastq.
-
-    """
-
-    start = str(start)
-    prefix_len = str(prefix_len)
-
-    # Check strand requested
-    if not rev:
-        rev = '0'
-    else:
-        rev = '1'
-
-    cmd = [
-        'bash',
-        '/hps/software/users/rdf/metagenomics/service-team/users/chrisata/asv_gen/bin/find_most_common_prefixes.sh',
-        '-i',
-        fastq,
-        '-l',
-        prefix_len,
-        '-c',
-        '10',
-        '-b',
-        start,
-        '-r',
-        rev
-    ]
-
-    # Run command
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = proc.communicate()
-    
-    # Capture stdout
-    output = stdout.decode('ascii')
-    output = output.strip()
-    output = output.split('\n')
-
-    mcp_count_dict = defaultdict(int)
-
-    # Process output into mcp count dictionary
-    for line in output:
-        line = line.strip()
-        temp_lst = line.split(' ')
-        if len(temp_lst) == 2:
-            mcp_count_dict[temp_lst[1]] = int(temp_lst[0])
-
-    return mcp_count_dict
-
 
 def find_mcp_props_for_sample(_PATH, rev=False):
     """
@@ -106,7 +54,7 @@ def find_mcp_props_for_sample(_PATH, rev=False):
         end = str(end)
 
         read_count = get_read_count(_PATH, type='fastq') # get read count for fastq file
-        mcp_count_dict = fetch_mcp(_PATH, end, start, rev) # get MCP count dict 
+        mcp_count_dict = fetch_mcp(_PATH, end, start, rev) # get MCP count dict
         mcp_cons_list = build_mcp_cons_dict_list(mcp_count_dict, mcp_len) # list of base conservation dicts for mcps
         cons_seq, cons_conf = build_cons_seq(mcp_cons_list, read_count) # get list of max base conservations for each index
         

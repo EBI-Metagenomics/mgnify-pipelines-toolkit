@@ -1,0 +1,16 @@
+- name: find_mcp_inflection_points test_wrong_args
+  tags:
+    - find_mcp_inflection_points
+  exit_code: 2 
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.find_mcp_inflection_points --chromosome X
+  stderr:
+    contains:
+      - "find_mcp_inflection_points.py: error: the following arguments are required: -i/--input, -s/--sample, -o/--output"
+- name: find_mcp_inflection_points test_correct_args
+  tags:
+    - find_mcp_inflection_points
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.find_mcp_inflection_points -i tests/fixtures/misc/test_mcp_cons.tsv -s sample -o ./
+  files:
+    - path: "sample_inf_points.tsv"
+      md5sum: b4da973b056b9b5ed4ec7ca8d7998be4
+      

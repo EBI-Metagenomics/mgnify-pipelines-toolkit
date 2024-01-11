@@ -1,0 +1,17 @@
+- name: assess_mcp_proportions test_wrong_args
+  tags:
+    - assess_mcp_proportions
+  exit_code: 2 
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions --chromosome X
+  stderr:
+    contains:
+      - "assess_mcp_proportions.py: error: the following arguments are required: -i/--input, -s/--sample, -st/--strand, -o/--output"
+- name: assess_mcp_proportions test_correct_args
+  tags:
+    - assess_mcp_proportions
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions -i tests/fixtures/sequences/test.fastq.gz -s sample -st FR -o ./
+  files:
+    - path: "sample_mcp_cons.tsv"
+      md5sum: 875c712aadf9b21bd535e555dbb4b7e1
+
+      

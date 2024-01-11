@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "0.0.6"
+version = "0.0.7"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -32,9 +32,11 @@ packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis.shared",
             "mgnify_pipelines_toolkit.analysis.amplicon"
             ]
+script-files = ["mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh",
+                "mgnify_pipelines_toolkit/analysis/amplicon/primer_agrep.sh"
+                ]
 
 [project.scripts]
-# TODO figure out how to add bash scripts
 # analysis.shared
 get_subunits = "mgnify_pipelines_toolkit.analysis.shared.get_subunits:main"
 get_subunits_coords = "mgnify_pipelines_toolkit.analysis.shared.get_subunits_coords:main"

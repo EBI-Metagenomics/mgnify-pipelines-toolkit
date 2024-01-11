@@ -50,4 +50,3 @@ find_mcp_inflection_points = "mgnify_pipelines_toolkit.analysis.amplicon.find_mc
 make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"
 remove_ambiguous_reads = "mgnify_pipelines_toolkit.analysis.amplicon.remove_ambiguous_reads:main"
 rev_comp_se_primers = "mgnify_pipelines_toolkit.analysis.amplicon.rev_comp_se_primers:main"
-standard_primer_agrep = "mgnify_pipelines_toolkit.analysis.amplicon.standard_primer_agrep:main"

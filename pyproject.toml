@@ -34,6 +34,7 @@ packages = ["mgnify_pipelines_toolkit",
             ]
 
 [project.scripts]
+# TODO figure out how to add bash scripts
 # analysis.shared
 get_subunits = "mgnify_pipelines_toolkit.analysis.shared.get_subunits:main"
 get_subunits_coords = "mgnify_pipelines_toolkit.analysis.shared.get_subunits_coords:main"

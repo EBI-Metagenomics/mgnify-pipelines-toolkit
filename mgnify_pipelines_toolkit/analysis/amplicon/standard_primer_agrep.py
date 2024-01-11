@@ -8,29 +8,28 @@ from Bio.Seq import Seq
 
 from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import primer_regex_query_builder, get_read_count
 
-# Folder containing the library of standard primers as fasta files
-_STD_PRIMERS = "/hps/software/users/rdf/metagenomics/service-team/users/chrisata/asv_gen/data/standard_primers"
-
 def parse_args():
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--input", required=True, type=str, help="Path to merged FASTQ to look for primers")
+    parser.add_argument("-p", "--primers", required=True, type=str, help="Path to directory containing standard primers fasta files")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
     args = parser.parse_args()
   
     _INPUT = args.input
+    _PRIMERS = args.primers
     _SAMPLE = args.sample
     _OUTPUT = args.output
 
-    return _INPUT, _SAMPLE, _OUTPUT
+    return _INPUT, _PRIMERS, _SAMPLE, _OUTPUT
 
-def parse_std_primers():
+def parse_std_primers(_PRIMERS):
     """
     Parse the library of standard primers.
 
-    Reads the fasta files in the given directory "_STD_PRIMERS"
+    Reads the fasta files in the given directory
     Primer names (which are the fasta headers) are labeled with F or R for 5'-3' and 3'-5' primers respectively
 
     Returns two dictionaries:
@@ -45,8 +44,8 @@ def parse_std_primers():
     std_primer_dict_regex = defaultdict(defaultdict)
     std_primer_dict = defaultdict(defaultdict)
 
-    dir = os.listdir(_STD_PRIMERS)
-    dir = [ f'{_STD_PRIMERS}/{path}' for path in dir ]
+    dir = os.listdir(_PRIMERS)
+    dir = [ f'{_PRIMERS}/{path}' for path in dir ]
     
     rev_flag = False
 
@@ -82,7 +81,7 @@ def run_primer_agrep_once(input_path, input_primer, strand, mismatches=1):
 
     cmd = [
         'bash',
-        '/hps/software/users/rdf/metagenomics/service-team/users/chrisata/asv_gen/bin/primer_agrep.sh',
+        './mgnify_pipelines_toolkit/analysis/amplicon/primer_agrep.sh',
         '-i',
         input_path,
         '-p',
@@ -275,8 +274,8 @@ def save_out(results, sample_id, output, std_primer_dict):
     
 def main():
     
-    _INPUT, _SAMPLE, _OUTPUT = parse_args()
-    std_primer_dict_regex, std_primer_dict = parse_std_primers() # Parse std primer library into dictionaries
+    _INPUT, _PRIMERS, _SAMPLE, _OUTPUT = parse_args()
+    std_primer_dict_regex, std_primer_dict = parse_std_primers(_PRIMERS) # Parse std primer library into dictionaries
     results = get_primer_props(std_primer_dict_regex, _INPUT) # Find all the std primers in the input and select most common
     save_out(results, _SAMPLE, _OUTPUT, std_primer_dict)
     

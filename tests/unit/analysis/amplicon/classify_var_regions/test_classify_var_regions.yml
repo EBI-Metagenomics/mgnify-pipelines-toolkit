@@ -1,0 +1,18 @@
+- name: classify_var_regions test_wrong_args
+  tags:
+    - classify_var_regions
+  exit_code: 2 
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions --chromosome X
+  stderr:
+    contains:
+      - "classify_var_regions.py: error: unrecognized arguments: --chromosome"
+- name: classify_var_regions test_correct_args
+  tags:
+    - classify_var_regions
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits_coords -i tests/fixtures/misc/matched_seqs_with_coords.txt -s SSU -l LSU
+  files:
+    - path: "sample.tsv"
+      md5sum: aba8ff1cc6df1ce076633dd844b95d28
+    - path: "sample.16S.V3-V4.txt"
+      md5sum: 26b4cbbafdcfba30abb7ac561be0a40e
+      

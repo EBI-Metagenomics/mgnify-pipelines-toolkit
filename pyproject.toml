@@ -32,8 +32,7 @@ packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis.shared",
             "mgnify_pipelines_toolkit.analysis.amplicon"
             ]
-script-files = ["mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh",
-                "mgnify_pipelines_toolkit/analysis/amplicon/primer_agrep.sh"
+script-files = ["mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh"
                 ]
 
 [project.scripts]

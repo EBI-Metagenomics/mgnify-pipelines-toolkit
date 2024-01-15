@@ -107,6 +107,8 @@ def primer_regex_query_builder(primer):
         else:
             query += str(_AMBIGUOUS_BASES_DICT[char])
 
+    query = f"(.*{query}){{e<=1}}"
+
     return query
 
 def build_mcp_cons_dict_list(mcp_count_dict, mcp_len):

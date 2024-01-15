@@ -11,7 +11,7 @@ description = "Collection of scripts and tools for MGnify pipelines"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 
@@ -19,6 +19,7 @@ dependencies = [
     "biopython==1.81",
     "numpy==1.24.3",
     "pandas==2.0.2",
+    "regex==2023.12.25"
 ]
 
 [build-system]
@@ -32,7 +33,8 @@ packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis.shared",
             "mgnify_pipelines_toolkit.analysis.amplicon"
             ]
-script-files = ["mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh"
+script-files = ["mgnify_pipelines_toolkit/analysis/amplicon/find_most_common_prefixes.sh",
+                "mgnify_pipelines_toolkit/analysis/amplicon/primer_substrings.sh"
                 ]
 
 [project.scripts]

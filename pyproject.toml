@@ -51,3 +51,13 @@ find_mcp_inflection_points = "mgnify_pipelines_toolkit.analysis.amplicon.find_mc
 make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"
 remove_ambiguous_reads = "mgnify_pipelines_toolkit.analysis.amplicon.remove_ambiguous_reads:main"
 rev_comp_se_primers = "mgnify_pipelines_toolkit.analysis.amplicon.rev_comp_se_primers:main"
+
+[project.optional-dependencies]
+tests = [
+    "pytest==7.4.0",
+    "pytest-md==0.2.0",
+    "pytest-workflow==2.0.1",
+    "biopython==1.8.2",
+    "pandas==2.0.2",
+    "numpy==1.26.0"
+]

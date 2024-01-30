@@ -19,8 +19,7 @@ from collections import defaultdict
 
 import numpy as np
 
-from mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions import fetch_mcp
-from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list, fetch_mcp
 
 def parse_args(argv=None):
 

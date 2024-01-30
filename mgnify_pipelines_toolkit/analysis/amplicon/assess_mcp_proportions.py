@@ -65,7 +65,6 @@ def find_mcp_props_for_sample(_PATH, rev=False):
     for start in start_range:
 
         end = start+mcp_len-1 # compute the final index for the mcp (inclusive). Indices are of base 1 not 0.
-        end = str(end)
 
         read_count = get_read_count(_PATH, type='fastq') # get read count for fastq file
         mcp_count_dict = fetch_mcp(_PATH, end, start, rev) # get MCP count dict

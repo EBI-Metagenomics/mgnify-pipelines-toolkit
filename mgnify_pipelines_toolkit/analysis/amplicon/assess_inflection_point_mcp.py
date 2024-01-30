@@ -56,7 +56,6 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
     
     # TODO error handle for empty inflection point list
 
-
     start_confs = [] # pre-inf point conservations
     end_confs = [] # post-inf point conservations
     start_cons_lens = [] # list for storing lengths of pre-inflection point sequences

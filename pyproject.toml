@@ -16,8 +16,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "biopython==1.81",
-    "numpy==1.24.3",
+    "biopython==1.82",
+    "numpy==1.26.0",
     "pandas==2.0.2",
     "regex==2023.12.25"
 ]

@@ -22,7 +22,7 @@ import subprocess
 from Bio.Seq import Seq
 import regex
 
-from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import primer_regex_query_builder, get_read_count
+from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import primer_regex_query_builder, get_read_count, fetch_mcp
 
 def parse_args():
 
@@ -77,7 +77,7 @@ def parse_std_primers(_PRIMERS):
                     key = line[1:]
                 else:
                     if rev_flag:
-                        rev_conv = str(Seq(line).reverse_complement())
+                        rev_conv = str(Seq(line).complement())
                         line = rev_conv
                         rev_flag = False
 
@@ -87,7 +87,7 @@ def parse_std_primers(_PRIMERS):
 
     return std_primer_dict_regex, std_primer_dict
 
-def run_primer_matching_once(input_path, input_primer, strand, mismatches=1):
+def run_primer_matching_once(input_path, input_primer, rev=False):
     """
     Run primer matching using the regex package.
 
@@ -96,27 +96,15 @@ def run_primer_matching_once(input_path, input_primer, strand, mismatches=1):
     Returns number of reads matching given primer
     """
 
-    cmd = [
-        'bash',
-        './mgnify_pipelines_toolkit/analysis/amplicon/primer_substrings.sh',
-        '-i',
-        input_path,
-        '-s',
-        strand
-    ]
+    match_count = 0.0
 
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    proc.communicate()
+    mcp_count_dict = fetch_mcp(input_path, 50, rev=rev)
 
-    match_count = 0
-
-    with open('./substrings.txt', 'r') as fr:
-        for line in fr:
-            line = line.strip()
-            res = regex.match(input_primer, line)
-
-            if res != None:
-                match_count += 1.0
+    for mcp in mcp_count_dict.keys():
+        mcp = mcp.strip()
+        res = regex.match(input_primer, mcp)
+        if res != None:
+            match_count += mcp_count_dict[mcp]
 
     return match_count
 
@@ -150,9 +138,9 @@ def get_primer_props(std_primer_dict_regex, input_path):
             primer_count = 0.0
 
             if 'F' in primer_name:
-                primer_count = run_primer_matching_once(input_path, primer_seq, 'F', 1) # Get proportion of a F primer with fuzzy regex matching
+                primer_count = run_primer_matching_once(input_path, primer_seq, rev=False) # Get proportion of a F primer with fuzzy regex matching
             elif 'R' in primer_name:
-                primer_count = run_primer_matching_once(input_path, primer_seq, 'R', 1) # Get proportion of a R primer with fuzzy regex matching
+                primer_count = run_primer_matching_once(input_path, primer_seq, rev=True) # Get proportion of a R primer with fuzzy regex matching
 
             try:
                 primer_prop = primer_count / read_count
@@ -264,7 +252,7 @@ def save_out(results, sample_id, output, std_primer_dict):
             primer_prop = results[1][list(results[1].keys())[0]]
             seq = std_primer_dict[region][primer_name]
             if 'R' in primer_name:
-                seq = str(Seq(seq).reverse_complement())
+                seq = str(Seq(seq).complement())
             fw_out.write(f'{region}\n')
             fw_out.write(f'{primer_name}: {primer_prop}')
 
@@ -279,7 +267,7 @@ def save_out(results, sample_id, output, std_primer_dict):
             r_primer_name = list(results[2].keys())[0]
             r_primer_prop = results[2][list(results[2].keys())[0]]
             r_seq = std_primer_dict[region][r_primer_name]
-            r_seq = str(Seq(r_seq).reverse_complement())
+            r_seq = str(Seq(r_seq).complement())
             
 
             fw_out.write(f'{region}\n')

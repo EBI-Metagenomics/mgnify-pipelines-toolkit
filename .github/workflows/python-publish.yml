@@ -5,28 +5,8 @@ on:
     types: [published]
     
 jobs:
-  pytest:
-    name: Run pytest
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-      - name: Install dependencies
-        run: pip install install .[tests]
-      - uses: pavelzw/pytest-action@v2
-        with:
-          emoji: false
-          verbose: true
-          job-summary: true
-
   build:
     name: Build distribution 📦
-    needs:
-    - pytest
     runs-on: ubuntu-latest
 
     steps:

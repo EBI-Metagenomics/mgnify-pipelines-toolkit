@@ -113,20 +113,23 @@ def main():
 
     res_df = ''
 
-    match _STRAND: # Check for which strands need to be processed
-        case "FR": # Both forward and reverse
-            fwd_out = find_mcp_props_for_sample(_PATH)
-            rev_out = find_mcp_props_for_sample(_PATH, rev=True)
-            res_df = concat_out(fwd_out, rev_out)
-        case "F": # Only forward
-            fwd_out = find_mcp_props_for_sample(_PATH)
-            res_df = concat_out(fwd_out)
-        case "R": # Only reverse
-            rev_out = find_mcp_props_for_sample(_PATH, rev=True)
-            res_df = concat_out(rev_out=rev_out)
-        case _:
-            print("Incorrect strand input. Should be F for forward, R for reverse, or FR for both.")
-            exit(1)
+    # TODO: match-case statement is python 3.10>. We are currently locking the version
+    # at version 3.9. The day we bump the version we should replace these if statements
+    # with a match-case block.
+
+    if _STRAND == "FR":
+        fwd_out = find_mcp_props_for_sample(_PATH)
+        rev_out = find_mcp_props_for_sample(_PATH, rev=True)
+        res_df = concat_out(fwd_out, rev_out)
+    elif _STRAND == "F":
+        fwd_out = find_mcp_props_for_sample(_PATH)
+        res_df = concat_out(fwd_out)
+    elif _STRAND == "R":
+        rev_out = find_mcp_props_for_sample(_PATH, rev=True)
+        res_df = concat_out(rev_out=rev_out)
+    else:
+        print("Incorrect strand input. Should be F for forward, R for reverse, or FR for both.")
+        exit(1)
 
     # Save resulting dataframe to a tsv file
     res_df.to_csv(f'{_OUTPUT}/{_SAMPLE}_mcp_cons.tsv', sep='\t')

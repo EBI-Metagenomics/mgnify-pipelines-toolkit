@@ -15,18 +15,17 @@
 # limitations under the License.
 
 import argparse
-import sys
 
 from Bio import Seq, SeqIO
 
-def parse_args(argv=None):
+def parse_args():
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--input", required=True, type=str, help="Path to finalised primer list fasta file")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
   
     _INPUT = args.input
     _SAMPLE = args.sample
@@ -34,9 +33,9 @@ def parse_args(argv=None):
 
     return _INPUT, _SAMPLE, _OUTPUT
 
-def main(argv=None):
+def main():
     
-    _INPUT, _SAMPLE, _OUTPUT = parse_args(argv)
+    _INPUT, _SAMPLE, _OUTPUT = parse_args()
 
     primers_dict = SeqIO.to_dict(SeqIO.parse(_INPUT, "fasta"))
     

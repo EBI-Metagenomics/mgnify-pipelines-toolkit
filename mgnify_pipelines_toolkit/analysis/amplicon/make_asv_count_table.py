@@ -16,7 +16,13 @@
 
 import argparse
 from collections import defaultdict
+import logging
+
 import pandas as pd
+
+from mgnify_pipelines_toolkit.constants.tax_ranks import _SILVA_TAX_RANKS, _PR2_TAX_RANKS
+
+logging.basicConfig(level=logging.DEBUG)
 
 def parse_args():
 
@@ -44,11 +50,11 @@ def parse_args():
 def order_df(taxa_df):
 
     if len(taxa_df.columns) == 8:
-        taxa_df = taxa_df.sort_values(["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"], ascending=True)
+        taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
     elif len(taxa_df.columns) == 10:
-        taxa_df = taxa_df.sort_values(["Domain", "Supergroup", "Division", "Subdivision", "Class", "Order", "Family", "Genus", "Species"], ascending=True)
+        taxa_df = taxa_df.sort_values(_PR2_TAX_RANKS, ascending=True)
     else:
-        print("Data frame not the right size, something wrong.")
+        logging.error("Data frame not the right size, something wrong.")
         exit(1)
 
     return taxa_df

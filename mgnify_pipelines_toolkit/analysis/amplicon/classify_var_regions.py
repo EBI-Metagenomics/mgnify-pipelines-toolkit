@@ -449,7 +449,7 @@ def parse_args(argv):
     return parser.parse_args(argv)
 
 
-def main(argv):
+def main(argv=None):
     t_start = time.perf_counter()  # time the run
     args = parse_args(argv)
     if not os.path.isdir(args.output_dir):
@@ -481,7 +481,7 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
 
 # don't print json
 # name the tsv file better

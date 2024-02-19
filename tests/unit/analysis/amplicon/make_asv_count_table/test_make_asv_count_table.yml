@@ -11,6 +11,6 @@
     - make_asv_count_table
   command: python -m mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table -t tests/fixtures/asv_count_table/test_taxa.tsv -f tests/fixtures/asv_count_table/test_1_map.txt -r tests/fixtures/asv_count_table/test_2_map.txt -a tests/fixtures/asv_count_table/test.16S.V3-V4.txt -hd tests/fixtures/asv_count_table/headers.txt -s sample
   files:
-    - path: "sample_16S.V3-V4_asv_krona_counts.txt"
-      md5sum: d9bad313abd84329ac187ced4b92857e
+    - path: "sample_16S.V3-V4_silva_asv_krona_counts.txt"
+      md5sum: a0a009c48d496232bee91235129cc176
       

@@ -13,4 +13,10 @@
   files:
     - path: "sample_inf_points.tsv"
       md5sum: b4da973b056b9b5ed4ec7ca8d7998be4
-      
+- name: find_mcp_inflection_points test_large_file
+  tags:
+    - find_mcp_inflection_points
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.find_mcp_inflection_points -i tests/fixtures/misc/test_mcp_cons_big.tsv -s sample -o ./
+  files:
+    - path: "sample_inf_points.tsv"
+      md5sum: 80767a078f817aab1b9c67736d14093b

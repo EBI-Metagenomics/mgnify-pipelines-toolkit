@@ -65,14 +65,18 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
 
     read_count = get_read_count(_PATH) # get readcount from fastq
 
+    max_line_count = None
+    if read_count > 300_000:
+        max_line_count = 300_000
+
     n_prop = 0.8
 
     for start in inf_point_list: # Looping through the pre-inflection point mcps
         mcp_len = start + 4 # length of pre-inf mcps is inflection point + 4
 
-        mcp_count_dict = fetch_mcp(_PATH, mcp_len, rev=rev) # get MCP count dict 
+        mcp_count_dict = fetch_mcp(_PATH, mcp_len, rev=rev, max_line_count=max_line_count) # get MCP count dict 
         mcp_cons_list = build_mcp_cons_dict_list(mcp_count_dict, mcp_len) # list of base conservation dicts for mcps
-        cons_seq, cons_confs = build_cons_seq(mcp_cons_list, read_count, n_prop, do_not_include_list) # get list of max base conservations for each index
+        cons_seq, cons_confs = build_cons_seq(mcp_cons_list, read_count, n_prop, do_not_include_list, max_line_count=max_line_count) # get list of max base conservations for each index
                                                                                                     # also get consensus sequence
         cons_seq_list.append(cons_seq)
         start_confs.append(np.mean(cons_confs))
@@ -83,9 +87,9 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
         subs_len = start_cons_lens[i] # length of respective pre-inf point sequence
         l = mcp_len + subs_len - 1 # final index of MCP
 
-        mcp_count_dict = fetch_mcp(_PATH, l, mcp_len, rev=rev)
+        mcp_count_dict = fetch_mcp(_PATH, l, mcp_len, rev=rev, max_line_count=max_line_count)
         mcp_cons_list = build_mcp_cons_dict_list(mcp_count_dict, subs_len)
-        cons_seq, cons_confs = build_cons_seq(mcp_cons_list, read_count, n_prop, do_not_include_list, subs_len)
+        cons_seq, cons_confs = build_cons_seq(mcp_cons_list, read_count, n_prop, do_not_include_list, subs_len, max_line_count=max_line_count)
 
         end_confs.append(np.mean(cons_confs))
 

@@ -13,3 +13,10 @@
   files:
     - path: "sample_general_primer_out.txt"
       md5sum: f2160c8ffedf48068f2e1137e0a3a7e7
+- name: are_there_primers test_big_file
+  tags:
+    - are_there_primers
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers -i tests/fixtures/sequences/test_big.fastq.gz -s sample -o ./
+  files:
+    - path: "sample_general_primer_out.txt"
+      md5sum: f2160c8ffedf48068f2e1137e0a3a7e7

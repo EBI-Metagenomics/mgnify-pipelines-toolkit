@@ -13,3 +13,10 @@
   files:
     - path: "sample_mcp_cons.tsv"
       md5sum: 875c712aadf9b21bd535e555dbb4b7e1
+- name: assess_mcp_proportions test_large_file
+  tags:
+    - assess_mcp_proportions
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions -i tests/fixtures/sequences/test_big.fastq.gz -s sample -st FR -o ./
+  files:
+    - path: "sample_mcp_cons.tsv"
+      md5sum: 96e5ae1bdeed8af57a5f5b67c8e50ea7

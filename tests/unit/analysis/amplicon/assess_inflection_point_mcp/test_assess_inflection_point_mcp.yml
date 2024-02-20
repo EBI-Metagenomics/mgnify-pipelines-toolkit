@@ -13,3 +13,10 @@
   files:
     - path: "sample_auto_primers.fasta"
       md5sum: c36ff305d6aec14df3b7a61cb702101e
+- name: assess_inflection_point_mcp test_large_file
+  tags:
+    - assess_inflection_point_mcp
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.assess_inflection_point_mcp -i tests/fixtures/sequences/test_big.fastq.gz -p tests/fixtures/misc/test_inf_points_big.tsv -s sample -o ./
+  files:
+    - path: "sample_auto_primers.fasta"
+      md5sum: b6abc080cbb4390dce82b23fc176f3c2

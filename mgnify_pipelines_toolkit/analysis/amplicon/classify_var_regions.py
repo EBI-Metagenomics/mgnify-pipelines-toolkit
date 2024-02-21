@@ -24,54 +24,13 @@ import sys
 import json
 import time
 
+from mgnify_pipelines_toolkit.constants.thresholds import MIN_OVERLAP, MIN_SEQ_COUNT, MAX_ERROR_PROPORTION,MAX_INTERNAL_PRIMER_PROPORTION
+from mgnify_pipelines_toolkit.constants.var_region_coordinates import REGIONS_16S_BACTERIA, REGIONS_16S_ARCHAEA, REGIONS_18S
+
 raw_f_regex = re.compile(
     "([A-z0-9\.\-\:]+)\s+-\s+(\w+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([-+])\s+([-+])\s+(\d+)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(.+)\s!\s+.*")
 
-MIN_OVERLAP = 0.95
-
-MIN_SEQ_COUNT = 5000
-
-MAX_ERROR_PROPORTION = 0.01
-
-MAX_INTERNAL_PRIMER_PROPORTION = 0.2
-
-regions_16S_bacteria = {
-    'V1': [69, 92],
-    'V2': [131, 239],
-    'V3': [430, 487],
-    'V4': [566, 672],
-    'V5': [812, 869],
-    'V6': [976, 1033],
-    'V7': [1107, 1164],
-    'V8': [1234, 1285],
-    'V9': [1426, 1456]
-}
-
-regions_16S_archaea = {
-    'V1': [61, 79],
-    'V2': [114, 223],
-    'V3': [397, 436],
-    'V4': [516, 623],
-    'V5': [763, 824],
-    'V6': [932, 982],
-    'V7': [1056, 1119],
-    'V8': [1189, 1240],
-    'V9': [1372, 1410]
-}
-
-regions_18S = {
-    'V1': [69, 109],
-    'V2': [136, 298],
-    'V3': [474, 545],
-    'V4': [627, 873],
-    'V5': [1059, 1102],
-    'V7': [1366, 1454],
-    'V8': [1526, 1608],
-    'V9': [1728, 1795]
-}
-
 logging.basicConfig(level=logging.DEBUG)
-
 
 def calc_overlap(read, reg):
     read_s, read_f = read
@@ -207,11 +166,11 @@ def determine_cm(cm_detected):
         model: A dictionary containing the coordinates of the variable regions for the matched model.
     """
     if cm_detected == 'RF00177':
-        model = regions_16S_bacteria
+        model = REGIONS_16S_BACTERIA
     elif cm_detected == 'RF01959':
-        model = regions_16S_archaea
+        model = REGIONS_16S_ARCHAEA
     elif cm_detected == 'RF01960':
-        model = regions_18S
+        model = REGIONS_18S
     else:
         model = 'unsupported'
     return model

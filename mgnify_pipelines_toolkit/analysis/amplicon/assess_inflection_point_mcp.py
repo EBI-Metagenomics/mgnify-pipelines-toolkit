@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 
 from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list, fetch_mcp
+from mgnify_pipelines_toolkit.constants.thresholds import MCP_MAX_LINE_COUNT
 
 def parse_args():
 
@@ -66,8 +67,8 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
     read_count = get_read_count(_PATH) # get readcount from fastq
 
     max_line_count = None
-    if read_count > 300_000:
-        max_line_count = 300_000
+    if read_count > MCP_MAX_LINE_COUNT:
+        max_line_count = MCP_MAX_LINE_COUNT
 
     n_prop = 0.8
 

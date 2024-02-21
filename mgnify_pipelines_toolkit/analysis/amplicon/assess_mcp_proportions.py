@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 
 from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count, build_cons_seq, build_mcp_cons_dict_list, fetch_mcp
+from mgnify_pipelines_toolkit.constants.thresholds import MCP_MAX_LINE_COUNT
 
 def parse_args():
 
@@ -61,13 +62,17 @@ def find_mcp_props_for_sample(_PATH, rev=False):
     print(f'Processing {_PATH}')
 
     mcp_len = 5 # length of generated mcps
-    max_line_count = 300_000
 
     for start in start_range:
 
         end = start+mcp_len-1 # compute the final index for the mcp (inclusive). Indices are of base 1 not 0.
 
         read_count = get_read_count(_PATH, type='fastq') # get read count for fastq file
+        
+        max_line_count = None
+        if read_count > MCP_MAX_LINE_COUNT:
+            max_line_count = MCP_MAX_LINE_COUNT
+
         mcp_count_dict = fetch_mcp(_PATH, end, start, rev, max_line_count) # get MCP count dict
         mcp_cons_list = build_mcp_cons_dict_list(mcp_count_dict, mcp_len) # list of base conservation dicts for mcps
         cons_seq, cons_conf = build_cons_seq(mcp_cons_list, read_count, max_line_count=max_line_count) # get list of max base conservations for each index

@@ -70,10 +70,10 @@ def get_read_count(read_path, type='fastq'):
         grep_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = grep_proc.communicate()
 
-    read_count = stdout.strip()
+    read_count = stdout.strip() if stdout is not None else "" 
 
     if not read_count.isdigit():
-        logging.error("Read count is not a digit, something wrong.")
+        logging.error(f"Read count is not a digit, something is wrong. stdout: '{stdout}', stderr: '{stderr}'")
         exit(1)
 
     read_count = int(read_count)

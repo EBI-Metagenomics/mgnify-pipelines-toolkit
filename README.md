@@ -54,11 +54,11 @@ When you have setup this command, executing `get_subunits` on the command-line w
 
 `from mgnify_pipelines_toolkit.analysis.shared.get_subunits import main; main()`
 
-You should then write at least one unit test for your addition. This package uses `pytest` at the moment for this purpose.
+You should then write at least one unit test for your addition. This package uses `pytest` at the moment for this purpose. A GitHub Action workflow will run all of the unit tests whenever a commit is pushed to any branch.
 
 Finally, you will need to bump up the version in the `version` line.
 
 At the moment, these should be the only steps required to setup your script in this package (which is subject to change).
 
 ### Building and uploading to PyPi
-The building of the package is automated by GitHub actions, which will activate on a new pushed commit in any branch. The publishing to PyPi is similarly activated, though only on a new release. Bioconda should then automatically pick up the new PyPi release and push it to their recipes, though it's worth keeping an eye on their automated pull requests just in case [here](https://github.com/bioconda/bioconda-recipes/pulls).
+The building and pushing of the package is automated by GitHub Actions, which will activate only on a new release. Bioconda should then automatically pick up the new PyPi release and push it to their recipes, though it's worth keeping an eye on their automated pull requests just in case [here](https://github.com/bioconda/bioconda-recipes/pulls).

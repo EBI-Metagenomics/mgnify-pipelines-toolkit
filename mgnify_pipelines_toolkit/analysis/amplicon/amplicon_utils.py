@@ -15,11 +15,14 @@
 # limitations under the License.
 
 from collections import defaultdict, Counter
+import logging
 import gzip
 import os
 import subprocess
 
 from mgnify_pipelines_toolkit.constants.regex_ambiguous_bases import _AMBIGUOUS_BASES_DICT, _AMBIGUOUS_BASES_DICT_REV
+
+logging.basicConfig(level=logging.DEBUG)
 
 def split_dir_into_sample_paths(_DIR):
 
@@ -41,21 +44,21 @@ def get_read_count(read_path, type='fastq'):
             'zcat',
             read_path
         ]
-        proc_1 = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        zcat_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         cmd = [
             'sed',
             '-n',
             '1~4p',
         ]
-        proc_2 = subprocess.Popen(cmd, stdin=proc_1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sed_proc = subprocess.Popen(cmd, stdin=zcat_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         cmd = [
             'wc',
             '-l'
         ]
-        proc_3 = subprocess.Popen(cmd, stdin=proc_2.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc_3.communicate()
+        wc_proc = subprocess.Popen(cmd, stdin=sed_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = wc_proc.communicate()
 
     elif type == 'fasta':
         cmd = [
@@ -64,10 +67,16 @@ def get_read_count(read_path, type='fastq'):
             '^>',
             read_path
         ]
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate()
+        grep_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = grep_proc.communicate()
 
-    read_count = int(stdout.strip())
+    read_count = stdout.strip()
+
+    if not read_count.isdigit():
+        logging.error("Read count is not a digit, something wrong.")
+        exit(1)
+
+    read_count = int(read_count)
 
     return read_count
 
@@ -98,7 +107,7 @@ def build_cons_seq(cons_list, read_count, cons_threshold=0.80, do_not_include=No
             if base not in ('A', 'T', 'C', 'G'):
                 continue
 
-            if max_line_count == None:
+            if max_line_count is None:
                 cons_dict[base] = count/read_count
             else:
                 cons_dict[base] = count/max_line_count

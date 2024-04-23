@@ -87,7 +87,7 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
 
             if sk != "0":
                 sk = "_".join(sk.split(" "))
-                tax_assignment += f"{sk}"
+                tax_assignment += sk
             else:
                 break
 
@@ -170,7 +170,7 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
 
             if d != "0":
                 d = "_".join(d.split(" "))
-                tax_assignment += f"{d}"
+                tax_assignment += d
             else:
                 break
 

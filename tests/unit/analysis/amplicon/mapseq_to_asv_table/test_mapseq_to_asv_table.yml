@@ -1,0 +1,15 @@
+- name: mapseq_to_asv_table test_wrong_args
+  tags:
+    - mapseq_to_asv_table
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_table --chromosome X
+  stderr:
+    contains:
+      - "mapseq_to_asv_table.py: error: the following arguments are required: -i/--input, -l/--label, -s/--sample"
+- name: mapseq_to_asv_table test_correct_args
+  tags:
+    - mapseq_to_asv_table
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_table -i tests/fixtures/misc/test.mseq -l DADA2-SILVA -s test
+  files:
+    - path: "test_DADA2-SILVA_asv_taxa.tsv"
+      md5sum: 1544939da914651200bd871470c328d5

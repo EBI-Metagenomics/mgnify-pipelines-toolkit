@@ -30,13 +30,14 @@ You should then be able to run the packages from the command-line. For example t
 ### New script requirements
 
 There are a few requirements for your script:
+
 - It needs to have a named main function of some kind. See `mgnify_pipelines_toolkit/analysis/shared/get_subunits.py` and the `main()` function for an example
 - Because this package is meant to be run from the command-line, make sure your script can easily pass arguments using tools like `argparse` or `click`
 - A small amount of dependencies. This requirement is subjective, but for example if your script only requires a handful of basic packages like `Biopython`, `numpy`, `pandas`, etc., then it's fine. However if the script has a more extensive list of dependencies, a container is probably a better fit.
 
 ### How to add a new script
 
-To add a new Python script, first copy it over to the `mgnify_pipelines_toolkit` directory in this repository, specifically to the subdirectory that makes the most sense. If none of the subdirectories make sense for your script, create a new one. If your script doesn't have a `main()` type function yet, write one. 
+To add a new Python script, first copy it over to the `mgnify_pipelines_toolkit` directory in this repository, specifically to the subdirectory that makes the most sense. If none of the subdirectories make sense for your script, create a new one. If your script doesn't have a `main()` type function yet, write one.
 
 Then, open `pyproject.toml` as you will need to add some bits. First, add any missing dependencies (include the version) to the `dependencies` field.
 
@@ -48,7 +49,7 @@ Then, scroll down to the `[project.scripts]` line. Here, you will create an alia
 
 - `get_subunits` is the alias
 - `mgnify_pipelines_toolkit.analysis.shared.get_subunits` will link the alias to the script with the path `mgnify_pipelines_toolkit/analysis/shared/get_subunits.py`
-- `:main` will specifically call the function named `main()` when the alias is run. 
+- `:main` will specifically call the function named `main()` when the alias is run.
 
 When you have setup this command, executing `get_subunits` on the command-line will be the equivalent of doing:
 
@@ -61,4 +62,5 @@ Finally, you will need to bump up the version in the `version` line.
 At the moment, these should be the only steps required to setup your script in this package (which is subject to change).
 
 ### Building and uploading to PyPi
+
 The building and pushing of the package is automated by GitHub Actions, which will activate only on a new release. Bioconda should then automatically pick up the new PyPi release and push it to their recipes, though it's worth keeping an eye on their automated pull requests just in case [here](https://github.com/bioconda/bioconda-recipes/pulls).

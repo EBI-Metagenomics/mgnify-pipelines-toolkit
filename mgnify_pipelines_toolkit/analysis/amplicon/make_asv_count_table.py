@@ -28,7 +28,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to DADA2 taxa file")
+    parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
     parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
     parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
     parser.add_argument("-a", "--amp", required=True, type=str, help="Path to extracted amp_region reads from inference subworkflow")
@@ -49,7 +49,7 @@ def parse_args():
 
 def order_df(taxa_df):
 
-    if len(taxa_df.columns) == 8:
+    if len(taxa_df.columns) == 9:
         taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
     elif len(taxa_df.columns) == 10:
         taxa_df = taxa_df.sort_values(_PR2_TAX_RANKS, ascending=True)
@@ -66,11 +66,13 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
     for i in range(len(taxa_df)):
         
         sorted_index = taxa_df.index[i]
-        asv_count = asv_dict[sorted_index]
+        asv_num = taxa_df.iloc[i, 0]
+        asv_count = asv_dict[asv_num]
 
         if asv_count == 0:
             continue
 
+        sk = taxa_df.loc[sorted_index, "Superkingdom"]
         k = taxa_df.loc[sorted_index, "Kingdom"]
         p = taxa_df.loc[sorted_index, "Phylum"]
         c = taxa_df.loc[sorted_index, "Class"]
@@ -83,47 +85,53 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
 
         while True:
 
+            if sk != "0":
+                sk = "_".join(sk.split(" "))
+                tax_assignment += f"{sk}"
+            else:
+                break
+
             if k != "0":
                 k = "_".join(k.split(" "))
-                if k == "Archaea" or k == "Bacteria":
-                    tax_assignment += f"sk__{k}"
-                elif k == "Eukaryota":
-                    tax_assignment += f"sk__Eukaryota"
-                else:
-                    tax_assignment += f"sk__Eukaryota\tk__{k}"
+                tax_assignment += f"\t{k}"
+            elif sk != "0":
+                tax_assignment += f"\tk__"
             else:
                 break
 
             if p != "0":
-                if k == "Archaea" or k == "Bacteria":
-                    tax_assignment += f"\tk__"
                 p = "_".join(p.split(" "))
-                tax_assignment += f"\tp__{p}"
+                tax_assignment += f"\t{p}"
             else:
                 break
+
             if c != "0":
                 c = "_".join(c.split(" "))
-                tax_assignment += f"\tc__{c}"
+                tax_assignment += f"\t{c}"
             else:
                 break
+
             if o != "0":
                 o = "_".join(o.split(" "))
-                tax_assignment += f"\to__{o}"
+                tax_assignment += f"\t{o}"
             else:
                 break
+
             if f != "0":
                 f = "_".join(f.split(" "))
-                tax_assignment += f"\tf__{f}"
+                tax_assignment += f"\t{f}"
             else:
                 break
+
             if g != "0":
                 g = "_".join(g.split(" "))
-                tax_assignment += f"\tg__{g}"
+                tax_assignment += f"\t{g}"
             else:
                 break
+
             if s != "0":
                 s = "_".join(s.split(" "))
-                tax_assignment += f"\ts__{s}"
+                tax_assignment += f"\t{s}"
             break
 
         if tax_assignment == "":
@@ -140,7 +148,8 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
     for i in range(len(taxa_df)):
         
         sorted_index = taxa_df.index[i]
-        asv_count = asv_dict[sorted_index]
+        asv_num = taxa_df.iloc[i, 0]
+        asv_count = asv_dict[asv_num]
 
         if asv_count == 0:
             continue
@@ -161,45 +170,55 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
 
             if d != "0":
                 d = "_".join(d.split(" "))
-                tax_assignment += f"d__{d}"
+                tax_assignment += f"{d}"
             else:
                 break
 
             if sg != "0":
                 sg = "_".join(sg.split(" "))
-                tax_assignment += f"\tsg__{sg}"
+                tax_assignment += f"\t{sg}"
             else:
                 break
+
             if dv != "0":
                 dv = "_".join(dv.split(" "))
-                tax_assignment += f"\tdv__{dv}"
+                tax_assignment += f"\t{dv}"
+            else:
+                break
 
             if sdv != "0":
                 sdv = "_".join(sdv.split(" "))
-                tax_assignment += f"\tsdv__{sdv}"
+                tax_assignment += f"\t{sdv}"
+            else:
+                break
+
             if c != "0":
                 c = "_".join(c.split(" "))
-                tax_assignment += f"\tc__{c}"
+                tax_assignment += f"\t{c}"
             else:
                 break
+
             if o != "0":
                 o = "_".join(o.split(" "))
-                tax_assignment += f"\to__{o}"
+                tax_assignment += f"\t{o}"
             else:
                 break
+
             if f != "0":
                 f = "_".join(f.split(" "))
-                tax_assignment += f"\tf__{f}"
+                tax_assignment += f"\t{f}"
             else:
                 break
+
             if g != "0":
                 g = "_".join(g.split(" "))
-                tax_assignment += f"\tg__{g}"
+                tax_assignment += f"\t{g}"
             else:
                 break
+
             if s != "0":
                 s = "_".join(s.split(" "))
-                tax_assignment += f"\ts__{s}"
+                tax_assignment += f"\t{s}"
             break
 
         if tax_assignment == "":
@@ -253,7 +272,7 @@ def main():
             asv_intersection = fwd_asvs
 
         if headers[counter] in amp_reads:
-            asv_dict[int(asv_intersection[0]) - 1] += 1
+            asv_dict[f"seq_{int(asv_intersection[0]) - 1}"] += 1
     
     fwd_fr.close()
     if paired_end:
@@ -261,7 +280,7 @@ def main():
 
     ref_db = ""
 
-    if len(taxa_df.columns) == 8:
+    if len(taxa_df.columns) == 9:
         tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
         ref_db = "silva"
     elif len(taxa_df.columns) == 10:

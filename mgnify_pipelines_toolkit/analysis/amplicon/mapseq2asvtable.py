@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.DEBUG)
 def parse_args():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, type=str, help="Input")
+    parser.add_argument("-i", "--input", required=True, type=str, help="Input from MAPseq output")
     parser.add_argument("-l", "--label", choices=['DADA2-SILVA', 'DADA2-PR2'], required=True, type=str, help="Database label - either DADA2-SILVA or DADA2-PR2")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 

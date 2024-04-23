@@ -1,7 +1,7 @@
 - name: get_subunits test_wrong_args
   tags:
     - get_subunits
-  exit_code: 2 
+  exit_code: 2
   command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits --chromosome X
   stderr:
     contains:
@@ -13,4 +13,3 @@
   files:
     - path: "sequence-categorisation/sample_SSU.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44
-      

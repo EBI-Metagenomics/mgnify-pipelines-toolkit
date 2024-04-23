@@ -1,7 +1,7 @@
 - name: make_asv_count_table test_wrong_args
   tags:
     - make_asv_count_table
-  exit_code: 2 
+  exit_code: 2
   command: python -m mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table --chromosome X
   stderr:
     contains:
@@ -13,4 +13,3 @@
   files:
     - path: "sample_concat.txt_silva_asv_krona_counts.txt"
       md5sum: 7f3ba50efddb2a223df601498c40ad12
-      

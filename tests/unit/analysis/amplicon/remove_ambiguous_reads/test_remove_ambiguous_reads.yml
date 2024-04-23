@@ -1,7 +1,7 @@
 - name: remove_ambiguous_reads test_wrong_args
   tags:
     - remove_ambiguous_reads
-  exit_code: 2 
+  exit_code: 2
   command: python mgnify_pipelines_toolkit/analysis/amplicon/remove_ambiguous_reads.py --chromosome X
   stderr:
     contains:

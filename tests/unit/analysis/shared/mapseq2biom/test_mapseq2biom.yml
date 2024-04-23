@@ -1,7 +1,7 @@
 - name: mapseq2biom test_wrong_args
   tags:
     - mapseq2biom
-  exit_code: 2 
+  exit_code: 2
   command: python -m mgnify_pipelines_toolkit.analysis.shared.mapseq2biom --chromosome X
   stderr:
     contains:
@@ -15,4 +15,3 @@
       md5sum: 8f5b16db9a82e4f2cc200d65ff500083
     - path: "sample.notaxid.tsv"
       md5sum: 3b79bb013dcceaaace095e5d5fd32505
-      

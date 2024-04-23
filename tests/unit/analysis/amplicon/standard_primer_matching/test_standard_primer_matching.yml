@@ -1,7 +1,7 @@
 - name: standard_primer_matching test_wrong_args
   tags:
     - standard_primer_matching
-  exit_code: 2 
+  exit_code: 2
   command: python -m mgnify_pipelines_toolkit.analysis.amplicon.standard_primer_matching --chromosome X
   stderr:
     contains:

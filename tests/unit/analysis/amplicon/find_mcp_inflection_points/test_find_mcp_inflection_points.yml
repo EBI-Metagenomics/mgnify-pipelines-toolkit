@@ -1,7 +1,7 @@
 - name: find_mcp_inflection_points test_wrong_args
   tags:
     - find_mcp_inflection_points
-  exit_code: 2 
+  exit_code: 2
   command: python -m mgnify_pipelines_toolkit.analysis.amplicon.find_mcp_inflection_points --chromosome X
   stderr:
     contains:

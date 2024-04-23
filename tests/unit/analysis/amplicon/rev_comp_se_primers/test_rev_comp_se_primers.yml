@@ -1,7 +1,7 @@
 - name: test_wrong_args
   tags:
     - rev_comp_se_primers
-  exit_code: 2 
+  exit_code: 2
   command: python mgnify_pipelines_toolkit/analysis/amplicon/rev_comp_se_primers.py --chromosome X
   stderr:
     contains:

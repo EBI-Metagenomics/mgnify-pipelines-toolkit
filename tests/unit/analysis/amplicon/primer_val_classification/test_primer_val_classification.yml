@@ -1,0 +1,15 @@
+- name: primer_val_classification test_wrong_args
+  tags:
+    - primer_val_classification
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification --chromosome X
+  stderr:
+    contains:
+      - "primer_val_classification.py: error: the following arguments are required: -i/--input, -f/--fasta, -s/--sample"
+- name: primer_val_classification test_correct_args
+  tags:
+    - primer_val_classification
+  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification -i tests/fixtures/misc/f_and_r_primers_cmsearch.tbl.deoverlapped -f tests/fixtures/sequences/f_and_r_primers.fasta -s test
+  files:
+    - path: "test_primer_validation.tsv"
+      md5sum: 953e749f8d42c4ac89cc84c4afd55731

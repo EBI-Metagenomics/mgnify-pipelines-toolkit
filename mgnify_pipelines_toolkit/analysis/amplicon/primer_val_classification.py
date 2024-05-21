@@ -1,3 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 from collections import defaultdict
@@ -9,14 +24,13 @@ import pandas as pd
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import REGIONS_16S_BACTERIA, REGIONS_16S_ARCHAEA, REGIONS_18S
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-i", "--input", required=True, type=str, help="Path to cmsearch_deoverlap_tblout file")
     parser.add_argument("-f", "--fasta", required=True, type=str, help="Path to concatenated primers fasta file")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     args = parser.parse_args()
-    
+
     _INPUT = args.input
     _FASTA = args.fasta
     _SAMPLE = args.sample
@@ -25,7 +39,6 @@ def parse_args():
 
 
 def get_amp_region(beg, strand, model):
-
     prev_region = ""
 
     for region, region_coords in model.items():
@@ -39,20 +52,20 @@ def get_amp_region(beg, strand, model):
         else:
             if beg_diff > 0:
                 return prev_region
-        
+
         prev_region = region
 
     return prev_region
 
-def main():
 
+def main():
     _INPUT, _FASTA, _SAMPLE = parse_args()    
     res_dict = defaultdict(list)
     fasta_dict = SeqIO.to_dict(SeqIO.parse(_FASTA, "fasta"))
 
     with open(_INPUT, "r") as fr:
         for line in fr:
-            line = line.strip()            
+            line = line.strip()
             line = re.sub("[ \t]+", "\t", line)
             line_lst = line.split("\t")
 
@@ -60,16 +73,16 @@ def main():
             rfam = line_lst[3]
             beg = float(line_lst[5])
 
-            if rfam == 'RF00177':
+            if rfam == "RF00177":
                 gene = "16S"
                 model = REGIONS_16S_BACTERIA
-            elif rfam == 'RF01959':
+            elif rfam == "RF01959":
                 gene = "16S"
                 model = REGIONS_16S_ARCHAEA
-            elif rfam == 'RF01960':
+            elif rfam == "RF01960":
                 gene = "18S"
                 model = REGIONS_18S
-            else: 
+            else:
                 continue
 
             res_dict["Run"].append(_SAMPLE)
@@ -80,7 +93,7 @@ def main():
 
             if "F" in primer_name:
                 strand = "fwd"
-            elif "R" in primer_name: 
+            elif "R" in primer_name:
                 strand = "rev"
 
             amp_region = get_amp_region(beg, strand, model)
@@ -91,7 +104,6 @@ def main():
             res_dict["PrimerName"].append(primer_name)
             res_dict["PrimerStrand"].append(strand)
             res_dict["PrimerSeq"].append(primer_seq)
-
 
     res_df = pd.DataFrame.from_dict(res_dict)
     res_df.to_csv(f"./{_SAMPLE}_primer_validation.tsv", sep="\t", index=False)

@@ -25,13 +25,14 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import _SILVA_TAX_RANKS, _PR2_
 logging.basicConfig(level=logging.DEBUG)
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
     parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
     parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
-    parser.add_argument("-a", "--amp", required=True, type=str, help="Path to extracted amp_region reads from inference subworkflow")
+    parser.add_argument(
+        "-a", "--amp", required=True, type=str, help="Path to extracted amp_region reads from inference subworkflow"
+    )
     parser.add_argument("-hd", "--headers", required=True, type=str, help="Path to fastq headers")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 
@@ -48,7 +49,6 @@ def parse_args():
 
 
 def order_df(taxa_df):
-
     if len(taxa_df.columns) == 9:
         taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
     elif len(taxa_df.columns) == 10:
@@ -60,11 +60,9 @@ def order_df(taxa_df):
     return taxa_df
 
 def make_tax_assignment_dict_silva(taxa_df, asv_dict):
-
     tax_assignment_dict = defaultdict(int)
 
     for i in range(len(taxa_df)):
-        
         sorted_index = taxa_df.index[i]
         asv_num = taxa_df.iloc[i, 0]
         asv_count = asv_dict[asv_num]
@@ -78,7 +76,7 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
         c = taxa_df.loc[sorted_index, "Class"]
         o = taxa_df.loc[sorted_index, "Order"]
         f = taxa_df.loc[sorted_index, "Family"]
-        g = taxa_df.loc[sorted_index, "Genus"]        
+        g = taxa_df.loc[sorted_index, "Genus"]
         s = taxa_df.loc[sorted_index, "Species"]
 
         tax_assignment = ""
@@ -142,11 +140,9 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
     return tax_assignment_dict
 
 def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
-
     tax_assignment_dict = defaultdict(int)
 
     for i in range(len(taxa_df)):
-        
         sorted_index = taxa_df.index[i]
         asv_num = taxa_df.iloc[i, 0]
         asv_count = asv_dict[asv_num]
@@ -162,12 +158,11 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
         o = taxa_df.loc[sorted_index, "Order"]
         f = taxa_df.loc[sorted_index, "Family"]
         g = taxa_df.loc[sorted_index, "Genus"]
-        s = taxa_df.loc[sorted_index, "Species"]         
+        s = taxa_df.loc[sorted_index, "Species"]
 
         tax_assignment = ""
 
         while True:
-
             if d != "0":
                 d = "_".join(d.split(" "))
                 tax_assignment += d
@@ -229,9 +224,8 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
     return tax_assignment_dict
 
 def main():
-
     _TAXA, _FWD, _REV, _AMP, _HEADERS, _SAMPLE = parse_args()
-    
+
     fwd_fr = open(_FWD, "r")
     paired_end = True
 
@@ -244,28 +238,28 @@ def main():
     taxa_df = pd.read_csv(_TAXA, sep="\t", dtype=str)
     taxa_df = taxa_df.fillna("0")
     taxa_df = order_df(taxa_df)
-    
-    amp_reads = [ read.strip() for read in list(open(_AMP, "r")) ]
-    headers = [ read.split(" ")[0][1:] for read in list(open(_HEADERS, "r")) ]
+
+    amp_reads = [read.strip() for read in list(open(_AMP, "r"))]
+    headers = [read.split(" ")[0][1:] for read in 
+               list(open(_HEADERS, "r"))]
     amp_region = ".".join(_AMP.split(".")[1:3])
 
     asv_dict = defaultdict(int)
 
     counter = -1
     for line_fwd in fwd_fr:
-
         counter += 1
         line_fwd = line_fwd.strip()
         fwd_asvs = line_fwd.split(",")
 
         if paired_end:
             line_rev = next(rev_fr).strip()
-            rev_asvs = line_rev.split(",")        
+            rev_asvs = line_rev.split(",")
             asv_intersection = list(set(fwd_asvs).intersection(rev_asvs))
-            
+
             if len(asv_intersection) == 0:
                 continue
-            
+
             if len(asv_intersection) == 1 and asv_intersection[0] == "0":
                 continue
         else:
@@ -273,7 +267,7 @@ def main():
 
         if headers[counter] in amp_reads:
             asv_dict[f"seq_{int(asv_intersection[0]) - 1}"] += 1
-    
+
     fwd_fr.close()
     if paired_end:
         rev_fr.close()
@@ -290,7 +284,7 @@ def main():
     with open(f"./{_SAMPLE}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
         for tax_assignment, count in tax_assignment_dict.items():
             fw.write(f"{count}\t{tax_assignment}\n")
-    
+
 
 if __name__ == "__main__":
     main()

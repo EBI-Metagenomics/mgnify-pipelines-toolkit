@@ -47,17 +47,10 @@ def get_read_count(read_path, type='fastq'):
         zcat_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         cmd = [
-            'sed',
-            '-n',
-            '1~4p',
-        ]
-        sed_proc = subprocess.Popen(cmd, stdin=zcat_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        cmd = [
             'wc',
             '-l'
         ]
-        wc_proc = subprocess.Popen(cmd, stdin=sed_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        wc_proc = subprocess.Popen(cmd, stdin=zcat_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = wc_proc.communicate()
 
     elif type == 'fasta':
@@ -77,6 +70,9 @@ def get_read_count(read_path, type='fastq'):
         exit(1)
 
     read_count = int(read_count)
+
+    if type == 'fastq':
+        read_count /= 4
 
     return read_count
 

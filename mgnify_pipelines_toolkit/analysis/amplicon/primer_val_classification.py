@@ -23,6 +23,9 @@ import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import REGIONS_16S_BACTERIA, REGIONS_16S_ARCHAEA, REGIONS_18S
 
+STRAND_FWD = "fwd"
+STRAND_REV = "rev"
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -46,7 +49,7 @@ def get_amp_region(beg, strand, model):
         region_beg = region_coords[0]
         beg_diff = region_beg - beg
 
-        if strand == "fwd":
+        if strand == STRAND_FWD:
             if beg_diff > 0:
                 return region
         else:
@@ -92,9 +95,9 @@ def main():
             strand = ""
 
             if "F" in primer_name:
-                strand = "fwd"
+                strand = STRAND_FWD
             elif "R" in primer_name:
-                strand = "rev"
+                strand = STRAND_REV
 
             amp_region = get_amp_region(beg, strand, model)
             primer_seq = str(fasta_dict[primer_name].seq)

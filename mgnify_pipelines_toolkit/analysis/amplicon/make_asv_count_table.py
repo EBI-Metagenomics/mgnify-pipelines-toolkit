@@ -223,6 +223,24 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
 
     return tax_assignment_dict
 
+def generate_asv_count_dict(asv_dict):
+
+    res_dict = defaultdict(list)
+
+    for asv_id, count in asv_dict.items():
+
+        if count == 0:
+            continue
+
+        res_dict['asv'].append(asv_id)
+        res_dict['count'].append(count)
+
+    res_df = pd.DataFrame.from_dict(res_dict)
+    res_df = res_df.sort_values(by='count', ascending=False)
+
+    return res_df
+
+
 def main():
     _TAXA, _FWD, _REV, _AMP, _HEADERS, _SAMPLE = parse_args()
 
@@ -250,23 +268,12 @@ def main():
     for line_fwd in fwd_fr:
         counter += 1
         line_fwd = line_fwd.strip()
-        fwd_asvs = line_fwd.split(",")
 
-        if paired_end:
-            line_rev = next(rev_fr).strip()
-            rev_asvs = line_rev.split(",")
-            asv_intersection = list(set(fwd_asvs).intersection(rev_asvs))
-
-            if len(asv_intersection) == 0:
-                continue
-
-            if len(asv_intersection) == 1 and asv_intersection[0] == "0":
-                continue
-        else:
-            asv_intersection = fwd_asvs
+        if line_fwd == '0':
+            continue
 
         if headers[counter] in amp_reads:
-            asv_dict[f"seq_{int(asv_intersection[0]) - 1}"] += 1
+            asv_dict[f"seq_{line_fwd}"] += 1
 
     fwd_fr.close()
     if paired_end:
@@ -285,6 +292,8 @@ def main():
         for tax_assignment, count in tax_assignment_dict.items():
             fw.write(f"{count}\t{tax_assignment}\n")
 
+    asv_count_df = generate_asv_count_dict(asv_dict)
+    asv_count_df.to_csv(f'./{_SAMPLE}_{amp_region}_asv_read_counts.tsv', sep='\t', index=False)
 
 if __name__ == "__main__":
     main()

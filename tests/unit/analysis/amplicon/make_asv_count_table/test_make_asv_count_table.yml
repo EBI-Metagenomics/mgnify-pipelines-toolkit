@@ -14,4 +14,4 @@
     - path: "sample_concat.txt_pr2_asv_krona_counts.txt"
       md5sum: 5b9ee7fe1109d728ab18a95c232b0c1b
     - path: "sample_concat.txt_asv_read_counts.tsv"
-      md5sum: e449c65abb1706d770de36b90f4a0333
+      md5sum: f195ac10c5ed58ea5e5fa91955554da7

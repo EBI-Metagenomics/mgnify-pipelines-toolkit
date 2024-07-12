@@ -17,14 +17,12 @@
 import argparse
 from collections import defaultdict
 import logging
-import random
 
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import _SILVA_TAX_RANKS, _PR2_TAX_RANKS
 
 logging.basicConfig(level=logging.DEBUG)
-random.seed(12)
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -238,6 +236,7 @@ def generate_asv_count_dict(asv_dict):
         res_dict['count'].append(count)
 
     res_df = pd.DataFrame.from_dict(res_dict)
+    res_df = res_df.sort_values(by='asv', ascending=True)
     res_df = res_df.sort_values(by='count', ascending=False)
 
     return res_df

@@ -37,20 +37,32 @@ def main():
     for record in res['records']:
         record_id = record['id']
 
+        protocluster_start = ''
+        protocluster_end = ''
+
         for row in record['features']:
+
+            if row['type'] == 'protocluster':
+                protocluster_start = int(row['location'].split(':')[0].split('[')[1])
+                protocluster_end = int(row['location'].split(':')[1].split(']')[0])
+
             if row['type'] == 'CDS':
 
                 if 'antismash.detection.genefunctions' not in record['modules'].keys():
+                    continue
+
+                row_start = int(row['location'].split(':')[0][1:])
+                row_end = int(row['location'].split(':')[1].split(']')[0])
+
+                if protocluster_start == '' or protocluster_start > row_start or protocluster_end < row_end:
                     continue
 
                 res_dict['contig'].append(record_id)
                 res_dict['version'].append(f'antiSMASH:{antismash_ver}')
                 res_dict['type'].append('CDS')
 
-                row_start = row['location'].split(':')[0][1:]
                 res_dict['start'].append(row_start)
                 
-                row_end = row['location'].split(':')[1].split(']')[0]
                 res_dict['end'].append(row_end)
 
                 res_dict['score'].append(".")
@@ -69,8 +81,8 @@ def main():
                     row_type = row['qualifiers']['gene_kind'][0]
                     note_str += f";as_type={row_type}"
 
-                    # row_functions = ','.join(row['qualifiers']['gene_functions'])
-                    # note_str += f"gene_functions={row_functions};"
+                    row_functions = ','.join(row['qualifiers']['gene_functions']).replace(' ', '_').replace(':_', ':').replace(';_', ';')
+                    note_str += f";gene_functions={row_functions}"
 
                 else:
                     note_str += f";as_type=other"
@@ -84,7 +96,8 @@ def main():
                     if 'cds_name' in row.keys():
                         row_id = row['cds_name']
                         row_as_clusters = ','.join(list(row['definition_domains'].keys()))
-                        note_dict[row_id] += f';as_gene_clusters={row_as_clusters}'
+                        if row_id in note_dict.keys():
+                            note_dict[row_id] += f';as_gene_clusters={row_as_clusters}'
 
         if 'antismash.detection.genefunctions' in record['modules'].keys():
             for tool in record['modules']['antismash.detection.genefunctions']['tools']:
@@ -100,11 +113,9 @@ def main():
                             note_str += f'smCOG%3A%20{hit_id}%A{hit_desc}%20%28Score%3A%20{score}%3B%20E-value%3A%20{eval}%29%3B'
                         else:
                             note_str += f';as_notes=smCOG%3A%20{hit_id}%A{hit_desc}%20%28Score%3A%20{score}%3B%20E-value%3A%20{eval}%29%3B'
-
-                        note_dict[best_hit] += note_str
+                        if best_hit in note_dict.keys():
+                            note_dict[best_hit] += note_str
                         break
-
-
 
 
     note_col = note_dict.values()
@@ -112,11 +123,6 @@ def main():
 
     res_df = pd.DataFrame.from_dict(res_dict)
     res_df.to_csv(f"{SAMPLE}_test.gff", header=False, index=False, sep='\t')
-
-    # print(res['records'][25]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'][0])
-    # print(res['records'][25]['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster'][0][1][0]['cds_name'])
-    # print(res['records'][25]['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster'][0][1][0]['definition_domains'].keys())
-    # print(res['records'][25]['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster'][0][1][0].keys())
 
 if __name__ == "__main__":
     main()

@@ -24,16 +24,14 @@ def parse_args():
 
     return FWD, REV, SAMPLE, OUTPUT
 
-
 def choose_open_func(file_path):
 
     open_func = open
 
-    if file_path[-2:] == 'gz':
+    if file_path[-2:] == "gz":
         open_func = gzip.open
 
     return open_func
-
 
 def main():
     
@@ -60,7 +58,7 @@ def main():
 
     for file in files_to_parse:
 
-        header_str = ''
+        header_str = ""
 
         if "_1" in file:
             header_str = "/1"
@@ -72,25 +70,25 @@ def main():
         for counter, line in enumerate(open_func(file)):
 
             if counter % 4 == 0: # Only do stuff every four lines to hit the header
-                line = line.decode('ascii').strip()
+                line = line.decode("ascii").strip()
                 curr_read_strand = line[-2:]
 
                 if curr_read_strand != header_str:
                     reads_with_err[file].append(line)
-                    reads_with_err['total'].append(1)
+                    reads_with_err["total"].append(1)
 
     if len(reads_with_err) != 0:
-        
-        num_of_reads_with_err = len(reads_with_err['total'])
-        reads_with_err['total'] = num_of_reads_with_err
-        
+
+        num_of_reads_with_err = len(reads_with_err["total"])
+        reads_with_err["total"] = num_of_reads_with_err
+
         logging.error(f"Found {num_of_reads_with_err} reads with header strands that don't match file suffix. See log file at {OUTPUT}/{SAMPLE}_suffix_header_err.json")
         
         with open(f"{OUTPUT}/{SAMPLE}_suffix_header_err.json", 'w') as fw: # Writes JSON file containing the headers of reads with errors
             json.dump(reads_with_err, fw)
 
     else:
-        with open(f"{OUTPUT}/{SAMPLE}_suffix_header_err.json", 'w') as fw: # Will create an empty file if there are no errors
+        with open(f"{OUTPUT}/{SAMPLE}_suffix_header_err.json", 'w') as fw: # Creates an empty file if there are no errors
             print("No errors.")
 
 if __name__ == "__main__":

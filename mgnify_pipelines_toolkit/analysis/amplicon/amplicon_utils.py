@@ -212,10 +212,10 @@ def fetch_mcp(fastq, prefix_len, start=1, rev=False, max_line_count=None):
             line = line.strip()
             if i % 4 == 1:
                 if not rev:
-                    selected_lines.append(line[start - 1: start + prefix_len - 1])
+                    selected_lines.append(line[start - 1 : start + prefix_len - 1])
                 else:
                     rev_line = line[::-1]
-                    selected_lines.append(rev_line[start - 1: start + prefix_len - 1])
+                    selected_lines.append(rev_line[start - 1 : start + prefix_len - 1])
             if max_line_count is not None:
                 if len(selected_lines) > max_line_count:
                     break

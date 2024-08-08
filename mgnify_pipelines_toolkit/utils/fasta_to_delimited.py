@@ -21,14 +21,15 @@ import csv
 import hashlib
 import gzip
 from Bio import SeqIO
-from mgnify_pipelines_toolkit.constants.regex_fasta_header import _FORMAT_REGEX_MAP
+from mgnify_pipelines_toolkit.constants.regex_fasta_header import FORMAT_REGEX_MAP
+
 
 def is_gzipped(filepath):
     with open(filepath, 'rb') as test_f:
         return test_f.read(2) == b'\x1f\x8b'
 
 def guess_header_format(header):
-    matches = [(format, re.search(regex, header)) for format, regex in _FORMAT_REGEX_MAP.items()]
+    matches = [(format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()]
     guesses = [(format, match.groups()) for format, match in matches if match is not None]
 
     if not guesses:
@@ -57,47 +58,47 @@ def parse_args():
 
     args = parser.parse_args()
     
-    _PATH = args.input
-    _OUTPUT = args.output
-    _FORMAT = args.format
-    _DELIMITER = args.delimiter
-    _WITH_HASH = args.with_hash
-    _NO_HEADER = args.no_header
+    path = args.input
+    output = args.output
+    format = args.format
+    delimiter = args.delimiter
+    with_hash = args.with_hash
+    no_header = args.no_header
 
-    return _PATH, _OUTPUT, _FORMAT, _DELIMITER, _WITH_HASH, _NO_HEADER
+    return path, output, format, delimiter, with_hash, no_header
 
 
 def main():
-    _PATH, _OUTPUT, _FORMAT, _DELIMITER, _WITH_HASH, _NO_HEADER = parse_args()
+    path, output, format, delimiter, with_hash, no_header = parse_args()
 
-    if is_gzipped(_PATH):
-        input_fh = gzip.open(_PATH, mode="rt")
+    if is_gzipped(path):
+        input_fh = gzip.open(path, mode="rt")
     else:
-        input_fh = open(_PATH, mode="rt")
+        input_fh = open(path, mode="rt")
 
-    if _OUTPUT is None:
+    if output is None:
         output_fh = sys.stdout
     else:
-        output_fh = open(_OUTPUT, mode="w", newline="")
+        output_fh = open(output, mode="w", newline="")
 
-    if _FORMAT != "auto":
-        header_regex = re.compile(_FORMAT_REGEX_MAP[_FORMAT])
+    if format != "auto":
+        header_regex = re.compile(FORMAT_REGEX_MAP[format])
     else:
         header, _ = next(SeqIO.FastaIO.SimpleFastaParser(input_fh))
         format = guess_header_format(header)
-        header_regex = re.compile(_FORMAT_REGEX_MAP[format])
+        header_regex = re.compile(FORMAT_REGEX_MAP[format])
         input_fh.seek(0)
 
     fieldnames = list(header_regex.groupindex.keys())
 
-    if _WITH_HASH:
+    if with_hash:
         fieldnames += ["sequence_hash"]
 
     fieldnames += ["sequence"]
 
-    csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=_DELIMITER, extrasaction="ignore")
+    csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
 
-    if not _NO_HEADER:
+    if not no_header:
         csv_writer.writeheader()
 
     for header, sequence in SeqIO.FastaIO.SimpleFastaParser(input_fh):
@@ -108,7 +109,7 @@ def main():
         if header_match:
             row.update(header_match.groupdict())
 
-        if _WITH_HASH:
+        if with_hash:
             row["sequence_hash"] = md5_hash(sequence)
 
         csv_writer.writerow(row)

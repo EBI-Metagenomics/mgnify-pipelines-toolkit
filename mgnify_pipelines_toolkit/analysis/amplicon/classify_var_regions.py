@@ -328,14 +328,6 @@ def retrieve_regions(tblout_file_list, outfile_prefix, stats_out, condensed_out,
             continue
 
         normalised_matches[run_id] = dict()
-
-        # filter out domains with <1%
-        # multiregion_matches = {d: v for d, v in multiregion_matches.items() if len(v)/len(data) >= 0.01}
-
-
-
-        run_ok = True
-        
         region_counter = defaultdict(int)
 
         regions_to_remove = []
@@ -363,18 +355,12 @@ def retrieve_regions(tblout_file_list, outfile_prefix, stats_out, condensed_out,
                 full_region = f'{marker_gene}.{region}'
                 if full_region not in regions_to_remove:
                     new_value.append(region)
-            if new_value == []:
+            if not new_value:
                 models_to_remove.append(model)
             multiregion_matches[model] = new_value
         
         [ multiregion_matches.pop(model) for model in models_to_remove ]
         print(multiregion_matches)
-            # if len(value) < MIN_SEQ_COUNT:
-            #     run_ok = False
-        # if not run_ok:
-        #     failed_run_counter += 1
-        #     logging.info('No output will be produced - too few sequences in a domain')
-        #     continue
 
         run_status = 'one'
         run_result = dict()
@@ -476,6 +462,3 @@ def main(argv=None):
 
 if __name__ == '__main__':
     main()
-
-# don't print json
-# name the tsv file better

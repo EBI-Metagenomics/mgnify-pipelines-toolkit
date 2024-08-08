@@ -21,9 +21,12 @@ import numpy as np
 
 from mgnify_pipelines_toolkit.constants.thresholds import MIN_AMPLICON_STRATEGY_CHECK
 
+
 def parse_args():
 
-    parser = argparse.ArgumentParser(description="Script that checks the output of assess_mcp_proportions.py to guess whether a FASTQ file is AMPLICON or NOT AMPLICON.")
+    parser = argparse.ArgumentParser(
+        description="Script that checks the output of assess_mcp_proportions.py to guess whether a FASTQ file is AMPLICON or NOT AMPLICON."
+    )
     parser.add_argument("-i", "--input", required=True, type=str, help="Input")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output")
@@ -38,10 +41,10 @@ def parse_args():
 
 
 def main():
-    
+
     input, sample, output = parse_args()
 
-    cons_df = pd.read_csv(input, sep='\t')
+    cons_df = pd.read_csv(input, sep="\t")
 
     cons_values = cons_df.values[0][1:]
     mean_cons = np.mean(cons_values)
@@ -50,13 +53,14 @@ def main():
 
     if mean_cons >= MIN_AMPLICON_STRATEGY_CHECK:
         print("This data is likely to be AMPLICON.")
-        fw.write("AMPLICON") # File with "AMPLICON" written as a result.
+        fw.write("AMPLICON")  # File with "AMPLICON" written as a result.
 
     else:
         print("This data is unlikely to be AMPLICON.")
         # If unlikely to be AMPLICON, the output file will be empty.
 
     fw.close()
+
 
 if __name__ == "__main__":
     main()

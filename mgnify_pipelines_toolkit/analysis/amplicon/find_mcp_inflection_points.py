@@ -20,21 +20,29 @@ import argparse
 import pandas as pd
 import numpy as np
 
+
 def parse_args():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--input", required=True, type=str, help="Path to mcp tsv file to find inflection points")
+    parser.add_argument(
+        "-i",
+        "--input",
+        required=True,
+        type=str,
+        help="Path to mcp tsv file to find inflection points",
+    )
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
 
     args = parser.parse_args()
-    
-    _PATH = args.input
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
 
-    return _PATH, _SAMPLE, _OUTPUT
+    path = args.input
+    sample = args.sample
+    output = args.output
+
+    return path, sample, output
+
 
 def find_mcp_inf_points(mcp_df):
     """
@@ -50,43 +58,52 @@ def find_mcp_inf_points(mcp_df):
     """
 
     inf_point_dict = defaultdict(list)
-    start_indices = [ int(i) for i in mcp_df.columns.tolist() ]
+    start_indices = [int(i) for i in mcp_df.columns.tolist()]
 
-    for i in range(len(mcp_df)): # Loop through both possible strands of the mcp_df
+    for i in range(len(mcp_df)):  # Loop through both possible strands of the mcp_df
         strand = mcp_df.index[i]
         props = mcp_df.iloc[i].tolist()
-        props = [ -val for val in props ] 
+        props = [-val for val in props]
 
-        prop_diff = np.diff(props)/np.diff(start_indices) # Get the derivative
-        infl_points = np.where(prop_diff > np.percentile(prop_diff, 80))[0] # Grab points above 80th percentile
+        prop_diff = np.diff(props) / np.diff(start_indices)  # Get the derivative
+        infl_points = np.where(prop_diff > np.percentile(prop_diff, 80))[
+            0
+        ]  # Grab points above 80th percentile
 
         for ind in infl_points:
             inf_point = start_indices[ind]
 
-            if inf_point < 10 or inf_point > 20: # Rule to facilitate results - won't accept 
-                continue                         # points below index 10 or above index 20
-                                                 # 10 means a cutoff of 15 and 20 a cutoff of 25
-                                                 # literature points to no primers existing that are 
-                                                 # shorter or bigger  than these lengths
+            if (
+                inf_point < 10 or inf_point > 20
+            ):  # Rule to facilitate results - won't accept
+                continue  # points below index 10 or above index 20
+                # 10 means a cutoff of 15 and 20 a cutoff of 25
+                # literature points to no primers existing that are
+                # shorter or bigger  than these lengths
 
-            inf_point_dict['strand'].append(strand)
-            inf_point_dict['inf_point'].append(inf_point)
-    
+            inf_point_dict["strand"].append(strand)
+            inf_point_dict["inf_point"].append(inf_point)
+
     return inf_point_dict
+
 
 def main():
 
-    _PATH, _SAMPLE, _OUTPUT = parse_args()
+    path, sample, output = parse_args()
 
-    mcp_df = pd.read_csv(_PATH, sep='\t', index_col=0) # Read mcp_df
-    inf_point_dict = find_mcp_inf_points(mcp_df) # Generate inflection points dict
+    mcp_df = pd.read_csv(path, sep="\t", index_col=0)  # Read mcp_df
+    inf_point_dict = find_mcp_inf_points(mcp_df)  # Generate inflection points dict
 
-    if len(inf_point_dict) > 0: # If the inf_point_dict isn't empty..
-        inf_point_df = pd.DataFrame.from_dict(inf_point_dict) # .. turn it into a dataframe
-        inf_point_df.to_csv(f'{_OUTPUT}/{_SAMPLE}_inf_points.tsv', sep='\t', index=False) # ..save it to a .tsv file
+    if len(inf_point_dict) > 0:  # If the inf_point_dict isn't empty..
+        inf_point_df = pd.DataFrame.from_dict(
+            inf_point_dict
+        )  # .. turn it into a dataframe
+        inf_point_df.to_csv(
+            f"{output}/{sample}_inf_points.tsv", sep="\t", index=False
+        )  # ..save it to a .tsv file
 
-    else: # If it is empty..
-        fw = open(f'{_OUTPUT}/{_SAMPLE}_inf_points.tsv', 'w') # ..make an empty file
+    else:  # If it is empty..
+        fw = open(f"{output}/{sample}_inf_points.tsv", "w")  # ..make an empty file
         fw.close()
 
 

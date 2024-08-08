@@ -15,6 +15,6 @@
 # limitations under the License.
 
 FORMAT_REGEX_MAP = {
-    "uniprotkb": r"^(?P<db>\w+)\|(?P<unique_identifier>\w+)\|(?P<entry_name>\w+)\s(?P<protein_name>.+)\sOS=(?P<organism_name>.+)\sOX=(?P<organism_identifier>\d+)(\sGN=(?P<gene_name>.+))?\sPE=(?P<protein_existence>\d+)\sSV=(?P<sequence_version>\d+)",
-    "rpxx": r"^(?P<unique_identifier>\S+)\s(?P<entry_name>\S+)\^\|\^.*\^\|\^(?P<protein_name>.+)\^\|\^.*\^\|\^.*\^\|\^(?P<organism_name>.+)\^\|\^(?P<organism_identifier>\d+)\^\|\^(?P<common_tax_name>.+)\^\|\^(?P<common_tax_identifier>\d+)"
+    "uniprotkb": r"^(?P<db>\w+)\|(?P<unique_identifier>\w+)\|(?P<entry_name>\w+)\s(?P<protein_name>.+)\sOS=(?P<organism_name>.+)\sOX=(?P<organism_identifier>\d+)(\sGN=(?P<gene_name>.+))?\sPE=(?P<protein_existence>\d+)\sSV=(?P<sequence_version>\d+)",  # noqa: E501
+    "rpxx": r"^(?P<unique_identifier>\S+)\s(?P<entry_name>\S+)\^\|\^.*\^\|\^(?P<protein_name>.+)\^\|\^.*\^\|\^.*\^\|\^(?P<organism_name>.+)\^\|\^(?P<organism_identifier>\d+)\^\|\^(?P<common_tax_name>.+)\^\|\^(?P<common_tax_identifier>\d+)",  # noqa: E501
 }

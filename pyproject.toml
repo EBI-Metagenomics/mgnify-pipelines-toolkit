@@ -27,7 +27,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["mgnify_pipelines_toolkit", 
+packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis",
             "mgnify_pipelines_toolkit.constants",
             "mgnify_pipelines_toolkit.utils",
@@ -63,4 +63,10 @@ tests = [
     "biopython==1.82",
     "pandas==2.0.2",
     "numpy==1.26.0"
+]
+
+dev = [
+    "mgnify_pipelines_toolkit[tests]",
+    "pre-commit==3.8.0",
+    "flake8==7.1.1"
 ]

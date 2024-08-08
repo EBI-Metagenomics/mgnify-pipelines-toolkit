@@ -78,7 +78,7 @@ def main():
     if _OUTPUT is None:
         output_fh = sys.stdout
     else:
-        output_fh = open(_PATH, mode="w", newline="")
+        output_fh = open(_OUTPUT, mode="w", newline="")
 
     if _FORMAT != "auto":
         header_regex = re.compile(_FORMAT_REGEX_MAP[_FORMAT])

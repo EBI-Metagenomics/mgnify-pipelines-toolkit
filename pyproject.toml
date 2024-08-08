@@ -30,6 +30,7 @@ build-backend = "setuptools.build_meta"
 packages = ["mgnify_pipelines_toolkit", 
             "mgnify_pipelines_toolkit.analysis",
             "mgnify_pipelines_toolkit.constants",
+            "mgnify_pipelines_toolkit.utils",
             "mgnify_pipelines_toolkit.analysis.shared",
             "mgnify_pipelines_toolkit.analysis.amplicon"
             ]

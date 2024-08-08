@@ -68,5 +68,6 @@ tests = [
 dev = [
     "mgnify_pipelines_toolkit[tests]",
     "pre-commit==3.8.0",
+    "black==24.8.0",
     "flake8==7.1.1"
 ]

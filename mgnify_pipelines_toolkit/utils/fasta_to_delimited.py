@@ -28,6 +28,7 @@ def is_gzipped(filepath):
     with open(filepath, 'rb') as test_f:
         return test_f.read(2) == b'\x1f\x8b'
 
+
 def guess_header_format(header):
     matches = [(format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()]
     guesses = [(format, match.groups()) for format, match in matches if match is not None]
@@ -39,11 +40,13 @@ def guess_header_format(header):
 
     return guessed_format
 
+
 def md5_hash(s):
     md5 = hashlib.md5()
     md5.update(s.encode('utf-8'))
 
     return md5.hexdigest()
+
 
 def parse_args():
 

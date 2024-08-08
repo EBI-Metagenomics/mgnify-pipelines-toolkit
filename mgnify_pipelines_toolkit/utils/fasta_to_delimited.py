@@ -84,41 +84,39 @@ def main():
     else:
         output_fh = open(output, mode="w", newline="")
 
-    if format != "auto":
-        header_regex = re.compile(FORMAT_REGEX_MAP[format])
-    else:
-        header, _ = next(SeqIO.FastaIO.SimpleFastaParser(input_fh))
-        format = guess_header_format(header)
-        header_regex = re.compile(FORMAT_REGEX_MAP[format])
-        input_fh.seek(0)
+    with input_fh, output_fh:
+        if format != "auto":
+            header_regex = re.compile(FORMAT_REGEX_MAP[format])
+        else:
+            header, _ = next(SeqIO.FastaIO.SimpleFastaParser(input_fh))
+            format = guess_header_format(header)
+            header_regex = re.compile(FORMAT_REGEX_MAP[format])
+            input_fh.seek(0)
 
-    fieldnames = list(header_regex.groupindex.keys())
-
-    if with_hash:
-        fieldnames.append("sequence_hash")
-
-    fieldnames.append("sequence")
-
-    csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
-
-    if not no_header:
-        csv_writer.writeheader()
-
-    for header, sequence in SeqIO.FastaIO.SimpleFastaParser(input_fh):
-        header_match = header_regex.match(header)
-
-        row = {"sequence": sequence}
-
-        if header_match:
-            row.update(header_match.groupdict())
+        fieldnames = list(header_regex.groupindex.keys())
 
         if with_hash:
-            row["sequence_hash"] = md5_hash(sequence)
+            fieldnames.append("sequence_hash")
 
-        csv_writer.writerow(row)
+        fieldnames.append("sequence")
 
-    input_fh.close()
-    output_fh.close()
+        csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
+
+        if not no_header:
+            csv_writer.writeheader()
+
+        for header, sequence in SeqIO.FastaIO.SimpleFastaParser(input_fh):
+            header_match = header_regex.match(header)
+
+            row = {"sequence": sequence}
+
+            if header_match:
+                row.update(header_match.groupdict())
+
+            if with_hash:
+                row["sequence_hash"] = md5_hash(sequence)
+
+            csv_writer.writerow(row)
 
 
 if __name__ == "__main__":

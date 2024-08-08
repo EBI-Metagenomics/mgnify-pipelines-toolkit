@@ -20,24 +20,40 @@ import logging
 
 import pandas as pd
 
-from mgnify_pipelines_toolkit.constants.tax_ranks import _SILVA_TAX_RANKS, _PR2_TAX_RANKS
+from mgnify_pipelines_toolkit.constants.tax_ranks import (
+    _SILVA_TAX_RANKS,
+    _PR2_TAX_RANKS,
+)
 
 logging.basicConfig(level=logging.DEBUG)
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
-    parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
-    parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
     parser.add_argument(
-        "-a", "--amp", required=True, type=str, help="Path to extracted amp_region reads from inference subworkflow"
+        "-t", "--taxa", required=True, type=str, help="Path to taxa file"
     )
-    parser.add_argument("-hd", "--headers", required=True, type=str, help="Path to fastq headers")
+    parser.add_argument(
+        "-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file"
+    )
+    parser.add_argument(
+        "-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file"
+    )
+    parser.add_argument(
+        "-a",
+        "--amp",
+        required=True,
+        type=str,
+        help="Path to extracted amp_region reads from inference subworkflow",
+    )
+    parser.add_argument(
+        "-hd", "--headers", required=True, type=str, help="Path to fastq headers"
+    )
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 
     args = parser.parse_args()
-  
+
     _TAXA = args.taxa
     _FWD = args.fwd
     _REV = args.rev
@@ -58,6 +74,7 @@ def order_df(taxa_df):
         exit(1)
 
     return taxa_df
+
 
 def make_tax_assignment_dict_silva(taxa_df, asv_dict):
     tax_assignment_dict = defaultdict(int)
@@ -93,7 +110,7 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
                 k = "_".join(k.split(" "))
                 tax_assignment += f"\t{k}"
             elif sk != "0":
-                tax_assignment += f"\tk__"
+                tax_assignment += "\tk__"
             else:
                 break
 
@@ -136,8 +153,9 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
             continue
 
         tax_assignment_dict[tax_assignment] += asv_count
-    
+
     return tax_assignment_dict
+
 
 def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
     tax_assignment_dict = defaultdict(int)
@@ -223,6 +241,7 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
 
     return tax_assignment_dict
 
+
 def generate_asv_count_dict(asv_dict):
 
     res_dict = defaultdict(list)
@@ -232,12 +251,12 @@ def generate_asv_count_dict(asv_dict):
         if count == 0:
             continue
 
-        res_dict['asv'].append(asv_id)
-        res_dict['count'].append(count)
+        res_dict["asv"].append(asv_id)
+        res_dict["count"].append(count)
 
     res_df = pd.DataFrame.from_dict(res_dict)
-    res_df = res_df.sort_values(by='asv', ascending=True)
-    res_df = res_df.sort_values(by='count', ascending=False)
+    res_df = res_df.sort_values(by="asv", ascending=True)
+    res_df = res_df.sort_values(by="count", ascending=False)
 
     return res_df
 
@@ -248,7 +267,7 @@ def main():
     fwd_fr = open(_FWD, "r")
     paired_end = True
 
-    if _REV == None:
+    if _REV is None:
         paired_end = False
         rev_fr = [True]
     else:
@@ -259,8 +278,7 @@ def main():
     taxa_df = order_df(taxa_df)
 
     amp_reads = [read.strip() for read in list(open(_AMP, "r"))]
-    headers = [read.split(" ")[0][1:] for read in 
-               list(open(_HEADERS, "r"))]
+    headers = [read.split(" ")[0][1:] for read in list(open(_HEADERS, "r"))]
     amp_region = ".".join(_AMP.split(".")[1:3])
 
     asv_dict = defaultdict(int)
@@ -270,7 +288,7 @@ def main():
         counter += 1
         line_fwd = line_fwd.strip()
 
-        if line_fwd == '0':
+        if line_fwd == "0":
             continue
 
         if headers[counter] in amp_reads:
@@ -294,7 +312,10 @@ def main():
             fw.write(f"{count}\t{tax_assignment}\n")
 
     asv_count_df = generate_asv_count_dict(asv_dict)
-    asv_count_df.to_csv(f'./{_SAMPLE}_{amp_region}_asv_read_counts.tsv', sep='\t', index=False)
+    asv_count_df.to_csv(
+        f"./{_SAMPLE}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
+    )
+
 
 if __name__ == "__main__":
     main()

@@ -21,16 +21,33 @@ import re
 from Bio import SeqIO
 import pandas as pd
 
-from mgnify_pipelines_toolkit.constants.var_region_coordinates import REGIONS_16S_BACTERIA, REGIONS_16S_ARCHAEA, REGIONS_18S
+from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
+    REGIONS_16S_BACTERIA,
+    REGIONS_16S_ARCHAEA,
+    REGIONS_18S,
+)
 
 STRAND_FWD = "fwd"
 STRAND_REV = "rev"
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--input", required=True, type=str, help="Path to cmsearch_deoverlap_tblout file")
-    parser.add_argument("-f", "--fasta", required=True, type=str, help="Path to concatenated primers fasta file")
+    parser.add_argument(
+        "-i",
+        "--input",
+        required=True,
+        type=str,
+        help="Path to cmsearch_deoverlap_tblout file",
+    )
+    parser.add_argument(
+        "-f",
+        "--fasta",
+        required=True,
+        type=str,
+        help="Path to concatenated primers fasta file",
+    )
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     args = parser.parse_args()
 
@@ -62,7 +79,7 @@ def get_amp_region(beg, strand, model):
 
 
 def main():
-    _INPUT, _FASTA, _SAMPLE = parse_args()    
+    _INPUT, _FASTA, _SAMPLE = parse_args()
     res_dict = defaultdict(list)
     fasta_dict = SeqIO.to_dict(SeqIO.parse(_FASTA, "fasta"))
 

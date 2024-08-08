@@ -22,9 +22,12 @@ import pandas as pd
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, type=str, help="Input from MAPseq output")
+    parser.add_argument(
+        "-i", "--input", required=True, type=str, help="Input from MAPseq output"
+    )
     parser.add_argument(
         "-l",
         "--label",
@@ -43,12 +46,42 @@ def parse_args():
 
     return _INPUT, _LABEL, _SAMPLE
 
+
 def parse_label(label):
     silva_short_ranks = ["sk__", "k__", "p__", "c__", "o__", "f__", "g__", "s__"]
-    pr2_short_ranks = ["d__", "sg__", "dv__", "sdv__", "c__", "o__", "f__", "g__", "s__"]
+    pr2_short_ranks = [
+        "d__",
+        "sg__",
+        "dv__",
+        "sdv__",
+        "c__",
+        "o__",
+        "f__",
+        "g__",
+        "s__",
+    ]
 
-    silva_long_ranks = ["Superkingdom", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
-    pr2_long_ranks = ["Domain", "Supergroup", "Division", "Subdivision", "Class", "Order", "Family", "Genus", "Species"]
+    silva_long_ranks = [
+        "Superkingdom",
+        "Kingdom",
+        "Phylum",
+        "Class",
+        "Order",
+        "Family",
+        "Genus",
+        "Species",
+    ]
+    pr2_long_ranks = [
+        "Domain",
+        "Supergroup",
+        "Division",
+        "Subdivision",
+        "Class",
+        "Order",
+        "Family",
+        "Genus",
+        "Species",
+    ]
 
     chosen_short_ranks = ""
     chosen_long_ranks = ""
@@ -64,6 +97,7 @@ def parse_label(label):
         exit(1)
 
     return chosen_short_ranks, chosen_long_ranks
+
 
 def parse_mapseq(mseq_df, short_ranks, long_ranks):
     res_dict = defaultdict(list)
@@ -91,7 +125,8 @@ def parse_mapseq(mseq_df, short_ranks, long_ranks):
             res_dict[curr_rank].append(curr_tax)
     res_df = pd.DataFrame.from_dict(res_dict)
 
-    return(res_df)
+    return res_df
+
 
 def process_blank_tax_ends(res_df, ranks):
     # Necessary function as we want to replace consecutive blank assignments that start at the last rank as NAs
@@ -105,7 +140,9 @@ def process_blank_tax_ends(res_df, ranks):
         ):  # Parse an assignment backwards, from Species all the way to Superkingdom/Domain
             curr_rank = res_df.iloc[i, j + 1]
             if curr_rank in ranks:
-                if last_empty_rank == "":  # Last rank is empty, start window of consecutive blanks
+                if (
+                    last_empty_rank == ""
+                ):  # Last rank is empty, start window of consecutive blanks
                     last_empty_rank = j + 1
                     currently_empty = True
                 elif (
@@ -124,7 +161,7 @@ def process_blank_tax_ends(res_df, ranks):
     return res_df
 
 
-def main():    
+def main():
     _INPUT, _LABEL, _SAMPLE = parse_args()
 
     mseq_df = pd.read_csv(_INPUT, header=1, delim_whitespace=True, usecols=[0, 12])
@@ -134,6 +171,7 @@ def main():
     final_res_df = process_blank_tax_ends(res_df, short_ranks)
 
     final_res_df.to_csv(f"./{_SAMPLE}_{_LABEL}_asv_taxa.tsv", sep="\t", index=False)
+
 
 if __name__ == "__main__":
     main()

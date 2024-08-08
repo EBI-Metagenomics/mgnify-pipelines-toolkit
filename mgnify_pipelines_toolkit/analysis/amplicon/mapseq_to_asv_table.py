@@ -40,11 +40,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    _INPUT = args.input
-    _LABEL = args.label
-    _SAMPLE = args.sample
+    input = args.input
+    label = args.label
+    sample = args.sample
 
-    return _INPUT, _LABEL, _SAMPLE
+    return input, label, sample
 
 
 def parse_label(label):
@@ -162,15 +162,15 @@ def process_blank_tax_ends(res_df, ranks):
 
 
 def main():
-    _INPUT, _LABEL, _SAMPLE = parse_args()
+    input, label, sample = parse_args()
 
-    mseq_df = pd.read_csv(_INPUT, header=1, delim_whitespace=True, usecols=[0, 12])
+    mseq_df = pd.read_csv(input, header=1, delim_whitespace=True, usecols=[0, 12])
 
-    short_ranks, long_ranks = parse_label(_LABEL)
+    short_ranks, long_ranks = parse_label(label)
     res_df = parse_mapseq(mseq_df, short_ranks, long_ranks)
     final_res_df = process_blank_tax_ends(res_df, short_ranks)
 
-    final_res_df.to_csv(f"./{_SAMPLE}_{_LABEL}_asv_taxa.tsv", sep="\t", index=False)
+    final_res_df.to_csv(f"./{sample}_{label}_asv_taxa.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":

@@ -48,15 +48,15 @@ def parse_args():
 
     args = parser.parse_args()
 
-    _PATH = args.input
-    _POINTS = args.points
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
+    path = args.input
+    points = args.points
+    sample = args.sample
+    output = args.output
 
-    return _PATH, _POINTS, _SAMPLE, _OUTPUT
+    return path, points, sample, output
 
 
-def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
+def assess_inflection_point_mcp_for_sample(path, inf_point_list, rev=False):
     """
     Assess inflection point list, selecting one for automatic primer trimming.
 
@@ -81,7 +81,7 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
         i + 5 for i in inf_point_list
     ]  # ignore conservation of inflection point in calculation
 
-    read_count = get_read_count(_PATH)  # get readcount from fastq
+    read_count = get_read_count(path)  # get readcount from fastq
 
     max_line_count = None
     if read_count > MCP_MAX_LINE_COUNT:
@@ -93,7 +93,7 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
         mcp_len = start + 4  # length of pre-inf mcps is inflection point + 4
 
         mcp_count_dict = fetch_mcp(
-            _PATH, mcp_len, rev=rev, max_line_count=max_line_count
+            path, mcp_len, rev=rev, max_line_count=max_line_count
         )  # get MCP count dict
         mcp_cons_list = build_mcp_cons_dict_list(
             mcp_count_dict, mcp_len
@@ -118,7 +118,7 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
         l = mcp_len + subs_len - 1  # final index of MCP
 
         mcp_count_dict = fetch_mcp(
-            _PATH, l, mcp_len, rev=rev, max_line_count=max_line_count
+            path, l, mcp_len, rev=rev, max_line_count=max_line_count
         )
         mcp_cons_list = build_mcp_cons_dict_list(mcp_count_dict, subs_len)
         cons_seq, cons_confs = build_cons_seq(
@@ -171,8 +171,8 @@ def assess_inflection_point_mcp_for_sample(_PATH, inf_point_list, rev=False):
 
 def main():
 
-    _PATH, _POINTS, _SAMPLE, _OUTPUT = parse_args()
-    inf_df = pd.read_csv(_POINTS, sep="\t")
+    path, points, sample, output = parse_args()
+    inf_df = pd.read_csv(points, sep="\t")
 
     f_slice = inf_df[inf_df.strand == "F"]  # get forward inflection points
     r_slice = inf_df[inf_df.strand == "R"]  # get reverse inflection points
@@ -186,24 +186,24 @@ def main():
     if not f_slice.empty:  # if there is a forward inflection point..
         inf_list = f_slice.inf_point.tolist()
         f_cutoff, f_primer = assess_inflection_point_mcp_for_sample(
-            _PATH, inf_list
+            path, inf_list
         )  # .. assess and select
 
     if not r_slice.empty:  # if there is a reverse inflection point..
         inf_list = r_slice.inf_point.tolist()
         r_cutoff, r_primer = assess_inflection_point_mcp_for_sample(
-            _PATH, inf_list, rev=True
+            path, inf_list, rev=True
         )  # .. assess and select
 
     # Output cutoff point(s) to .txt file
-    with open(f"{_OUTPUT}/{_SAMPLE}_cutoff.txt", "w") as fw:
+    with open(f"{output}/{sample}_cutoff.txt", "w") as fw:
         if f_cutoff != "":
             fw.write(f"F: {f_cutoff}\n")
         if r_cutoff != "":
             fw.write(f"R: {r_cutoff}\n")
 
     # Output consensus primer sequence(s) to .fasta file
-    with open(f"{_OUTPUT}/{_SAMPLE}_auto_primers.fasta", "w") as fw:
+    with open(f"{output}/{sample}_auto_primers.fasta", "w") as fw:
         if f_cutoff != "":
             fw.write(f">F_auto\n{f_primer}\n")
         if r_cutoff != "":

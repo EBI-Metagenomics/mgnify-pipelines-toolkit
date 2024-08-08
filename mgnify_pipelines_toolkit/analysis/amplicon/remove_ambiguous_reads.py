@@ -39,27 +39,27 @@ def parse_args():
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     args = parser.parse_args()
 
-    _FWD = args.fwd
-    _REV = args.rev
-    _SAMPLE = args.sample
+    fwd = args.fwd
+    rev = args.rev
+    sample = args.sample
 
-    return _FWD, _REV, _SAMPLE
+    return fwd, rev, sample
 
 
 def main():
 
-    _FWD, _REV, _SAMPLE = parse_args()
+    fwd, rev, sample = parse_args()
 
-    fwd_handle = gzip.open(_FWD, "rt")
+    fwd_handle = gzip.open(fwd, "rt")
     fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
     fwd_handle.close()
 
     paired_end = True
 
-    if _REV is None:
+    if rev is None:
         paired_end = False
     else:
-        rev_handle = gzip.open(_REV, "rt")
+        rev_handle = gzip.open(rev, "rt")
         rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
         rev_handle.close()
 
@@ -92,8 +92,8 @@ def main():
         [rev_reads.pop(read_id) for read_id in remove_set]
 
     if paired_end:
-        fwd_handle = bgzf.BgzfWriter(f"./{_SAMPLE}_noambig_1.fastq.gz", "wb")
-        rev_handle = bgzf.BgzfWriter(f"./{_SAMPLE}_noambig_2.fastq.gz", "wb")
+        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb")
+        rev_handle = bgzf.BgzfWriter(f"./{sample}_noambig_2.fastq.gz", "wb")
 
         SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
         SeqIO.write(sequences=rev_reads.values(), handle=rev_handle, format="fastq")
@@ -101,7 +101,7 @@ def main():
         fwd_handle.close()
         rev_handle.close()
     else:
-        fwd_handle = bgzf.BgzfWriter(f"./{_SAMPLE}_noambig.fastq.gz", "wb")
+        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig.fastq.gz", "wb")
         SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
         fwd_handle.close()
 

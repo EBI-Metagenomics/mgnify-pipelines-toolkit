@@ -83,9 +83,9 @@ def main():
     directory = "sequence-categorisation"
     if not os.path.exists(directory):
         os.makedirs(directory)
-    directory_ncRNA = os.path.join("sequence-categorisation", "ncRNA")
-    if not os.path.exists(directory_ncRNA):
-        os.makedirs(directory_ncRNA)
+    directory_ncrna = os.path.join("sequence-categorisation", "ncRNA")
+    if not os.path.exists(directory_ncrna):
+        os.makedirs(directory_ncrna)
 
     print("Start fasta mode")
     pattern_dict = set_model_names(prefix, name, directory)
@@ -106,7 +106,7 @@ def main():
         if model in coding_rna:
             filename = pattern_dict[model]
         else:
-            filename = os.path.join(directory_ncRNA, f"{prefix}{name}_{model}.fasta")
+            filename = os.path.join(directory_ncrna, f"{prefix}{name}_{model}.fasta")
         if model not in open_files:
             file_out = open(filename, "w")
             open_files[model] = file_out
@@ -131,8 +131,8 @@ def main():
     for item in open_files:
         open_files[item].close()
 
-    if len(os.listdir(directory_ncRNA)) == 0:
-        os.rmdir(directory_ncRNA)
+    if len(os.listdir(directory_ncrna)) == 0:
+        os.rmdir(directory_ncrna)
 
 
 if __name__ == "__main__":

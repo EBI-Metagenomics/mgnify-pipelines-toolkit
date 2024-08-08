@@ -52,15 +52,15 @@ def parse_args():
 
     args = parser.parse_args()
 
-    _PATH = args.input
-    _SAMPLE = args.sample
-    _STRAND = args.strand
-    _OUTPUT = args.output
+    path = args.input
+    sample = args.sample
+    strand = args.strand
+    output = args.output
 
-    return _PATH, _SAMPLE, _STRAND, _OUTPUT
+    return path, sample, strand, output
 
 
-def find_mcp_props_for_sample(_PATH, rev=False):
+def find_mcp_props_for_sample(path, rev=False):
     """
     Generate mcp proportions in a stepwise and windowed manner for a fastq file.
 
@@ -77,7 +77,7 @@ def find_mcp_props_for_sample(_PATH, rev=False):
     res_dict = defaultdict(float)
     start_range = range(2, 25, 1)  # Range of starting indices
 
-    print(f"Processing {_PATH}")
+    print(f"Processing {path}")
 
     mcp_len = 5  # length of generated mcps
 
@@ -87,16 +87,14 @@ def find_mcp_props_for_sample(_PATH, rev=False):
             start + mcp_len - 1
         )  # compute the final index for the mcp (inclusive). Indices are of base 1 not 0.
 
-        read_count = get_read_count(
-            _PATH, type="fastq"
-        )  # get read count for fastq file
+        read_count = get_read_count(path, type="fastq")  # get read count for fastq file
 
         max_line_count = None
         if read_count > MCP_MAX_LINE_COUNT:
             max_line_count = MCP_MAX_LINE_COUNT
 
         mcp_count_dict = fetch_mcp(
-            _PATH, end, start, rev, max_line_count
+            path, end, start, rev, max_line_count
         )  # get MCP count dict
         mcp_cons_list = build_mcp_cons_dict_list(
             mcp_count_dict, mcp_len
@@ -143,7 +141,7 @@ def concat_out(fwd_out="", rev_out=""):
 
 def main():
 
-    _PATH, _SAMPLE, _STRAND, _OUTPUT = parse_args()
+    path, sample, strand, output = parse_args()
 
     res_df = ""
 
@@ -151,15 +149,15 @@ def main():
     # at version 3.9. The day we bump the version we should replace these if statements
     # with a match-case block.
 
-    if _STRAND == "FR":
-        fwd_out = find_mcp_props_for_sample(_PATH)
-        rev_out = find_mcp_props_for_sample(_PATH, rev=True)
+    if strand == "FR":
+        fwd_out = find_mcp_props_for_sample(path)
+        rev_out = find_mcp_props_for_sample(path, rev=True)
         res_df = concat_out(fwd_out, rev_out)
-    elif _STRAND == "F":
-        fwd_out = find_mcp_props_for_sample(_PATH)
+    elif strand == "F":
+        fwd_out = find_mcp_props_for_sample(path)
         res_df = concat_out(fwd_out)
-    elif _STRAND == "R":
-        rev_out = find_mcp_props_for_sample(_PATH, rev=True)
+    elif strand == "R":
+        rev_out = find_mcp_props_for_sample(path, rev=True)
         res_df = concat_out(rev_out=rev_out)
     else:
         print(
@@ -168,7 +166,7 @@ def main():
         exit(1)
 
     # Save resulting dataframe to a tsv file
-    res_df.to_csv(f"{_OUTPUT}/{_SAMPLE}_mcp_cons.tsv", sep="\t")
+    res_df.to_csv(f"{output}/{sample}_mcp_cons.tsv", sep="\t")
 
 
 if __name__ == "__main__":

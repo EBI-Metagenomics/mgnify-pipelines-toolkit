@@ -28,16 +28,16 @@ from mgnify_pipelines_toolkit.constants.regex_ambiguous_bases import (
 logging.basicConfig(level=logging.DEBUG)
 
 
-def split_dir_into_sample_paths(_DIR):
+def split_dir_into_sample_paths(dir):
 
-    file_list = os.listdir(_DIR)
+    file_list = os.listdir(dir)
     file_list = [
         file
         for file in file_list
         if ".fastq" in file and ("_1" in file or "_2" in file)
     ]
     sample_set = set()
-    [sample_set.add(f"{_DIR}/{file.split('_')[0]}") for file in file_list]
+    [sample_set.add(f"{dir}/{file.split('_')[0]}") for file in file_list]
     sample_list = sorted(list(sample_set))
 
     return sample_list

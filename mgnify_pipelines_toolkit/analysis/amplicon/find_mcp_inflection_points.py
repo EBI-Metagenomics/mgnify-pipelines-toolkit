@@ -37,11 +37,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    _PATH = args.input
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
+    path = args.input
+    sample = args.sample
+    output = args.output
 
-    return _PATH, _SAMPLE, _OUTPUT
+    return path, sample, output
 
 
 def find_mcp_inf_points(mcp_df):
@@ -89,9 +89,9 @@ def find_mcp_inf_points(mcp_df):
 
 def main():
 
-    _PATH, _SAMPLE, _OUTPUT = parse_args()
+    path, sample, output = parse_args()
 
-    mcp_df = pd.read_csv(_PATH, sep="\t", index_col=0)  # Read mcp_df
+    mcp_df = pd.read_csv(path, sep="\t", index_col=0)  # Read mcp_df
     inf_point_dict = find_mcp_inf_points(mcp_df)  # Generate inflection points dict
 
     if len(inf_point_dict) > 0:  # If the inf_point_dict isn't empty..
@@ -99,11 +99,11 @@ def main():
             inf_point_dict
         )  # .. turn it into a dataframe
         inf_point_df.to_csv(
-            f"{_OUTPUT}/{_SAMPLE}_inf_points.tsv", sep="\t", index=False
+            f"{output}/{sample}_inf_points.tsv", sep="\t", index=False
         )  # ..save it to a .tsv file
 
     else:  # If it is empty..
-        fw = open(f"{_OUTPUT}/{_SAMPLE}_inf_points.tsv", "w")  # ..make an empty file
+        fw = open(f"{output}/{sample}_inf_points.tsv", "w")  # ..make an empty file
         fw.close()
 
 

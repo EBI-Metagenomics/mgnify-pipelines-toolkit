@@ -34,18 +34,18 @@ def parse_args():
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
     args = parser.parse_args()
 
-    _INPUT = args.input
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
+    input = args.input
+    sample = args.sample
+    output = args.output
 
-    return _INPUT, _SAMPLE, _OUTPUT
+    return input, sample, output
 
 
 def main():
 
-    _INPUT, _SAMPLE, _OUTPUT = parse_args()
+    input, sample, output = parse_args()
 
-    primers_dict = SeqIO.to_dict(SeqIO.parse(_INPUT, "fasta"))
+    primers_dict = SeqIO.to_dict(SeqIO.parse(input, "fasta"))
 
     for primer_key in primers_dict.keys():
 
@@ -56,7 +56,7 @@ def main():
             primers_dict[primer_key].seq = primer.seq.reverse_complement()
 
     SeqIO.write(
-        primers_dict.values(), f"{_OUTPUT}/{_SAMPLE}_rev_comp_se_primers.fasta", "fasta"
+        primers_dict.values(), f"{output}/{sample}_rev_comp_se_primers.fasta", "fasta"
     )
 
 

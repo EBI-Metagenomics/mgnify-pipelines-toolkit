@@ -41,14 +41,14 @@ def parse_args(argv=None):
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
     args = parser.parse_args(argv)
 
-    _PATH = args.input
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
+    path = args.input
+    sample = args.sample
+    output = args.output
 
-    return _PATH, _SAMPLE, _OUTPUT
+    return path, sample, output
 
 
-def are_there_primers_in_this_sample(_PATH, rev=False):
+def are_there_primers_in_this_sample(path, rev=False):
     """
     Predict the presence of primers based on windows of base conservation.
 
@@ -63,11 +63,11 @@ def are_there_primers_in_this_sample(_PATH, rev=False):
         False if a primer was not identified
     """
 
-    read_count = get_read_count(_PATH, "fastq")  # Get read count for fastq file
+    read_count = get_read_count(path, "fastq")  # Get read count for fastq file
     mcp_len = 100  # Script will look at first 100 base mcps (for rev=True, it will look at first 100 from 3' to 5')
 
     mcp_count_dict = fetch_mcp(
-        _PATH, mcp_len, rev=rev
+        path, mcp_len, rev=rev
     )  # mcp dict where key is the mcp and value is the count
     mcp_cons_list = build_mcp_cons_dict_list(
         mcp_count_dict, mcp_len
@@ -134,13 +134,13 @@ def save_out(results, sample_id, output):
 
 def main(argv=None):
 
-    _PATH, _SAMPLE, _OUTPUT = parse_args(argv)
+    path, sample, output = parse_args(argv)
 
     fwd_primer_flag = are_there_primers_in_this_sample(
-        _PATH
+        path
     )  # Check for general primers in fwd
     rev_primer_flag = are_there_primers_in_this_sample(
-        _PATH, rev=True
+        path, rev=True
     )  # Check for general primers in rev
 
     fwd_status = "0"
@@ -157,9 +157,7 @@ def main(argv=None):
     else:
         print("No reverse primer detected")
 
-    save_out(
-        (fwd_status, rev_status), _SAMPLE, _OUTPUT
-    )  # Save primer flags to .txt file
+    save_out((fwd_status, rev_status), sample, output)  # Save primer flags to .txt file
 
 
 if __name__ == "__main__":

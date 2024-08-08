@@ -51,11 +51,11 @@ def parse_args():
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
     args = parser.parse_args()
 
-    _INPUT = args.input
-    _FASTA = args.fasta
-    _SAMPLE = args.sample
+    input = args.input
+    fasta = args.fasta
+    sample = args.sample
 
-    return _INPUT, _FASTA, _SAMPLE
+    return input, fasta, sample
 
 
 def get_amp_region(beg, strand, model):
@@ -79,11 +79,11 @@ def get_amp_region(beg, strand, model):
 
 
 def main():
-    _INPUT, _FASTA, _SAMPLE = parse_args()
+    input, fasta, sample = parse_args()
     res_dict = defaultdict(list)
-    fasta_dict = SeqIO.to_dict(SeqIO.parse(_FASTA, "fasta"))
+    fasta_dict = SeqIO.to_dict(SeqIO.parse(fasta, "fasta"))
 
-    with open(_INPUT, "r") as fr:
+    with open(input, "r") as fr:
         for line in fr:
             line = line.strip()
             line = re.sub("[ \t]+", "\t", line)
@@ -105,7 +105,7 @@ def main():
             else:
                 continue
 
-            res_dict["Run"].append(_SAMPLE)
+            res_dict["Run"].append(sample)
             res_dict["AssertionEvidence"].append("ECO_0000363")
             res_dict["AssertionMethod"].append("automatic assertion")
 
@@ -126,7 +126,7 @@ def main():
             res_dict["PrimerSeq"].append(primer_seq)
 
     res_df = pd.DataFrame.from_dict(res_dict)
-    res_df.to_csv(f"./{_SAMPLE}_primer_validation.tsv", sep="\t", index=False)
+    res_df.to_csv(f"./{sample}_primer_validation.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":

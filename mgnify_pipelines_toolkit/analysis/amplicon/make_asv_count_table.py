@@ -54,14 +54,14 @@ def parse_args():
 
     args = parser.parse_args()
 
-    _TAXA = args.taxa
-    _FWD = args.fwd
-    _REV = args.rev
-    _AMP = args.amp
-    _HEADERS = args.headers
-    _SAMPLE = args.sample
+    taxa = args.taxa
+    fwd = args.fwd
+    rev = args.rev
+    amp = args.amp
+    headers = args.headers
+    sample = args.sample
 
-    return _TAXA, _FWD, _REV, _AMP, _HEADERS, _SAMPLE
+    return taxa, fwd, rev, amp, headers, sample
 
 
 def order_df(taxa_df):
@@ -262,24 +262,24 @@ def generate_asv_count_dict(asv_dict):
 
 
 def main():
-    _TAXA, _FWD, _REV, _AMP, _HEADERS, _SAMPLE = parse_args()
+    taxa, fwd, rev, amp, headers, sample = parse_args()
 
-    fwd_fr = open(_FWD, "r")
+    fwd_fr = open(fwd, "r")
     paired_end = True
 
-    if _REV is None:
+    if rev is None:
         paired_end = False
         rev_fr = [True]
     else:
-        rev_fr = open(_REV, "r")
+        rev_fr = open(rev, "r")
 
-    taxa_df = pd.read_csv(_TAXA, sep="\t", dtype=str)
+    taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
     taxa_df = taxa_df.fillna("0")
     taxa_df = order_df(taxa_df)
 
-    amp_reads = [read.strip() for read in list(open(_AMP, "r"))]
-    headers = [read.split(" ")[0][1:] for read in list(open(_HEADERS, "r"))]
-    amp_region = ".".join(_AMP.split(".")[1:3])
+    amp_reads = [read.strip() for read in list(open(amp, "r"))]
+    headers = [read.split(" ")[0][1:] for read in list(open(headers, "r"))]
+    amp_region = ".".join(amp.split(".")[1:3])
 
     asv_dict = defaultdict(int)
 
@@ -307,13 +307,13 @@ def main():
         tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
         ref_db = "pr2"
 
-    with open(f"./{_SAMPLE}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
+    with open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
         for tax_assignment, count in tax_assignment_dict.items():
             fw.write(f"{count}\t{tax_assignment}\n")
 
     asv_count_df = generate_asv_count_dict(asv_dict)
     asv_count_df.to_csv(
-        f"./{_SAMPLE}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
+        f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
     )
 
 

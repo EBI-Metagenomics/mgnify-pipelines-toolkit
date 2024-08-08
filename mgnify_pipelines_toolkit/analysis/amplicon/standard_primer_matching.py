@@ -50,15 +50,15 @@ def parse_args():
     parser.add_argument("-o", "--output", required=True, type=str, help="Output path")
     args = parser.parse_args()
 
-    _INPUT = args.input
-    _PRIMERS = args.primers
-    _SAMPLE = args.sample
-    _OUTPUT = args.output
+    input = args.input
+    primers = args.primers
+    sample = args.sample
+    output = args.output
 
-    return _INPUT, _PRIMERS, _SAMPLE, _OUTPUT
+    return input, primers, sample, output
 
 
-def parse_std_primers(_PRIMERS):
+def parse_std_primers(primers):
     """
     Parse the library of standard primers.
 
@@ -77,8 +77,8 @@ def parse_std_primers(_PRIMERS):
     std_primer_dict_regex = defaultdict(defaultdict)
     std_primer_dict = defaultdict(defaultdict)
 
-    dir = os.listdir(_PRIMERS)
-    dir = [f"{_PRIMERS}/{path}" for path in dir]
+    dir = os.listdir(primers)
+    dir = [f"{primers}/{path}" for path in dir]
 
     rev_flag = False
 
@@ -313,14 +313,14 @@ def save_out(results, sample_id, output, std_primer_dict):
 
 def main():
 
-    _INPUT, _PRIMERS, _SAMPLE, _OUTPUT = parse_args()
+    input, primers, sample, output = parse_args()
     std_primer_dict_regex, std_primer_dict = parse_std_primers(
-        _PRIMERS
+        primers
     )  # Parse std primer library into dictionaries
     results = get_primer_props(
-        std_primer_dict_regex, _INPUT
+        std_primer_dict_regex, input
     )  # Find all the std primers in the input and select most common
-    save_out(results, _SAMPLE, _OUTPUT, std_primer_dict)
+    save_out(results, sample, output, std_primer_dict)
 
 
 if __name__ == "__main__":

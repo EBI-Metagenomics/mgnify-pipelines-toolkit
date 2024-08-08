@@ -1,0 +1,22 @@
+- name: library_strategy_check test_wrong_args
+  tags:
+    - library_strategy_check
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.library_strategy_check --chromosome X
+  stderr:
+    contains:
+      - "library_strategy_check.py: error: the following arguments are required: -i/--input, -s/--sample, -o/--output"
+- name: library_strategy_check test_correct_args_amplicon
+  tags:
+    - library_strategy_check
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.library_strategy_check -i tests/fixtures/misc/test_mcp_cons.tsv -s test -o ./
+  files:
+    - path: "test_library_check_out.txt"
+      md5sum: 1605ca08f9028fe03bcb53a0c50ba2ff
+- name: library_strategy_check test_correct_args_no_amplicon
+  tags:
+    - library_strategy_check
+  command: python -m  mgnify_pipelines_toolkit.analysis.shared.library_strategy_check -i tests/fixtures/misc/test_noamplicon_mcp_cons.tsv -s test -o ./
+  files:
+    - path: "test_library_check_out.txt"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e

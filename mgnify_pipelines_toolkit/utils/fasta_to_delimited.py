@@ -95,9 +95,9 @@ def main():
     fieldnames = list(header_regex.groupindex.keys())
 
     if with_hash:
-        fieldnames += ["sequence_hash"]
+        fieldnames.append("sequence_hash")
 
-    fieldnames += ["sequence"]
+    fieldnames.append("sequence")
 
     csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
 

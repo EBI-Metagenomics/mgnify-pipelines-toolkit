@@ -405,7 +405,7 @@ def retrieve_regions(
         for model, value in multiregion_matches.items():
             marker_gene = determine_marker_gene(determine_domain(model))
             for region in value:
-                region_counter[f'{marker_gene}.{region}'] += 1
+                region_counter[f"{marker_gene}.{region}"] += 1
 
         for region, count in region_counter.items():
             if count < MIN_SEQ_COUNT:
@@ -422,17 +422,17 @@ def retrieve_regions(
             new_value = []
             for region in value:
                 marker_gene = determine_marker_gene(determine_domain(model))
-                full_region = f'{marker_gene}.{region}'
+                full_region = f"{marker_gene}.{region}"
                 if full_region not in regions_to_remove:
                     new_value.append(region)
             if not new_value:
                 models_to_remove.append(model)
             multiregion_matches[model] = new_value
-        
-        [ multiregion_matches.pop(model) for model in models_to_remove ]
+
+        [multiregion_matches.pop(model) for model in models_to_remove]
         print(multiregion_matches)
 
-        run_status = 'one'
+        run_status = "one"
         run_result = dict()
         total_useful_sequences = 0.0
         temp_seq_counter = dict()

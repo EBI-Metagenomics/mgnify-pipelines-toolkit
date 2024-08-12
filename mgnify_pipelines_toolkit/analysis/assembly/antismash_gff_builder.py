@@ -32,6 +32,8 @@ def parse_args():
     return args.input, args.output, args.cds_tag
 
 def main():
+    """ Transform an antiSMASH JSON into a GFF3 with 'regions' and CDS within those regions
+    """
     
     json_input, output_file, cds_tag = parse_args()
 
@@ -52,10 +54,11 @@ def main():
         for feature in record['features']:
 
             if feature['type'] == 'region': # 'region' is the conceptual equivalent of BGC. I'd suggest using it, as it ensures that the no 'BGC' locations overlaps other BGCs
+                # Annotate region features
                 region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}" # Tanya's code is f"bgc{region_number}", but I suggest calling it region for consistence
                 region_start = int(feature['location'].split(':')[0].split('[')[1])
                 region_end = int(feature['location'].split(':')[1].split(']')[0])
-                # Add region feature to GFF3
+                
                 res_dict['contig'].append(record_id)
                 res_dict['version'].append(f"antiSMASH:{antismash_ver}")
                 res_dict['type'].append('region')
@@ -70,6 +73,7 @@ def main():
                 attributes_dict[region_name].update({'ID':region_name,'product':product})
 
             if iter_cds and feature['type'] == 'CDS':
+                # Annotate CDS features
 
                 start = int(feature['location'].split(':')[0][1:])
                 end = int(feature['location'].split(':')[1].split(']')[0])
@@ -95,6 +99,7 @@ def main():
                     'Parent':region_name # Add Parent field for the corresponding region
                 })
                 
+        # Extended CDS attributes 
         if 'antismash.detection.hmm_detection' in record['modules'].keys():
             cds_by_protocluster = record['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster'] # imprive var name
             if len(cds_by_protocluster) > 0:

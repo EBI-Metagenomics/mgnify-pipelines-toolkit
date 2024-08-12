@@ -44,11 +44,11 @@ def main():
     attributes_dict = defaultdict(dict)
 
     antismash_ver = antismash_analysis['version']
-    iter_cds = 'antismash.detection.genefunctions' in record['modules'].keys()
     
     for record in antismash_analysis['records']:
         record_id = record['id']
 
+        iter_cds = 'antismash.detection.genefunctions' in record['modules'].keys() # Flag to iterate CDS
         region_name = None
 
         for feature in record['features']:
@@ -112,7 +112,7 @@ def main():
 
         if 'antismash.detection.genefunctions' in record['modules'].keys():
             for tool in record['modules']['antismash.detection.genefunctions']['tools']:
-                if tool['tool'] == 'smcogs' and len(tool['best_hits']) > 0:
+                if tool['tool'] == 'smcogs':
                     for locus_tag in tool['best_hits']:
                         hit_id = tool['best_hits'][locus_tag]['hit_id'].split(':')[0]
                         hit_desc = tool['best_hits'][locus_tag]['hit_id'].split(':')[1].replace(' ', '_')

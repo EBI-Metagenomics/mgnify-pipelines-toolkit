@@ -25,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', required=True, type=str, help='Input JSON from antiSMASH')
     parser.add_argument('-o', '--output', required=True, type=str, help='Output GFF3 file name')
-    parser.add_argument('--cds_tag', default='locus_tag', type=str, help='Type of CDS ID tag to use in the GFF3 (default: locus_tag)') # The CDS' identifier changes from tool to tool. In my opinion this should be left as an option with locus_tag as default (as in Tanya's script)
+    parser.add_argument('--cds_tag', default='ID', type=str, help='Type of CDS ID tag to use in the GFF3 (default: locus_tag)') # The CDS' identifier changes from tool to tool. In my opinion this should be left as an option with locus_tag as default (as in Tanya's script)
  
     args = parser.parse_args()
 
@@ -84,7 +84,7 @@ def main():
 
                 res_dict['contig'].append(record_id)
                 res_dict['version'].append(f"antiSMASH:{antismash_ver}")
-                res_dict['type'].append('CDS')
+                res_dict['type'].append('gene')
                 res_dict['start'].append(start + 1) # Correct for 1-based indexing
                 res_dict['end'].append(end)
                 res_dict['score'].append('.')
@@ -95,7 +95,7 @@ def main():
                 attributes_dict[locus_tag].update({
                     'ID':locus_tag,
                     'as_type':','.join(feature['qualifiers'].get('gene_kind',['other'])),
-                    'gene_functions': ','.join(feature['qualifiers'].get('gene_functions', [])).replace(' ', '_').replace(':_', ':').replace(';_', ';'),
+                    'gene_functions': ','.join(feature['qualifiers'].get('gene_functions', [])).replace(' ', '_').replace(':_', ':').replace(';_', '%3B'),
                     'Parent':region_name # Add Parent field for the corresponding region
                 })
                 
@@ -119,7 +119,7 @@ def main():
                         score = tool['best_hits'][locus_tag]['bitscore']
                         e_value = tool['best_hits'][locus_tag]['evalue'] # Changed var name to not confuse with built-in func
 
-                        smcog_note = f"smCOG:{hit_id}:{hit_desc.replace(' ', '_')}(Score:{score};E-value:{e_value})"
+                        smcog_note = f"smCOG:{hit_id}:{hit_desc.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
                         if locus_tag in attributes_dict.keys():
                             attributes_dict[locus_tag].update({'as_notes':smcog_note})
                         break

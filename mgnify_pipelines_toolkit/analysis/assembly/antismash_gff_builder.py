@@ -1,3 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 from collections import defaultdict
@@ -8,121 +23,115 @@ import pandas as pd
 def parse_args():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, type=str, help="Input json from antiSMASH")
-    parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
-    parser.add_argument("-o", "--output", required=True, type=str, help="Output")
-
+    parser.add_argument('-i', '--input', required=True, type=str, help='Input JSON from antiSMASH')
+    parser.add_argument('-o', '--output', required=True, type=str, help='Output GFF3 file name')
+    parser.add_argument('--cds_tag', default='ID', type=str, help='Type of CDS ID tag to use in the GFF3 (default: locus_tag)') # The CDS' identifier changes from tool to tool.
+ 
     args = parser.parse_args()
 
-    JSON = args.input
-    SAMPLE = args.sample
-    OUTPUT = args.output
-
-    return JSON, SAMPLE, OUTPUT
+    return args.input, args.output, args.cds_tag
 
 def main():
+    """ Transform an antiSMASH JSON into a GFF3 with 'regions' and CDS within those regions
+    """
     
-    JSON, SAMPLE, OUTPUT = parse_args()
+    json_input, output_file, cds_tag = parse_args()
+
+    with open(json_input, 'r') as json_data:
+        antismash_analysis = json.load(json_data)
 
     res_dict = defaultdict(list)
+    attributes_dict = defaultdict(dict)
 
-    res = ''
-    with open(JSON, 'r') as json_data:
-        res = json.load(json_data)
-
-    antismash_ver = res['version']
-
-    note_dict = defaultdict(str)
-
-    for record in res['records']:
+    antismash_ver = antismash_analysis['version']
+    
+    for record in antismash_analysis['records']:
         record_id = record['id']
 
-        protocluster_start = ''
-        protocluster_end = ''
+        iter_cds = 'antismash.detection.genefunctions' in record['modules'].keys() # Flag to iterate CDS
+        region_name = None
 
-        for row in record['features']:
+        for feature in record['features']:
 
-            if row['type'] == 'protocluster':
-                protocluster_start = int(row['location'].split(':')[0].split('[')[1])
-                protocluster_end = int(row['location'].split(':')[1].split(']')[0])
+            if feature['type'] == 'region':
+                # Annotate region features
+                region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}"
+                region_start = int(feature['location'].split(':')[0].split('[')[1])
+                region_end = int(feature['location'].split(':')[1].split(']')[0])
+                
+                res_dict['contig'].append(record_id)
+                res_dict['version'].append(f"antiSMASH:{antismash_ver}")
+                res_dict['type'].append('region')
+                res_dict['start'].append(region_start + 1) 
+                res_dict['end'].append(region_end)
+                res_dict['score'].append('.')
+                res_dict['strand'].append('.')
+                res_dict['phase'].append('.')
+                
+                product = ','.join(feature['qualifiers'].get('product', []))
 
-            if row['type'] == 'CDS':
+                attributes_dict[region_name].update({'ID':region_name,'product':product})
 
-                if 'antismash.detection.genefunctions' not in record['modules'].keys():
-                    continue
+            if iter_cds and feature['type'] == 'CDS':
+                # Annotate CDS features
 
-                row_start = int(row['location'].split(':')[0][1:])
-                row_end = int(row['location'].split(':')[1].split(']')[0])
+                start = int(feature['location'].split(':')[0][1:])
+                end = int(feature['location'].split(':')[1].split(']')[0])
+                strand = feature['location'].split('(')[1][0] # + or -
 
-                if protocluster_start == '' or protocluster_start > row_start or protocluster_end < row_end:
+                if not region_name or not (region_start <= end and start <= region_end):
                     continue
 
                 res_dict['contig'].append(record_id)
-                res_dict['version'].append(f'antiSMASH:{antismash_ver}')
-                res_dict['type'].append('CDS')
+                res_dict['version'].append(f"antiSMASH:{antismash_ver}")
+                res_dict['type'].append('gene')
+                res_dict['start'].append(start + 1) # Correct for 1-based indexing
+                res_dict['end'].append(end)
+                res_dict['score'].append('.')
+                res_dict['strand'].append(strand)
+                res_dict['phase'].append('.')
 
-                res_dict['start'].append(row_start)
+                locus_tag = feature['qualifiers'][cds_tag][0]
+                attributes_dict[locus_tag].update({
+                    'ID':locus_tag,
+                    'as_type':','.join(feature['qualifiers'].get('gene_kind',['other'])),
+                    'gene_functions': ','.join(feature['qualifiers'].get('gene_functions', [])).replace(' ', '_').replace(':_', ':').replace(';_', '%3B'),
+                    'Parent':region_name
+                })
                 
-                res_dict['end'].append(row_end)
-
-                res_dict['score'].append(".")
-
-                row_strand = row['location'].split('(')[1][0] # + or -
-                res_dict['strand'].append(row_strand)
-
-                res_dict['phase'].append(".")
-
-                note_str = ""
-
-                row_id = row['qualifiers']['ID'][0]
-                note_str = f"ID={row_id}"
-                
-                if 'gene_kind' in row['qualifiers'].keys():
-                    row_type = row['qualifiers']['gene_kind'][0]
-                    note_str += f";as_type={row_type}"
-
-                    row_functions = ','.join(row['qualifiers']['gene_functions']).replace(' ', '_').replace(':_', ':').replace(';_', ';')
-                    note_str += f";gene_functions={row_functions}"
-
-                else:
-                    note_str += f";as_type=other"
-                
-                note_dict[row_id] += note_str
-
+        # Extended CDS attributes 
         if 'antismash.detection.hmm_detection' in record['modules'].keys():
-            temp_row = record['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster']
-            if len(temp_row) > 0:
-                for row in temp_row[0][1]:
-                    if 'cds_name' in row.keys():
-                        row_id = row['cds_name']
-                        row_as_clusters = ','.join(list(row['definition_domains'].keys()))
-                        if row_id in note_dict.keys():
-                            note_dict[row_id] += f';as_gene_clusters={row_as_clusters}'
+            cds_by_protocluster = record['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster']
+            if len(cds_by_protocluster) > 0:
+                for feature in cds_by_protocluster[0][1]:
+                    if 'cds_name' in feature.keys():
+                        locus_tag = feature['cds_name']
+                        as_clusters = ','.join(list(feature['definition_domains'].keys()))
+                        if locus_tag in attributes_dict.keys():
+                            attributes_dict[locus_tag].update({'as_gene_clusters':as_clusters})
 
         if 'antismash.detection.genefunctions' in record['modules'].keys():
             for tool in record['modules']['antismash.detection.genefunctions']['tools']:
-                note_str = ""
-                if tool['tool'] == 'smcogs' and len(tool['best_hits']) > 0:
-                    for best_hit in tool['best_hits']:
-                        hit_id = tool['best_hits'][best_hit]['hit_id'].split(':')[0]
-                        hit_desc = tool['best_hits'][best_hit]['hit_id'].split(':')[1].replace(' ', '_')
-                        score = tool['best_hits'][best_hit]['bitscore']
-                        eval = tool['best_hits'][best_hit]['evalue']
+                if tool['tool'] == 'smcogs':
+                    for locus_tag in tool['best_hits']:
+                        hit_id = tool['best_hits'][locus_tag]['hit_id'].split(':')[0]
+                        hit_desc = tool['best_hits'][locus_tag]['hit_id'].split(':')[1].replace(' ', '_')
+                        score = tool['best_hits'][locus_tag]['bitscore']
+                        e_value = tool['best_hits'][locus_tag]['evalue']
 
-                        if "as_notes" in note_str:
-                            note_str += f'smCOG%3A%20{hit_id}%A{hit_desc}%20%28Score%3A%20{score}%3B%20E-value%3A%20{eval}%29%3B'
-                        else:
-                            note_str += f';as_notes=smCOG%3A%20{hit_id}%A{hit_desc}%20%28Score%3A%20{score}%3B%20E-value%3A%20{eval}%29%3B'
-                        if best_hit in note_dict.keys():
-                            note_dict[best_hit] += note_str
+                        smcog_note = f"smCOG:{hit_id}:{hit_desc.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
+                        if locus_tag in attributes_dict.keys():
+                            attributes_dict[locus_tag].update({'as_notes':smcog_note})
                         break
 
-
-    note_col = note_dict.values()
-    res_dict['attributes'] = note_col
+    attributes = [';'.join(f"{k}={v}" for k, v in attrib_data.items() if v) for attrib_data in attributes_dict.values()]
+    res_dict['attributes'] = attributes
 
     res_df = pd.DataFrame.from_dict(res_dict)
-    res_df.to_csv(f"{SAMPLE}_test.gff", header=False, index=False, sep='\t')
+    
+    with open(output_file, 'w') as f_out:
+        f_out.write('##gff-version 3\n') # Save data to the GFF3 file with the proper header
+        res_df.to_csv(f_out, header=False, index=False, sep='\t')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

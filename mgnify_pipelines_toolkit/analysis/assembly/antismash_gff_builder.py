@@ -25,7 +25,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', required=True, type=str, help='Input JSON from antiSMASH')
     parser.add_argument('-o', '--output', required=True, type=str, help='Output GFF3 file name')
-    parser.add_argument('--cds_tag', default='ID', type=str, help='Type of CDS ID tag to use in the GFF3 (default: locus_tag)') # The CDS' identifier changes from tool to tool. In my opinion this should be left as an option with locus_tag as default (as in Tanya's script)
+    parser.add_argument('--cds_tag', default='ID', type=str, help='Type of CDS ID tag to use in the GFF3 (default: locus_tag)') # The CDS' identifier changes from tool to tool.
  
     args = parser.parse_args()
 
@@ -53,9 +53,9 @@ def main():
 
         for feature in record['features']:
 
-            if feature['type'] == 'region': # 'region' is the conceptual equivalent of BGC. I'd suggest using it, as it ensures that the no 'BGC' locations overlaps other BGCs
+            if feature['type'] == 'region':
                 # Annotate region features
-                region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}" # Tanya's code is f"bgc{region_number}", but I suggest calling it region for consistence
+                region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}"
                 region_start = int(feature['location'].split(':')[0].split('[')[1])
                 region_end = int(feature['location'].split(':')[1].split(']')[0])
                 
@@ -96,12 +96,12 @@ def main():
                     'ID':locus_tag,
                     'as_type':','.join(feature['qualifiers'].get('gene_kind',['other'])),
                     'gene_functions': ','.join(feature['qualifiers'].get('gene_functions', [])).replace(' ', '_').replace(':_', ':').replace(';_', '%3B'),
-                    'Parent':region_name # Add Parent field for the corresponding region
+                    'Parent':region_name
                 })
                 
         # Extended CDS attributes 
         if 'antismash.detection.hmm_detection' in record['modules'].keys():
-            cds_by_protocluster = record['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster'] # imprive var name
+            cds_by_protocluster = record['modules']['antismash.detection.hmm_detection']['rule_results']['cds_by_protocluster']
             if len(cds_by_protocluster) > 0:
                 for feature in cds_by_protocluster[0][1]:
                     if 'cds_name' in feature.keys():
@@ -117,7 +117,7 @@ def main():
                         hit_id = tool['best_hits'][locus_tag]['hit_id'].split(':')[0]
                         hit_desc = tool['best_hits'][locus_tag]['hit_id'].split(':')[1].replace(' ', '_')
                         score = tool['best_hits'][locus_tag]['bitscore']
-                        e_value = tool['best_hits'][locus_tag]['evalue'] # Changed var name to not confuse with built-in func
+                        e_value = tool['best_hits'][locus_tag]['evalue']
 
                         smcog_note = f"smCOG:{hit_id}:{hit_desc.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
                         if locus_tag in attributes_dict.keys():
@@ -129,7 +129,7 @@ def main():
 
     res_df = pd.DataFrame.from_dict(res_dict)
     
-    with open(output_file, 'w') as f_out: # Correct output file
+    with open(output_file, 'w') as f_out:
         f_out.write('##gff-version 3\n') # Save data to the GFF3 file with the proper header
         res_df.to_csv(f_out, header=False, index=False, sep='\t')
 

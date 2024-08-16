@@ -25,13 +25,17 @@ from mgnify_pipelines_toolkit.constants.regex_fasta_header import FORMAT_REGEX_M
 
 
 def is_gzipped(filepath):
-    with open(filepath, 'rb') as test_f:
-        return test_f.read(2) == b'\x1f\x8b'
+    with open(filepath, "rb") as test_f:
+        return test_f.read(2) == b"\x1f\x8b"
 
 
 def guess_header_format(header):
-    matches = [(format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()]
-    guesses = [(format, match.groups()) for format, match in matches if match is not None]
+    matches = [
+        (format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()
+    ]
+    guesses = [
+        (format, match.groups()) for format, match in matches if match is not None
+    ]
 
     if not guesses:
         raise ValueError("Header format could not be determined")
@@ -43,7 +47,7 @@ def guess_header_format(header):
 
 def md5_hash(s):
     md5 = hashlib.md5()
-    md5.update(s.encode('utf-8'))
+    md5.update(s.encode("utf-8"))
 
     return md5.hexdigest()
 
@@ -54,13 +58,28 @@ def parse_args():
 
     parser.add_argument("input", type=str, help="Path to (gzipped) Fasta file")
     parser.add_argument("-o", "--output", type=str, help="Output path")
-    parser.add_argument("-f", "--format", type=str, choices=["auto", "uniprotkb", "rpxx"], default="auto", help="Format of the input Fasta header")
-    parser.add_argument("-d", "--delimiter", type=str, default="\t", help="Output column delimiter")
-    parser.add_argument("--with-hash", action="store_true", help="Add a MD5 hash of the sequence to the output")
-    parser.add_argument("--no-header", action="store_true", help="Do not add header to output file")
+    parser.add_argument(
+        "-f",
+        "--format",
+        type=str,
+        choices=["auto", "uniprotkb", "rpxx"],
+        default="auto",
+        help="Format of the input Fasta header",
+    )
+    parser.add_argument(
+        "-d", "--delimiter", type=str, default="\t", help="Output column delimiter"
+    )
+    parser.add_argument(
+        "--with-hash",
+        action="store_true",
+        help="Add a MD5 hash of the sequence to the output",
+    )
+    parser.add_argument(
+        "--no-header", action="store_true", help="Do not add header to output file"
+    )
 
     args = parser.parse_args()
-    
+
     path = args.input
     output = args.output
     format = args.format
@@ -100,7 +119,9 @@ def main():
 
         fieldnames.append("sequence")
 
-        csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
+        csv_writer = csv.DictWriter(
+            output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore"
+        )
 
         if not no_header:
             csv_writer.writeheader()

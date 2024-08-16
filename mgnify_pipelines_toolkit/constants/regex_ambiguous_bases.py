@@ -15,7 +15,6 @@
 # limitations under the License.
 
 _AMBIGUOUS_BASES_DICT = {
-    
     "R": "[AG]",
     "Y": "[CT]",
     "S": "[GC]",
@@ -26,11 +25,10 @@ _AMBIGUOUS_BASES_DICT = {
     "D": "[AGT]",
     "H": "[ACT]",
     "V": "[ACG]",
-    "N": "[ACTG]"
+    "N": "[ACTG]",
 }
 
 _AMBIGUOUS_BASES_DICT_REV = {
-    
     "A,G": "R",
     "C,T": "Y",
     "C,G": "S",
@@ -41,5 +39,5 @@ _AMBIGUOUS_BASES_DICT_REV = {
     "A,G,T": "D",
     "A,C,T": "H",
     "A,C,G": "V",
-    "A,C,G,T": "N"
+    "A,C,G,T": "N",
 }

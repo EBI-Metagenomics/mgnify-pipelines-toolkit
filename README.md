@@ -27,6 +27,16 @@ You should then be able to run the packages from the command-line. For example t
 
 ## Adding a new script to the package
 
+### Local development requirements
+Before starting any development, you should do these few steps:
+- Clone the repo if you haven't already and create a feature branch from the `dev` branch (NOT `main`).
+- Create a virtual environment with the tool of your choice (i.e. `conda create --name my_new_env`)
+- Activate you new environment (i.e. `conda activate my_new_env`)
+- Install dev dependencies `pip install -e '.[dev]'`
+- Install pre-commit hooks `pre-commit install`
+
+When doing these steps above, you ensure that the code you add will be linted and formatted properly.
+
 ### New script requirements
 
 There are a few requirements for your script:

@@ -1,0 +1,5 @@
+- name: test_get_mpt_version
+  tags:
+    - test_get_mpt_version
+  exit_code: 0
+  command: python -m mgnify_pipelines_toolkit.utils.get_mpt_version

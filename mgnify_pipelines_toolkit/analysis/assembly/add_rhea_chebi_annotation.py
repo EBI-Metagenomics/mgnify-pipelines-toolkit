@@ -9,7 +9,7 @@ import pandas as pd
 import requests
 
 
-def main(input, output, rhea2chebi, up2rhea):
+def main(input: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
     logging.info("Step 0/4: Checking Rhea-CHEBI mapping file...")
     if not rhea2chebi:
         logging.info("Rhea-CHEBI mapping not provided. Starting download...")
@@ -23,28 +23,31 @@ def main(input, output, rhea2chebi, up2rhea):
             logging.info(f"File downloaded successfully and saved to {rhea2chebi.resolve()}")
 
     logging.info(f"Step 1/4: Reading input file {input.resolve()}")
-    diamond_df = pd.read_csv(input, sep='\t', usecols=[0, 1], header=0)
-    diamond_df.columns = ['uniref90_ID', 'contig_name']
-    diamond_df['Uniref90_rep'] = diamond_df['uniref90_ID'].str.split('_').str[1]
+    diamond_df = pd.read_csv(input, sep='\t', usecols=['uniref90_ID', 'contig_name'])
+    diamond_df[['protein_id', 'contig']] = diamond_df['contig_name'].str.split('-', n=1, expand=True)
+    diamond_df['uniref90_rep'] = diamond_df['uniref90_ID'].str.split('_').str[1]
 
     logging.info(f"Step 2/4: Adding RHEA IDs based on provided file {up2rhea.resolve()}")
-    up2rhea_df = pd.read_csv(up2rhea, sep='\t', usecols=[0, 2])
-    diamond_df = diamond_df.merge(up2rhea_df, left_on='Uniref90_rep', right_on="Entry", how='left')
-    diamond_df['Rhea ID'] = diamond_df['Rhea ID'].str.split()
-    diamond_df = diamond_df.explode('Rhea ID')
+    up2rhea_df = pd.read_csv(up2rhea, sep='\t', usecols=['Entry','Rhea ID'])
+    up2rhea_df.columns = ['unirefKB_id', 'rhea_id']
+    diamond_df = diamond_df.merge(up2rhea_df, left_on='uniref90_rep', right_on="unirefKB_id", how='left')
+    diamond_df['rhea_id'] = diamond_df['rhea_id'].str.split()
+    diamond_df = diamond_df.explode('rhea_id')
 
     logging.info(f"Step 3/4: Adding CHEBI reactions based on provided file {rhea2chebi.resolve()}")
     rhea2chebi_df = pd.read_csv(rhea2chebi, sep='\t')
-    diamond_df = diamond_df.merge(rhea2chebi_df[['ENTRY', 'EQUATION']], left_on='Rhea ID', right_on='ENTRY', how='left')
-    diamond_df = diamond_df.drop(columns=['ENTRY', 'Entry'])
+    rhea2chebi_df.columns = ['rhea_id', 'definition', 'chebi_reaction', 'enzyme_id']
+    diamond_df = diamond_df.merge(rhea2chebi_df[['rhea_id', 'chebi_reaction']], on='rhea_id', how='left')
+    diamond_df = diamond_df.drop(columns=['contig_name', 'unirefKB_id', 'uniref90_rep'])
 
     logging.info(f"Step 4/4: Saving output table to {output.resolve()}")
+    diamond_df = diamond_df[['contig', 'protein_id', 'uniref90_ID', 'rhea_id', 'chebi_reaction']]
     diamond_df.to_csv(output, sep="\t", index=False)
 
     logging.info("Processed successfully. Exiting.")
 
 
-def download_and_convert_to_tsv(download_path: Path):
+def download_and_convert_to_tsv(download_path: Path)  -> Path:
     url = "https://ftp.expasy.org/databases/rhea/txt/rhea-reactions.txt.gz"
     
     # Ensure the download directory exists
@@ -91,13 +94,13 @@ if __name__ == "__main__":
         "-o", "--output", 
         required=True, 
         type=Path, 
-        help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, Rhea ID, CHEBI reaction participants"
+        help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, rhea_ids, CHEBI reaction participants"
     )
     parser.add_argument(
         "--rhea2chebi",
         default=None,
         type=Path,
-        help="File that maps RHEA IDs to CHEBI. Will be downloaded if not provided",
+        help="File that maps rhea_idss to CHEBI. Will be downloaded if not provided",
     ) 
     parser.add_argument(
         "--up2rhea",

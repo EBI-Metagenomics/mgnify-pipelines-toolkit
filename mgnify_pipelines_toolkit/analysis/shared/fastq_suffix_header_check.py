@@ -77,12 +77,10 @@ def main():
                 'No reverse file given, yet given forward file has the "_1" suffix implying it\'s paired-end. '
                 + "Either supply the reverse file, or supply a single-end file."
             )
-            exit(1)
         elif "_2" not in rev:
             logging.error(
                 'The expected suffix "_2" for a supplied reverse file is missing. Please verify your inputs.'
             )
-            exit(1)
         else:
             files_to_parse = [fwd, rev]
 

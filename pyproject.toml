@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "0.1.5"
+version = "0.1.6"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -56,6 +56,7 @@ mapseq_to_asv_table = "mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_
 primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification:main"
 # utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
+get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
 [project.optional-dependencies]
 tests = [

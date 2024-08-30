@@ -1,16 +1,17 @@
 import argparse
 import gzip
+import hashlib
 import logging
 import re
 from pathlib import Path
 import sys
 
+from Bio import SeqIO
 import pandas as pd
 import requests
 
-
-def main(input: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
-    logging.info("Step 0/4: Checking Rhea-CHEBI mapping file...")
+def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
+    logging.info("Step 0/5: Checking Rhea-CHEBI mapping file...")
     if not rhea2chebi:
         logging.info("Rhea-CHEBI mapping not provided. Starting download...")
         download_path = Path("./data/")
@@ -22,30 +23,39 @@ def main(input: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
         finally:
             logging.info(f"File downloaded successfully and saved to {rhea2chebi.resolve()}")
 
-    logging.info(f"Step 1/4: Reading input file {input.resolve()}")
+    logging.info(f"Step 1/5: Reading input file {input.resolve()}")
     diamond_df = pd.read_csv(input, sep='\t', usecols=['uniref90_ID', 'contig_name'])
-    diamond_df[['protein_id', 'contig']] = diamond_df['contig_name'].str.split('-', n=1, expand=True)
+    diamond_df.rename(columns={'contig_name': 'protein_id'}, inplace=True)
+    diamond_df['contig_id'] = diamond_df['protein_id'].str.split('-', n=1, expand=True)[1]
     diamond_df['uniref90_rep'] = diamond_df['uniref90_ID'].str.split('_').str[1]
 
-    logging.info(f"Step 2/4: Adding RHEA IDs based on provided file {up2rhea.resolve()}")
+    logging.info(f"Step 2/5: Adding RHEA IDs based on provided file {up2rhea.resolve()}")
     up2rhea_df = pd.read_csv(up2rhea, sep='\t', usecols=['Entry','Rhea ID'])
     up2rhea_df.columns = ['unirefKB_id', 'rhea_id']
     diamond_df = diamond_df.merge(up2rhea_df, left_on='uniref90_rep', right_on="unirefKB_id", how='left')
     diamond_df['rhea_id'] = diamond_df['rhea_id'].str.split()
     diamond_df = diamond_df.explode('rhea_id')
 
-    logging.info(f"Step 3/4: Adding CHEBI reactions based on provided file {rhea2chebi.resolve()}")
+    logging.info(f"Step 3/5: Adding CHEBI reactions based on provided file {rhea2chebi.resolve()}")
     rhea2chebi_df = pd.read_csv(rhea2chebi, sep='\t')
     rhea2chebi_df.columns = ['rhea_id', 'definition', 'chebi_reaction', 'enzyme_id']
     diamond_df = diamond_df.merge(rhea2chebi_df[['rhea_id', 'chebi_reaction']], on='rhea_id', how='left')
-    diamond_df = diamond_df.drop(columns=['contig_name', 'unirefKB_id', 'uniref90_rep'])
+    diamond_df = diamond_df.drop(columns=['unirefKB_id', 'uniref90_rep'])
 
-    logging.info(f"Step 4/4: Saving output table to {output.resolve()}")
-    diamond_df = diamond_df[['contig', 'protein_id', 'uniref90_ID', 'rhea_id', 'chebi_reaction']]
+    logging.info(f"Step 4/5: Parsing protein sequences and calculating SHA256 hash from {proteins.resolve()}")
+    protein_hashes = {}
+    with open(proteins, 'r') as fasta_file:
+        for record in SeqIO.parse(fasta_file, "fasta"):
+            protein_hash = hashlib.sha256(str(record.seq).encode('utf-8')).hexdigest()
+            protein_hashes[record.id] = protein_hash
+    
+    diamond_df['checksum'] = diamond_df['protein_id'].map(protein_hashes)
+
+    logging.info(f"Step 5/5: Saving output table to {output.resolve()}")
+    diamond_df = diamond_df[['contig_id', 'protein_id', 'checksum', 'uniref90_ID', 'rhea_id', 'chebi_reaction']]
     diamond_df.to_csv(output, sep="\t", index=False)
 
     logging.info("Processed successfully. Exiting.")
-
 
 def download_and_convert_to_tsv(download_path: Path)  -> Path:
     url = "https://ftp.expasy.org/databases/rhea/txt/rhea-reactions.txt.gz"
@@ -78,7 +88,6 @@ def download_and_convert_to_tsv(download_path: Path)  -> Path:
     gz_file_path.unlink()
     return tsv_file_path
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("""
                                      Use diamond output file to create a table with Rhea and CHEBI 
@@ -89,6 +98,12 @@ if __name__ == "__main__":
         required=True, 
         type=Path, 
         help="DIAMOND results file"
+    )
+    parser.add_argument(
+        "-p", "--proteins", 
+        required=True, 
+        type=Path, 
+        help="Protein fasta file used as DIAMOND input"
     )
     parser.add_argument(
         "-o", "--output", 
@@ -109,4 +124,4 @@ if __name__ == "__main__":
         help="File that maps UniProt IDs to Rhea. Must contain at least 2 columns 'Entry' and 'Rhea ID'",
     ) 
     args = parser.parse_args()
-    main(args.input, args.output, args.rhea2chebi, args.up2rhea)
+    main(args.input, args.proteins, args.output, args.rhea2chebi, args.up2rhea)

@@ -1,14 +1,30 @@
-- name: add_rhea_chebi_annotation test_download_rhea2chebi
+- name: Add Rhea and CHEBI annotation test - Download of rhea2chebi mapping
   tags:
     - add_rhea_chebi_annotation
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation -p tests/fixtures/diamond/proteins_short.faa -i tests/fixtures/diamond/diamond_short.tsv -o short_test.tsv --up2rhea tests/fixtures/diamond/up2rhea_short.tsv
+  command: >
+    python
+    -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    -p tests/fixtures/diamond/proteins_short.faa
+    -i tests/fixtures/diamond/diamond_short.tsv
+    -o short_test_download.tsv
+    --up2rhea tests/fixtures/diamond/up2rhea_short.tsv
+  exit_code: 0
   files:
     - path: "short_test_download.tsv"
       md5sum: 9a133edb6d8ffdedda043656164642b7
-- name: add_rhea_chebi_annotation test_providing_rhea2chebi
+    - path: "rhea2chebi.tsv"
+- name: Add Rhea and CHEBI annotation test - Local rhea2chebi mapping
   tags:
     - add_rhea_chebi_annotation
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation -p tests/fixtures/diamond/proteins_short.faa -i tests/fixtures/diamond/diamond_short.tsv -o short_test.tsv --up2rhea tests/fixtures/diamond/up2rhea_short.tsv --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv
+  command: >
+    python
+    -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    -p tests/fixtures/diamond/proteins_short.faa
+    -i tests/fixtures/diamond/diamond_short.tsv
+    -o short_test.tsv
+    --up2rhea tests/fixtures/diamond/up2rhea_short.tsv
+    --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv
+  exit_code: 0
   files:
     - path: "short_test.tsv"
       md5sum: 9a133edb6d8ffdedda043656164642b7

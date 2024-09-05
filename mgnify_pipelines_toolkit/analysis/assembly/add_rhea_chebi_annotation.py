@@ -20,8 +20,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         except:
             logging.info("Failed to download file. Exiting...")
             sys.exit(1)
-        finally:
-            logging.info(f"File downloaded successfully and saved to {rhea2chebi.resolve()}")
+        logging.info(f"File downloaded successfully and saved to {rhea2chebi.resolve()}")
 
     logging.info(f"Step 1/5: Reading input file {input.resolve()}")
     diamond_df = pd.read_csv(input, sep='\t', usecols=['uniref90_ID', 'contig_name'])
@@ -42,7 +41,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
     diamond_df = diamond_df.merge(rhea2chebi_df[['rhea_id', 'chebi_reaction']], on='rhea_id', how='left')
     diamond_df = diamond_df.drop(columns=['unirefKB_id', 'uniref90_rep'])
 
-    logging.info(f"Step 4/5: Parsing protein sequences and calculating SHA256 hash from {proteins.resolve()}")
+    logging.info(f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}")
     protein_hashes = {}
     with open(proteins, 'r') as fasta_file:
         for record in SeqIO.parse(fasta_file, "fasta"):

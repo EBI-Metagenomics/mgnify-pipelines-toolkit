@@ -24,9 +24,9 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
 
     logging.info(f"Step 1/5: Reading input file {input.resolve()}")
     diamond_df = pd.read_csv(input, sep='\t', usecols=['uniref90_ID', 'contig_name'])
-    diamond_df.rename(columns={'contig_name': 'protein_id'}, inplace=True)
-    diamond_df['contig_id'] = diamond_df['protein_id'].str.split('-', n=1, expand=True)[1]
-    diamond_df['uniref90_rep'] = diamond_df['uniref90_ID'].str.split('_').str[1]
+    diamond_df.rename(columns={'contig_name': 'protein_id'}, inplace=True)   # rename the column because in fact it contains protein names
+    diamond_df['contig_id'] = diamond_df['protein_id'].str.split('-', n=1, expand=True)[1]   # protein name contains a contig name
+    diamond_df['uniref90_rep'] = diamond_df['uniref90_ID'].str.split('_').str[1]   # UniRef90 cluster name contains a representative protein name
 
     logging.info(f"Step 2/5: Adding RHEA IDs based on provided file {up2rhea.resolve()}")
     up2rhea_df = pd.read_csv(up2rhea, sep='\t', usecols=['Entry','Rhea ID'])

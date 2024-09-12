@@ -21,6 +21,13 @@ def get_metadata_from_run_acc(run_acc):
 
     res_samples = requests.get(f"{url}/samples/{sample_acc}/metadata", headers=headers)
 
+    res_samples_studies = requests.get(
+        f"{url}/samples/{sample_acc}/studies", headers=headers
+    )
+    study_acc = res_samples_studies.json()["data"][0]["attributes"][
+        "secondary-accession"
+    ]
+
     fields_of_interest = {
         "geographic location (longitude)": "decimalLongitude",
         "geographic location (latitude)": "decimalLatitude",
@@ -30,6 +37,7 @@ def get_metadata_from_run_acc(run_acc):
 
     res_dict = defaultdict(list)
     res_dict["SampleID"].append(sample_acc)
+    res_dict["StudyID"].append(study_acc)
     res_dict["RunID"].append(run_acc)
 
     present_fields = []
@@ -81,7 +89,7 @@ def get_all_runs_from_studies(data_path, study_list):
 
 def get_all_asv_data_from_runs(data_path, study_list):
 
-    asv_dict = defaultdict(dict)
+    asv_dict = {}
 
     no_asv_runs = []
     for study in study_list:
@@ -139,6 +147,7 @@ def cleanup_taxa(df):
     cleaned_df = cleaned_df[
         [
             "ASVID",
+            "StudyID",
             "SampleID",
             "RunID",
             "decimalLongitude",
@@ -165,7 +174,6 @@ def main():
     data_path = "/hps/nobackup/rdf/metagenomics/service-team/users/chrisata/atlanteco_v6/analysis"
     # data_path = "/hps/software/users/rdf/metagenomics/service-team/users/chrisata/mgnify-pipelines-toolkit/metadata_asv_test_data"
     study_list = ["ERP107119", "ERP129129", "SRP279131"]
-    # study_list = ['ERP107119']
 
     asv_dict = get_all_asv_data_from_runs(data_path, study_list)
     all_runs = get_all_runs_from_studies(data_path, study_list)
@@ -174,10 +182,11 @@ def main():
     all_merged_df = []
 
     for run in all_runs:
-        run_asv_data = asv_dict[run]
-        run_metadata = run_metadata_dict[run]
-        run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
-        all_merged_df.append(run_merged_result)
+        if run in asv_dict.keys() and run in run_metadata_dict.keys():
+            run_asv_data = asv_dict[run]
+            run_metadata = run_metadata_dict[run]
+            run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
+            all_merged_df.append(run_merged_result)
 
     final_df = pd.concat(all_merged_df, ignore_index=True)
 
@@ -185,16 +194,8 @@ def main():
 
     final_df.to_csv("all_merged.csv", index=False, na_rep="NA")
 
-    # print(final_df)
 
-    # run_acc = "ERR2356286"
-
-    # run_metadata_dict = defaultdict(dict)
-    # res_dict = get_metadata_from_run_acc(run_acc)
-
-    # run_metadata_dict[run_acc] = res_dict
-
-    # print(run_metadata_dict)
+# TODO NEED TO FIX THE NON-NA EMPTYS (',,')
 
 
 if __name__ == "__main__":

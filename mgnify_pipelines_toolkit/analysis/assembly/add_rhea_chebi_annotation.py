@@ -44,9 +44,16 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         f"Step 3/5: Adding CHEBI reactions based on provided file {rhea2chebi.resolve()}"
     )
     rhea2chebi_df = pd.read_csv(rhea2chebi, sep="\t")
-    rhea2chebi_df.columns = ["rhea_id", "definition", "chebi_reaction", "enzyme_id"]
+    rhea2chebi_df.columns = [
+        "rhea_id",
+        "reaction_definition",
+        "chebi_reaction",
+        "enzyme_id",
+    ]
     diamond_df = diamond_df.merge(
-        rhea2chebi_df[["rhea_id", "chebi_reaction"]], on="rhea_id", how="left"
+        rhea2chebi_df[["rhea_id", "chebi_reaction", "reaction_definition"]],
+        on="rhea_id",
+        how="left",
     )
     diamond_df = diamond_df.drop(columns=["unirefKB_id", "uniref90_rep"])
 
@@ -69,6 +76,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
             "checksum",
             "uniref90_ID",
             "rhea_id",
+            "reaction_definition",
             "chebi_reaction",
         ]
     ]

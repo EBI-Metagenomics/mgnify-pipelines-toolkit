@@ -10,6 +10,13 @@ import pandas as pd
 import requests
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()],
+)
+
+
 def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
     logging.info("Step 0/5: Checking Rhea-CHEBI mapping file...")
     if not rhea2chebi:

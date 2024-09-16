@@ -11,7 +11,7 @@
   exit_code: 0
   files:
     - path: "short_test_download.tsv"
-      md5sum: 9a133edb6d8ffdedda043656164642b7
+      md5sum: 2d648505828c9158ded68dd75612f923
     - path: "rhea2chebi.tsv"
 - name: Add Rhea and CHEBI annotation test - Local rhea2chebi mapping
   tags:
@@ -27,4 +27,4 @@
   exit_code: 0
   files:
     - path: "short_test.tsv"
-      md5sum: 9a133edb6d8ffdedda043656164642b7
+      md5sum: 2d648505828c9158ded68dd75612f923

@@ -102,7 +102,7 @@ def main():
     ]
     open_files = {}
     for record in SeqIO.parse(args.input, "fasta"):
-        model = "-".join(record.id.split("/")[0].split("-")[1:])
+        model = "-".join(record.id.split("/")[0].split("-")[-1:])
         if model in coding_rna:
             filename = pattern_dict[model]
         else:

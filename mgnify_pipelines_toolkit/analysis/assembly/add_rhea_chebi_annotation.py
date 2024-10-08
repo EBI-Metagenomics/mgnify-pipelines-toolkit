@@ -44,6 +44,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         )
 
     logging.info(f"Step 1/5: Reading input file {input.resolve()}")
+    # TODO File is quite big, inadequate memory load
     diamond_df = pd.read_csv(
         input,
         sep="\t",
@@ -51,23 +52,27 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         names=["protein_id", "uniref90_ID", "e_value"],
         header=None,
     )
-
-    diamond_df["rank"] = diamond_df.groupby("protein_id")["e_value"].rank(
-        method="first"
-    )
-
-    split_protein_id = diamond_df["protein_id"].str.split("_", n=1, expand=True)
-    diamond_df["contig_id"] = split_protein_id[0]
     # UniRef90 cluster name contains a representative protein name
     diamond_df["uniref90_rep"] = diamond_df["uniref90_ID"].str.split("_").str[1]
+
     logging.info(
         f"Step 2/5: Adding RHEA IDs based on provided file {up2rhea.resolve()}"
     )
+    # TODO File is quite big, inadequate memory load
     up2rhea_df = pd.read_csv(up2rhea, sep="\t", usecols=["Entry", "Rhea ID"])
     up2rhea_df.columns = ["unirefKB_id", "rhea_id"]
     diamond_df = diamond_df.merge(
         up2rhea_df, left_on="uniref90_rep", right_on="unirefKB_id", how="left"
     )
+    diamond_df = diamond_df[diamond_df["rhea_id"].notna()]
+
+    split_protein_id = diamond_df["protein_id"].str.split("_", n=1, expand=True)
+    diamond_df["contig_id"] = split_protein_id[0]
+
+    diamond_df["rank"] = diamond_df.groupby("protein_id")["e_value"].rank(
+        method="first"
+    )
+
     diamond_df["rhea_id"] = diamond_df["rhea_id"].str.split()
     diamond_df = diamond_df.explode("rhea_id")
 
@@ -86,6 +91,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         on="rhea_id",
         how="left",
     )
+
     grouped_df = (
         diamond_df.groupby(
             ["protein_id", "rhea_id", "reaction_definition", "chebi_reaction"]
@@ -93,20 +99,22 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         .agg(
             {
                 "uniref90_ID": lambda x: ",".join(x),  # Combine all UniRef90 IDs
-                "rank": "min",  # Top hit (first match) based on the smallest rank
+                "rank": "min",
             }
         )
         .reset_index()
     )
 
+    # Assign top hit based on first match with RHEA IDs
+    grouped_df["top_hit"] = grouped_df["rank"].apply(
+        lambda x: "top hit" if x == 1 else ""
+    )
+
+    # Merge contig ID back into the grouped dataframe
     grouped_df = grouped_df.merge(
         diamond_df[["protein_id", "contig_id"]].drop_duplicates(),
         on="protein_id",
         how="left",
-    )
-
-    grouped_df["top_hit"] = grouped_df["rank"].apply(
-        lambda x: "top hit" if x == 1 else ""
     )
 
     logging.info(

@@ -56,8 +56,8 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         method="first"
     )
 
-    split_protein_id = diamond_df["protein_id"].str.split("-", n=1, expand=True)
-    diamond_df["contig_id"] = split_protein_id[1]
+    split_protein_id = diamond_df["protein_id"].str.split("_", n=1, expand=True)
+    diamond_df["contig_id"] = split_protein_id[0]
     # UniRef90 cluster name contains a representative protein name
     diamond_df["uniref90_rep"] = diamond_df["uniref90_ID"].str.split("_").str[1]
     logging.info(
@@ -86,7 +86,6 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         on="rhea_id",
         how="left",
     )
-    logging.info(f"Diamond DataFrame:\n{diamond_df.head()}")
     grouped_df = (
         diamond_df.groupby(
             ["protein_id", "rhea_id", "reaction_definition", "chebi_reaction"]
@@ -127,7 +126,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
             "contig_id",
             "protein_id",
             "checksum",
-            "uniref90_ID",
+            # "uniref90_ID",
             "rhea_id",
             "reaction_definition",
             "chebi_reaction",

@@ -44,10 +44,18 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         )
 
     logging.info(f"Step 1/5: Reading input file {input.resolve()}")
-    diamond_df = pd.read_csv(input, sep="\t", usecols=["uniref90_ID", "contig_name"])
-    # rename the column because in fact it contains protein names
-    diamond_df.rename(columns={"contig_name": "protein_id"}, inplace=True)
-    # protein name contains a contig name
+    diamond_df = pd.read_csv(
+        input,
+        sep="\t",
+        usecols=[0, 1, 10],
+        names=["protein_id", "uniref90_ID", "e_value"],
+        header=None,
+    )
+
+    diamond_df["rank"] = diamond_df.groupby("protein_id")["e_value"].rank(
+        method="first"
+    )
+
     split_protein_id = diamond_df["protein_id"].str.split("-", n=1, expand=True)
     diamond_df["contig_id"] = split_protein_id[1]
     # UniRef90 cluster name contains a representative protein name
@@ -78,7 +86,29 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         on="rhea_id",
         how="left",
     )
-    diamond_df = diamond_df.drop(columns=["unirefKB_id", "uniref90_rep"])
+    logging.info(f"Diamond DataFrame:\n{diamond_df.head()}")
+    grouped_df = (
+        diamond_df.groupby(
+            ["protein_id", "rhea_id", "reaction_definition", "chebi_reaction"]
+        )
+        .agg(
+            {
+                "uniref90_ID": lambda x: ",".join(x),  # Combine all UniRef90 IDs
+                "rank": "min",  # Top hit (first match) based on the smallest rank
+            }
+        )
+        .reset_index()
+    )
+
+    grouped_df = grouped_df.merge(
+        diamond_df[["protein_id", "contig_id"]].drop_duplicates(),
+        on="protein_id",
+        how="left",
+    )
+
+    grouped_df["top_hit"] = grouped_df["rank"].apply(
+        lambda x: "top hit" if x == 1 else ""
+    )
 
     logging.info(
         f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}"
@@ -89,10 +119,10 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
             protein_hash = hashlib.sha256(str(record.seq).encode("utf-8")).hexdigest()
             protein_hashes[record.id] = protein_hash
 
-    diamond_df["checksum"] = diamond_df["protein_id"].map(protein_hashes)
+    grouped_df["checksum"] = grouped_df["protein_id"].map(protein_hashes)
 
     logging.info(f"Step 5/5: Saving output table to {output.resolve()}")
-    diamond_df = diamond_df[
+    grouped_df = grouped_df[
         [
             "contig_id",
             "protein_id",
@@ -101,9 +131,10 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
             "rhea_id",
             "reaction_definition",
             "chebi_reaction",
+            "top_hit",
         ]
     ]
-    diamond_df.to_csv(output, sep="\t", index=False)
+    grouped_df.to_csv(output, sep="\t", index=False)
 
     logging.info("Processed successfully. Exiting.")
 
@@ -171,7 +202,7 @@ if __name__ == "__main__":
         "--rhea2chebi",
         default=None,
         type=Path,
-        help="File that maps rhea_idss to CHEBI. Will be downloaded if not provided",
+        help="File that maps rhea_ids to CHEBI. Will be downloaded if not provided",
     )
     parser.add_argument(
         "--up2rhea",

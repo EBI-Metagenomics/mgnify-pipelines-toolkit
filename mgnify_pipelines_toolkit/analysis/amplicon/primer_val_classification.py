@@ -58,19 +58,20 @@ def parse_args():
     return input, fasta, sample
 
 
-def get_amp_region(beg, strand, model):
+def get_amp_region(beg, end, strand, model):
     prev_region = ""
 
     for region, region_coords in model.items():
 
         region_beg = region_coords[0]
         beg_diff = region_beg - beg
+        end_diff = region_beg - end
 
         if strand == STRAND_FWD:
-            if beg_diff > 0:
+            if beg_diff > 0 and end_diff > 0:
                 return region
         else:
-            if beg_diff > 0:
+            if beg_diff > 0 and end_diff > 0:
                 return prev_region
 
         prev_region = region
@@ -92,6 +93,7 @@ def main():
             primer_name = line_lst[0]
             rfam = line_lst[3]
             beg = float(line_lst[5])
+            end = float(line_lst[6])
 
             if rfam == "RF00177":
                 gene = "16S"
@@ -116,7 +118,7 @@ def main():
             elif "R" in primer_name:
                 strand = STRAND_REV
 
-            amp_region = get_amp_region(beg, strand, model)
+            amp_region = get_amp_region(beg, end, strand, model)
             primer_seq = str(fasta_dict[primer_name].seq)
 
             res_dict["Gene"].append(gene)

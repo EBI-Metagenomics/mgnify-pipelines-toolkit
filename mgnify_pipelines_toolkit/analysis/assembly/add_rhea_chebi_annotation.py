@@ -59,7 +59,7 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         f"Step 2/5: Adding RHEA IDs based on provided file {up2rhea.resolve()}"
     )
     # TODO File is quite big, inadequate memory load
-    up2rhea_df = pd.read_csv(up2rhea, sep="\t", usecols=["Entry", "Rhea ID"])
+    up2rhea_df = pd.read_csv(up2rhea, sep="\t", header=None)
     up2rhea_df.columns = ["unirefKB_id", "rhea_id"]
     diamond_df = diamond_df.merge(
         up2rhea_df, left_on="uniref90_rep", right_on="unirefKB_id", how="left"

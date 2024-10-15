@@ -44,8 +44,8 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
         )
 
     logging.info(f"Step 1/5: Loading RHEA ids from provided file {up2rhea.resolve()}")
-    df = pd.read_csv(up2rhea, delimiter="\t")
-    up2rhea_dict = dict(zip(df.iloc[:, 0], df.iloc[:, 2].str.split()))
+    df = pd.read_csv(up2rhea, delimiter="\t", header=None)
+    up2rhea_dict = dict(zip(df.iloc[:, 0], df.iloc[:, 1].str.split()))
 
     logging.info(
         f"Step 2/5: Loading reactions from provided file {rhea2chebi.resolve()}"

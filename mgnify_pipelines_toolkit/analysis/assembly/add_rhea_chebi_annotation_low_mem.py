@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
 import gzip
 import hashlib
 import logging
@@ -54,20 +55,17 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
     rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
 
     logging.info(f"Step 3/5: Reading input file {input.resolve()}")
-    query2rhea = {}
+    query2rhea = defaultdict(dict)
     with open(input) as fh:
         for line in fh:
             parts = line.strip().split("\t")
             protein_id, uniref90_ID = parts[0], parts[1].split("_")[1]
             rhea_list = up2rhea_dict.get(uniref90_ID, [])
+            top_hit = "top hit" if rhea_list and protein_id not in query2rhea else ""
 
             for rhea in rhea_list:
                 chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                if protein_id not in query2rhea:
-                    query2rhea[protein_id] = {}
-                    query2rhea[protein_id][rhea] = (chebi_reaction, reaction, "top hit")
-                elif rhea not in query2rhea[protein_id]:
-                    query2rhea[protein_id][rhea] = (chebi_reaction, reaction, "")
+                query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
 
     logging.info(
         f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}"

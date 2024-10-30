@@ -35,7 +35,7 @@ logging.basicConfig(
 )
 
 
-def main(proteins: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
+def main(proteins: Path, output: Path, rhea2chebi: Path):
     logging.info("Step 0/5: Checking Rhea-CHEBI mapping file...")
     if not rhea2chebi:
         logging.info("Rhea-CHEBI mapping is not provided. Starting download...")
@@ -61,9 +61,10 @@ def main(proteins: Path, output: Path, rhea2chebi: Path, up2rhea: Path):
         top_hit = "top hit" if rhea_list and protein_id not in processed_queries else ""
 
         for rhea in rhea_list:
-            chebi_reaction, reaction = rhea2reaction_dict[rhea]
-            query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
-            processed_queries.add(protein_id)
+            if rhea not in query2rhea[protein_id]:
+                chebi_reaction, reaction = rhea2reaction_dict[rhea]
+                query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
+                processed_queries.add(protein_id)
 
     logging.info(
         f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}"
@@ -155,11 +156,6 @@ if __name__ == "__main__":
         type=Path,
         help="File that maps rhea_ids to CHEBI. Will be downloaded if not provided",
     )
-    parser.add_argument(
-        "--up2rhea",
-        required=True,
-        type=Path,
-        help="File that maps UniProt IDs to Rhea. Must contain at least 2 columns 'Entry' and 'Rhea ID'",
-    )
+
     args = parser.parse_args()
-    main(args.proteins, args.output, args.rhea2chebi, args.up2rhea)
+    main(args.proteins, args.output, args.rhea2chebi)

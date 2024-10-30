@@ -64,8 +64,9 @@ def main(input: Path, proteins: Path, output: Path, rhea2chebi: Path, up2rhea: P
             top_hit = "top hit" if rhea_list and protein_id not in query2rhea else ""
 
             for rhea in rhea_list:
-                chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
+                if rhea not in query2rhea[protein_id]:
+                    chebi_reaction, reaction = rhea2reaction_dict[rhea]
+                    query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
 
     logging.info(
         f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}"

@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import gzip
 import hashlib
 import logging
@@ -36,7 +35,7 @@ logging.basicConfig(
 
 
 def main(proteins: Path, output: Path, rhea2chebi: Path):
-    logging.info("Step 0/5: Checking Rhea-CHEBI mapping file...")
+    logging.info("Step 0/3: Check Rhea-CHEBI mapping file...")
     if not rhea2chebi:
         logging.info("Rhea-CHEBI mapping is not provided. Starting download...")
         download_path = Path(".")
@@ -46,28 +45,7 @@ def main(proteins: Path, output: Path, rhea2chebi: Path):
         )
 
     logging.info(
-        f"Step 2/5: Loading reactions from provided file {rhea2chebi.resolve()}"
-    )
-    df = pd.read_csv(rhea2chebi, delimiter="\t")
-    rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
-
-    logging.info("Step 3/5: Reading DIAMOND results from STDIN")
-    query2rhea = defaultdict(dict)
-    processed_queries = set()
-    for line in sys.stdin:
-        parts = line.strip().split("\t")
-        protein_id = parts[0]
-        rhea_list = parts[-1].split("RheaID=")[1].split()
-        top_hit = "top hit" if rhea_list and protein_id not in processed_queries else ""
-
-        for rhea in rhea_list:
-            if rhea not in query2rhea[protein_id]:
-                chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                query2rhea[protein_id][rhea] = (chebi_reaction, reaction, top_hit)
-                processed_queries.add(protein_id)
-
-    logging.info(
-        f"Step 4/5: Parsing protein fasta and calculating SHA256 hash from {proteins.resolve()}"
+        f"Step 1/3: Parse protein fasta and calculating SHA256 hash from {proteins.resolve()}"
     )
     protein_hashes = {}
     with open(proteins, "r") as fasta_file:
@@ -75,21 +53,40 @@ def main(proteins: Path, output: Path, rhea2chebi: Path):
             protein_hash = hashlib.sha256(str(record.seq).encode("utf-8")).hexdigest()
             protein_hashes[record.id] = protein_hash
 
-    logging.info(f"Step 5/5: Finalising and saving output table to {output.resolve()}")
+    logging.info(f"Step 2/3: Load reactions from provided file {rhea2chebi.resolve()}")
+    df = pd.read_csv(rhea2chebi, delimiter="\t")
+    rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
+
+    logging.info("Step 3/3: Read DIAMOND results from STDIN and write output")
     with open(output, "w") as fh:
-        for protein_id in query2rhea:
-            contig_id = protein_id.split("_")[0]
-            protein_hash = protein_hashes.get(protein_id, "N/A")
-            for rhea in query2rhea[protein_id]:
-                print(
-                    contig_id,
-                    protein_id,
-                    protein_hash,
-                    rhea,
-                    "\t".join(query2rhea[protein_id][rhea]),
-                    sep="\t",
-                    file=fh,
-                )
+        current_protein = None
+        for line in sys.stdin:
+            parts = line.strip().split("\t")
+            protein_id = parts[0]
+            if protein_id != current_protein:
+                current_protein = protein_id
+                protein_rheas = set()
+            rhea_list = parts[-1].split("RheaID=")[1].split()
+            top_hit = "top hit" if rhea_list and not protein_rheas else ""
+
+            for rhea in rhea_list:
+                if rhea not in protein_rheas:
+                    chebi_reaction, reaction = rhea2reaction_dict[rhea]
+                    contig_id = protein_id.split("_")[0]
+                    protein_hash = protein_hashes.get(protein_id, "N/A")
+
+                    print(
+                        contig_id,
+                        protein_id,
+                        protein_hash,
+                        rhea,
+                        chebi_reaction,
+                        reaction,
+                        top_hit,
+                        sep="\t",
+                        file=fh,
+                    )
+                    protein_rheas.add(rhea)
 
     logging.info("Processed successfully. Exiting.")
 

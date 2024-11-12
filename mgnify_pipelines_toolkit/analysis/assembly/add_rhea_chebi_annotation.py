@@ -31,6 +31,37 @@ logging.basicConfig(
 )
 
 
+def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
+    current_protein = None
+    for line in lines:
+        parts = line.strip().split("\t")
+        protein_id = parts[0]
+        if protein_id != current_protein:
+            current_protein = protein_id
+            protein_rheas = set()
+        rhea_list = parts[-1].split("RheaID=")[1].split()
+        top_hit = "top hit" if rhea_list and not protein_rheas else ""
+
+        for rhea in rhea_list:
+            if rhea not in protein_rheas:
+                chebi_reaction, reaction = rhea2reaction_dict[rhea]
+                contig_id = protein_id.split("_")[0]
+                protein_hash = protein_hashes[protein_id]
+
+                print(
+                    contig_id,
+                    protein_id,
+                    protein_hash,
+                    rhea,
+                    chebi_reaction,
+                    reaction,
+                    top_hit,
+                    sep="\t",
+                    file=output_handler,
+                )
+                protein_rheas.add(rhea)
+
+
 def main(input: str, output: Path, proteins: Path, rhea2chebi: Path):
     logging.info(
         f"Step 1/3: Parse protein fasta and calculating SHA256 hash from {proteins.resolve()}"
@@ -45,36 +76,17 @@ def main(input: str, output: Path, proteins: Path, rhea2chebi: Path):
     df = pd.read_csv(rhea2chebi, delimiter="\t")
     rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
 
-    logging.info("Step 3/3: Read DIAMOND results from STDIN and write output")
-    with open(output, "w") as fh:
-        current_protein = None
-        for line in sys.stdin:
-            parts = line.strip().split("\t")
-            protein_id = parts[0]
-            if protein_id != current_protein:
-                current_protein = protein_id
-                protein_rheas = set()
-            rhea_list = parts[-1].split("RheaID=")[1].split()
-            top_hit = "top hit" if rhea_list and not protein_rheas else ""
-
-            for rhea in rhea_list:
-                if rhea not in protein_rheas:
-                    chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                    contig_id = protein_id.split("_")[0]
-                    protein_hash = protein_hashes[protein_id]
-
-                    print(
-                        contig_id,
-                        protein_id,
-                        protein_hash,
-                        rhea,
-                        chebi_reaction,
-                        reaction,
-                        top_hit,
-                        sep="\t",
-                        file=fh,
-                    )
-                    protein_rheas.add(rhea)
+    logging.info(
+        f"Step 3/3: Read DIAMOND results from {'STDIN' if input == '-' else Path(input).resolve()} and write output"
+    )
+    with open(output, "w") as output_handler:
+        if input == "-":
+            process_lines(sys.stdin, output_handler, rhea2reaction_dict, protein_hashes)
+        else:
+            with open(args.input, "r") as input_file:
+                process_lines(
+                    input_file, output_handler, rhea2reaction_dict, protein_hashes
+                )
 
     logging.info("Processed successfully. Exiting.")
 

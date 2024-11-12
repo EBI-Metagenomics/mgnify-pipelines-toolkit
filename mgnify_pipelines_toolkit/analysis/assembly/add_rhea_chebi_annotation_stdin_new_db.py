@@ -73,7 +73,7 @@ def main(proteins: Path, output: Path, rhea2chebi: Path):
                 if rhea not in protein_rheas:
                     chebi_reaction, reaction = rhea2reaction_dict[rhea]
                     contig_id = protein_id.split("_")[0]
-                    protein_hash = protein_hashes.get(protein_id, "N/A")
+                    protein_hash = protein_hashes[protein_id]
 
                     print(
                         contig_id,

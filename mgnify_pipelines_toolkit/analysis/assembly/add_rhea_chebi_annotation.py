@@ -31,7 +31,7 @@ logging.basicConfig(
 )
 
 
-def main(proteins: Path, output: Path, rhea2chebi: Path):
+def main(input: str, output: Path, proteins: Path, rhea2chebi: Path):
     logging.info(
         f"Step 1/3: Parse protein fasta and calculating SHA256 hash from {proteins.resolve()}"
     )
@@ -82,16 +82,16 @@ def main(proteins: Path, output: Path, rhea2chebi: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         """
-                                     Use diamond output file to create a table with Rhea and CHEBI
-                                     reaction annotation for every protein.
-                                     """
+                                    Use diamond output file to create a table with Rhea and CHEBI
+                                    reaction annotation for every protein.
+                                    """
     )
     parser.add_argument(
-        "-p",
-        "--proteins",
+        "-i",
+        "--input",
         required=True,
-        type=Path,
-        help="Protein fasta file used as DIAMOND input",
+        type=str,
+        help="DIAMOND results file, use '-' for stdin",
     )
     parser.add_argument(
         "-o",
@@ -101,6 +101,13 @@ if __name__ == "__main__":
         help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, rhea_ids, CHEBI reaction participants",
     )
     parser.add_argument(
+        "-p",
+        "--proteins",
+        required=True,
+        type=Path,
+        help="Protein fasta file used as DIAMOND input",
+    )
+    parser.add_argument(
         "--rhea2chebi",
         default=None,
         type=Path,
@@ -108,4 +115,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(args.proteins, args.output, args.rhea2chebi)
+    main(args.input, args.output, args.proteins, args.rhea2chebi)

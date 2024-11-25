@@ -1,0 +1,82 @@
+ENTRY	DEFINITION	EQUATION	ENZYME
+RHEA:10164	(2R)-2-phosphoglycerate = H2O + phosphoenolpyruvate	CHEBI:58289 = CHEBI:15377 + CHEBI:58702
+RHEA:10240	a 2,3-saturated acyl-[ACP] + NAD(+) = a (2E)-enoyl-[ACP] + H(+) + NADH	CHEBI:78785 + CHEBI:57540 = CHEBI:78784 + CHEBI:15378 + CHEBI:57945
+RHEA:10248	dUTP + H2O = diphosphate + dUMP + H(+)	CHEBI:61555 + CHEBI:15377 = CHEBI:33019 + CHEBI:246422 + CHEBI:15378
+RHEA:10388	GTP + oxaloacetate = CO2 + GDP + phosphoenolpyruvate	CHEBI:37565 + CHEBI:16452 = CHEBI:16526 + CHEBI:58189 + CHEBI:58702
+RHEA:10532	(1S,2R)-1-C-(indol-3-yl)glycerol 3-phosphate + L-serine = D-glyceraldehyde 3-phosphate + H2O + L-tryptophan	CHEBI:58866 + CHEBI:33384 = CHEBI:59776 + CHEBI:15377 + CHEBI:57912
+RHEA:11708	H2O + IMP + NAD(+) = H(+) + NADH + XMP	CHEBI:15377 + CHEBI:58053 + CHEBI:57540 = CHEBI:15378 + CHEBI:57945 + CHEBI:57464
+RHEA:11844	acetyl-CoA + formate = CoA + pyruvate	CHEBI:57288 + CHEBI:15740 = CHEBI:57287 + CHEBI:15361
+RHEA:12120	alpha-D-glucose 1-phosphate + ATP + H(+) = ADP-alpha-D-glucose + diphosphate	CHEBI:58601 + CHEBI:30616 + CHEBI:15378 = CHEBI:57498 + CHEBI:33019
+RHEA:12460	(S)-malate = fumarate + H2O	CHEBI:15589 = CHEBI:29806 + CHEBI:15377
+RHEA:12665	a 2-deoxystreptamine antibiotic + acetyl-CoA = an N(3')-acetyl-2-deoxystreptamine antibiotic + CoA + H(+)	CHEBI:77452 + CHEBI:57288 = CHEBI:57921 + CHEBI:57287 + CHEBI:15378
+RHEA:12813	L-glutamate = D-glutamate	CHEBI:29985 = CHEBI:29986
+RHEA:13017	diphosphate + UMP = 5-phospho-alpha-D-ribose 1-diphosphate + uracil	CHEBI:33019 + CHEBI:57865 = CHEBI:58017 + CHEBI:17568
+RHEA:13065	ATP + H2O = ADP + H(+) + phosphate	CHEBI:30616 + CHEBI:15377 = CHEBI:456216 + CHEBI:15378 + CHEBI:43474
+RHEA:13193	5-carboxyamino-1-(5-phospho-D-ribosyl)imidazole + H(+) = 5-amino-1-(5-phospho-D-ribosyl)imidazole-4-carboxylate	CHEBI:58730 + CHEBI:15378 = CHEBI:77657
+RHEA:13409	7-aminomethyl-7-carbaguanine + 2 NADP(+) = 7-cyano-7-deazaguanine + 3 H(+) + 2 NADPH	CHEBI:58703 + 2 CHEBI:58349 = CHEBI:45075 + 3 CHEBI:15378 + 2 CHEBI:57783
+RHEA:13481	ATP + L-methionine + tRNA(Met) = AMP + diphosphate + L-methionyl-tRNA(Met)	CHEBI:30616 + CHEBI:57844 + CHEBI:78442 = CHEBI:456215 + CHEBI:33019 + CHEBI:78530
+RHEA:13493	(2R,3R)-2,3-dihydroxy-3-methylpentanoate + NADP(+) = (S)-2-ethyl-2-hydroxy-3-oxobutanoate + H(+) + NADPH	CHEBI:49258 + CHEBI:58349 = CHEBI:49256 + CHEBI:15378 + CHEBI:57783
+RHEA:13677	D-ribulose 5-phosphate = D-xylulose 5-phosphate	CHEBI:58121 = CHEBI:57737
+RHEA:14657	aldehydo-D-ribose 5-phosphate = D-ribulose 5-phosphate	CHEBI:58273 = CHEBI:58121
+RHEA:15225	alpha-D-glucose 1-phosphate + dTTP + H(+) = diphosphate + dTDP-alpha-D-glucose	CHEBI:58601 + CHEBI:37568 + CHEBI:15378 = CHEBI:33019 + CHEBI:57477
+RHEA:15609	ATP + D-ribose 5-phosphate = 5-phospho-alpha-D-ribose 1-diphosphate + AMP + H(+)	CHEBI:30616 + CHEBI:78346 = CHEBI:58017 + CHEBI:456215 + CHEBI:15378
+RHEA:15889	H2O + L-glutamine = L-glutamate + NH4(+)	CHEBI:15377 + CHEBI:58359 = CHEBI:29985 + CHEBI:28938
+RHEA:16013	ATP + glycine + tRNA(Gly) = AMP + diphosphate + glycyl-tRNA(Gly)	CHEBI:30616 + CHEBI:57305 + CHEBI:78442 = CHEBI:456215 + CHEBI:33019 + CHEBI:78522
+RHEA:16237	[protein]-peptidylproline (omega=180) = [protein]-peptidylproline (omega=0)	CHEBI:83834 = CHEBI:83833
+RHEA:16597	ATP + NH4(+) + UTP = ADP + CTP + 2 H(+) + phosphate	CHEBI:30616 + CHEBI:28938 + CHEBI:46398 = CHEBI:456216 + CHEBI:37563 + 2 CHEBI:15378 + CHEBI:43474
+RHEA:16853	N(6)-(1,2-dicarboxyethyl)-AMP = AMP + fumarate	CHEBI:57567 = CHEBI:456215 + CHEBI:29806
+RHEA:16873	(6R)-5,10-methylene-5,6,7,8-tetrahydrofolate + H(+) + NADH + uridine(54) in tRNA = (6S)-5,6,7,8-tetrahydrofolate + 5-methyluridine(54) in tRNA + NAD(+)	CHEBI:15636 + CHEBI:15378 + CHEBI:57945 + CHEBI:65315 = CHEBI:57453 + CHEBI:74447 + CHEBI:57540
+RHEA:17129	ATP + H2O + L-glutamine + N(2)-formyl-N(1)-(5-phospho-beta-D-ribosyl)glycinamide = 2-formamido-N(1)-(5-O-phospho-beta-D-ribosyl)acetamidine + ADP + H(+) + L-glutamate + phosphate	CHEBI:30616 + CHEBI:15377 + CHEBI:58359 + CHEBI:147286 = CHEBI:147287 + CHEBI:456216 + CHEBI:15378 + CHEBI:29985 + CHEBI:43474
+RHEA:17221	dTDP-alpha-D-glucose = dTDP-4-dehydro-6-deoxy-alpha-D-glucose + H2O	CHEBI:57477 = CHEBI:57649 + CHEBI:15377
+RHEA:17313	ATP + L-histidine + tRNA(His) = AMP + diphosphate + H(+) + L-histidyl-tRNA(His)	CHEBI:30616 + CHEBI:57595 + CHEBI:78442 = CHEBI:456215 + CHEBI:33019 + CHEBI:15378 + CHEBI:78527
+RHEA:17325	(S)-2,3,4,5-tetrahydrodipicolinate + H2O + succinyl-CoA = (S)-2-succinylamino-6-oxoheptanedioate + CoA	CHEBI:16845 + CHEBI:15377 + CHEBI:57292 = CHEBI:15685 + CHEBI:57287
+RHEA:17473	GTP + H2O = 7,8-dihydroneopterin 3'-triphosphate + formate + H(+)	CHEBI:37565 + CHEBI:15377 = CHEBI:58462 + CHEBI:15740 + CHEBI:15378
+RHEA:17973	diphosphate + IMP = 5-phospho-alpha-D-ribose 1-diphosphate + hypoxanthine	CHEBI:33019 + CHEBI:58053 = CHEBI:58017 + CHEBI:17368
+RHEA:18113	a ribonucleoside 5'-diphosphate + ATP = a ribonucleoside 5'-triphosphate + ADP	CHEBI:57930 + CHEBI:30616 = CHEBI:61557 + CHEBI:456216
+RHEA:18473	1-(5-phospho-beta-D-ribosyl)-ATP + diphosphate = 5-phospho-alpha-D-ribose 1-diphosphate + ATP	CHEBI:73183 + CHEBI:33019 = CHEBI:58017 + CHEBI:30616
+RHEA:18681	phosphoenolpyruvate + UDP-N-acetyl-alpha-D-glucosamine = phosphate + UDP-N-acetyl-3-O-(1-carboxyvinyl)-alpha-D-glucosamine	CHEBI:58702 + CHEBI:57705 = CHEBI:43474 + CHEBI:68483
+RHEA:19205	dCTP + 2 H2O = diphosphate + dUMP + NH4(+)	CHEBI:61481 + 2 CHEBI:15377 = CHEBI:33019 + CHEBI:246422 + CHEBI:28938
+RHEA:19573	[phosphate](n) + ATP = [phosphate](n+1) + ADP	CHEBI:16838 + CHEBI:30616 = CHEBI:16838 + CHEBI:456216
+RHEA:19669	GTP + H2O = GDP + H(+) + phosphate	CHEBI:37565 + CHEBI:15377 = CHEBI:58189 + CHEBI:15378 + CHEBI:43474
+RHEA:19709	a 1-acyl-sn-glycero-3-phosphate + an acyl-CoA = a 1,2-diacyl-sn-glycero-3-phosphate + CoA	CHEBI:57970 + CHEBI:58342 = CHEBI:58608 + CHEBI:57287
+RHEA:20013	carbamoyl phosphate + L-aspartate = H(+) + N-carbamoyl-L-aspartate + phosphate	CHEBI:58228 + CHEBI:29991 = CHEBI:15378 + CHEBI:32814 + CHEBI:43474
+RHEA:20221	(6S)-5,6,7,8-tetrahydrofolate + ATP + formate = (6R)-10-formyltetrahydrofolate + ADP + phosphate	CHEBI:57453 + CHEBI:30616 + CHEBI:15740 = CHEBI:195366 + CHEBI:456216 + CHEBI:43474
+RHEA:20345	[thioredoxin]-dithiol + NADP(+) = [thioredoxin]-disulfide + H(+) + NADPH	CHEBI:29950,CHEBI:29950 + CHEBI:58349 = CHEBI:50058 + CHEBI:15378 + CHEBI:57783
+RHEA:20736	acetyl-CoA + glycine = (2S)-2-amino-3-oxobutanoate + CoA	CHEBI:57288 + CHEBI:57305 = CHEBI:78948 + CHEBI:57287
+RHEA:20780	ATP + GMP = ADP + GDP	CHEBI:30616 + CHEBI:58115 = CHEBI:456216 + CHEBI:58189
+RHEA:21080	ATP + H2O + L-methionine = diphosphate + phosphate + S-adenosyl-L-methionine	CHEBI:30616 + CHEBI:15377 + CHEBI:57844 = CHEBI:33019 + CHEBI:43474 + CHEBI:59789
+RHEA:21248	a ribonucleoside 5'-triphosphate + RNA(n) = diphosphate + RNA(n+1)	CHEBI:61557 + CHEBI:140395 = CHEBI:33019 + CHEBI:140395
+RHEA:21644	ATP + glycerol = ADP + H(+) + sn-glycerol 3-phosphate	CHEBI:30616 + CHEBI:17754 = CHEBI:456216 + CHEBI:15378 + CHEBI:57597
+RHEA:22068	(2R)-2,3-dihydroxy-3-methylbutanoate + NADP(+) = (2S)-2-acetolactate + H(+) + NADPH	CHEBI:49072 + CHEBI:58349 = CHEBI:58476 + CHEBI:15378 + CHEBI:57783
+RHEA:22508	a 2'-deoxyribonucleoside 5'-triphosphate + DNA(n) = diphosphate + DNA(n+1)	CHEBI:61560 + CHEBI:173112 = CHEBI:33019 + CHEBI:173112
+RHEA:22812	(6R)-5,10-methylene-5,6,7,8-tetrahydrofolate + NADP(+) = (6R)-5,10-methenyltetrahydrofolate + NADPH	CHEBI:15636 + CHEBI:58349 = CHEBI:57455 + CHEBI:57783
+RHEA:23252	[thioredoxin]-disulfide + a 2'-deoxyribonucleoside 5'-diphosphate + H2O = [thioredoxin]-dithiol + a ribonucleoside 5'-diphosphate	CHEBI:50058 + CHEBI:73316 + CHEBI:15377 = CHEBI:29950,CHEBI:29950 + CHEBI:57930
+RHEA:23700	(6R)-5,10-methenyltetrahydrofolate + H2O = (6R)-10-formyltetrahydrofolate + H(+)	CHEBI:57455 + CHEBI:15377 = CHEBI:195366 + CHEBI:15378
+RHEA:23920	(2S)-2-[5-amino-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamido]succinate = 5-amino-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamide + fumarate	CHEBI:58443 = CHEBI:58475 + CHEBI:29806
+RHEA:23932	an N-acyl-D-glucosamine 6-phosphate = an N-acyl-D-mannosamine 6-phosphate	CHEBI:57599 = CHEBI:57666
+RHEA:23988	(2S,6S)-2,6-diaminoheptanedioate + 2-oxoglutarate = (S)-2,3,4,5-tetrahydrodipicolinate + H(+) + H2O + L-glutamate	CHEBI:57609 + CHEBI:16810 = CHEBI:16845 + CHEBI:15378 + CHEBI:15377 + CHEBI:29985
+RHEA:24104	7-aminomethyl-7-carbaguanine + guanosine(34) in tRNA = 7-aminomethyl-7-carbaguanosine(34) in tRNA + guanine	CHEBI:58703 + CHEBI:74269 = CHEBI:82833 + CHEBI:16235
+RHEA:24384	ATP + deamido-NAD(+) + H2O + L-glutamine = AMP + diphosphate + H(+) + L-glutamate + NAD(+)	CHEBI:30616 + CHEBI:58437 + CHEBI:15377 + CHEBI:58359 = CHEBI:456215 + CHEBI:33019 + CHEBI:15378 + CHEBI:29985 + CHEBI:57540
+RHEA:24400	ATP + UMP = ADP + UDP	CHEBI:30616 + CHEBI:57865 = CHEBI:456216 + CHEBI:58223
+RHEA:24488	H2O + isopentenyl diphosphate + 2 oxidized [2Fe-2S]-[ferredoxin] = (2E)-4-hydroxy-3-methylbut-2-enyl diphosphate + 2 H(+) + 2 reduced [2Fe-2S]-[ferredoxin]	CHEBI:15377 + CHEBI:128769 + 2 CHEBI:33737 = CHEBI:128753 + 2 CHEBI:15378 + 2 CHEBI:33738
+RHEA:24560	acetyl-CoA + L-serine = CoA + O-acetyl-L-serine	CHEBI:57288 + CHEBI:33384 = CHEBI:57287 + CHEBI:58340
+RHEA:24793	5-[(5-phospho-1-deoxy-D-ribulos-1-ylimino)methylamino]-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamide + L-glutamine = 5-amino-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamide + D-erythro-1-(imidazol-4-yl)glycerol 3-phosphate + H(+) + L-glutamate	CHEBI:58525 + CHEBI:58359 = CHEBI:58475 + CHEBI:58278 + CHEBI:15378 + CHEBI:29985
+RHEA:24825	dimethylallyl diphosphate + H2O + 2 oxidized [2Fe-2S]-[ferredoxin] = (2E)-4-hydroxy-3-methylbut-2-enyl diphosphate + 2 H(+) + 2 reduced [2Fe-2S]-[ferredoxin]	CHEBI:57623 + CHEBI:15377 + 2 CHEBI:33737 = CHEBI:128753 + 2 CHEBI:15378 + 2 CHEBI:33738
+RHEA:25424	diphosphate + GMP = 5-phospho-alpha-D-ribose 1-diphosphate + guanine	CHEBI:33019 + CHEBI:58115 = CHEBI:58017 + CHEBI:16235
+RHEA:26152	(2S)-2-hydroxy-3-oxobutyl phosphate + 5-amino-6-(D-ribitylamino)uracil = 6,7-dimethyl-8-(1-D-ribityl)lumazine + H(+) + 2 H2O + phosphate	CHEBI:58830 + CHEBI:15934 = CHEBI:58201 + CHEBI:15378 + 2 CHEBI:15377 + CHEBI:43474
+RHEA:26176	1D-myo-inositol 2-amino-2-deoxy-alpha-D-glucopyranoside + ATP + L-cysteine = 1D-myo-inositol 2-(L-cysteinylamino)-2-deoxy-alpha-D-glucopyranoside + AMP + diphosphate + H(+)	CHEBI:58886 + CHEBI:30616 + CHEBI:35235 = CHEBI:58887 + CHEBI:456215 + CHEBI:33019 + CHEBI:15378
+RHEA:26426	ATP + H2O + L-glutamine + UTP = ADP + CTP + 2 H(+) + L-glutamate + phosphate	CHEBI:30616 + CHEBI:15377 + CHEBI:58359 + CHEBI:46398 = CHEBI:456216 + CHEBI:37563 + 2 CHEBI:15378 + CHEBI:29985 + CHEBI:43474
+RHEA:26562	2-succinylbenzoyl-CoA + H(+) = 1,4-dihydroxy-2-naphthoyl-CoA + H2O	CHEBI:57364 + CHEBI:15378 = CHEBI:58897 + CHEBI:15377
+RHEA:31227	di-trans-octa-cis-undecaprenyl diphospho-N-acetyl-alpha-D-muramoyl-L-alanyl-D-glutamyl-meso-2,6-diaminopimeloyl-D-alanyl-D-alanine + UDP-N-acetyl-alpha-D-glucosamine = di-trans-octa-cis-undecaprenyl diphospho-[N-acetyl-alpha-D-glucosaminyl-(1->4)]-N-acetyl-alpha-D-muramoyl-L-alanyl-D-glutamyl-meso-2,6-diaminopimeloyl-D-alanyl-D-alanine + H(+) + UDP	CHEBI:61387 + CHEBI:57705 = CHEBI:61388 + CHEBI:15378 + CHEBI:58223
+RHEA:31507	aldehydo-D-ribose 5-phosphate + D-glyceraldehyde 3-phosphate + L-glutamine = H(+) + 3 H2O + L-glutamate + phosphate + pyridoxal 5'-phosphate	CHEBI:58273 + CHEBI:59776 + CHEBI:58359 = CHEBI:15378 + 3 CHEBI:15377 + CHEBI:29985 + CHEBI:43474 + CHEBI:597326
+RHEA:32287	(2R,3S)-3-isopropylmalate = (2S)-2-isopropylmalate	CHEBI:35121 = CHEBI:1178
+RHEA:42916	adenosine(2503) in 23S rRNA + 2 reduced [2Fe-2S]-[ferredoxin] + 2 S-adenosyl-L-methionine = 2-methyladenosine(2503) in 23S rRNA + 5'-deoxyadenosine + L-methionine + 2 oxidized [2Fe-2S]-[ferredoxin] + S-adenosyl-L-homocysteine	CHEBI:74411 + 2 CHEBI:33738 + 2 CHEBI:59789 = CHEBI:74497 + CHEBI:17319 + CHEBI:57844 + 2 CHEBI:33737 + CHEBI:57856
+RHEA:43168	adenosine(34) in tRNA + H(+) + H2O = inosine(34) in tRNA + NH4(+)	CHEBI:74411 + CHEBI:15378 + CHEBI:15377 = CHEBI:82852 + CHEBI:28938
+RHEA:43332	adenosine(37) in tRNA + 2 reduced [2Fe-2S]-[ferredoxin] + 2 S-adenosyl-L-methionine = 2-methyladenosine(37) in tRNA + 5'-deoxyadenosine + L-methionine + 2 oxidized [2Fe-2S]-[ferredoxin] + S-adenosyl-L-homocysteine	CHEBI:74411 + 2 CHEBI:33738 + 2 CHEBI:59789 = CHEBI:74497 + CHEBI:17319 + CHEBI:57844 + 2 CHEBI:33737 + CHEBI:57856
+RHEA:43604	(2E)-4-hydroxy-3-methylbut-2-enyl diphosphate + 2 H(+) + H2O + oxidized [flavodoxin] = 2-C-methyl-D-erythritol 2,4-cyclic diphosphate + reduced [flavodoxin]	CHEBI:128753 + 2 CHEBI:15378 + CHEBI:15377 + CHEBI:58210 = CHEBI:58483 + CHEBI:57618
+RHEA:44640	a 2'-deoxyribonucleoside 5'-diphosphate + ATP = a 2'-deoxyribonucleoside 5'-triphosphate + ADP	CHEBI:73316 + CHEBI:30616 = CHEBI:61560 + CHEBI:456216
+RHEA:47748	a ubiquinone + H(+) + n Na(+)(in) + NADH = a ubiquinol + n Na(+)(out) + NAD(+)	CHEBI:16389 + CHEBI:15378 + 5 CHEBI:29101 + CHEBI:57945 = CHEBI:17976 + 5 CHEBI:29101 + CHEBI:57540
+RHEA:57720	ATP + 4 H(+)(in) + H2O = ADP + 5 H(+)(out) + phosphate	CHEBI:30616 + 4 CHEBI:15378 + CHEBI:15377 = CHEBI:456216 + 5 CHEBI:15378 + CHEBI:43474
+RHEA:57888	a quinone + 5 H(+)(in) + NADH = a quinol + 4 H(+)(out) + NAD(+)	CHEBI:132124 + 5 CHEBI:15378 + CHEBI:57945 = CHEBI:24646 + 4 CHEBI:15378 + CHEBI:57540
+RHEA:58144	acetate + ATP + cytidine(34) in elongator tRNA(Met) = AMP + diphosphate + N(4)-acetylcytidine(34) in elongator tRNA(Met)	CHEBI:30089 + CHEBI:30616 + CHEBI:82748 = CHEBI:456215 + CHEBI:33019 + CHEBI:74900
+RHEA:62372	(6R)-5,10-methylene-5,6,7,8-tetrahydrofolate + H(+) + NADPH + uridine(54) in tRNA = (6S)-5,6,7,8-tetrahydrofolate + 5-methyluridine(54) in tRNA + NADP(+)	CHEBI:15636 + CHEBI:15378 + CHEBI:57783 + CHEBI:65315 = CHEBI:57453 + CHEBI:74447 + CHEBI:58349

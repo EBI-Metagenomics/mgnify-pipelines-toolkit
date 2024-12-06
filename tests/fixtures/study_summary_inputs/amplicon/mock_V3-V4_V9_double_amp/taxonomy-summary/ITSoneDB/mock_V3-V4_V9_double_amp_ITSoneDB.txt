@@ -1,0 +1,8 @@
+1	sk__Eukaryota	k__	p__Apicomplexa	c__Conoidasida
+4	sk__Eukaryota	k__Viridiplantae
+2	sk__Eukaryota	k__Viridiplantae	p__Chlorophyta	c__Ulvophyceae
+10	sk__Eukaryota	k__Viridiplantae	p__Streptophyta	c__Magnoliopsida
+1	sk__Eukaryota	k__Viridiplantae	p__Streptophyta	c__Magnoliopsida	o__Brassicales
+1	sk__Eukaryota	k__Viridiplantae	p__Streptophyta	c__Magnoliopsida	o__Caryophyllales	f__Aizoaceae
+10	sk__Eukaryota	k__Viridiplantae	p__Streptophyta	c__Magnoliopsida	o__Gentianales
+4	sk__Eukaryota	k__Viridiplantae	p__Streptophyta	c__Magnoliopsida	o__Gentianales	f__Apocynaceae

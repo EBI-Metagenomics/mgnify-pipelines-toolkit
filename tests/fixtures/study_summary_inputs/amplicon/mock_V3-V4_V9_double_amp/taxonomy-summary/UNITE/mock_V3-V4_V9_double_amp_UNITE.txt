@@ -1,0 +1,15 @@
+7	sk__Eukaryota
+2	sk__Eukaryota	k__Alveolata
+1	sk__Eukaryota	k__Alveolata	p__Ciliophora	c__Spirotrichea	o__Tintinnida	f__Tintinnidae	g__Eutintinnus
+10	sk__Eukaryota	k__Alveolata	p__Dinophyta	c__Dinophyceae
+1	sk__Eukaryota	k__Alveolata	p__Dinophyta	c__Dinophyceae	o__Blastodiniales
+1	sk__Eukaryota	k__Alveolata	p__Dinophyta	c__Dinophyceae	o__Gonyaulacales	f__Gonyaulacaceae
+2	sk__Eukaryota	k__Alveolata	p__Dinophyta	c__Dinophyceae	o__Gonyaulacales	f__Gonyaulacaceae	g__Alexandrium
+3	sk__Eukaryota	k__Fungi
+1	sk__Eukaryota	k__Fungi	p__Ascomycota	c__Pezizomycetes	o__Pezizales
+1	sk__Eukaryota	k__Fungi	p__Basidiomycota
+1	sk__Eukaryota	k__Fungi	p__Basidiomycota	c__Agaricomycetes	o__Thelephorales
+4	sk__Eukaryota	k__Rhodoplantae	p__Rhodophyta	c__Florideophyceae	o__Gigartinales
+1	sk__Eukaryota	k__Stramenopila
+1	sk__Eukaryota	k__Stramenopila	p__Ochrophyta
+1	sk__Eukaryota	k__Viridiplantae

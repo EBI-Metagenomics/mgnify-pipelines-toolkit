@@ -90,9 +90,18 @@ def get_tax_file(run_acc, analyses_dir, db_label):
                 # so need to skip those. Should probably fix that at some point
                 tax_file = ""
         elif db_label in ASV_TAXDB_LABELS:
-            # TODO will need to do ASV DB stuff later once we know how we want to do it. For now return empty file
-            tax_file = ""
+            # ASV tax files could have up to two files, one for each amplified region (maximum two from the pipeline).
+            # So will need to handle this differently to closed-reference files
+            asv_tax_files = glob.glob(
+                f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/*.txt"
+            )
+            asv_tax_files = [
+                Path(file) for file in asv_tax_files if "concat" not in file
+            ]  # Have to filter out concatenated file if it exists
 
+            tax_file = asv_tax_files
+
+    # output will be a Path if closed-reference file, or a list if ASV file
     return tax_file
 
 
@@ -114,9 +123,9 @@ def parse_one_tax_file(run_acc, tax_file):
 
 def generate_db_summary(db_label, tax_files, output_prefix):
 
-    df_list = []
-
     if db_label in TAXDB_LABELS:
+        df_list = []
+
         for run_acc, tax_file in tax_files.items():
             df_list.append(parse_one_tax_file(run_acc, tax_file))
 
@@ -125,15 +134,43 @@ def generate_db_summary(db_label, tax_files, output_prefix):
             res_df = res_df.join(df, how="outer")
         res_df = res_df.fillna(0)
 
-    elif db_label in ASV_TAXDB_LABELS:
-        # TODO will need to do ASV DB stuff later once we know how we want to do it. For now skip
-        pass
+        res_df.to_csv(
+            f"{output_prefix}_{db_label}_study_summary.tsv",
+            sep="\t",
+            index_label="taxonomy",
+        )
 
-    res_df.to_csv(
-        f"{output_prefix}_{db_label}_study_summary.tsv",
-        sep="\t",
-        index_label="taxonomy",
-    )
+    elif db_label in ASV_TAXDB_LABELS:
+
+        amp_region_dict = defaultdict(list)
+
+        for (
+            run_acc,
+            tax_file_asv_lst,
+        ) in (
+            tax_files.items()
+        ):  # each `tax_file` will be a list containing at most two files (one for each amp_region)
+            for tax_file in tax_file_asv_lst:
+                amp_region = str(tax_file).split("_")[
+                    -5
+                ]  # there are a lot of underscores in these names... but it is consistent
+                amp_region_df = parse_one_tax_file(run_acc, tax_file)
+                amp_region_dict[amp_region].append(amp_region_df)
+
+        for amp_region, amp_region_dfs in amp_region_dict.items():
+            if (
+                len(amp_region_dfs) > 1
+            ):  # Need at least two analyses with this amp_region to bother with the summary
+                amp_res_df = amp_region_dfs[0]
+                for amp_df in amp_region_dfs[1:]:
+                    amp_res_df = amp_res_df.join(amp_df, how="outer")
+                amp_res_df = amp_res_df.fillna(0)
+
+                amp_res_df.to_csv(
+                    f"{output_prefix}_{db_label}_{amp_region}_asv_study_summary.tsv",
+                    sep="\t",
+                    index_label="taxonomy",
+                )
 
 
 def summarise_analyses(runs_df, analyses_dir, output_prefix):
@@ -164,7 +201,14 @@ def organise_study_summaries(all_study_summaries):
         summary_filename = summary_path.stem
 
         temp_lst = summary_filename.split("_")
-        summary_db_label = temp_lst[1]
+        if "asv_study_summary" in summary_filename:
+            summary_db_label = "_".join(
+                temp_lst[1:3]
+            )  # For ASVs we need to include the amp_region in the label
+        else:
+            summary_db_label = temp_lst[
+                1
+            ]  # For closed reference, just the db_label is needed
 
         summaries_dict[summary_db_label].append(summary_path)
 

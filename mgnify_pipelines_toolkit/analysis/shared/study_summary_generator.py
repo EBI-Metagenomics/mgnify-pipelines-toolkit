@@ -53,7 +53,7 @@ def parse_args():
         help="Mode to either summarise analyses (summarise), or merge multiple existing summaries (merge)",
     )
     parser.add_argument(
-        "-o", "--output", required=True, type=str, help="Prefix to output"
+        "-p", "--prefix", required=True, type=str, help="Prefix to output"
     )
 
     args = parser.parse_args()
@@ -61,9 +61,9 @@ def parse_args():
     INDIR = args.indir
     RUNS = args.runs
     MODE = args.mode
-    OUTPUT = args.output
+    PREFIX = args.prefix
 
-    return INDIR, RUNS, MODE, OUTPUT
+    return INDIR, RUNS, MODE, PREFIX
 
 
 def get_tax_file(run_acc, analyses_dir, db_label):
@@ -187,6 +187,7 @@ def merge_summaries(analyses_dir, output_prefix):
                 res_df = res_df.fillna(0)
                 res_df = res_df.astype(int)
 
+            res_df = res_df.reindex(sorted(res_df.columns), axis=1)
             res_df.to_csv(
                 f"{output_prefix}_{db_label}_study_summary.tsv",
                 sep="\t",
@@ -196,7 +197,7 @@ def merge_summaries(analyses_dir, output_prefix):
 
 def main():
 
-    INDIR, RUNS, MODE, OUTPUT = parse_args()
+    INDIR, RUNS, MODE, PREFIX = parse_args()
 
     if MODE == "summarise":
         if not RUNS:
@@ -206,9 +207,9 @@ def main():
             exit(1)
 
         runs_df = pd.read_csv(RUNS, names=["run", "status"])
-        summarise_analyses(runs_df, INDIR, OUTPUT)
+        summarise_analyses(runs_df, INDIR, PREFIX)
     elif MODE == "merge":
-        merge_summaries(INDIR, OUTPUT)
+        merge_summaries(INDIR, PREFIX)
     else:
         logging.error("Mode can only be `summarise` or `merge` - exiting.")
         exit(1)

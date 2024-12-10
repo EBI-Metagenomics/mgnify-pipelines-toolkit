@@ -1,0 +1,35 @@
+- name: study_summary_generator test_wrong_args
+  tags:
+    - study_summary_generator
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator --chromosome X
+  stderr:
+    contains:
+      - "study_summary_generator.py: error: the following arguments are required: -i/--indir, -m/--mode, -p/--prefix"
+- name: study_summary_generator test_correct_args_summarise_1
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -m summarise -p chunk_1
+  files:
+    - path: "chunk_1_PR2_study_summary.tsv"
+      md5sum: 7956b692bb9c03b10a3387306a8351ef
+    - path: "chunk_1_SILVA-SSU_study_summary.tsv"
+      md5sum: 136405b300ddd8bd2bd437ac05f0fe96
+- name: study_summary_generator test_correct_args_summarise_2
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -m summarise -p chunk_2
+  files:
+    - path: "chunk_2_PR2_study_summary.tsv"
+      md5sum: a23b6a9b2d350e777e045c659e5d1480
+    - path: "chunk_2_SILVA-SSU_study_summary.tsv"
+      md5sum: ba685a3526ae29a4151fe15de46eba43
+- name: study_summary_generator test_correct_args_merge
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -m merge -p merged
+  files:
+    - path: "merged_SILVA-SSU_study_summary.tsv"
+      md5sum: 82962f2a87b0a21e3f2226300bc40667
+    - path: "merged_PR2_study_summary.tsv"
+      md5sum: 7aea4848c45ef1685579861bf3a14475

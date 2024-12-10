@@ -6,23 +6,27 @@
   stderr:
     contains:
       - "study_summary_generator.py: error: the following arguments are required: -i/--indir, -m/--mode, -p/--prefix"
-- name: study_summary_generator test_correct_args_summarise_1
+- name: study_summary_generator test_correct_args_summarise_withasvs
   tags:
     - study_summary_generator
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -m summarise -p chunk_1
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -m summarise -p chunk1
   files:
-    - path: "chunk_1_PR2_study_summary.tsv"
+    - path: "chunk1_PR2_study_summary.tsv"
       md5sum: 7956b692bb9c03b10a3387306a8351ef
-    - path: "chunk_1_SILVA-SSU_study_summary.tsv"
+    - path: "chunk1_SILVA-SSU_study_summary.tsv"
       md5sum: 136405b300ddd8bd2bd437ac05f0fe96
-- name: study_summary_generator test_correct_args_summarise_2
+    - path: "chunk1_DADA2-SILVA_16S-V3-V4_asv_study_summary.tsv"
+      md5sum: 227c7dade83cd0d25386f274378b72a7
+    - path: "chunk1_DADA2-PR2_16S-V3-V4_asv_study_summary.tsv"
+      md5sum: cc32ee3a746db003ffb066d7d2c652ed
+- name: study_summary_generator test_correct_args_summarise_withoutasvs
   tags:
     - study_summary_generator
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -m summarise -p chunk_2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -m summarise -p chunk2
   files:
-    - path: "chunk_2_PR2_study_summary.tsv"
+    - path: "chunk2_PR2_study_summary.tsv"
       md5sum: a23b6a9b2d350e777e045c659e5d1480
-    - path: "chunk_2_SILVA-SSU_study_summary.tsv"
+    - path: "chunk2_SILVA-SSU_study_summary.tsv"
       md5sum: ba685a3526ae29a4151fe15de46eba43
 - name: study_summary_generator test_correct_args_merge
   tags:
@@ -33,3 +37,7 @@
       md5sum: 82962f2a87b0a21e3f2226300bc40667
     - path: "merged_PR2_study_summary.tsv"
       md5sum: 7aea4848c45ef1685579861bf3a14475
+    - path: "merged_DADA2-SILVA_16S-V3-V4_study_summary.tsv"
+      md5sum: 89d3251dc5b143bd08ee17613417d3e7
+    - path: "merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
+      md5sum: 503fa9bf4df51de93482710679c11268

@@ -58,12 +58,12 @@ def parse_args():
 
     args = parser.parse_args()
 
-    INDIR = args.indir
-    RUNS = args.runs
-    MODE = args.mode
-    PREFIX = args.prefix
+    indir = args.indir
+    runs = args.runs
+    mode = args.mode
+    prefix = args.prefix
 
-    return INDIR, RUNS, MODE, PREFIX
+    return indir, runs, mode, prefix
 
 
 def get_tax_file(run_acc, analyses_dir, db_label):
@@ -241,19 +241,19 @@ def merge_summaries(analyses_dir, output_prefix):
 
 def main():
 
-    INDIR, RUNS, MODE, PREFIX = parse_args()
+    indir, runs, mode, prefix = parse_args()
 
-    if MODE == "summarise":
-        if not RUNS:
+    if mode == "summarise":
+        if not runs:
             logging.error(
                 "Can't run in `summarise` mode without specifying -r/--runs - exiting."
             )
             exit(1)
 
-        runs_df = pd.read_csv(RUNS, names=["run", "status"])
-        summarise_analyses(runs_df, INDIR, PREFIX)
-    elif MODE == "merge":
-        merge_summaries(INDIR, PREFIX)
+        runs_df = pd.read_csv(runs, names=["run", "status"])
+        summarise_analyses(runs_df, indir, prefix)
+    elif mode == "merge":
+        merge_summaries(indir, prefix)
     else:
         logging.error("Mode can only be `summarise` or `merge` - exiting.")
         exit(1)

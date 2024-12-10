@@ -19,10 +19,12 @@ from collections import defaultdict
 import glob
 import logging
 from pathlib import Path
+from typing import Union, List
 
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.db_labels import TAXDB_LABELS, ASV_TAXDB_LABELS
+from mgnify_pipelines_toolkit.utils.directory_path_argparse import directory_path
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -34,7 +36,7 @@ def parse_args():
         "-i",
         "--indir",
         required=True,
-        type=str,
+        type=directory_path,
         help="Input directory to where all the individual analyses subdirectories are if summarising, or where all the summaries are if merging",
     )
     parser.add_argument(
@@ -66,7 +68,23 @@ def parse_args():
     return indir, runs, mode, prefix
 
 
-def get_tax_file(run_acc, analyses_dir, db_label):
+def get_tax_file(
+    run_acc: str, analyses_dir: Path, db_label: str
+) -> Union[Path, List[Path]]:
+    """Takes path information for a particular analysis and db_label combo, and returns any existing files.
+
+    :param run_acc: Run accession for the tax file that should be retrieved.
+    :type run_acc: str
+    :param analyses_dir: The path to the directory containing all of the analyses,
+            including the tax file corresponding to :param:`run_acc`.
+    :type analyses_dir: Path
+    :param db_label: One of the database labels that results might exist for,
+            values of which come from the imported constants ``TAXDB_LABELS`` and ``ASV_TAXDB_LABELS``.
+    :type db_label: str
+    :return: Either a :class:`Path` object if :param:`db_label` comes from ``TAXDB_LABELS``,
+            or a list of :class:`Path` objects if from ``ASV_TAXDB_LABELS``.
+    :rtype: Union[Path, List[Path]]
+    """
 
     tax_file = ""
 
@@ -101,12 +119,19 @@ def get_tax_file(run_acc, analyses_dir, db_label):
 
             tax_file = asv_tax_files
 
-    # output will be a Path if closed-reference file, or a list if ASV file
     return tax_file
 
 
-def parse_one_tax_file(run_acc, tax_file):
+def parse_one_tax_file(run_acc: str, tax_file: Path) -> pd.DataFrame:
+    """Parses a taxonomy file, and returns it as a pandas DataFrame object.
 
+    :param run_acc: Run accession of the taxonomy file that will be parsed.
+    :type run_acc: str
+    :param tax_file: Taxonomy file that will be parsed.
+    :type tax_file: Path
+    :return: The parsed :param:`tax_file` as a :class:`pd.DataFrame` object
+    :rtype: pd.DataFrame
+    """
     res_df = pd.DataFrame()
 
     with open(tax_file, "r") as fr:
@@ -121,13 +146,29 @@ def parse_one_tax_file(run_acc, tax_file):
     return res_df
 
 
-def generate_db_summary(db_label, tax_files, output_prefix):
+def generate_db_summary(
+    db_label: str, tax_dfs: defaultdict[Path], output_prefix: str
+) -> None:
+    """Takes paired run accessions taxonomy dataframes in the form of a dictionary,
+    and respective db_label, joins them together, and generates a study-wide summary
+    in the form of a .tsv file.
+
+    :param db_label: One of the database labels that results might exist for,
+            values of which come from the imported constants ``TAXDB_LABELS`` and ``ASV_TAXDB_LABELS``.
+    :param tax_dfs: Dictionary where the key is a run accession,
+        and values are either one parsed taxonomy dataframe if the :param:db_label comes from ``TAXDB_LABELS``,
+        or a list of at least 1 and at most 2 dataframes if it comes from ``ASV_TAXDB_LABELS``.
+        These dataframes are parsed by :func:`parse_one_tax_file`
+    :type tax_dfs: DefaultDict[Path]
+    :param output_prefix: Prefix to be added to the generated summary file.
+    :type output_prefix: str
+    """
 
     if db_label in TAXDB_LABELS:
         df_list = []
 
-        for run_acc, tax_file in tax_files.items():
-            df_list.append(parse_one_tax_file(run_acc, tax_file))
+        for run_acc, tax_df in tax_dfs.items():
+            df_list.append(parse_one_tax_file(run_acc, tax_df))
 
         res_df = df_list[0]
         for df in df_list[1:]:
@@ -146,15 +187,15 @@ def generate_db_summary(db_label, tax_files, output_prefix):
 
         for (
             run_acc,
-            tax_file_asv_lst,
+            tax_df_asv_lst,
         ) in (
-            tax_files.items()
+            tax_dfs.items()
         ):  # each `tax_file` will be a list containing at most two files (one for each amp_region)
-            for tax_file in tax_file_asv_lst:
-                amp_region = str(tax_file).split("_")[
+            for tax_df in tax_df_asv_lst:
+                amp_region = str(tax_df).split("_")[
                     -5
                 ]  # there are a lot of underscores in these names... but it is consistent
-                amp_region_df = parse_one_tax_file(run_acc, tax_file)
+                amp_region_df = parse_one_tax_file(run_acc, tax_df)
                 amp_region_dict[amp_region].append(amp_region_df)
 
         for amp_region, amp_region_dfs in amp_region_dict.items():
@@ -173,8 +214,23 @@ def generate_db_summary(db_label, tax_files, output_prefix):
                 )
 
 
-def summarise_analyses(runs_df, analyses_dir, output_prefix):
+def summarise_analyses(
+    runs_df: pd.DataFrame, analyses_dir: Path, output_prefix: str
+) -> None:
+    """Wrapper function that will take a dataframe of successful run accessions
+    that should be considered for the generation of the relevant db-specific
+    study-level summary files. For ASV results, these will also be on a
+    per-amplified-region basis.
 
+    :param runs_df: Parsed dataframe of a qc_passed_runs file from the pipeline execution.
+        Contains the accessions of runs that should therefore be included in the generated
+        summaries.
+    :type runs_df: pd.DataFrame
+    :param analyses_dir: The path to the directory containing all of the analyses.
+    :type analyses_dir: Path
+    :param output_prefix: Prefix to be added to the generated summary file.
+    :type output_prefix: str
+    """
     all_db_labels = TAXDB_LABELS + ASV_TAXDB_LABELS
     for db_label in all_db_labels:
 
@@ -192,8 +248,17 @@ def summarise_analyses(runs_df, analyses_dir, output_prefix):
             generate_db_summary(db_label, tax_files, output_prefix)
 
 
-def organise_study_summaries(all_study_summaries):
+def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List]:
+    """Matches different summary files of the same database label and analysis
+    type (and amplified region for ASVs) into a dictionaryto help merge
+    the correct summaries.
 
+    :param all_study_summaries: List of file paths to different summary files
+    :type all_study_summaries: List[str]
+    :return: Organised dictionary where each summary is paired to a specific
+        database label key to be merged together.
+    :rtype: DefaultDict[List]
+    """
     summaries_dict = defaultdict(list)
 
     for summary in all_study_summaries:
@@ -215,7 +280,16 @@ def organise_study_summaries(all_study_summaries):
     return summaries_dict
 
 
-def merge_summaries(analyses_dir, output_prefix):
+def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
+    """Wrapper function that will take a file path containing study-level
+    summaries that should be merged together on a per-db-per-amplified-region
+    basis.
+
+    :param analyses_dir: The filepath to the directory containing all of the analyses.
+    :type analyses_dir: str
+    :param output_prefix: Prefix to be added to the generated summary file.
+    :type output_prefix: str
+    """
 
     # TODO: The way we grab all the summaries might change depending on how the prefect side does things
     all_study_summaries = glob.glob(f"{analyses_dir}/*_study_summary.tsv")

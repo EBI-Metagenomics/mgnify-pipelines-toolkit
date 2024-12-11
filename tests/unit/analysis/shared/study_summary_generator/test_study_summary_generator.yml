@@ -5,11 +5,11 @@
   command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator --chromosome X
   stderr:
     contains:
-      - "study_summary_generator.py: error: the following arguments are required: -i/--indir, -m/--mode, -p/--prefix"
+      - "Error: No such option: --chromosome"
 - name: study_summary_generator test_correct_args_summarise_withasvs
   tags:
     - study_summary_generator
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -m summarise -p chunk1
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -p chunk1
   files:
     - path: "chunk1_PR2_study_summary.tsv"
       md5sum: 7956b692bb9c03b10a3387306a8351ef
@@ -22,7 +22,7 @@
 - name: study_summary_generator test_correct_args_summarise_withoutasvs
   tags:
     - study_summary_generator
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -m summarise -p chunk2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -p chunk2
   files:
     - path: "chunk2_PR2_study_summary.tsv"
       md5sum: a23b6a9b2d350e777e045c659e5d1480
@@ -31,7 +31,7 @@
 - name: study_summary_generator test_correct_args_merge
   tags:
     - study_summary_generator
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -m merge -p merged
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator merge -a tests/fixtures/study_summary_inputs/amplicon -p merged
   files:
     - path: "merged_SILVA-SSU_study_summary.tsv"
       md5sum: 82962f2a87b0a21e3f2226300bc40667

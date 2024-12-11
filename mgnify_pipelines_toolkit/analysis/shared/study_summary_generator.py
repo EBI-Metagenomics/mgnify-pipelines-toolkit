@@ -159,7 +159,7 @@ def generate_db_summary(
         and values are either one parsed taxonomy dataframe if the :param:db_label comes from ``TAXDB_LABELS``,
         or a list of at least 1 and at most 2 dataframes if it comes from ``ASV_TAXDB_LABELS``.
         These dataframes are parsed by :func:`parse_one_tax_file`
-    :type tax_dfs: DefaultDict[Path]
+    :type tax_dfs: defaultdict[Path]
     :param output_prefix: Prefix to be added to the generated summary file.
     :type output_prefix: str
     """
@@ -195,6 +195,7 @@ def generate_db_summary(
                 amp_region = str(tax_df).split("_")[
                     -5
                 ]  # there are a lot of underscores in these names... but it is consistent
+                # e.g. ERR4334351_16S-V3-V4_DADA2-SILVA_asv_krona_counts.txt
                 amp_region_df = parse_one_tax_file(run_acc, tax_df)
                 amp_region_dict[amp_region].append(amp_region_df)
 
@@ -257,7 +258,7 @@ def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List
     :type all_study_summaries: List[str]
     :return: Organised dictionary where each summary is paired to a specific
         database label key to be merged together.
-    :rtype: DefaultDict[List]
+    :rtype: defaultdict[List]
     """
     summaries_dict = defaultdict(list)
 
@@ -328,9 +329,6 @@ def main():
         summarise_analyses(runs_df, indir, prefix)
     elif mode == "merge":
         merge_summaries(indir, prefix)
-    else:
-        logging.error("Mode can only be `summarise` or `merge` - exiting.")
-        exit(1)
 
 
 if __name__ == "__main__":

@@ -86,38 +86,46 @@ def get_tax_file(
     :rtype: Union[Path, List[Path]]
     """
 
-    tax_file = ""
+    tax_file = None
 
     db_path = Path(f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}")
 
-    if db_path.exists():
-        if db_label in TAXDB_LABELS:
-            tax_file = Path(
-                f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/{run_acc}_{db_label}.txt"
-            )
-            if not tax_file.exists():
-                logging.error(
-                    f"DB path exists but file doesn't - exiting. Path: {tax_file}"
-                )
-                exit(1)
+    if not db_path.exists():
+        logging.debug(
+            f"DB {db_path} doesn't exist for {run_acc}. Skipping"
+        )  # or error?
+        return
 
-            file_size = tax_file.stat().st_size
-            if (
-                file_size == 0
-            ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
-                # so need to skip those. Should probably fix that at some point
-                tax_file = ""
-        elif db_label in ASV_TAXDB_LABELS:
-            # ASV tax files could have up to two files, one for each amplified region (maximum two from the pipeline).
-            # So will need to handle this differently to closed-reference files
-            asv_tax_files = glob.glob(
-                f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/*.txt"
+    if db_label in TAXDB_LABELS:
+        tax_file = Path(
+            f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/{run_acc}_{db_label}.txt"
+        )
+        if not tax_file.exists():
+            logging.error(
+                f"DB path exists but file doesn't - exiting. Path: {tax_file}"
             )
-            asv_tax_files = [
-                Path(file) for file in asv_tax_files if "concat" not in file
-            ]  # Have to filter out concatenated file if it exists
+            exit(1)
 
-            tax_file = asv_tax_files
+        file_size = tax_file.stat().st_size
+        if (
+            file_size == 0
+        ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
+            # so need to skip those. Should probably fix that at some point
+            logging.debug(
+                f"File {tax_file} exists but is empty, so will be ignoring it."
+            )
+            tax_file = None
+    elif db_label in ASV_TAXDB_LABELS:
+        # ASV tax files could have up to two files, one for each amplified region (maximum two from the pipeline).
+        # So will need to handle this differently to closed-reference files
+        asv_tax_files = glob.glob(
+            f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/*.txt"
+        )
+        asv_tax_files = [
+            Path(file) for file in asv_tax_files if "concat" not in file
+        ]  # Have to filter out concatenated file if it exists
+
+        tax_file = asv_tax_files
 
     return tax_file
 

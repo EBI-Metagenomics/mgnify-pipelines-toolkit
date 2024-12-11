@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "0.1.8"
+version = "0.1.9"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -20,7 +20,8 @@ dependencies = [
     "numpy==1.26.0",
     "pandas==2.0.2",
     "regex==2023.12.25",
-    "requests==2.32.3"
+    "requests==2.32.3",
+    "click==8.1.7"
 ]
 
 [build-system]
@@ -44,6 +45,7 @@ get_subunits_coords = "mgnify_pipelines_toolkit.analysis.shared.get_subunits_coo
 mapseq2biom = "mgnify_pipelines_toolkit.analysis.shared.mapseq2biom:main"
 fastq_suffix_header_check = "mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check:main"
 library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strategy_check:main"
+study_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.study_summary_generator:main"
 # analysis.amplicon
 are_there_primers = "mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers:main"
 assess_inflection_point_mcp = "mgnify_pipelines_toolkit.analysis.amplicon.assess_inflection_point_mcp:main"
@@ -71,7 +73,8 @@ tests = [
     "pandas==2.0.2",
     "numpy==1.26.0",
     "regex==2023.12.25",
-    "requests==2.32.3"
+    "requests==2.32.3",
+    "click==8.1.7"
 ]
 
 dev = [

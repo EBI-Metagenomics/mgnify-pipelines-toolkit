@@ -14,28 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_SILVA_TAX_RANKS = [
-    "Superkingdom",
-    "Kingdom",
-    "Phylum",
-    "Class",
-    "Order",
-    "Family",
-    "Genus",
-    "Species",
-]
-_PR2_TAX_RANKS = [
-    "Domain",
-    "Supergroup",
-    "Division",
-    "Subdivision",
-    "Class",
-    "Order",
-    "Family",
-    "Genus",
-    "Species",
-]
+# taxonomy_summary labels for closed-reference method
+TAXDB_LABELS = ["SILVA-SSU", "SILVA-LSU", "PR2", "UNITE", "ITSoneDB"]
 
-SHORT_TAX_RANKS = ["sk", "k", "p", "c", "o", "f", "g", "s"]
-
-SHORT_PR2_TAX_RANKS = ["d", "sg", "dv", "sdv", "c", "o", "f", "g", "s"]
+# taxonomy_summary for ASV method
+ASV_TAXDB_LABELS = ["DADA2-SILVA", "DADA2-PR2"]

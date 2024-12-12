@@ -24,6 +24,14 @@ from typing import Union, List
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.db_labels import TAXDB_LABELS, ASV_TAXDB_LABELS
+from mgnify_pipelines_toolkit.constants.tax_ranks import (
+    SHORT_TAX_RANKS,
+    SHORT_PR2_TAX_RANKS,
+)
+from mgnify_pipelines_toolkit.schemas.schemas import (
+    SuccessfulRunsSchema,
+    generate_dynamic_tax_df_schema,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -140,8 +148,17 @@ def generate_db_summary(
     if db_label in TAXDB_LABELS:
         df_list = []
 
+        if "PR2" in db_label:
+            short_tax_ranks = SHORT_PR2_TAX_RANKS
+        else:
+            short_tax_ranks = SHORT_TAX_RANKS
+
         for run_acc, tax_df in tax_dfs.items():
-            df_list.append(parse_one_tax_file(run_acc, tax_df))
+            res_df = parse_one_tax_file(run_acc, tax_df)
+            res_schema = generate_dynamic_tax_df_schema(run_acc, short_tax_ranks)
+            res_schema.validate(res_df)
+
+            df_list.append(res_df)
 
         res_df = pd.concat(df_list, axis=1).fillna(0)
         res_df = res_df.sort_index()
@@ -153,6 +170,11 @@ def generate_db_summary(
         )
 
     elif db_label in ASV_TAXDB_LABELS:
+
+        if "PR2" in db_label:
+            short_tax_ranks = SHORT_PR2_TAX_RANKS
+        else:
+            short_tax_ranks = SHORT_TAX_RANKS
 
         amp_region_dict = defaultdict(list)
 
@@ -168,6 +190,8 @@ def generate_db_summary(
                 ]  # there are a lot of underscores in these names... but it is consistent
                 # e.g. ERR4334351_16S-V3-V4_DADA2-SILVA_asv_krona_counts.txt
                 amp_region_df = parse_one_tax_file(run_acc, tax_df)
+                res_schema = generate_dynamic_tax_df_schema(run_acc, short_tax_ranks)
+                res_schema.validate(amp_region_df)
                 amp_region_dict[amp_region].append(amp_region_df)
 
         for amp_region, amp_region_dfs in amp_region_dict.items():
@@ -257,6 +281,8 @@ def summarise_analyses(runs: Path, analyses_dir: Path, output_prefix: str) -> No
     :type output_prefix: str
     """
     runs_df = pd.read_csv(runs, names=["run", "status"])
+    SuccessfulRunsSchema(runs_df)  # Run validation on the successful_runs .csv file
+
     all_db_labels = TAXDB_LABELS + ASV_TAXDB_LABELS
     for db_label in all_db_labels:
 

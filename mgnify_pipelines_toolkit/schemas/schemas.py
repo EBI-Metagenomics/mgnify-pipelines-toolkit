@@ -1,3 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import pandas as pd
 import pandera as pa
 from pandera.typing import DataFrame, Series
@@ -16,7 +32,7 @@ class SuccessfulRunsSchema(pa.DataFrameModel):
         raise_warning=True,
         error="One or more run accessions do not fit the INSDC format [ERR*,SRR*,DRR*]. This is only a warning, not an error.",
     )
-    def run_validity_check(cls, run: Series[str]) -> Series[bool]:
+    def run_validity_check(self, run: Series[str]) -> Series[bool]:
         # This will only produce a WARNING, not an ERROR. This is to allow flexibility of running this on non-ENA/INSDC data
         run_accession_regex = "(E|D|S)RR[0-9]{6,}"
         return run.str.contains(run_accession_regex)
@@ -26,7 +42,7 @@ class SuccessfulRunsSchema(pa.DataFrameModel):
         name="status_vality_check",
         error='The status column can only have values ["all_results", "no_asvs"].',
     )
-    def status_vality_check(cls, status: Series[str]) -> Series[bool]:
+    def status_vality_check(self, status: Series[str]) -> Series[bool]:
         possible_statuses = ["all_results", "no_asvs"]
         return status.isin(possible_statuses)
 

@@ -35,3 +35,7 @@ _PR2_TAX_RANKS = [
     "Genus",
     "Species",
 ]
+
+SHORT_TAX_RANKS = ["sk", "k", "p", "c", "o", "f", "g", "s"]
+
+SHORT_PR2_TAX_RANKS = ["d", "sg", "dv", "sdv", "c", "o", "f", "g", "s"]

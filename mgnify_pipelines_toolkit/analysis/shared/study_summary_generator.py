@@ -29,7 +29,8 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
     SHORT_PR2_TAX_RANKS,
 )
 from mgnify_pipelines_toolkit.schemas.schemas import (
-    SuccessfulRunsSchema,
+    AmpliconPassedRunsSchema,
+    AmpliconNonINSDCPassedRunsSchema,
     generate_dynamic_tax_df_schema,
 )
 
@@ -264,7 +265,15 @@ def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List
 @click.option(
     "-p", "--output_prefix", required=True, help="Prefix to summary files", type=str
 )
-def summarise_analyses(runs: Path, analyses_dir: Path, output_prefix: str) -> None:
+@click.option(
+    "--non_insdc",
+    default=False,
+    is_flag=True,
+    help="If run accessions aren't INSDC-formatted",
+)
+def summarise_analyses(
+    runs: Path, analyses_dir: Path, output_prefix: str, non_insdc: bool
+) -> None:
     """Function that will take a file of pipeline-successful run accessions
     that should be used for the generation of the relevant db-specific
     study-level summary files. For ASV results, these will also be on a
@@ -281,7 +290,13 @@ def summarise_analyses(runs: Path, analyses_dir: Path, output_prefix: str) -> No
     :type output_prefix: str
     """
     runs_df = pd.read_csv(runs, names=["run", "status"])
-    SuccessfulRunsSchema(runs_df)  # Run validation on the successful_runs .csv file
+
+    if not non_insdc:
+        AmpliconPassedRunsSchema(
+            runs_df
+        )  # Run validation on the successful_runs .csv file
+    else:
+        AmpliconNonINSDCPassedRunsSchema(runs_df)
 
     all_db_labels = TAXDB_LABELS + ASV_TAXDB_LABELS
     for db_label in all_db_labels:

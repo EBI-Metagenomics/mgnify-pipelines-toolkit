@@ -14,41 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
+
+from enum import Enum
 import pandas as pd
 import pandera as pa
-from pandera.typing import DataFrame, Series
 import pandera.extensions as extensions
 
-import pydantic
-
-
-class SuccessfulRunsSchema(pa.DataFrameModel):
-    run: Series[str] = pa.Field(unique=True)
-    status: Series[str]
-
-    @pa.check(
-        "run",
-        name="run_validity_check",
-        raise_warning=True,
-        error="One or more run accessions do not fit the INSDC format [ERR*,SRR*,DRR*]. This is only a warning, not an error.",
-    )
-    def run_validity_check(self, run: Series[str]) -> Series[bool]:
-        # This will only produce a WARNING, not an ERROR. This is to allow flexibility of running this on non-ENA/INSDC data
-        run_accession_regex = "(E|D|S)RR[0-9]{6,}"
-        return run.str.contains(run_accession_regex)
-
-    @pa.check(
-        "status",
-        name="status_vality_check",
-        error='The status column can only have values ["all_results", "no_asvs"].',
-    )
-    def status_vality_check(self, status: Series[str]) -> Series[bool]:
-        possible_statuses = ["all_results", "no_asvs"]
-        return status.isin(possible_statuses)
-
-
-class PydanticModel(pydantic.BaseModel):
-    df: DataFrame[pa.DataFrameModel]
+from pydantic import (
+    Field,
+    BaseModel,
+    field_validator,
+    RootModel,
+)
+from pandera.engines.pandas_engine import PydanticModel
 
 
 @extensions.register_check_method(statistics=["short_tax_ranks"])
@@ -85,3 +64,65 @@ def generate_dynamic_tax_df_schema(
     )
 
     return tax_schema
+
+
+class ASVResultTypes(str, Enum):
+    all_results = "all_results"
+    no_asvs = "no_asvs"
+
+
+class INSDCRunAccession(RootModel):
+    # RootModel example:
+    # https://stackoverflow.com/questions/78393675/how-to-make-a-custom-type-inheriting-from-uuid-work-as-a-pydantic-model
+
+    root: str = Field(
+        unique=True,
+        description="The run needs to be a valid ENA accession",
+        examples=["ERR123456", "DRR789012", "SRR345678"],
+    )
+
+    @field_validator("root", mode="after")
+    @classmethod
+    def run_validity_check(cls, run: str) -> bool:
+        # This will only produce a WARNING, not an ERROR. This is to allow flexibility of running this on non-ENA/INSDC data
+        run_accession_regex = "(E|D|S)RR[0-9]{6,}"
+        regex_res = re.match(run_accession_regex, run)
+
+        if regex_res is None:
+            raise ValueError(
+                f"Accession `{run}` does not fit INSDC format [ERR*,SRR*,DRR*]."
+            )
+
+        return run
+
+
+# This is one row
+class AmpliconPassedRunsRecord(BaseModel):
+    run: INSDCRunAccession
+    status: ASVResultTypes
+
+
+class AmpliconNonINSDCSPassedRunsRecord(BaseModel):
+    run: str
+    status: ASVResultTypes
+
+
+# This is the schema for the whole DF
+class AmpliconPassedRunsSchema(pa.DataFrameModel):
+    """Pandera schema using the pydantic model."""
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(AmpliconPassedRunsRecord)
+        coerce = True
+
+
+class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
+    """Pandera schema using the pydantic model."""
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(AmpliconNonINSDCSPassedRunsRecord)
+        coerce = True

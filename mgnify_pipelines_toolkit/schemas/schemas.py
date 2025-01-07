@@ -84,7 +84,6 @@ class INSDCRunAccession(RootModel):
     @field_validator("root", mode="after")
     @classmethod
     def run_validity_check(cls, run: str) -> bool:
-        # This will only produce a WARNING, not an ERROR. This is to allow flexibility of running this on non-ENA/INSDC data
         run_accession_regex = "(E|D|S)RR[0-9]{6,}"
         regex_res = re.match(run_accession_regex, run)
 

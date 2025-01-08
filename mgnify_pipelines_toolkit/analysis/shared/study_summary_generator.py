@@ -25,13 +25,14 @@ import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.db_labels import TAXDB_LABELS, ASV_TAXDB_LABELS
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    SHORT_TAX_RANKS,
-    SHORT_PR2_TAX_RANKS,
+    _SILVA_TAX_RANKS,
+    _PR2_TAX_RANKS,
 )
 from mgnify_pipelines_toolkit.schemas.schemas import (
     AmpliconPassedRunsSchema,
     AmpliconNonINSDCPassedRunsSchema,
-    generate_dynamic_tax_df_schema,
+    TaxonSchema,
+    PR2TaxonSchema,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -104,7 +105,9 @@ def get_tax_file(
     return tax_file
 
 
-def parse_one_tax_file(run_acc: str, tax_file: Path) -> pd.DataFrame:
+def parse_one_tax_file(
+    run_acc: str, tax_file: Path, long_tax_ranks: str
+) -> pd.DataFrame:
     """Parses a taxonomy file, and returns it as a pandas DataFrame object.
 
     :param run_acc: Run accession of the taxonomy file that will be parsed.
@@ -114,18 +117,24 @@ def parse_one_tax_file(run_acc: str, tax_file: Path) -> pd.DataFrame:
     :return: The parsed :param:`tax_file` as a :class:`pd.DataFrame` object
     :rtype: pd.DataFrame
     """
-    res_df = pd.DataFrame()
+    # TODO: update this docstring and comments
 
-    with open(tax_file, "r") as fr:
-        for line in fr:
-            line = line.strip()
-            temp_lst = line.split("\t")
-            curr_count = temp_lst[0]
-            curr_tax = ";".join(temp_lst[1:])
+    res_df = pd.read_csv(tax_file, sep="\t", names=["Count"] + long_tax_ranks)
+    res_df = res_df.fillna("")
 
-            res_df.loc[curr_tax, run_acc] = curr_count
+    if len(long_tax_ranks) == 8:
+        TaxonSchema(res_df)
+    elif len(long_tax_ranks) == 9:
+        PR2TaxonSchema(res_df)
 
-    return res_df
+    res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
+        lambda x: ";".join(x).strip(";"), axis=1
+    )
+    final_df = res_df.iloc[:, [0, -1]]
+    final_df = final_df.set_index("full_taxon")
+    final_df.columns = [run_acc]
+
+    return final_df
 
 
 def generate_db_summary(
@@ -150,19 +159,17 @@ def generate_db_summary(
         df_list = []
 
         if "PR2" in db_label:
-            short_tax_ranks = SHORT_PR2_TAX_RANKS
+            long_tax_ranks = _PR2_TAX_RANKS
         else:
-            short_tax_ranks = SHORT_TAX_RANKS
+            long_tax_ranks = _SILVA_TAX_RANKS
 
         for run_acc, tax_df in tax_dfs.items():
-            res_df = parse_one_tax_file(run_acc, tax_df)
-            res_schema = generate_dynamic_tax_df_schema(run_acc, short_tax_ranks)
-            res_schema.validate(res_df)
-
+            res_df = parse_one_tax_file(run_acc, tax_df, long_tax_ranks)
             df_list.append(res_df)
 
         res_df = pd.concat(df_list, axis=1).fillna(0)
         res_df = res_df.sort_index()
+        res_df = res_df.astype(int)
 
         res_df.to_csv(
             f"{output_prefix}_{db_label}_study_summary.tsv",
@@ -173,9 +180,9 @@ def generate_db_summary(
     elif db_label in ASV_TAXDB_LABELS:
 
         if "PR2" in db_label:
-            short_tax_ranks = SHORT_PR2_TAX_RANKS
+            long_tax_ranks = _PR2_TAX_RANKS
         else:
-            short_tax_ranks = SHORT_TAX_RANKS
+            long_tax_ranks = _SILVA_TAX_RANKS
 
         amp_region_dict = defaultdict(list)
 
@@ -190,9 +197,7 @@ def generate_db_summary(
                     -5
                 ]  # there are a lot of underscores in these names... but it is consistent
                 # e.g. ERR4334351_16S-V3-V4_DADA2-SILVA_asv_krona_counts.txt
-                amp_region_df = parse_one_tax_file(run_acc, tax_df)
-                res_schema = generate_dynamic_tax_df_schema(run_acc, short_tax_ranks)
-                res_schema.validate(amp_region_df)
+                amp_region_df = parse_one_tax_file(run_acc, tax_df, long_tax_ranks)
                 amp_region_dict[amp_region].append(amp_region_df)
 
         for amp_region, amp_region_dfs in amp_region_dict.items():
@@ -203,6 +208,7 @@ def generate_db_summary(
                 for amp_df in amp_region_dfs[1:]:
                     amp_res_df = amp_res_df.join(amp_df, how="outer")
                 amp_res_df = amp_res_df.fillna(0)
+                amp_res_df = amp_res_df.astype(int)
 
                 amp_res_df.to_csv(
                     f"{output_prefix}_{db_label}_{amp_region}_asv_study_summary.tsv",

@@ -18,9 +18,7 @@ import re
 
 from enum import Enum
 from typing import ClassVar, Optional
-import pandas as pd
 import pandera as pa
-import pandera.extensions as extensions
 
 from pydantic import (
     Field,
@@ -36,12 +34,11 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 )
 
 
-class ASVResultTypes(str, Enum):
-    all_results = "all_results"
-    no_asvs = "no_asvs"
-
-
 class INSDCRunAccession(RootModel):
+    """Class for modelling for INSDC-specific run accessions.
+    Essentially is just a special string with regex-based validation of the accession.
+    """
+
     # RootModel example:
     # https://stackoverflow.com/questions/78393675/how-to-make-a-custom-type-inheriting-from-uuid-work-as-a-pydantic-model
 
@@ -54,6 +51,10 @@ class INSDCRunAccession(RootModel):
     @field_validator("root", mode="after")
     @classmethod
     def run_validity_check(cls, run: str) -> bool:
+        """Checks that the run string matches the regex code of an INSDC run accession.
+        Throws a `ValueError` exception if not, which is what Pydantic prefers for validation errors.
+        """
+
         run_accession_regex = "(E|D|S)RR[0-9]{6,}"
         regex_res = re.match(run_accession_regex, run)
 
@@ -65,20 +66,39 @@ class INSDCRunAccession(RootModel):
         return run
 
 
-# This is one row
+class AmpliconResultTypes(str, Enum):
+    """Class that models the two allowed statuses for successful amplicon analysis runs.
+    Pydantic validates Enums very simply without needing to declare a new function.
+    """
+
+    all_results = "all_results"
+    no_asvs = "no_asvs"
+
+
 class AmpliconPassedRunsRecord(BaseModel):
+    """Class defining a Pydantic model for a single "row" of an amplicon passed runs file.
+    Uses the previous two classes.
+    """
+
     run: INSDCRunAccession
-    status: ASVResultTypes
+    status: AmpliconResultTypes
 
 
 class AmpliconNonINSDCSPassedRunsRecord(BaseModel):
+    """Class modeling a very similar model as the preceding one, but with no INSDC-validation.
+    This is achieved by replacing the type of the runs with just a simple string so no validation
+    happens.
+    """
+
     run: str
-    status: ASVResultTypes
+    status: AmpliconResultTypes
 
 
 # This is the schema for the whole DF
 class AmpliconPassedRunsSchema(pa.DataFrameModel):
-    """Pandera schema using the pydantic model."""
+    """Class modelling a Pandera dataframe schema that uses the AmpliconPassedRunsRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
 
     class Config:
         """Config with dataframe-level data type."""
@@ -88,7 +108,9 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
 
 
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
-    """Pandera schema using the pydantic model."""
+    """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
+    Uses the AmpliconNonINSDCSPassedRunsRecord as a dtype to achieve this.
+    """
 
     class Config:
         """Config with dataframe-level data type."""
@@ -97,46 +119,15 @@ class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
-@extensions.register_check_method(statistics=["short_tax_ranks"])
-def is_valid_tax_hierarchy(pandas_obj, *, short_tax_ranks):
-
-    bool_list = []
-    short_tax_ranks.append(
-        "Unclassified"
-    )  # This is the only non-hierarchical value we can still accept
-
-    for taxa in pandas_obj:
-        taxa_lst = [rank.split("__")[0] for rank in taxa.split(";")]
-        if len(set.intersection(set(taxa_lst), set(short_tax_ranks))) == len(taxa_lst):
-            bool_list.append(True)
-        else:
-            bool_list.append(False)
-
-    return pd.Series(bool_list)
-
-
-def generate_dynamic_tax_df_schema(
-    run_acc: str, short_tax_ranks: list
-) -> pa.DataFrameSchema:
-
-    tax_schema = pa.DataFrameSchema(
-        {run_acc: pa.Column(int, checks=pa.Check.ge(0))},
-        index=pa.Index(
-            str,
-            unique=True,
-            checks=[pa.Check.is_valid_tax_hierarchy(short_tax_ranks=short_tax_ranks)],
-        ),
-        strict=True,
-        coerce=True,
-    )
-
-    return tax_schema
-
-
-# https://stackoverflow.com/questions/76537360/initialize-one-of-two-pydantic-models-depending-on-an-init-parameter
-
-
 class TaxRank(RootModel):
+    """Class for modelling a single Taxonomic Rank.
+    Essentially is just a special string with validation of the structure:
+    `${rank}__${taxon}`
+    Where `${rank}` is one of the allowed short ranks defined by the imported
+    `SHORT_TAX_RANKS` and `SHORT_PR2_TAX_RANKS` variables.
+    And `${taxon}` is the actual taxon for that rank (this isn't validated).
+    It will also validate if the whole string is the permitted "Unclassified".
+    """
 
     valid_tax_ranks: ClassVar = SHORT_TAX_RANKS + SHORT_PR2_TAX_RANKS
 
@@ -157,7 +148,15 @@ class TaxRank(RootModel):
         return taxrank
 
 
+# TODO: see if we can simplify the declaration of two Taxon classes by using one of these solutions
+# None of the solutions have a model-only way of doing it, but worth considering maybe
+# https://stackoverflow.com/questions/76537360/initialize-one-of-two-pydantic-models-depending-on-an-init-parameter
+
+
 class Taxon(BaseModel):
+    """Class for modelling an entire Taxon or taxonomic assignment.
+    All of the ranks are optional, to model for the taxon being "Unclassified".
+    """
 
     Superkingdom: Optional[TaxRank]
     Kingdom: Optional[TaxRank]
@@ -170,6 +169,7 @@ class Taxon(BaseModel):
 
 
 class PR2Taxon(BaseModel):
+    """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
     Domain: Optional[TaxRank]
     Supergroup: Optional[TaxRank]
@@ -183,18 +183,25 @@ class PR2Taxon(BaseModel):
 
 
 class TaxonRecord(Taxon):
+    """Class for modelling a single taxon record in a taxonomy file.
+    It inherits the Taxon class, and simply adds a Count field, modelling the read counts
+    for that particular Taxon record.
+    """
 
     Count: int
 
 
 class PR2TaxonRecord(PR2Taxon):
+    """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
     Count: int
 
 
 # This is the schema for the whole DF
 class TaxonSchema(pa.DataFrameModel):
-    """Pandera schema using the pydantic model."""
+    """Class modelling a Pandera dataframe schema that uses the TaxonRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
 
     class Config:
         """Config with dataframe-level data type."""
@@ -204,7 +211,9 @@ class TaxonSchema(pa.DataFrameModel):
 
 
 class PR2TaxonSchema(pa.DataFrameModel):
-    """Pandera schema using the pydantic model."""
+    """Class modelling the same dataframe schema as the preceding one, except for the PR2 taxonomy.
+    Uses the PR2TaxonSchema as a dtype to achieve this.
+    """
 
     class Config:
         """Config with dataframe-level data type."""

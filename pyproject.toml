@@ -22,7 +22,7 @@ dependencies = [
     "regex==2023.12.25",
     "requests==2.32.3",
     "click==8.1.7",
-    "pandera==0.21.1"
+    "pandera==0.22.1"
 ]
 
 [build-system]
@@ -77,7 +77,7 @@ tests = [
     "regex==2023.12.25",
     "requests==2.32.3",
     "click==8.1.7",
-    "pandera==0.21.1"
+    "pandera==0.22.1"
 ]
 
 dev = [

@@ -158,28 +158,28 @@ class Taxon(BaseModel):
     All of the ranks are optional, to model for the taxon being "Unclassified".
     """
 
-    Superkingdom: Optional[TaxRank]
-    Kingdom: Optional[TaxRank]
-    Phylum: Optional[TaxRank]
-    Class: Optional[TaxRank]
-    Order: Optional[TaxRank]
-    Family: Optional[TaxRank]
-    Genus: Optional[TaxRank]
-    Species: Optional[TaxRank]
+    Superkingdom: Optional[TaxRank] = None
+    Kingdom: Optional[TaxRank] = None
+    Phylum: Optional[TaxRank] = None
+    Class: Optional[TaxRank] = None
+    Order: Optional[TaxRank] = None
+    Family: Optional[TaxRank] = None
+    Genus: Optional[TaxRank] = None
+    Species: Optional[TaxRank] = None
 
 
 class PR2Taxon(BaseModel):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
-    Domain: Optional[TaxRank]
-    Supergroup: Optional[TaxRank]
-    Division: Optional[TaxRank]
-    Subdivision: Optional[TaxRank]
-    Class: Optional[TaxRank]
-    Order: Optional[TaxRank]
-    Family: Optional[TaxRank]
-    Genus: Optional[TaxRank]
-    Species: Optional[TaxRank]
+    Domain: Optional[TaxRank] = None
+    Supergroup: Optional[TaxRank] = None
+    Division: Optional[TaxRank] = None
+    Subdivision: Optional[TaxRank] = None
+    Class: Optional[TaxRank] = None
+    Order: Optional[TaxRank] = None
+    Family: Optional[TaxRank] = None
+    Genus: Optional[TaxRank] = None
+    Species: Optional[TaxRank] = None
 
 
 class TaxonRecord(Taxon):

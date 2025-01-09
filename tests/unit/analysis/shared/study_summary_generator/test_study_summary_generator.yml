@@ -6,7 +6,7 @@
   stderr:
     contains:
       - "Error: No such option: --chromosome"
-- name: study_summary_generator test_correct_args_summarise_withasvs
+- name: study_summary_generator test_correct_args_summarise_withasvs_noninsdc
   tags:
     - study_summary_generator
   command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -p chunk1 --non_insdc
@@ -19,7 +19,7 @@
       md5sum: 227c7dade83cd0d25386f274378b72a7
     - path: "chunk1_DADA2-PR2_16S-V3-V4_asv_study_summary.tsv"
       md5sum: cc32ee3a746db003ffb066d7d2c652ed
-- name: study_summary_generator test_correct_args_summarise_withoutasvs
+- name: study_summary_generator test_correct_args_summarise_withoutasvs_noninsdc
   tags:
     - study_summary_generator
   command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_2.csv -p chunk2 --non_insdc
@@ -28,6 +28,32 @@
       md5sum: a23b6a9b2d350e777e045c659e5d1480
     - path: "chunk2_SILVA-SSU_study_summary.tsv"
       md5sum: ba685a3526ae29a4151fe15de46eba43
+- name: study_summary_generator test_insdc_error
+  tags:
+    - study_summary_generator
+  exit_code: 1
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -p chunk1
+  stderr:
+    contains:
+      - "{'run': 'mock_V3-V4_V9_double_amp'}"
+- name: study_summary_generator test_invalid_success_status
+  tags:
+    - study_summary_generator
+  exit_code: 1
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/invalid_passed_runs.csv -p chunk1 --non_insdc
+  stderr:
+    contains:
+      - "{'status': 'all_resultsssss'}"
+- name: study_summary_generator test_invalid_taxonomic_ranks
+  tags:
+    - study_summary_generator
+  exit_code: 1
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/invalid_taxranks_runs.csv -p chunk1 --non_insdc
+  stderr:
+    contains:
+      - "{'Superkingdom': 'skkkk__Archaea'}"
+      - "{'Phylum': 'ppppp__Acidobacteriota'}"
+      - "{'Family': 'ffffff__Holophagaceae'}"
 - name: study_summary_generator test_correct_args_merge
   tags:
     - study_summary_generator

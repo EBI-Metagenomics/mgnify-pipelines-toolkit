@@ -106,7 +106,7 @@ def get_tax_file(
 
 
 def parse_one_tax_file(
-    run_acc: str, tax_file: Path, long_tax_ranks: str
+    run_acc: str, tax_file: Path, long_tax_ranks: list
 ) -> pd.DataFrame:
     """Parses a taxonomy file, and returns it as a pandas DataFrame object.
 
@@ -114,14 +114,18 @@ def parse_one_tax_file(
     :type run_acc: str
     :param tax_file: Taxonomy file that will be parsed.
     :type tax_file: Path
+    :param long_tax_ranks: Either the imported list _SILVA_TAX_RANKS or _PR2_TAX_RANKS
+            to validate the taxonomic ranks of the file.
+    :type tax_file: list
     :return: The parsed :param:`tax_file` as a :class:`pd.DataFrame` object
     :rtype: pd.DataFrame
     """
-    # TODO: update this docstring and comments
 
     res_df = pd.read_csv(tax_file, sep="\t", names=["Count"] + long_tax_ranks)
     res_df = res_df.fillna("")
 
+    # Two different schemas used for validation depending on the database
+    # because PR2 schema has different taxonomic ranks than the standard
     if len(long_tax_ranks) == 8:
         TaxonSchema(res_df)
     elif len(long_tax_ranks) == 9:

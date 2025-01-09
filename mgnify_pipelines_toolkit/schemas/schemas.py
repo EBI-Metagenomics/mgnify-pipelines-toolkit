@@ -168,18 +168,13 @@ class Taxon(BaseModel):
     Species: Optional[TaxRank] = None
 
 
-class PR2Taxon(BaseModel):
+class PR2Taxon(Taxon):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
     Domain: Optional[TaxRank] = None
     Supergroup: Optional[TaxRank] = None
     Division: Optional[TaxRank] = None
     Subdivision: Optional[TaxRank] = None
-    Class: Optional[TaxRank] = None
-    Order: Optional[TaxRank] = None
-    Family: Optional[TaxRank] = None
-    Genus: Optional[TaxRank] = None
-    Species: Optional[TaxRank] = None
 
 
 class TaxonRecord(Taxon):

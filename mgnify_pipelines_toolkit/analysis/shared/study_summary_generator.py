@@ -223,7 +223,7 @@ def generate_db_summary(
 
 def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List]:
     """Matches different summary files of the same database label and analysis
-    type (and amplified region for ASVs) into a dictionaryto help merge
+    type (and amplified region for ASVs) into a dictionary to help merge
     the correct summaries.
 
     :param all_study_summaries: List of file paths to different summary files

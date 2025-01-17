@@ -36,19 +36,15 @@ def create_gaf_file(gaf_input_file_path, go_id_set):
 def main():
 
     if not os.stat(IPS_INPUT).st_size == 0:
-        # Create temporary file names, necessary to run map2slim
-        gaf_input_temp_file_path = f"{OUTPUT}_ips_annotations.gaf"
-        print("Creating temp files under: " + gaf_input_temp_file_path)
-
         # Parse InterProScan result file; map protein accessions and GO terms
-        print("Parsing the InterProScan result output file: " + IPS_INPUT)
+        print("Parsing InterProScan input: " + IPS_INPUT)
         go2protein_count_dict = parse_ips_file(IPS_INPUT)
         print("Finished parsing.")
 
-        # Generating the GAF input file for Map2Slim
-        print("Generating the GAF input file for Map2Slim...")
+        gaf_output_path = f"{OUTPUT}_ips_annotations.gaf"
+        print("Creating GAF file: " + gaf_output_path)
         go_id_set = go2protein_count_dict.keys()
-        create_gaf_file(gaf_input_temp_file_path, go_id_set)
+        create_gaf_file(gaf_output_path, go_id_set)
         print("Finished GAF file generation.")
 
 

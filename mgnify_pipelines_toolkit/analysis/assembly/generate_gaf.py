@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from go_utils import parse_ips_file
+from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_ips_file
 
 description = "Go slim pipeline."
 parser = argparse.ArgumentParser(description=description)

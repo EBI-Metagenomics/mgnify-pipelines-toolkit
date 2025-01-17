@@ -2,7 +2,7 @@ import argparse
 import os
 import re
 
-from go_utils import parse_ips_file
+from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_ips_file
 
 description = "Go slim pipeline."
 parser = argparse.ArgumentParser(description=description)
@@ -26,7 +26,7 @@ GAF_INPUT = args.gaf_input
 OUTPUT = args.output
 
 
-def parse_mapped_gaf_file(gaf_file):
+def parse_gaf_file(gaf_file):
     """
     parse_mapped_gaf_file(gaf_file) -> dictionary
     Example of GAF mapped output:
@@ -55,7 +55,7 @@ def parse_mapped_gaf_file(gaf_file):
     return result
 
 
-def parse_iprscan_output_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dict):
+def parse_ips_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dict):
     # result -> GO accessions mapped to number of occurrences
     # Example {'GO:0009842':267, 'GO:0009841':566}
     result = {}
@@ -67,23 +67,16 @@ def parse_iprscan_output_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dic
         previous_protein_acc = None
         go_annotations_single_protein = set()
         # Set default value for number of proteins to 1
-        num_of_proteins = 1
         for line in handle:
             line_counter += 1
             line = line.strip()
             chunks = line.split("\t")
             # Get protein accession
             current_protein_acc = chunks[0]
-            num_of_proteins = len(current_protein_acc.split("|"))
             # If new protein accession extracted, store GO annotation counts in result dictionary
             if not current_protein_acc == previous_protein_acc:
                 previous_protein_acc = current_protein_acc
-                count_slims(
-                    go_annotations_single_protein,
-                    map2slim_mapped_go_ids_dict,
-                    num_of_proteins,
-                    result,
-                )
+
                 # reset go id set because we hit a new protein accession
                 go_annotations_single_protein = set()
             # Parse out GO annotations
@@ -93,33 +86,8 @@ def parse_iprscan_output_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dic
                 for go_annotation in goPattern.findall(line):
                     go_annotations_single_protein.add(go_annotation)
 
-        # Do final counting for the last protein
-        count_slims(
-            go_annotations_single_protein,
-            map2slim_mapped_go_ids_dict,
-            num_of_proteins,
-            result,
-        )
         handle.close()
     return result
-
-
-def count_slims(
-    go_annotations_single_protein, map2slim_mapped_go_ids_dict, num_of_proteins, result
-):
-    # count goslims
-    slim_go_ids_set = set()
-    # Get the set of slim terms
-    for go_annotation in go_annotations_single_protein:
-        mapped_go_ids = map2slim_mapped_go_ids_dict.get(go_annotation)
-        if mapped_go_ids:
-            slim_go_ids_set.update(mapped_go_ids)
-    # Iterate over the set of slim terms and update the counts
-    for slim_go_id in slim_go_ids_set:
-        count = result.setdefault(slim_go_id, 0)
-        count += 1 * num_of_proteins
-        result[slim_go_id] = count
-
 
 def get_go_slim_summary(go_slim_banding_file, go_slims_2_protein_count):
     summary = []
@@ -195,7 +163,7 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, topLevelGoIds
 
 def main():
 
-    print("Parsing the InterProScan result output file: " + IPS_INPUT)
+    print("Parsing the InterProScan input: " + IPS_INPUT)
     go2protein_count_dict = parse_ips_file(IPS_INPUT)
     print("Finished parsing.")
 
@@ -209,30 +177,21 @@ def main():
     full_go_summary = get_full_go_summary(
         core_gene_ontology_list, go2protein_count_dict, topLevelGoIds
     )
-    # delete core gene ontology list
-    del core_gene_ontology_list
     print("Finished generation.")
 
-    print("Writing full GO summary to the following file: " + OUTPUT)
+    print("Writing full GO summary: " + OUTPUT)
     write_go_summary_to_file(full_go_summary, OUTPUT)
-    # delete full GO summary variable
-    del full_go_summary
     print("Finished writing.")
 
-    go2mapped_go = parse_mapped_gaf_file(GAF_INPUT)
-    print("Finished parsing.")
-
-    print("Getting GO slim counts by parsing I5 TSV again")
-    go_slims_2_protein_count = parse_iprscan_output_goslim_counts(
+    go2mapped_go = parse_gaf_file(GAF_INPUT)
+    print("Getting GO slim counts")
+    go_slims_2_protein_count = parse_ips_goslim_counts(
         IPS_INPUT, go2mapped_go
     )
-
     go_slim_summary = get_go_slim_summary(GO_BANDING, go_slims_2_protein_count)
     go_slim_output_file = OUTPUT + "_slim"
-    print("Writing GO slim summary to the following file: " + go_slim_output_file)
+    print("Writing GO slim summary: " + go_slim_output_file)
     write_go_summary_to_file(go_slim_summary, go_slim_output_file)
-    # delete full GO summary variable
-    del go_slim_summary
     print("Finished writing.")
 
 

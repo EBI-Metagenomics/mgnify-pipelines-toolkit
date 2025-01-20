@@ -89,6 +89,7 @@ def parse_ips_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dict):
         handle.close()
     return result
 
+
 def get_go_slim_summary(go_slim_banding_file, go_slims_2_protein_count):
     summary = []
 
@@ -150,13 +151,13 @@ def go_sort_key(item):
 def get_full_go_summary(core_gene_ontology, go2protein_count_dict, topLevelGoIds):
     summary = []
 
-    for goId, term, category in core_gene_ontology:
+    for go_id, term, category in core_gene_ontology:
 
-        if (goId in go2protein_count_dict) and (
-            goId not in topLevelGoIds
+        if (go_id in go2protein_count_dict) and (
+            go_id not in topLevelGoIds
         ):  # make sure that top level terms are not included (they tell you nothing!)
-            count = go2protein_count_dict.get(goId)
-            summary.append((goId, term, category, count))
+            count = go2protein_count_dict.get(go_id)
+            summary.append((go_id, term, category, count))
     summary.sort(key=go_sort_key)
     return summary
 
@@ -185,9 +186,7 @@ def main():
 
     go2mapped_go = parse_gaf_file(GAF_INPUT)
     print("Getting GO slim counts")
-    go_slims_2_protein_count = parse_ips_goslim_counts(
-        IPS_INPUT, go2mapped_go
-    )
+    go_slims_2_protein_count = parse_ips_goslim_counts(IPS_INPUT, go2mapped_go)
     go_slim_summary = get_go_slim_summary(GO_BANDING, go_slims_2_protein_count)
     go_slim_output_file = OUTPUT + "_slim"
     print("Writing GO slim summary: " + go_slim_output_file)

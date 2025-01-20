@@ -16,7 +16,7 @@ def parse_ips_file(ips_file):
     total_num_of_proteins = 0
     if os.path.exists(ips_file):
         handle = open(ips_file, "r")
-        goPattern = re.compile("GO:\\d+")
+        go_pattern = re.compile("GO:\\d+")
         line_counter = 0
         previous_protein_acc = None
         go_annotations_single_protein = set()
@@ -43,7 +43,7 @@ def parse_ips_file(ips_file):
             # GO annotations are associated to InterPro entries (InterPro entries start with 'IPR')
             # Than use the regex to extract the GO Ids (e.g. GO:0009842)
             if len(chunks) >= 13 and chunks[11].startswith("IPR"):
-                for go_annotation in goPattern.findall(line):
+                for go_annotation in go_pattern.findall(line):
                     go_annotations_single_protein.add(go_annotation)
 
         # Do final counting for the last protein

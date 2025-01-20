@@ -55,14 +55,14 @@ def parse_gaf_file(gaf_file):
     return result
 
 
-def parse_ips_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dict):
+def parse_ips_goslim_counts(ips, map2slim_mapped_go_ids_dict):
     # result -> GO accessions mapped to number of occurrences
     # Example {'GO:0009842':267, 'GO:0009841':566}
     result = {}
-    if os.path.exists(iprscanOutput):
-        handle = open(iprscanOutput, "r")
+    if os.path.exists(ips):
+        handle = open(ips, "r")
         # Example GO Id -> GO:0009842
-        goPattern = re.compile("GO:\\d+")
+        go_pattern = re.compile("GO:\\d+")
         line_counter = 0
         previous_protein_acc = None
         go_annotations_single_protein = set()
@@ -83,7 +83,7 @@ def parse_ips_goslim_counts(iprscanOutput, map2slim_mapped_go_ids_dict):
             # GO annotations are associated to InterPro entries (InterPro entries start with 'IPR')
             # Than use the regex to extract the GO Ids (e.g. GO:0009842)
             if len(chunks) >= 13 and chunks[11].startswith("IPR"):
-                for go_annotation in goPattern.findall(line):
+                for go_annotation in go_pattern.findall(line):
                     go_annotations_single_protein.add(go_annotation)
 
         handle.close()
@@ -110,9 +110,9 @@ def get_go_slim_summary(go_slim_banding_file, go_slims_2_protein_count):
     return summary
 
 
-def write_go_summary_to_file(goSummary, outputFile):
-    handle = open(outputFile, "w")
-    for go, term, category, count in goSummary:
+def write_go_summary_to_file(go_summary, output_file):
+    handle = open(output_file, "w")
+    for go, term, category, count in go_summary:
         handle.write('","'.join(['"' + go, term, category, str(count) + '"']) + "\n")
     handle.close()
 
@@ -128,13 +128,13 @@ def get_gene_ontology(obo_file):
     id, term, category = "", "", ""
     for line in handle:
         line = line.strip()
-        splitLine = line.split(": ")
+        split_line = line.split(": ")
         if line.startswith("id:"):
-            id = splitLine[1].strip()
+            id = split_line[1].strip()
         elif line.startswith("name:"):
-            term = splitLine[1].strip()
+            term = split_line[1].strip()
         elif line.startswith("namespace"):
-            category = splitLine[1].strip()
+            category = split_line[1].strip()
         else:
             if id.startswith("GO:") and id and term and category:
                 item = (id, term, category)
@@ -148,13 +148,13 @@ def go_sort_key(item):
     return (item[2], -item[3])
 
 
-def get_full_go_summary(core_gene_ontology, go2protein_count_dict, topLevelGoIds):
+def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_ids):
     summary = []
 
     for go_id, term, category in core_gene_ontology:
 
         if (go_id in go2protein_count_dict) and (
-            go_id not in topLevelGoIds
+            go_id not in top_level_go_ids
         ):  # make sure that top level terms are not included (they tell you nothing!)
             count = go2protein_count_dict.get(go_id)
             summary.append((go_id, term, category, count))
@@ -174,9 +174,9 @@ def main():
     print("Finished loading.")
 
     print("Generating full GO summary...")
-    topLevelGoIds = ["GO:0008150", "GO:0003674", "GO:0005575"]
+    top_level_go_ids = ["GO:0008150", "GO:0003674", "GO:0005575"]
     full_go_summary = get_full_go_summary(
-        core_gene_ontology_list, go2protein_count_dict, topLevelGoIds
+        core_gene_ontology_list, go2protein_count_dict, top_level_go_ids
     )
     print("Finished generation.")
 

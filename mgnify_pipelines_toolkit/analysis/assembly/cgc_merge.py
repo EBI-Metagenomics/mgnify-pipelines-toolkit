@@ -5,11 +5,11 @@ import json
 import logging
 import os
 import re
-from importlib.metadata import version
 
 from Bio import SeqIO
 
 __version__ = "1.0.4"
+
 
 class Region:
     def __init__(self, start, end):
@@ -202,8 +202,13 @@ def get_regions_fgs(fn):
     return regions
 
 
-# This is from cmsearch
-# ERR855786.1000054-HWI-M02024:111:000000000-A8H14:1:1115:23473:14586-1 -         LSU_rRNA_bacteria    RF02541   hmm     1224     1446        5      227      +     -    6 0.61   0.8  135.2   2.8e-38 !   -
+"""
+# noqa: E501
+This is from cmsearch
+ERR855786.1000054-HWI-M02024:111:000000000-A8H14:1:1115:23473:14586-1 -         LSU_rRNA_bacteria    RF02541   hmm     1224     1446        5      227      +     -    6 0.61   0.8  135.2   2.8e-38 !   -
+"""
+
+
 def get_regions_mask(mask_file):
     """Parse masked region file (i.e. ncRNA)"""
     regions = {}

@@ -17,9 +17,25 @@
 import argparse
 import os
 import logging
-from typing import Set
 
-from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_ips_file
+from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_interproscan_tsv
+
+
+def parse_args():
+
+    description = "Go slim pipeline for processing InterProScan results"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "-i", "--ips_input", help="InterProScan result file", required=True
+    )
+    parser.add_argument("-o", "--output", help="GO summary output file", required=True)
+    args = parser.parse_args()
+
+    IPS_INPUT = args.ips_input
+    OUTPUT = args.output
+
+    return IPS_INPUT, OUTPUT
+
 
 # Constants
 PROJECT_NAME = "EBI Metagenomics"
@@ -32,7 +48,7 @@ logging.basicConfig(
 )
 
 
-def write_gaf_file(gaf_input_file_path: str, go_id_set: Set[str]) -> None:
+def write_gaf_file(gaf_input_file_path: str, go_id_set: set[str]) -> None:
     """
     Create a GO Annotation File (GAF) from a set of GO IDs.
 
@@ -77,31 +93,24 @@ def main():
     """
     Process the InterProScan TSV output and generate a GO annotation file (GAF)).
     """
-    description = "Go slim pipeline for processing InterProScan results"
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "-i", "--ips_input", help="InterProScan result file", required=True
-    )
-    parser.add_argument("-o", "--output", help="GO summary output file", required=True)
-    args = parser.parse_args()
+
+    IPS_INPUT, OUTPUT = parse_args()
 
     # Validate input file
-    if not os.path.exists(args.ips_input):
-        raise FileNotFoundError(f"Input file not found: {args.ips_input}")
+    if not os.path.exists(IPS_INPUT):
+        raise FileNotFoundError(f"Input file not found: {IPS_INPUT}")
 
-    if os.path.getsize(args.ips_input) == 0:
+    if os.path.getsize(IPS_INPUT) == 0:
         logging.warning("Input file is empty. Skipping processing.")
         return
 
     # Parse InterProScan result file
-    logging.info(f"Parsing InterProScan input: {args.ips_input}")
-    go2protein_count_dict = parse_ips_file(args.ips_input)
+    logging.info(f"Parsing InterProScan input: {IPS_INPUT}")
+    go2protein_count_dict = parse_interproscan_tsv(IPS_INPUT)
     logging.info("Finished parsing InterProScan file")
 
     logging.info("Writing the GAF file")
-    write_gaf_file(
-        f"{args.output}_ips_annotations.gaf", set(go2protein_count_dict.keys())
-    )
+    write_gaf_file(f"{OUTPUT}_ips_annotations.gaf", go2protein_count_dict.keys())
 
 
 if __name__ == "__main__":

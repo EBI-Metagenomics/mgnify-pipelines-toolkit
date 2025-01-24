@@ -49,13 +49,13 @@ def parse_args():
     parser.add_argument("-o", "--output", help="GO summary output file.", required=True)
     args = parser.parse_args()
 
-    GO_OBO = args.go_obo
-    GO_BANDING = args.go_banding
-    GAF_INPUT = args.gaf_input
-    IPS_INPUT = args.ips_input
-    OUTPUT = args.output
+    go_obo = args.go_obo
+    go_banding = args.go_banding
+    gaf_input = args.gaf_input
+    ips_input = args.ips_input
+    output = args.output
 
-    return GO_OBO, GO_BANDING, GAF_INPUT, IPS_INPUT, OUTPUT
+    return go_obo, go_banding, gaf_input, ips_input, output
 
 
 def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
@@ -144,15 +144,15 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_
 
 def main():
 
-    GO_OBO, GO_BANDING, GAF_INPUT, IPS_INPUT, OUTPUT = parse_args()
+    go_obo, go_banding, gaf_input, ips_input, output = parse_args()
 
-    logging.info("Parsing the InterProScan input: " + IPS_INPUT)
-    go2protein_count_dict = parse_interproscan_tsv(IPS_INPUT)
+    logging.info("Parsing the InterProScan input: " + ips_input)
+    go2protein_count_dict = parse_interproscan_tsv(ips_input)
     logging.info("Finished parsing.")
 
     # Generate GO summary
-    logging.info("Loading full Gene ontology: " + GO_OBO)
-    go_term_tuples = parse_gene_ontology(GO_OBO)
+    logging.info("Loading full Gene ontology: " + go_obo)
+    go_term_tuples = parse_gene_ontology(go_obo)
     logging.info("Finished loading.")
 
     logging.info("Generating full GO summary...")
@@ -162,16 +162,16 @@ def main():
     )
     logging.info("Finished generation.")
 
-    logging.info("Writing full GO summary: " + OUTPUT)
-    write_go_summary_to_file(full_go_summary, OUTPUT)
+    logging.info("Writing full GO summary: " + output)
+    write_go_summary_to_file(full_go_summary, output)
     logging.info("Finished writing.")
 
-    mapped_go_terms = parse_mapped_gaf_file(GAF_INPUT)
+    mapped_go_terms = parse_mapped_gaf_file(gaf_input)
     logging.info("Getting GO slim counts")
-    goslims2_protein_count = parse_interproscan_tsv(IPS_INPUT, mapped_go_terms)
+    goslims2_protein_count = parse_interproscan_tsv(ips_input, mapped_go_terms)
 
-    go_slim_summary = get_go_slim_summary(GO_BANDING, goslims2_protein_count)
-    go_slim_output_file = OUTPUT + "_slim"
+    go_slim_summary = get_go_slim_summary(go_banding, goslims2_protein_count)
+    go_slim_output_file = output + "_slim"
     logging.info("Writing GO slim summary: " + go_slim_output_file)
     write_go_summary_to_file(go_slim_summary, go_slim_output_file)
     logging.info("Finished writing.")

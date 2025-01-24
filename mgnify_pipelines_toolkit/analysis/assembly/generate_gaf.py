@@ -31,10 +31,10 @@ def parse_args():
     parser.add_argument("-o", "--output", help="GO summary output file", required=True)
     args = parser.parse_args()
 
-    IPS_INPUT = args.ips_input
-    OUTPUT = args.output
+    ips_input = args.ips_input
+    output = args.output
 
-    return IPS_INPUT, OUTPUT
+    return ips_input, output
 
 
 # Constants
@@ -94,23 +94,23 @@ def main():
     Process the InterProScan TSV output and generate a GO annotation file (GAF)).
     """
 
-    IPS_INPUT, OUTPUT = parse_args()
+    ips_input, output = parse_args()
 
     # Validate input file
-    if not os.path.exists(IPS_INPUT):
-        raise FileNotFoundError(f"Input file not found: {IPS_INPUT}")
+    if not os.path.exists(ips_input):
+        raise FileNotFoundError(f"Input file not found: {ips_input}")
 
-    if os.path.getsize(IPS_INPUT) == 0:
+    if os.path.getsize(ips_input) == 0:
         logging.warning("Input file is empty. Skipping processing.")
         return
 
     # Parse InterProScan result file
-    logging.info(f"Parsing InterProScan input: {IPS_INPUT}")
-    go2protein_count_dict = parse_interproscan_tsv(IPS_INPUT)
+    logging.info(f"Parsing InterProScan input: {ips_input}")
+    go2protein_count_dict = parse_interproscan_tsv(ips_input)
     logging.info("Finished parsing InterProScan file")
 
     logging.info("Writing the GAF file")
-    write_gaf_file(f"{OUTPUT}_ips_annotations.gaf", go2protein_count_dict.keys())
+    write_gaf_file(f"{output}_ips_annotations.gaf", go2protein_count_dict.keys())
 
 
 if __name__ == "__main__":

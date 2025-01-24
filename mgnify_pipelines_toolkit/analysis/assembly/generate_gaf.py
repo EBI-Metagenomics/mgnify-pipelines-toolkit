@@ -55,12 +55,12 @@ def write_gaf_file(gaf_input_file_path: str, go_id_set: set[str]) -> None:
     :param gaf_input_file_path: Path to output GAF file
     :param go_id_set: Set of GO IDs to include in the file
     """
-    with open(gaf_input_file_path, "w") as file:
+    with open(gaf_input_file_path, "w") as fw:
         # Write GAF header
-        file.write("!gaf-version: 2.1\n")
-        file.write(f"!Project_name: {PROJECT_NAME}\n")
-        file.write(f"!URL: {PROJECT_URL}\n")
-        file.write(f"!Contact Email: {PROJECT_CONTACT}\n")
+        fw.write("!gaf-version: 2.1\n")
+        fw.write(f"!Project_name: {PROJECT_NAME}\n")
+        fw.write(f"!URL: {PROJECT_URL}\n")
+        fw.write(f"!Contact Email: {PROJECT_CONTACT}\n")
 
         # Write GO entries
         for go_id in go_id_set:
@@ -84,7 +84,7 @@ def write_gaf_file(gaf_input_file_path: str, go_id_set: set[str]) -> None:
                     "",
                 ]
             )
-            file.write(gaf_entry + "\n")
+            fw.write(gaf_entry + "\n")
 
     logging.info(f"GAF file created successfully: {gaf_input_file_path}")
 

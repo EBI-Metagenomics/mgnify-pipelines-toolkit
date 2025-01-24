@@ -15,10 +15,16 @@
 # limitations under the License.
 
 import argparse
+from collections import defaultdict
+import logging
 import os
-import re
+from pathlib import Path
 
 from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_interproscan_tsv
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
+)
 
 
 def parse_args():
@@ -52,23 +58,9 @@ def parse_args():
     return GO_OBO, GO_BANDING, GAF_INPUT, IPS_INPUT, OUTPUT
 
 
-def parse_mapped_gaf_file(gaf_file):
-    """
-    parse_mapped_gaf_file(gaf_file) -> dictionary
-    Example of GAF mapped output:
-        !gaf-version: 2.0
-        ! This GAF has been mapped to a subset:
-        ! Subset: user supplied list, size = 38
-        ! Number of annotation in input set: 1326
-        ! Number of annotations rewritten: 120
-        EMG	GO:0005839	GO		GO:0005839	PMID:12069591	IEA		C			protein	taxon:1310605	20160528	InterPro
-        EMG	GO:0000160	GO		GO:0005575	PMID:12069591	IEA		C			protein	taxon:1310605	20160528	InterPro
-    Parsing the above GAF file will create the following dictionary:
-    result = {'GO:0005839':'GO:0005839', 'GO:0000160':'GO:0005575'}
-    :param gaf_file:
-    :return:
-    """
-    result = {}
+def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
+
+    mapped_go_dict = defaultdict(set)
     if os.path.exists(gaf_file):
         handle = open(gaf_file, "r")
         for line in handle:
@@ -77,83 +69,17 @@ def parse_mapped_gaf_file(gaf_file):
                 splitted_line = line.split("\t")
                 go_id = splitted_line[1]
                 mapped_go_id = splitted_line[4]
-                result.setdefault(go_id, set()).add(mapped_go_id)
-    return result
+                mapped_go_dict[go_id].add(mapped_go_id)
+
+    return mapped_go_dict
 
 
-def parse_ips_goslim_counts(ips, map2slim_mapped_go_ids_dict):
-    # result -> GO accessions mapped to number of occurrences
-    # Example {'GO:0009842':267, 'GO:0009841':566}
-    result = {}
-    if os.path.exists(ips):
-        handle = open(ips, "r")
-        # Example GO Id -> GO:0009842
-        go_pattern = re.compile("GO:\\d+")
-        line_counter = 0
-        previous_protein_acc = None
-        go_annotations_single_protein = set()
-        # Set default value for number of proteins to 1
-        num_of_proteins = 1
-        for line in handle:
-            line_counter += 1
-            line = line.strip()
-            chunks = line.split("\t")
-            # Get protein accession
-            current_protein_acc = chunks[0]
-            num_of_proteins = len(current_protein_acc.split("|"))
-            # If new protein accession extracted, store GO annotation counts in result dictionary
-            if not current_protein_acc == previous_protein_acc:
-                previous_protein_acc = current_protein_acc
-                count_slims(
-                    go_annotations_single_protein,
-                    map2slim_mapped_go_ids_dict,
-                    num_of_proteins,
-                    result,
-                )
-
-                # reset go id set because we hit a new protein accession
-                go_annotations_single_protein = set()
-            # Parse out GO annotations
-            # GO annotations are associated to InterPro entries (InterPro entries start with 'IPR')
-            # Than use the regex to extract the GO Ids (e.g. GO:0009842)
-            if len(chunks) >= 13 and chunks[11].startswith("IPR"):
-                for go_annotation in go_pattern.findall(line):
-                    go_annotations_single_protein.add(go_annotation)
-
-        # Do final counting for the last protein
-        count_slims(
-            go_annotations_single_protein,
-            map2slim_mapped_go_ids_dict,
-            num_of_proteins,
-            result,
-        )
-        handle.close()
-    return result
-
-
-def count_slims(
-    go_annotations_single_protein, map2slim_mapped_go_ids_dict, num_of_proteins, result
-):
-    # count goslims
-    slim_go_ids_set = set()
-    # Get the set of slim terms
-    for go_annotation in go_annotations_single_protein:
-        mapped_go_ids = map2slim_mapped_go_ids_dict.get(go_annotation)
-        if mapped_go_ids:
-            slim_go_ids_set.update(mapped_go_ids)
-    # Iterate over the set of slim terms and update the counts
-    for slim_go_id in slim_go_ids_set:
-        count = result.setdefault(slim_go_id, 0)
-        count += 1 * num_of_proteins
-        result[slim_go_id] = count
-
-
-def get_go_slim_summary(go_slim_banding_file, go_slims_2_protein_count):
+def get_go_slim_summary(go_slim_banding_file, goslims2_protein_count):
     summary = []
 
-    file_handler = open(go_slim_banding_file, "r")
+    fr = open(go_slim_banding_file, "r")
 
-    for line in file_handler:
+    for line in fr:
         if line.startswith("GO"):
             line = line.strip()
             line_chunks = line.split("\t")
@@ -162,17 +88,17 @@ def get_go_slim_summary(go_slim_banding_file, go_slims_2_protein_count):
             category = line_chunks[2]
             # Default value for the count
             count = 0
-            if go_id in go_slims_2_protein_count:
-                count = go_slims_2_protein_count.get(go_id)
+            if go_id in goslims2_protein_count:
+                count = goslims2_protein_count[go_id]
             summary.append((go_id, term, category, count))
     return summary
 
 
 def write_go_summary_to_file(go_summary, output_file):
-    handle = open(output_file, "w")
+    fw = open(output_file, "w")
     for go, term, category, count in go_summary:
-        handle.write('","'.join(['"' + go, term, category, str(count) + '"']) + "\n")
-    handle.close()
+        fw.write('","'.join(['"' + go, term, category, str(count) + '"']) + "\n")
+    fw.close()
 
 
 def parse_gene_ontology(obo_file):
@@ -182,9 +108,9 @@ def parse_gene_ontology(obo_file):
     :return:
     """
     go_term_tuples = []
-    handle = open(obo_file, "r")
+    fr = open(obo_file, "r")
     id, term, category = "", "", ""
-    for line in handle:
+    for line in fr:
         line = line.strip()
         split_line = line.split(": ")
         if line.startswith("id:"):
@@ -198,41 +124,8 @@ def parse_gene_ontology(obo_file):
                 item = (id, term, category)
                 go_term_tuples.append(item)
                 id, term, category = "", "", ""
-    handle.close()
+    fr.close()
     return go_term_tuples
-
-
-def parse_gaf_file(gaf_file):
-    """
-    parse_mapped_gaf_file(gaf_file) -> dictionary
-    Example of GAF mapped output:
-        !gaf-version: 2.0
-        ! This GAF has been mapped to a subset:
-        ! Subset: user supplied list, size = 38
-        ! Number of annotation in input set: 1326
-        ! Number of annotations rewritten: 120
-        EMG	GO:0005839	GO		GO:0005839	PMID:12069591	IEA		C			protein	taxon:1310605	20160528	InterPro
-        EMG	GO:0000160	GO		GO:0005575	PMID:12069591	IEA		C			protein	taxon:1310605	20160528	InterPro
-    Parsing the above GAF file will create the following dictionary:
-    result = {'GO:0005839':'GO:0005839', 'GO:0000160':'GO:0005575'}
-    :param gaf_file:
-    :return:
-    """
-    result = {}
-    if os.path.exists(gaf_file):
-        handle = open(gaf_file, "r")
-        for line in handle:
-            if not line.startswith("!"):
-                line = line.strip()
-                splitted_line = line.split("\t")
-                go_id = splitted_line[1]
-                mapped_go_id = splitted_line[4]
-                result.setdefault(go_id, set()).add(mapped_go_id)
-    return result
-
-
-def go_sort_key(item):
-    return (item[2], -item[3])
 
 
 def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_ids):
@@ -245,7 +138,7 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_
         ):  # make sure that top level terms are not included (they tell you nothing!)
             count = go2protein_count_dict[go_id]
             summary.append((go_id, term, category, count))
-    summary.sort(key=go_sort_key)
+    summary.sort(key=lambda x: (x[2], -x[3]))
     return summary
 
 
@@ -253,37 +146,35 @@ def main():
 
     GO_OBO, GO_BANDING, GAF_INPUT, IPS_INPUT, OUTPUT = parse_args()
 
-    print("Parsing the InterProScan input: " + IPS_INPUT)
+    logging.info("Parsing the InterProScan input: " + IPS_INPUT)
     go2protein_count_dict = parse_interproscan_tsv(IPS_INPUT)
-    print("Finished parsing.")
+    logging.info("Finished parsing.")
 
     # Generate GO summary
-    print("Loading full Gene ontology: " + GO_OBO)
+    logging.info("Loading full Gene ontology: " + GO_OBO)
     go_term_tuples = parse_gene_ontology(GO_OBO)
-    print("Finished loading.")
+    logging.info("Finished loading.")
 
-    print("Generating full GO summary...")
+    logging.info("Generating full GO summary...")
     top_level_go_ids = ["GO:0008150", "GO:0003674", "GO:0005575"]
     full_go_summary = get_full_go_summary(
         go_term_tuples, go2protein_count_dict, top_level_go_ids
     )
-    print("Finished generation.")
+    logging.info("Finished generation.")
 
-    print("Writing full GO summary: " + OUTPUT)
+    logging.info("Writing full GO summary: " + OUTPUT)
     write_go_summary_to_file(full_go_summary, OUTPUT)
-    print("Finished writing.")
+    logging.info("Finished writing.")
 
-    go2mapped_go = parse_gaf_file(GAF_INPUT)
-    print("Getting GO slim counts")
-    print(go2mapped_go)
-    go_slims_2_protein_count = parse_ips_goslim_counts(IPS_INPUT, go2mapped_go)
-    print(go_slims_2_protein_count)
-    print(go2protein_count_dict)
-    go_slim_summary = get_go_slim_summary(GO_BANDING, go_slims_2_protein_count)
+    mapped_go_terms = parse_mapped_gaf_file(GAF_INPUT)
+    logging.info("Getting GO slim counts")
+    goslims2_protein_count = parse_interproscan_tsv(IPS_INPUT, mapped_go_terms)
+
+    go_slim_summary = get_go_slim_summary(GO_BANDING, goslims2_protein_count)
     go_slim_output_file = OUTPUT + "_slim"
-    print("Writing GO slim summary: " + go_slim_output_file)
+    logging.info("Writing GO slim summary: " + go_slim_output_file)
     write_go_summary_to_file(go_slim_summary, go_slim_output_file)
-    print("Finished writing.")
+    logging.info("Finished writing.")
 
 
 if __name__ == "__main__":

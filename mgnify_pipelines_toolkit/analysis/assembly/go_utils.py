@@ -26,16 +26,42 @@ logging.basicConfig(
 
 
 def count_and_assign_go_annotations(
-    go2protein_count: defaultdict[int], go_annotations: set[str], num_of_proteins: int
+    go2protein_count: defaultdict[int],
+    go_annotations: set[str],
+    num_of_proteins: int,
+    mapped_go_terms: defaultdict[set] = None,
 ) -> defaultdict[int]:
-    # increment count for the found GO terms from a single protein
-    for go_id in go_annotations:
-        go2protein_count[go_id] += num_of_proteins
+    """Increments counts dictionary for GO terms found on a protein.
+        If used for GO-slim terms, then a mapped_go_terms dictionary is required
+        (with default value of None).
+    :param go2protein_count: Current state of the count dictionary
+    :type go2protein_count: defaultdict[int]
+    :param go_annotations: GO-terms to be incremented
+    :type go_annotations: set[str]
+    :param num_of_proteins: Number of proteins to be incremented (not sure if we need this, see TODO below)
+    :type num_of_proteins: int
+    :param mapped_go_terms: Dictionary containin the GO-slim conversion
+    :type mapped_go_terms: defaultdict(set)
+    :return: _description_
+    :rtype: _type_
+    """
+
+    if not mapped_go_terms:
+        for go_id in go_annotations:
+            go2protein_count[go_id] += num_of_proteins
+    else:
+        slim_go_ids_set = set()
+        for go_annotation in go_annotations:
+            mapped_go_ids = mapped_go_terms.get(go_annotation)
+            if mapped_go_ids:
+                slim_go_ids_set.update(mapped_go_ids)
+        for slim_go_id in slim_go_ids_set:
+            go2protein_count[slim_go_id] += num_of_proteins
 
     return go2protein_count
 
 
-def parse_interproscan_tsv(ips_file: Path) -> dict:
+def parse_interproscan_tsv(ips_file: Path, mapped_go_terms: dict = None) -> dict:
     """Parses an InterProScan output line by line and return a dictionary of counts for the different GO terms.
         The structure of the IPS file is one annotation per line, some of which will be GO terms. If a protein
         has multiple annotations, then those annotations will follow one by one in order. This function therefore
@@ -58,10 +84,10 @@ def parse_interproscan_tsv(ips_file: Path) -> dict:
     previous_protein_acc = None
     go_annotations_single_protein = set()
 
-    handle = open(ips_file, "r")
+    fr = open(ips_file, "r")
     go_pattern = re.compile("GO:\\d+")
 
-    for line in handle:
+    for line in fr:
         # IPS files are parsed line by line - the same protein accession will appear multiple lines in a row with different annotation
         line_counter += 1
         line = line.strip()
@@ -80,7 +106,10 @@ def parse_interproscan_tsv(ips_file: Path) -> dict:
             if len(go_annotations_single_protein) > 0:
                 num_of_proteins_with_go += 1
                 go2protein_count = count_and_assign_go_annotations(
-                    go2protein_count, go_annotations_single_protein, num_of_proteins
+                    go2protein_count,
+                    go_annotations_single_protein,
+                    num_of_proteins,
+                    mapped_go_terms,
                 )
             # reset GO id set because we hit a new protein accession
             go_annotations_single_protein = set()
@@ -95,9 +124,12 @@ def parse_interproscan_tsv(ips_file: Path) -> dict:
 
     # Do final counting for the last protein
     go2protein_count = count_and_assign_go_annotations(
-        go2protein_count, go_annotations_single_protein, num_of_proteins
+        go2protein_count,
+        go_annotations_single_protein,
+        num_of_proteins,
+        mapped_go_terms,
     )
 
-    handle.close()
+    fr.close()
 
     return go2protein_count

@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "0.1.9"
+version = "0.2.0"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -63,6 +63,8 @@ primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_v
 # analysis.assembly
 add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation:main"
 cgc_merge = "mgnify_pipelines_toolkit.analysis.assembly.cgc_merge:combine_main"
+generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
+summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
 # utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"

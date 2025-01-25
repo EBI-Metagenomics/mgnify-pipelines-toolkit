@@ -143,7 +143,7 @@ def get_primer_props(std_primer_dict_regex, input_path):
 
     threshold = 0.60  # Arbitrary threshold for collecting a matched primer
     read_count = get_read_count(
-        input_path, "fastq"
+        input_path, file_type="fastq"
     )  # Get read count of fastq file to calculate proportion with
     res_dict = defaultdict(defaultdict)
 

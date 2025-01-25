@@ -66,7 +66,6 @@ def main():
     parser = argparse.ArgumentParser(
         "Use diamond output file to create a table with Rhea and CHEBI reaction annotation for every protein."
     )
-    # TODO: input is not a descriptive name
     parser.add_argument(
         "-d",
         "--diamond_hits",
@@ -119,10 +118,10 @@ def main():
         f"Step 3/3: Read DIAMOND results from {'STDIN' if diamond_hits == '-' else Path(diamond_hits).resolve()} and write output"
     )
     with open(output, "w") as output_handler:
-        if input == "-":
+        if diamond_hits == "-":
             process_lines(sys.stdin, output_handler, rhea2reaction_dict, protein_hashes)
         else:
-            with open(args.input, "r") as input_file:
+            with open(diamond_hits, "r") as input_file:
                 process_lines(
                     input_file, output_handler, rhea2reaction_dict, protein_hashes
                 )

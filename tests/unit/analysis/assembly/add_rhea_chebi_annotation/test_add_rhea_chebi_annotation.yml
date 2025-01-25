@@ -6,7 +6,7 @@
     -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
     -p tests/fixtures/diamond/proteins_short.faa
     -o short_test.tsv
-    -i tests/fixtures/diamond/diamond_short.tsv
+    -d tests/fixtures/diamond/diamond_short.tsv
     --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv
   exit_code: 0
   files:
@@ -21,7 +21,7 @@
     python -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
     -p tests/fixtures/diamond/proteins_short.faa
     -o short_test.tsv
-    -i -
+    -d -
     --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv"
   exit_code: 0
   files:

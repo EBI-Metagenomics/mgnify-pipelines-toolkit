@@ -38,8 +38,6 @@ def test_get_read_count(mock_popen, read_count_output, expected_result):
     mock_process = mock_popen.return_value
     mock_process.communicate.return_value = (read_count_output, expected_result)
 
-    print(expected_result)
-
     read_count = get_read_count("/path/to/read_file")
 
     assert read_count == expected_result

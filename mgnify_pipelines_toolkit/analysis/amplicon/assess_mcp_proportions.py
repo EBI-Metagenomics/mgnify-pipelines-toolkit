@@ -87,7 +87,9 @@ def find_mcp_props_for_sample(path, rev=False):
             start + mcp_len - 1
         )  # compute the final index for the mcp (inclusive). Indices are of base 1 not 0.
 
-        read_count = get_read_count(path, type="fastq")  # get read count for fastq file
+        read_count = get_read_count(
+            path, file_type="fastq"
+        )  # get read count for fastq file
 
         max_line_count = None
         if read_count > MCP_MAX_LINE_COUNT:

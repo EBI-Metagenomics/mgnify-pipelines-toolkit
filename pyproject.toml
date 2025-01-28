@@ -22,7 +22,8 @@ dependencies = [
     "regex==2023.12.25",
     "requests==2.32.3",
     "click==8.1.7",
-    "pandera==0.22.1"
+    "pandera==0.22.1",
+    "pyfastx>=2.2.0",
 ]
 
 [build-system]

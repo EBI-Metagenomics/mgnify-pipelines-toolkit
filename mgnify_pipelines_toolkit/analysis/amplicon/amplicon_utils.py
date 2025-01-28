@@ -18,7 +18,7 @@ from collections import defaultdict, Counter
 import logging
 import gzip
 import os
-import subprocess
+import pyfastx
 
 from mgnify_pipelines_toolkit.constants.regex_ambiguous_bases import (
     _AMBIGUOUS_BASES_DICT,
@@ -29,7 +29,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def split_dir_into_sample_paths(dir):
-
     file_list = os.listdir(dir)
     file_list = [
         file
@@ -43,42 +42,33 @@ def split_dir_into_sample_paths(dir):
     return sample_list
 
 
-def get_read_count(read_path, type="fastq"):
+def get_read_count(read_path: str, file_type: str = "fastq") -> int:
+    """
+    Get the read count of a FASTQ or FASTA file.
 
-    cmd = []
-    stdout = ""
+    :param read_path: The path to the FASTQ or FASTA file.
+    :type read_path: str
+    :param fasta_type: The type of the file, either "fastq" or "fasta". Defaults to "fastq".
+    :type fasta_type: str
+    :return: The number of reads in the file.
+    :rtype: int
+    :raises ValueError: If the file type is not supported or the read count is not a positive integer.
+    """
+    read_count = 0
 
-    if type == "fastq":
-        cmd = ["zcat", read_path]
-        zcat_proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    if file_type == "fasta":
+        fasta = pyfastx.Fasta(read_path, build_index=False)
+        read_count = sum(1 for _ in fasta)
+    elif file_type == "fastq":
+        fastq = pyfastx.Fastq(read_path, build_index=False)
+        read_count = sum(1 for _ in fastq)
+    else:
+        raise ValueError(
+            f"Invalid file_type {file_type}, it needs to be either 'fasta' or 'fastq'"
         )
 
-        cmd = ["wc", "-l"]
-        wc_proc = subprocess.Popen(
-            cmd, stdin=zcat_proc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        stdout, stderr = wc_proc.communicate()
-
-    elif type == "fasta":
-        cmd = ["grep", "-c", "^>", read_path]
-        grep_proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        stdout, stderr = grep_proc.communicate()
-
-    read_count = stdout.strip() if stdout is not None else ""
-
-    if not read_count.isdigit():
-        logging.error(
-            f"Read count is not a digit, something is wrong. stdout: '{stdout}', stderr: '{stderr}'"
-        )
-        exit(1)
-
-    read_count = int(read_count)
-
-    if type == "fastq":
-        read_count /= 4
+    if read_count <= 0:
+        raise ValueError(f"Read count is not a positive integer: {read_count}")
 
     return read_count
 

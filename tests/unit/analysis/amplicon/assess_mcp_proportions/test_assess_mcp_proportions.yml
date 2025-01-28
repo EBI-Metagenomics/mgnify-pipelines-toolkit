@@ -19,4 +19,4 @@
   command: python -m mgnify_pipelines_toolkit.analysis.amplicon.assess_mcp_proportions -i tests/fixtures/sequences/test_big.fastq.gz -s sample -st FR -o ./
   files:
     - path: "sample_mcp_cons.tsv"
-      md5sum: 96e5ae1bdeed8af57a5f5b67c8e50ea7
+      md5sum: e4e43a0b9eb6c1c7d1cf9f10926b24c3

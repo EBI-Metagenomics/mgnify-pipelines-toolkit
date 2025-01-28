@@ -58,7 +58,7 @@ def get_read_count(read_path: str, file_type: str = "fastq") -> int:
 
     if file_type == "fasta":
         fasta = pyfastx.Fasta(read_path, build_index=False)
-        read_count = len(fasta)
+        read_count = sum(1 for _ in fasta)
     elif file_type == "fastq":
         fastq = pyfastx.Fastq(read_path, build_index=False)
         read_count = sum(1 for _ in fastq)

@@ -14,53 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest.mock import patch
-
+from pathlib import Path
 import pytest
 
 from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import get_read_count
 
-
-@pytest.mark.parametrize(
-    "read_count_output, expected_result",
-    [
-        ("123\n", 123),
-        ("5435", 5435),
-        ("1000000000000", 1000000000000),
-        ("999999999999999999999999999999", 999999999999999999999999999999),
-        ("\n999999999999999999999999999999", 999999999999999999999999999999),
-        ("\n999999999999999999999999999999\n", 999999999999999999999999999999),
-        ("     999999999999999999999999999999      ", 999999999999999999999999999999),
-    ],
-)
-@patch("mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils.subprocess.Popen")
-def test_get_read_count(mock_popen, read_count_output, expected_result):
-    mock_process = mock_popen.return_value
-    mock_process.communicate.return_value = (read_count_output, expected_result)
-
-    read_count = get_read_count("/path/to/read_file")
-
-    assert read_count == expected_result
+# This is not very nice, we will improve later
+fixtures_directory = Path(__file__).resolve().parent.parent.parent.parent / "fixtures"
 
 
-@pytest.mark.parametrize(
-    "read_count_output",
-    [
-        "9999.9999",
-        "abc\n",
-        "",
-        None,
-        "8765\t888",
-        "888 888",
-    ],
-)
-@patch("mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils.subprocess.Popen")
-def test_get_read_count_error(mock_popen, read_count_output):
-    mock_process = mock_popen.return_value
-    mock_process.communicate.return_value = (read_count_output, None)
-    # Simulating non-digit output
-    with pytest.raises(SystemExit) as exc_info:
-        get_read_count("/path/to/read_file")
+def test_get_read_count_from_fastq():
+    read_count = get_read_count(f"{fixtures_directory}/sequences/ERR4674038_1.fastq.gz")
 
-    assert exc_info.type == SystemExit
-    assert exc_info.value.code == 1
+    assert read_count == 10
+
+
+def test_get_read_count_from_fasta():
+    read_count = get_read_count(f"{fixtures_directory}/sequences/rpxx.fasta", "fasta")
+
+    assert read_count == 2
+
+    read_count = get_read_count(
+        f"{fixtures_directory}/sequences/rpxx.fasta.gz", "fasta"
+    )
+
+    assert read_count == 2
+
+
+def test_get_read_count_should_break():
+    with pytest.raises(RuntimeError):
+        get_read_count(f"{fixtures_directory}/sequences/rpxx.fasta", "fastq")
+
+
+def test_get_read_count_should_break_if_no_records(tmp_path):
+    empty_file = tmp_path / "empty.fasta"
+    empty_file.touch()  # This creates an empty file
+
+    with pytest.raises(RuntimeError, match="is not plain or gzip compressed fasta"):
+        get_read_count(str(empty_file), "fasta")

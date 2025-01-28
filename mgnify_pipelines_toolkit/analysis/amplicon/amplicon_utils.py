@@ -128,7 +128,10 @@ def build_cons_seq(
         counter += 1
 
         try:
-            max_prop = max_count / read_count
+            if max_line_count is None:
+                max_prop = max_count / read_count
+            else:
+                max_prop = max_count / max_line_count
 
             cons_bases = []
             curr_prop = 0.0

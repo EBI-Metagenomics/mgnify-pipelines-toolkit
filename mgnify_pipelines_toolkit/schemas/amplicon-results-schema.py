@@ -45,6 +45,33 @@ class DirectoryModel(BaseModel):
         pattern = f"{run_id}{filename_pattern}"
         return filename == pattern
 
+    @classmethod
+    def validate_folder(cls, run_id, path, required_filesuffixes, optional_filesuffixes):
+        required_files, optional_files = [], []
+        for filename in path.path.iterdir():
+            for pattern in required_filesuffixes:
+                print(pattern)
+                if RequiredDirectoryModel.validate_file(
+                        run_id=run_id,
+                        filename=RequiredFileModel(path=filename).path.name,
+                        filename_pattern=pattern
+                ):
+                    required_files.append(filename)
+
+            if filename not in required_files:
+                for pattern in optional_filesuffixes:
+                    if OptionalFileModel.file_can_exist(filename):
+                        if DirectoryModel.validate_file(
+                                run_id=run_id,
+                                filename=FileModel(path=filename).path.name,
+                                filename_pattern=pattern):
+                            optional_files.append(filename)
+        other_files = set(path.path.iterdir()).difference(set(optional_files + required_files))
+
+        for filename in other_files:
+            if filename not in required_files and filename not in optional_files:
+                raise ValueError(f"Unexpected file {filename}")
+
 
 class RequiredDirectoryModel(DirectoryModel):
     path: Path
@@ -75,31 +102,13 @@ class QCFolderModel(DirectoryModel):
             "_multiqc_report.html",
         ]
 
-        required_files, optional_files = [], []
-        for filename in values.path.path.iterdir():
-            for pattern in required_filesuffixes:
-                print(pattern)
-                if RequiredDirectoryModel.validate_file(
-                        run_id=values.run_id,
-                        filename=RequiredFileModel(path=filename).path.name,
-                        filename_pattern=pattern
-                ):
-                    required_files.append(filename)
+        DirectoryModel.validate_folder(
+            run_id=values.run_id,
+            path=values.path,
+            required_filesuffixes=required_filesuffixes,
+            optional_filesuffixes=optional_filesuffixes
+        )
 
-            if filename not in required_files:
-                for pattern in optional_filesuffixes:
-                    if OptionalFileModel.file_can_exist(filename):
-                        if DirectoryModel.validate_file(
-                                run_id=values.run_id,
-                                          filename=FileModel(path=filename).path.name,
-                                          filename_pattern=pattern):
-                            optional_files.append(filename)
-        other_files = set(values.path.path.iterdir()).difference(set(optional_files + required_files))
-        #print(optional_files, required_files)
-        for filename in other_files:
-            if filename not in required_files and filename not in optional_files:
-                raise ValueError(f"Unexpected file {filename}")
-        return values
 
 qc_folder = QCFolderModel(
     path=RequiredDirectoryModel(path=Path("/Users/kates/Desktop/EBI/MGnify/mgnify-pipelines-toolkit/tests/fixtures/study_summary_inputs/amplicon/ERR4334351/qc")),

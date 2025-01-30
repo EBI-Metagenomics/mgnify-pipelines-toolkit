@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import Union, Optional
 
 # Copyright 2025 EMBL - European Bioinformatics Institute
 #
@@ -21,7 +22,24 @@ from pathlib import Path
 
 class FileModel(BaseModel):
     path: Path
-    # TODO: check path is not a directory
+
+
+class AccessionedFileModel(FileModel):
+    @classmethod
+    def validate_accession_file(cls, path, run_id) -> bool:
+        """
+        Does file start with run_id ?
+        """
+        return path.name.startswith(run_id)
+
+
+class SuffixedFileModel(FileModel):
+    @classmethod
+    def validate_suffix_file(cls, path, pattern) -> bool:
+        """
+        Does filename end with suffix ?
+        """
+        return path.name.endswith(pattern)
 
 
 class RequiredFileModel(FileModel):
@@ -40,18 +58,68 @@ class OptionalFileModel(FileModel):
         return filename.is_file()
 
 
+class ResultFile(AccessionedFileModel, SuffixedFileModel):
+    pass
+
+
+# ----------- files in directory -----------
+
+
 class DirectoryModel(BaseModel):
     path: Path
 
     @classmethod
-    def validate_file(cls, run_id, filename, filename_pattern: str) -> bool:
-        pattern = f"{run_id}{filename_pattern}"
-        return filename == pattern
+    def check_reqired(cls, path, suffixes, run_id):
+        """
+        suffixes = [ Single[], OneOf[], ...]
+        """
+        summ = 0
+        required_files = []
+        for filename in path.path.iterdir():
+            for suffix in suffixes:
+                res = [ ResultFile.validate_suffix_file(path=filename, pattern=suff) and ResultFile.validate_accession_file(path=filename, run_id=run_id) for suff in suffix ]
+                summ += sum(res)
+                if sum(res) == 1:
+                    required_files.append(filename)
+        if summ != len(suffixes):
+            raise ValueError("Error in required step")
+        return len(suffixes), required_files
 
     @classmethod
-    def validate_folder(cls, run_id, path, required_filesuffixes, optional_filesuffixes):
+    def check_optional(cls, path, suffixes, run_id):
+        """
+        suffixes = [ Single[], OneOf[], Single[], ...]
+        """
+        summ = 0
+        optional_files = []
+        for filename in path.path.iterdir():
+            for suffix in suffixes:
+                res = [
+                    ResultFile.validate_suffix_file(path=filename, pattern=suff) and ResultFile.validate_accession_file(
+                        path=filename, run_id=run_id) for suff in suffix]
+                summ += sum(res)
+                if sum(res) == 1:
+                    optional_files.append(filename)
+
+        return summ, optional_files
+
+    @classmethod
+    def validate_folder(cls, path, required_suffixes, optional_suffixes, run_id):
+        """
+        AMPLICON_QC_REQ = [Single("*seq_fu.tsv"])
+        AMPLICON_QC_OPT = [[Single("json"), Single("html"), OneOf(["merged", "fastp"])], Single("err.json")]
+        """
+        result_required, required_files = cls.check_reqired(path=path, suffixes=required_suffixes, run_id=run_id)
+        result_optional, optional_files = cls.check_optional(path=path, suffixes=optional_suffixes, run_id=run_id)
+        if result_required + result_optional < len(list(path.path.iterdir())):
+            print([ parsed_file for parsed_file in path.path.iterdir() if parsed_file not in required_files+optional_files] )
+            raise ValueError("Unexpected file presented")
+        return result_optional
+
+"""
         required_files, optional_files = [], []
         for filename in path.path.iterdir():
+
             for pattern in required_filesuffixes:
                 if RequiredDirectoryModel.validate_file(
                         run_id=run_id,
@@ -73,7 +141,7 @@ class DirectoryModel(BaseModel):
         for filename in other_files:
             if filename not in required_files and filename not in optional_files:
                 raise ValueError(f"Unexpected file {filename}")
-
+"""
 
 class RequiredDirectoryModel(DirectoryModel):
     path: Path

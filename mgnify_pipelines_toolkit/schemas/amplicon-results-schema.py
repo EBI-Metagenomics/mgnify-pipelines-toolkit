@@ -29,21 +29,19 @@ class QCFolderModel(DirectoryModel):
     def validate_qc_folder(cls, values):
         """Validates the QC folder structure and returns a dictionary of validated files."""
         required_filesuffixes = [
-            "_seqfu.tsv"
+            ["_seqfu.tsv"]
         ]
         optional_filesuffixes = [
-            ".merged.fastq.gz",
-            ".fastp.fastq.gz",
-            ".fastp.json",
-            "_suffix_header_err.json",
-            "_multiqc_report.html",
+            [".merged.fastq.gz", ".fastp.fastq.gz"],
+            [".fastp.json"],
+            ["_suffix_header_err.json"],
+            ["_multiqc_report.html"]
         ]
-
         DirectoryModel.validate_folder(
-            run_id=values.run_id,
             path=values.path,
-            required_filesuffixes=required_filesuffixes,
-            optional_filesuffixes=optional_filesuffixes
+            required_suffixes=required_filesuffixes,
+            optional_suffixes=optional_filesuffixes,
+            run_id=values.run_id
         )
 
 

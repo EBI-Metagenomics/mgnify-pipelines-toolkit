@@ -15,78 +15,96 @@
 # limitations under the License.
 
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator, model_validator
 from pathlib import Path
-import re
+
 
 class FileModel(BaseModel):
     path: Path
+    # TODO: check path is not a directory
 
-    @validator('path')
-    def file_must_exist(cls, v):
-        if not v.is_file():
-            raise ValueError(f'File does not exist: {v}')
-        return v
+class RequiredFileModel(FileModel):
+    @field_validator("path", mode="after")
+    @classmethod
+    def file_must_exist(cls, filename) -> Path:
+        if not filename.is_file():
+            raise ValueError(f'File does not exist: {filename}')
+        return filename
+
+class OptionalFileModel(FileModel):
+
+    @classmethod
+    def file_can_exist(cls, filename) -> bool:
+        return filename.is_file()
 
 class DirectoryModel(BaseModel):
     path: Path
-    files: list[FileModel] = []
-    subdirectories: list['DirectoryModel'] = []
 
-    @validator('path')
-    def directory_must_exist(cls, v):
-        if not v.is_dir():
-            raise ValueError(f'Directory does not exist: {v}')
-        return v
+    @classmethod
+    def validate_file(cls, run_id, filename, filename_pattern: str) -> bool:
+        pattern = f"{run_id}{filename_pattern}"
+        return filename == pattern
 
-    @validator('files', each_item=True)
-    def files_must_exist(cls, v):
-        if not v.path.is_file():
-            raise ValueError(f'File does not exist: {v.path}')
-        return v
 
-    @validator('subdirectories', each_item=True)
-    def subdirectories_must_exist(cls, v):
-        if not v.path.is_dir():
-            raise ValueError(f'Subdirectory does not exist: {v.path}')
-        return v
-
-class QCFolderModel(BaseModel):
+class RequiredDirectoryModel(DirectoryModel):
     path: Path
+
+    @field_validator("path")
+    def directory_must_exist(cls, directory_name):
+        if not directory_name.is_dir():
+            raise ValueError(f'Directory does not exist: {directory_name}')
+        return directory_name
+
+
+class QCFolderModel(DirectoryModel):
+    path: RequiredDirectoryModel
     run_id: str
 
-    @validator('path')
-    def directory_must_exist(cls, v):
-        if not v.is_dir():
-            raise ValueError(f"Directory does not exist: {v}")
-        return v
-
-    def validate_file(self, filename_pattern: str, required: bool = False) -> FileModel:
-        """Validates if a file exists in the folder following the given pattern."""
-        expected_file = self.path / filename_pattern.format(run_id=self.run_id)
-        return FileModel(path=expected_file, required=required)
-
-    def validate_qc_folder(self):
+    @model_validator(mode="after")
+    @classmethod
+    def validate_qc_folder(cls, values):
         """Validates the QC folder structure and returns a dictionary of validated files."""
-        required_files = {f"{self.run_id}_seqfu.tsv"}
-        optional_files = {
-            f"{self.run_id}.merged.fastq.gz",
-            f"{self.run_id}.fastp.fastq.gz",
-            f"{self.run_id}.fastp.json",
-            f"{self.run_id}_suffix_header_err.json",
-            f"{self.run_id}_multiqc_report.html",
-        }
+        required_filesuffixes = [
+            "_seqfu.tsv"
+        ]
+        optional_filesuffixes = [
+            ".merged.fastq.gz",
+            ".fastp.fastq.gz",
+            ".fastp.json",
+            "_suffix_header_err.json",
+            "_multiqc_report.html",
+        ]
 
-        for filename in self.path.iterdir():
-            if filename in required_files:
-                self.validate_file(filename, required=True)
-            elif filename in optional_files:
-                self.validate_file(filename)
-            else:
+        required_files, optional_files = [], []
+        for filename in values.path.path.iterdir():
+            for pattern in required_filesuffixes:
+                print(pattern)
+                if RequiredDirectoryModel.validate_file(
+                        run_id=values.run_id,
+                        filename=RequiredFileModel(path=filename).path.name,
+                        filename_pattern=pattern
+                ):
+                    required_files.append(filename)
+
+            if filename not in required_files:
+                for pattern in optional_filesuffixes:
+                    if OptionalFileModel.file_can_exist(filename):
+                        if DirectoryModel.validate_file(
+                                run_id=values.run_id,
+                                          filename=FileModel(path=filename).path.name,
+                                          filename_pattern=pattern):
+                            optional_files.append(filename)
+        other_files = set(values.path.path.iterdir()).difference(set(optional_files + required_files))
+        #print(optional_files, required_files)
+        for filename in other_files:
+            if filename not in required_files and filename not in optional_files:
                 raise ValueError(f"Unexpected file {filename}")
+        return values
 
+qc_folder = QCFolderModel(
+    path=RequiredDirectoryModel(path=Path("/Users/kates/Desktop/EBI/MGnify/mgnify-pipelines-toolkit/tests/fixtures/study_summary_inputs/amplicon/ERR4334351/qc")),
+    run_id="ERR4334351")
+#validated_files = qc_folder.validate_qc_folder()
 
-qc_folder = QCFolderModel(path=Path("qc"), run_id="ERR")
-validated_files = qc_folder.validate_qc_folder()
 
 

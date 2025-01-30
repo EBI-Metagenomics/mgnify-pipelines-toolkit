@@ -17,70 +17,7 @@
 
 from pydantic import BaseModel, field_validator, model_validator
 from pathlib import Path
-
-
-class FileModel(BaseModel):
-    path: Path
-    # TODO: check path is not a directory
-
-class RequiredFileModel(FileModel):
-    @field_validator("path", mode="after")
-    @classmethod
-    def file_must_exist(cls, filename) -> Path:
-        if not filename.is_file():
-            raise ValueError(f'File does not exist: {filename}')
-        return filename
-
-class OptionalFileModel(FileModel):
-
-    @classmethod
-    def file_can_exist(cls, filename) -> bool:
-        return filename.is_file()
-
-class DirectoryModel(BaseModel):
-    path: Path
-
-    @classmethod
-    def validate_file(cls, run_id, filename, filename_pattern: str) -> bool:
-        pattern = f"{run_id}{filename_pattern}"
-        return filename == pattern
-
-    @classmethod
-    def validate_folder(cls, run_id, path, required_filesuffixes, optional_filesuffixes):
-        required_files, optional_files = [], []
-        for filename in path.path.iterdir():
-            for pattern in required_filesuffixes:
-                print(pattern)
-                if RequiredDirectoryModel.validate_file(
-                        run_id=run_id,
-                        filename=RequiredFileModel(path=filename).path.name,
-                        filename_pattern=pattern
-                ):
-                    required_files.append(filename)
-
-            if filename not in required_files:
-                for pattern in optional_filesuffixes:
-                    if OptionalFileModel.file_can_exist(filename):
-                        if DirectoryModel.validate_file(
-                                run_id=run_id,
-                                filename=FileModel(path=filename).path.name,
-                                filename_pattern=pattern):
-                            optional_files.append(filename)
-        other_files = set(path.path.iterdir()).difference(set(optional_files + required_files))
-
-        for filename in other_files:
-            if filename not in required_files and filename not in optional_files:
-                raise ValueError(f"Unexpected file {filename}")
-
-
-class RequiredDirectoryModel(DirectoryModel):
-    path: Path
-
-    @field_validator("path")
-    def directory_must_exist(cls, directory_name):
-        if not directory_name.is_dir():
-            raise ValueError(f'Directory does not exist: {directory_name}')
-        return directory_name
+from base_schemas import *
 
 
 class QCFolderModel(DirectoryModel):

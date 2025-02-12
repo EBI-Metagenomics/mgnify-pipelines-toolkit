@@ -25,3 +25,7 @@ MAX_INTERNAL_PRIMER_PROPORTION = 0.2
 
 # used by library_strategy_checker in analysis.shared
 MIN_AMPLICON_STRATEGY_CHECK = 0.30
+
+# used by gff_toolkit in analysis.assembly
+EVALUE_CUTOFF_IPS = 1e-10
+EVALUE_CUTOFF_EGGNOG = 1e-10

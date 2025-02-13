@@ -18,7 +18,7 @@
 import argparse
 
 from gff_annotation_utils import get_ncrnas, get_trnas, load_annotations, load_crispr
-from gff_file_utils import write_results_to_file
+from gff_file_utils import write_results_to_file, print_pseudogene_report
 
 
 def main(
@@ -32,11 +32,19 @@ def main(
     gecco_file,
     dbcan_file,
     defense_finder_file,
+    pseudofinder_file,
     rfam_file,
     trnascan_file,
     outfile,
+    pseudogene_report_file,
 ):
-    header, main_gff_extended, fasta = load_annotations(
+    # load annotations and add them to existing CDS
+    # here header contains leading GFF lines starting with "#",
+    # main_gff_extended is a dictionary that contains GFF lines with added in additional annotations
+    # fasta is the fasta portion of the original GFF file
+    # pseudogene_report_dict is the information on detected pseudogene which can be optionally printed
+    # to a separate output file
+    header, main_gff_extended, fasta, pseudogene_report_dict = load_annotations(
         gff,
         eggnog_file,
         ipr_file,
@@ -46,6 +54,7 @@ def main(
         gecco_file,
         dbcan_file,
         defense_finder_file,
+        pseudofinder_file,
     )
     ncrnas = {}
     if rfam_file:
@@ -58,6 +67,8 @@ def main(
         crispr_annotations = load_crispr(crispr_file)
 
     write_results_to_file(outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations)
+    if pseudogene_report_file:
+        print_pseudogene_report(pseudogene_report_dict, pseudogene_report_file)
 
 
 def parse_args():
@@ -121,28 +132,39 @@ def parse_args():
         help="The GFF file produced by Defense Finder post-processing script",
         required=False,
     )
+    parser.add_argument(
+        "--pseudofinder",
+        help="The GFF file produced by the Pseudofinder post-processing script",
+        required=False,
+    )
     parser.add_argument("-r", dest="rfam", help="Rfam results", required=False)
     parser.add_argument(
         "-t", dest="trnascan", help="tRNAScan-SE results", required=False
     )
     parser.add_argument("-o", dest="outfile", help="Outfile name", required=True)
+    parser.add_argument(
+        "--pseudogene-report", help="Pseudogene report filename", required=False
+    )
 
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    main(args.gff_input,
-         args.ips,
-         args.eggnog,
-         args.sanntis,
-         args.crispr,
-         args.amr,
-         args.antismash,
-         args.gecco,
-         args.dbcan,
-         args.defense_finder,
-         args.rfam,
-         args.trnascan,
-         args.outfile,
+    main(
+        args.gff_input,
+        args.ips,
+        args.eggnog,
+        args.sanntis,
+        args.crispr,
+        args.amr,
+        args.antismash,
+        args.gecco,
+        args.dbcan,
+        args.defense_finder,
+        args.pseudofinder,
+        args.rfam,
+        args.trnascan,
+        args.outfile,
+        args.pseudogene_report,
          )

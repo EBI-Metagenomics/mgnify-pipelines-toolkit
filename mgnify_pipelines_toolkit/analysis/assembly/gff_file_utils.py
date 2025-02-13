@@ -15,6 +15,9 @@
 # limitations under the License.
 
 
+import csv
+
+
 def write_results_to_file(
     outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations
 ):
@@ -33,13 +36,13 @@ def write_results_to_file(
                 for my_dict in (ncrnas, trnas, crispr_annotations, main_gff_extended):
                     if contig in my_dict and pos in my_dict[contig]:
                         for line in my_dict[contig][pos]:
-                            if type(line) == str:
-                                file_out.write("{}\n".format(line))
+                            if type(line) is str:
+                                file_out.write(f"{line}\n")
                             else:
                                 for element in line:
                                     file_out.write(element)
         for line in fasta:
-            file_out.write("{}\n".format(line))
+            file_out.write(f"{line}\n")
 
 
 def sort_positions(contig, main_gff_extended, ncrnas, trnas, crispr_annotations):
@@ -57,3 +60,23 @@ def check_for_additional_keys(ncrnas, trnas, crispr_annotations, contig_list):
         if absent_keys:
             contig_list = contig_list + list(absent_keys)
     return contig_list
+
+
+def print_pseudogene_report(pseudogene_report_dict, pseudogene_report_file):
+    with open(pseudogene_report_file, "w") as file_out:
+        writer = csv.writer(file_out, delimiter="\t", lineterminator="\n")
+        # Print header
+        writer.writerow(
+            [
+                "ID",
+                "Pseudogene according to Bakta/Prokka",
+                "Pseudogene according to Pseudofinder",
+                "AntiFam hit",
+            ]
+        )
+
+        all_keys = ["gene_caller", "pseudofinder", "antifams"]
+        for protein, attributes in pseudogene_report_dict.items():
+            # Fill in missing attributes with False
+            line = [protein] + [str(attributes.get(key, False)) for key in all_keys]
+            writer.writerow(line)

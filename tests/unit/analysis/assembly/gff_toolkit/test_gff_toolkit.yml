@@ -1,0 +1,15 @@
+- name: test_gff_toolkit test_wrong_args
+  tags:
+    - test_gff_toolkit
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit --chromosome X
+  stderr:
+    contains:
+      - "gff_toolkit.py: error: the following arguments are required: -g, -o"
+- name: test_gff_toolkit test_correct_args
+  tags:
+    - test_gff_toolkit
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/MGYG000500002.gff -i tests/fixtures/gff_toolkit/MGYG000500002_InterProScan_trimmed.tsv -e tests/fixtures/gff_toolkit/MGYG000500002_eggNOG.tsv -s tests/fixtures/gff_toolkit/MGYG000500002_sanntis.gff -c tests/fixtures/gff_toolkit/MGYG000500002_crisprcasfinder_hq.gff -a tests/fixtures/gff_toolkit/MGYG000500002_amrfinderplus.tsv --antismash tests/fixtures/gff_toolkit/MGYG000500002_antismash.gff --gecco tests/fixtures/gff_toolkit/MGYG000500002_gecco.gff --dbcan tests/fixtures/gff_toolkit/MGYG000500002_dbcan.gff --defense-finder tests/fixtures/gff_toolkit/MGYG000500002_defense_finder.gff -r tests/fixtures/gff_toolkit/MGYG000500002.ncrna.deoverlap.tbl -t tests/fixtures/gff_toolkit/MGYG000500002_trna.gff  -o gff_toolkit_testing.gff
+  files:
+    - path: "gff_toolkit_testing.gff"
+      md5sum: d779836ae94180c59c5e2e732b680c75

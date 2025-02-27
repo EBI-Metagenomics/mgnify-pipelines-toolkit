@@ -1,0 +1,13 @@
+##gff-version 3
+MGYG000500002_3	DefenseFinder:1.2.0	Anti-phage system	158025	158810	.	.	.	ID=MGYG000500002_AbiH_1;type=AbiH;subtype=AbiH
+MGYG000500002_3	DefenseFinder:1.2.0	gene	158025	158810	.	-	.	ID=MGYG000500002_01683;Parent=MGYG000500002_AbiH_1;gene_name=AbiH__AbiH;hit_status=mandatory
+MGYG000500002_9	DefenseFinder:1.2.0	Anti-phage system	25767	26371	.	.	.	ID=MGYG000500002_MazEF_2;type=MazEF;subtype=MazEF
+MGYG000500002_9	DefenseFinder:1.2.0	gene	25767	26036	.	+	.	ID=MGYG000500002_02400;Parent=MGYG000500002_MazEF_2;gene_name=MazEF__MazE;hit_status=mandatory
+MGYG000500002_9	DefenseFinder:1.2.0	gene	26033	26371	.	+	.	ID=MGYG000500002_02401;Parent=MGYG000500002_MazEF_2;gene_name=MazEF__MazF;hit_status=mandatory
+MGYG000500002_2	DefenseFinder:1.2.0	Anti-phage system	504795	509441	.	.	.	ID=MGYG000500002_RM_Type_I_3;type=RM;subtype=RM_Type_I
+MGYG000500002_2	DefenseFinder:1.2.0	gene	504795	506351	.	-	.	ID=MGYG000500002_01516;Parent=MGYG000500002_RM_Type_I_3;gene_name=RM__Type_I_MTases;hit_status=mandatory
+MGYG000500002_2	DefenseFinder:1.2.0	gene	507459	509441	.	-	.	ID=MGYG000500002_01518;Parent=MGYG000500002_RM_Type_I_3;gene_name=RM__Type_I_REases;hit_status=mandatory
+MGYG000500002_3	DefenseFinder:1.2.0	Anti-phage system	152079	157966	.	.	.	ID=MGYG000500002_RM_Type_I_4;type=RM;subtype=RM_Type_I
+MGYG000500002_3	DefenseFinder:1.2.0	gene	152079	155198	.	-	.	ID=MGYG000500002_01680;Parent=MGYG000500002_RM_Type_I_4;gene_name=RM__Type_I_REases;hit_status=mandatory
+MGYG000500002_3	DefenseFinder:1.2.0	gene	155182	156462	.	-	.	ID=MGYG000500002_01681;Parent=MGYG000500002_RM_Type_I_4;gene_name=RM__Type_I_S;hit_status=accessory
+MGYG000500002_3	DefenseFinder:1.2.0	gene	156452	157966	.	-	.	ID=MGYG000500002_01682;Parent=MGYG000500002_RM_Type_I_4;gene_name=RM__Type_I_MTases;hit_status=mandatory

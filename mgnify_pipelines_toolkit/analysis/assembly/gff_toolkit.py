@@ -17,8 +17,16 @@
 
 import argparse
 
-from gff_annotation_utils import get_ncrnas, get_trnas, load_annotations, load_crispr
-from gff_file_utils import write_results_to_file, print_pseudogene_report
+from mgnify_pipelines_toolkit.analysis.assembly.gff_annotation_utils import (
+    get_ncrnas,
+    get_trnas,
+    load_annotations,
+    load_crispr,
+)
+from mgnify_pipelines_toolkit.analysis.assembly.gff_file_utils import (
+    write_results_to_file,
+    print_pseudogene_report,
+)
 
 
 def main(
@@ -66,7 +74,9 @@ def main(
     if crispr_file:
         crispr_annotations = load_crispr(crispr_file)
 
-    write_results_to_file(outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations)
+    write_results_to_file(
+        outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations
+    )
     if pseudogene_report_file:
         print_pseudogene_report(pseudogene_report_dict, pseudogene_report_file)
 
@@ -74,7 +84,7 @@ def main(
 def parse_args():
     parser = argparse.ArgumentParser(
         description="The script extends a user-provided base GFF annotation file by incorporating "
-                    "information extracted from the user-provided outputs of supplementary annotation tools.",
+        "information extracted from the user-provided outputs of supplementary annotation tools.",
     )
     parser.add_argument(
         "-g",
@@ -149,7 +159,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_args()
     main(
         args.gff_input,
@@ -167,4 +177,4 @@ if __name__ == '__main__':
         args.trnascan,
         args.outfile,
         args.pseudogene_report,
-         )
+    )

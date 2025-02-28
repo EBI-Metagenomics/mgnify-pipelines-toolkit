@@ -134,7 +134,11 @@ def get_counts(predictions):
 
 def combine_main():
     parser = argparse.ArgumentParser(
-        "MGnify gene caller combiner. This script merges gene predictions made by Prodigal and FragGeneScan and outputs FASTA and GFF files."
+        """
+        MGnify gene caller combiner.
+        This script merges gene predictions made by Prodigal and FragGeneScan
+        and outputs FASTA and GFF files.
+        """
     )
     parser.add_argument(
         "-n", "--name", required=True, help="Base name for output files"
@@ -142,7 +146,6 @@ def combine_main():
     parser.add_argument("-m", "--mask", help="Masked regions (in GFF or BED format)")
     parser.add_argument("-p", "--prodigal", help="GFF file from Prodigal")
     parser.add_argument("-f", "--fgs", help="GFF file from FragGeneScan")
-
     parser.add_argument(
         "-a",
         "--prodigal-out",
@@ -158,7 +161,6 @@ def combine_main():
         "--prodigal-faa",
         help="Stats faa prodigal",
     )
-
     parser.add_argument(
         "-d",
         "--fgs-out",
@@ -174,32 +176,22 @@ def combine_main():
         "--fgs-faa",
         help="Stats faa FGS",
     )
-
     parser.add_argument(
         "--priority",
         choices=["prodigal_fgs", "fgs_prodigal"],
         default="prodigal_fgs",
         help="Merge priority",
     )
-
     parser.add_argument(
         "-v", "--verbose", action="count", help="Increase verbosity level"
     )
 
     args = parser.parse_args()
 
-    # Set up logging system
-    verbose_mode = args.verbose or 0
-
     log_level = logging.WARNING
-    if verbose_mode:
-        log_level = logging.DEBUG if verbose_mode > 1 else logging.INFO
-
-    logging.basicConfig(
-        level=log_level,
-        format="%(levelname)s %(asctime)s - %(message)s",
-        datefmt="%Y/%m/%d %I:%M:%S %p",
-    )
+    if args.verbose:
+        log_level = logging.INFO if args.verbose == 1 else logging.DEBUG
+    logging.basicConfig(level=log_level)
 
     summary = {}
     all_predictions = {}

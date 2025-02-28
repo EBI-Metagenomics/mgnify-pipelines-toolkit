@@ -134,79 +134,52 @@ def get_counts(predictions):
 
 def combine_main():
     parser = argparse.ArgumentParser(
-        "MGnify gene caller combiner. This script will merge the gene called by prodigal and fraggenescan (in any order)"
+        "MGnify gene caller combiner. This script merges gene predictions made by Prodigal and FragGeneScan and outputs FASTA and GFF files."
     )
     parser.add_argument(
-        "-n", "--name", action="store", dest="name", required=True, help="basename"
+        "-n", "--name", required=True, help="Base name for output files"
     )
-    parser.add_argument(
-        "-k",
-        "--mask",
-        action="store",
-        dest="mask",
-        required=False,
-        help="Sequence mask file",
-    )
+    parser.add_argument("-m", "--mask", help="Masked regions (in GFF or BED format)")
+    parser.add_argument("-p", "--prodigal", help="GFF file from Prodigal")
+    parser.add_argument("-f", "--fgs", help="GFF file from FragGeneScan")
 
     parser.add_argument(
         "-a",
         "--prodigal-out",
-        action="store",
-        dest="prodigal_out",
-        required=False,
         help="Stats out prodigal",
     )
     parser.add_argument(
         "-b",
         "--prodigal-ffn",
-        action="store",
-        dest="prodigal_ffn",
-        required=False,
         help="Stats ffn prodigal",
     )
     parser.add_argument(
         "-c",
         "--prodigal-faa",
-        action="store",
-        dest="prodigal_faa",
-        required=False,
         help="Stats faa prodigal",
     )
 
     parser.add_argument(
         "-d",
         "--fgs-out",
-        action="store",
-        dest="fgs_out",
-        required=False,
         help="Stats out FGS",
     )
     parser.add_argument(
         "-e",
         "--fgs-ffn",
-        action="store",
-        dest="fgs_ffn",
-        required=False,
         help="Stats ffn FGS",
     )
     parser.add_argument(
         "-f",
         "--fgs-faa",
-        action="store",
-        dest="fgs_faa",
-        required=False,
         help="Stats faa FGS",
     )
 
     parser.add_argument(
-        "-p",
-        "--caller-priority",
-        action="store",
-        dest="caller_priority",
-        required=False,
+        "--priority",
         choices=["prodigal_fgs", "fgs_prodigal"],
         default="prodigal_fgs",
-        help="Caller priority.",
+        help="Merge priority",
     )
 
     parser.add_argument(

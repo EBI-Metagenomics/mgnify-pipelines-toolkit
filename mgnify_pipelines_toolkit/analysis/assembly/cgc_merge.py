@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 from collections import defaultdict
+import re
 
 from intervaltree import Interval, IntervalTree
 from Bio import SeqIO
@@ -78,7 +79,7 @@ def parse_gff(gff_file):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            seq_id, _, feature_type, start, end, _, strand, _, _ = fields
+            seq_id, _, feature_type, start, end, _, strand, _ = fields
             if feature_type == "gene":
                 predictions[seq_id][strand].append(Interval(int(start), int(end)))
     return predictions
@@ -99,6 +100,53 @@ def parse_cmsearch_output(mask_file):
                 start, end = end, start
             regions[seq_id].append(Interval(start, end))
     return regions
+
+
+def parse_prodigal_output(file):
+    """
+    Parse Prodigal *.out file.
+    Example:
+    # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
+    # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
+    >1_1_279_+
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith("# Model Data"):
+                continue
+            if line.startswith("# Sequence Data"):
+                matches = re.search(r'seqhdr="(\S+)"', line)
+                if matches:
+                    seq_id = matches.group(1)
+            else:
+                fields = line[1:].strip().split("_")
+                # fragment_id is an index of the fragment
+                # prodigal uses these (rather than coordinates) to identify sequences in the fasta output
+                fragment_id, start, end, strand = fields
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"fragment_id": fragment_id})
+                )
+    return predictions
+
+
+def parse_fgs_output(file):
+    """
+    Parse FGS *.out file.
+    Example:
+    >Bifidobacterium-longum-subsp-infantis-MC2-contig1
+    256	2133	-	1	1.263995	I:	D:
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith(">"):
+                seq_id = line.split()[0][1:]
+            else:
+                fields = line.strip().split("_")
+                start, end, strand, _ = fields
+                predictions[seq_id][strand].append(Interval(int(start), int(end)))
+    return predictions
 
 
 def mask_regions(predictions, mask):

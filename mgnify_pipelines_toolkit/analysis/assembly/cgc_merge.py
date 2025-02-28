@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import logging
 from collections import defaultdict
 
 from intervaltree import Interval, IntervalTree
+from Bio import SeqIO
 
 
 def create_interval_tree(regions):
@@ -33,18 +35,38 @@ def check_against_gaps(regions, candidates):
     return selected_candidates
 
 
-def output_prodigal(predictions, files, outputs):
-    """From the combined predictions output the prodigal data"""
-    pass
+def output(predictions, input_faa, input_fna, output_faa, output_ffn):
+    seqs = set()
+    for seq_id, strand_dict in predictions.items():
+        for strand, regions in strand_dict.items():
+            for region in regions:
+                seqs.add(f"{seq_id}_{region.begin}_{region.end}")
+
+    for input_file, output_file in [
+        (input_faa, output_faa),
+        (input_fna, output_ffn),
+    ]:
+        sequences = []
+        for record in SeqIO.parse(input_file, "fasta"):
+            if record.id in seqs:
+                sequences.append(record)
+        with open(output_file, "a") as output_handle:
+            SeqIO.write(sequences, output_handle, "fasta")
 
 
-def output_fgs(predictions, files, outputs):
-    """From the combined predictions output the FGS data"""
-    pass
+def output_gff(predictions, output_gff):
+    with open(output_gff, "w") as gff_out:
+        for seq_id, strand_dict in predictions.items():
+            for strand, regions in strand_dict.items():
+                for region in regions:
+                    gff_out.write(
+                        f"{seq_id}\tMGnify\tgene\t{region.begin}\t{region.end}\t.\t{strand}\t.\tID=gene_{seq_id}_{region.begin}_{region.end}\n"
+                    )
 
 
-def output_files(predictions, summary, files):
-    """Output all files"""
+def output_summary(summary, output_file):
+    with open(output_file, "w") as sf:
+        sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
     pass
 
 
@@ -132,7 +154,7 @@ def get_counts(predictions):
     return total
 
 
-def combine_main():
+def main():
     parser = argparse.ArgumentParser(
         """
         MGnify gene caller combiner.
@@ -149,32 +171,32 @@ def combine_main():
     parser.add_argument(
         "-a",
         "--prodigal-out",
-        help="Stats out prodigal",
+        help="Prodigal *.out file",
     )
     parser.add_argument(
         "-b",
         "--prodigal-ffn",
-        help="Stats ffn prodigal",
+        help="Prodigal *.ffn file with transcripts",
     )
     parser.add_argument(
         "-c",
         "--prodigal-faa",
-        help="Stats faa prodigal",
+        help="Prodigal *.faa file with proteins",
     )
     parser.add_argument(
         "-d",
         "--fgs-out",
-        help="Stats out FGS",
+        help="FragGeneScan *.out file",
     )
     parser.add_argument(
         "-e",
         "--fgs-ffn",
-        help="Stats ffn FGS",
+        help="FragGeneScan *.ffn file with transcripts",
     )
     parser.add_argument(
         "-f",
         "--fgs-faa",
-        help="Stats faa FGS",
+        help="FragGeneScan *.faa file with proteins",
     )
     parser.add_argument(
         "--priority",
@@ -195,13 +217,8 @@ def combine_main():
 
     summary = {}
     all_predictions = {}
-    files = {}
-    caller_priority = []
-    if args.caller_priority:
-        caller_priority = args.caller_priority.split("_")
-    else:
-        caller_priority = ["prodigal", "fgs"]
 
+    caller_priority = args.priority.split("_")
     logging.info(f"Caller priority: 1. {caller_priority[0]}, 2. {caller_priority[1]}")
 
     if args.prodigal_out:
@@ -209,48 +226,55 @@ def combine_main():
         logging.info("Getting Prodigal regions...")
         all_predictions["prodigal"] = parse_gff(args.prodigal_out)
 
-        files["prodigal"] = [args.prodigal_out, args.prodigal_ffn, args.prodigal_faa]
-
     if args.fgs_out:
         logging.info("FGS presented")
         logging.info("Getting FragGeneScan regions ...")
         all_predictions["fgs"] = parse_gff(args.fgs_out)
 
-        files["fgs"] = [args.fgs_out, args.fgs_ffn, args.fgs_faa]
-
     summary["all"] = get_counts(all_predictions)
 
     # Apply mask of ncRNA search
-    logging.info("Masking non coding RNA regions...")
     if args.mask:
-        logging.info("Reading regions for masking...")
-        mask = parse_cmsearch_output(args.mask)
-        if "prodigal" in all_predictions:
-            logging.info("Masking Prodigal outputs...")
-            all_predictions["prodigal"] = mask_regions(
-                all_predictions["prodigal"], mask
+        logging.info("Masking of non-coding RNA regions was enabled")
+        logging.info(f"Parsing masking intervals from file {args.mask}")
+        mask_regions_file = parse_cmsearch_output(args.mask)
+        for caller in all_predictions:
+            logging.info(f"Masking {caller} outputs...")
+            all_predictions[caller] = mask_regions(
+                all_predictions[caller], mask_regions_file
             )
-        if "fgs" in all_predictions:
-            logging.info("Masking FragGeneScan outputs...")
-            all_predictions["fgs"] = mask_regions(all_predictions["fgs"], mask)
         summary["masked"] = get_counts(all_predictions)
 
-    # Run the merging step
-    if len(all_predictions) > 1:
-        logging.info("Merging combined gene caller results...")
-        merged_predictions = merge_predictions(all_predictions, caller_priority)
-    else:
-        logging.info("Skipping merging step...")
-        merged_predictions = all_predictions
-    summary["merged"] = get_counts(merged_predictions)
+    logging.info("Merging combined gene caller results")
+    merged_predictions = merge_predictions(all_predictions, caller_priority)
 
-    # Output fasta files and summary (json)
     logging.info("Writing output files...")
 
-    files["merged"] = [args.name + ext for ext in [".out", ".ffn", ".faa"]]
+    summary["merged"] = get_counts(merged_predictions)
+    output_summary(summary, f"{args.name}.summary.txt")
 
-    output_files(merged_predictions, summary, files)
+    output_gff(merged_predictions, f"{args.name}.gff")
+
+    with (
+        open(f"{args.name}.faa", "w") as merged_proteins,
+        open(f"{args.name}.ffn", "w") as merged_transcripts,
+    ):
+        output(
+            merged_predictions["prodigal"],
+            args.prodigal_faa,
+            args.prodigal_ffn,
+            merged_proteins,
+            merged_transcripts,
+        )
+
+        output(
+            merged_predictions["prodigal"],
+            args.fgs_faa,
+            args.fgs_ffn,
+            merged_proteins,
+            merged_transcripts,
+        )
 
 
 if __name__ == "__main__":
-    combine_main()
+    main()

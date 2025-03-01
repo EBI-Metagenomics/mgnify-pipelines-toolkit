@@ -17,14 +17,6 @@ def create_interval_tree(regions):
     return tree
 
 
-# Flatten regions (merge overlapping intervals)
-def flatten_regions(regions):
-    """Take a list of intervals, merge overlapping intervals and return modified list"""
-    tree = create_interval_tree(regions)
-    tree.merge_overlaps()
-    return sorted(tree)
-
-
 def check_against_gaps(regions, candidates):
     # TODO there is no check if region is empty, is it a problem?
     regions_tree = create_interval_tree(regions)

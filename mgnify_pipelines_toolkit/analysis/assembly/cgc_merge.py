@@ -26,7 +26,7 @@ def flatten_regions(regions):
 
 
 def check_against_gaps(regions, candidates):
-    # TODO there is no check if regions is empty, is it a problem?
+    # TODO there is no check if region is empty, is it a problem?
     regions_tree = create_interval_tree(regions)
     selected_candidates = []
     for candidate in candidates:
@@ -36,33 +36,42 @@ def check_against_gaps(regions, candidates):
     return selected_candidates
 
 
-def output(predictions, input_faa, input_fna, output_faa, output_ffn):
-    seqs = set()
-    for seq_id, strand_dict in predictions.items():
-        for strand, regions in strand_dict.items():
-            for region in regions:
-                seqs.add(f"{seq_id}_{region.begin}_{region.end}")
+def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
+    with (
+        open(output_faa, "w") as output_faa_fh,
+        open(output_ffn, "w") as output_ffn_fh,
+    ):
+        for caller, seq_data in predictions.items():
+            seqs = set()
+            for seq_id, strand_dict in seq_data.items():
+                for strand, regions in strand_dict.items():
+                    for region in regions:
+                        if caller == "prodigal":
+                            contig_id = f"{seq_id}_{region.data['fragment_id']}"
+                        elif caller == "fgs":
+                            contig_id = f"{seq_id}_{region.begin}_{region.end}_{strand}"
+                        seqs.add(contig_id)
 
-    for input_file, output_file in [
-        (input_faa, output_faa),
-        (input_fna, output_ffn),
-    ]:
-        sequences = []
-        for record in SeqIO.parse(input_file, "fasta"):
-            if record.id in seqs:
-                sequences.append(record)
-        with open(output_file, "a") as output_handle:
-            SeqIO.write(sequences, output_handle, "fasta")
+            for input_file, output_file in [
+                (files_dict[caller]["proteins"], output_faa_fh),
+                (files_dict[caller]["transcripts"], output_ffn_fh),
+            ]:
+                sequences = []
+                for record in SeqIO.parse(input_file, "fasta"):
+                    if record.id in seqs:
+                        sequences.append(record)
+                SeqIO.write(sequences, output_file, "fasta")
 
 
 def output_gff(predictions, output_gff):
     with open(output_gff, "w") as gff_out:
-        for seq_id, strand_dict in predictions.items():
-            for strand, regions in strand_dict.items():
-                for region in regions:
-                    gff_out.write(
-                        f"{seq_id}\tMGnify\tgene\t{region.begin}\t{region.end}\t.\t{strand}\t.\tID=gene_{seq_id}_{region.begin}_{region.end}\n"
-                    )
+        for caller, seq_data in predictions.items():
+            for seq_id, strand_dict in seq_data.items():
+                for strand, regions in strand_dict.items():
+                    for region in regions:
+                        gff_out.write(
+                            f"{seq_id}\tMGnify\tgene\t{region.begin}\t{region.end}\t.\t{strand}\t.\tID=gene_{seq_id}_{region.begin}_{region.end}\n"
+                        )
 
 
 def output_summary(summary, output_file):
@@ -79,7 +88,7 @@ def parse_gff(gff_file):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            seq_id, _, feature_type, start, end, _, strand, _ = fields
+            seq_id, _, feature_type, start, end, _, strand, *_ = fields
             if feature_type == "gene":
                 predictions[seq_id][strand].append(Interval(int(start), int(end)))
     return predictions
@@ -143,8 +152,8 @@ def parse_fgs_output(file):
             if line.startswith(">"):
                 seq_id = line.split()[0][1:]
             else:
-                fields = line.strip().split("_")
-                start, end, strand, _ = fields
+                fields = line.strip().split("\t")
+                start, end, strand, *_ = fields
                 predictions[seq_id][strand].append(Interval(int(start), int(end)))
     return predictions
 
@@ -166,29 +175,25 @@ def mask_regions(predictions, mask):
 
 
 def merge_predictions(predictions, priority):
-    merged = {}
+    merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
     primary, secondary = priority
 
     # Primary merge
-    for seq_id in predictions[primary]:
-        merged[seq_id] = defaultdict(list)
-        for strand in ["+", "-"]:
-            merged[seq_id][strand] = flatten_regions(
-                predictions[primary][seq_id][strand]
-            )
+    merged[primary] = predictions[primary]
+
     # Secondary merge: add non-overlapping regions from the secondary gene caller
     for seq_id in predictions[secondary]:
-        if seq_id not in merged:
-            merged[seq_id] = defaultdict(list)
         for strand in ["+", "-"]:
             if seq_id in predictions[primary]:
-                primary_regions = merged[seq_id][strand]
+                primary_regions = merged[primary][seq_id][strand]
                 secondary_regions = predictions[secondary][seq_id][strand]
-                merged[seq_id][strand].extend(
+                merged[secondary][seq_id][strand].extend(
                     check_against_gaps(primary_regions, secondary_regions)
                 )
             else:
-                merged[seq_id][strand] = predictions[secondary][seq_id][strand]
+                merged[secondary][seq_id][strand] = predictions[secondary][seq_id][
+                    strand
+                ]
     return merged
 
 
@@ -214,8 +219,8 @@ def main():
         "-n", "--name", required=True, help="Base name for output files"
     )
     parser.add_argument("-m", "--mask", help="Masked regions (in GFF or BED format)")
-    parser.add_argument("-p", "--prodigal", help="GFF file from Prodigal")
-    parser.add_argument("-f", "--fgs", help="GFF file from FragGeneScan")
+    # parser.add_argument("-p", "--prodigal", help="GFF file from Prodigal")
+    # parser.add_argument("-f", "--fgs", help="GFF file from FragGeneScan")
     parser.add_argument(
         "-a",
         "--prodigal-out",
@@ -261,7 +266,11 @@ def main():
     log_level = logging.WARNING
     if args.verbose:
         log_level = logging.INFO if args.verbose == 1 else logging.DEBUG
-    logging.basicConfig(level=log_level)
+    logging.basicConfig(
+        level=log_level,
+        format="%(levelname)s %(asctime)s - %(message)s",
+        datefmt="%Y/%m/%d %H:%M:%S",
+    )
 
     summary = {}
     all_predictions = {}
@@ -272,12 +281,12 @@ def main():
     if args.prodigal_out:
         logging.info("Prodigal presented")
         logging.info("Getting Prodigal regions...")
-        all_predictions["prodigal"] = parse_gff(args.prodigal_out)
+        all_predictions["prodigal"] = parse_prodigal_output(args.prodigal_out)
 
     if args.fgs_out:
         logging.info("FGS presented")
         logging.info("Getting FragGeneScan regions ...")
-        all_predictions["fgs"] = parse_gff(args.fgs_out)
+        all_predictions["fgs"] = parse_fgs_output(args.fgs_out)
 
     summary["all"] = get_counts(all_predictions)
 
@@ -303,25 +312,16 @@ def main():
 
     output_gff(merged_predictions, f"{args.name}.gff")
 
-    with (
-        open(f"{args.name}.faa", "w") as merged_proteins,
-        open(f"{args.name}.ffn", "w") as merged_transcripts,
-    ):
-        output(
-            merged_predictions["prodigal"],
-            args.prodigal_faa,
-            args.prodigal_ffn,
-            merged_proteins,
-            merged_transcripts,
-        )
-
-        output(
-            merged_predictions["prodigal"],
-            args.fgs_faa,
-            args.fgs_ffn,
-            merged_proteins,
-            merged_transcripts,
-        )
+    files = {
+        "prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
+        "fgs": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},
+    }
+    output_fasta_files(
+        merged_predictions,
+        files,
+        f"{args.name}.faa",
+        f"{args.name}.ffn",
+    )
 
 
 if __name__ == "__main__":

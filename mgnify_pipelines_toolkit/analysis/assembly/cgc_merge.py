@@ -73,7 +73,6 @@ def output_gff(predictions, output_gff):
 def output_summary(summary, output_file):
     with open(output_file, "w") as sf:
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
-    pass
 
 
 # Parsing GFF files into a structure containing IntervalTrees
@@ -225,49 +224,38 @@ def main():
         """
     )
     parser.add_argument(
-        "-n", "--name", required=True, help="Base name for output files"
-    )
-    parser.add_argument("-m", "--mask", help="Masked regions (in GFF or BED format)")
-    # parser.add_argument("-p", "--prodigal", help="GFF file from Prodigal")
-    # parser.add_argument("-f", "--fgs", help="GFF file from FragGeneScan")
-    parser.add_argument(
-        "-a",
-        "--prodigal-out",
-        help="Prodigal *.out file",
-    )
-    parser.add_argument(
-        "-b",
-        "--prodigal-ffn",
-        help="Prodigal *.ffn file with transcripts",
-    )
-    parser.add_argument(
-        "-c",
-        "--prodigal-faa",
-        help="Prodigal *.faa file with proteins",
-    )
-    parser.add_argument(
-        "-d",
-        "--fgs-out",
-        help="FragGeneScan *.out file",
-    )
-    parser.add_argument(
-        "-e",
-        "--fgs-ffn",
-        help="FragGeneScan *.ffn file with transcripts",
-    )
-    parser.add_argument(
-        "-f",
-        "--fgs-faa",
-        help="FragGeneScan *.faa file with proteins",
+        "--name", "-n", required=True, help="Base name for output files"
     )
     parser.add_argument(
         "--priority",
+        "-P",
         choices=["prodigal_fgs", "fgs_prodigal"],
         default="prodigal_fgs",
         help="Merge priority",
     )
     parser.add_argument(
-        "-v", "--verbose", action="count", help="Increase verbosity level"
+        "--mask",
+        "-m",
+        help="Masked regions (in GFF or BED format)",  # TODO why GFF or BED?
+    )
+    parser.add_argument("--prodigal-gff", "-pg", help="Prodigal *.gff file")
+    parser.add_argument("--prodigal-out", "-po", help="Prodigal *.out file")
+    parser.add_argument(
+        "--prodigal-ffn", "-pt", help="Prodigal *.ffn file with transcripts"
+    )
+    parser.add_argument(
+        "--prodigal-faa", "-pp", help="Prodigal *.faa file with proteins"
+    )
+    parser.add_argument("--fgs-gff", "-fg", help="FragGeneScan *.gff file")
+    parser.add_argument("--fgs-out", "-fo", help="FragGeneScan *.out file")
+    parser.add_argument(
+        "--fgs-ffn", "-ft", help="FragGeneScan *.ffn file with transcripts"
+    )
+    parser.add_argument(
+        "--fgs-faa", "-fp", help="FragGeneScan *.faa file with proteins"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="count", help="Increase verbosity level"
     )
 
     args = parser.parse_args()
@@ -309,7 +297,7 @@ def main():
             all_predictions[caller] = mask_regions(
                 all_predictions[caller], mask_regions_file
             )
-        summary["masked"] = get_counts(all_predictions)
+        summary["after_masking"] = get_counts(all_predictions)
 
     logging.info("Merging combined gene caller results")
     merged_predictions = merge_predictions(all_predictions, caller_priority)

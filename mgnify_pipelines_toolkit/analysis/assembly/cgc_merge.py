@@ -37,15 +37,12 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
         open(output_ffn, "w") as output_ffn_fh,
     ):
         for caller, seq_data in predictions.items():
-            seqs = set()
+            proteins = set()
             for seq_id, strand_dict in seq_data.items():
                 for strand, regions in strand_dict.items():
                     for region in regions:
-                        if caller == "prodigal":
-                            contig_id = f"{seq_id}_{region.data['fragment_id']}"
-                        elif caller == "fgs":
-                            contig_id = f"{seq_id}_{region.begin}_{region.end}_{strand}"
-                        seqs.add(contig_id)
+                        protein_id = region.data["protein_id"]
+                        proteins.add(protein_id)
 
             for input_file, output_file in [
                 (files_dict[caller]["proteins"], output_faa_fh),
@@ -53,7 +50,7 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
             ]:
                 sequences = []
                 for record in SeqIO.parse(input_file, "fasta"):
-                    if record.id in seqs:
+                    if record.id in proteins:
                         record.seq = record.seq.rstrip("*")
                         sequences.append(record)
                 SeqIO.write(sequences, output_file, "fasta")
@@ -75,7 +72,6 @@ def output_summary(summary, output_file):
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
 
 
-# Parsing GFF files into a structure containing IntervalTrees
 def parse_gff(gff_file):
     predictions = defaultdict(lambda: defaultdict(list))
     with open(gff_file, "r") as gff_in:
@@ -83,9 +79,16 @@ def parse_gff(gff_file):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            seq_id, _, feature_type, start, end, _, strand, *_ = fields
-            if feature_type == "gene":
-                predictions[seq_id][strand].append(Interval(int(start), int(end)))
+            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
+            if feature_type == "CDS":
+                # Parse attributes to get the ID value
+                attr_dict = dict(
+                    attr.split("=") for attr in attributes.split(";") if "=" in attr
+                )
+                protein_id = attr_dict["ID"]
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
     return predictions
 
 
@@ -128,8 +131,9 @@ def parse_prodigal_output(file):
                 # fragment_id is an index of the fragment
                 # prodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
+                protein_id = f"{seq_id}_{fragment_id}"
                 predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"fragment_id": fragment_id})
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
                 )
     return predictions
 
@@ -149,7 +153,10 @@ def parse_fgs_output(file):
             else:
                 fields = line.strip().split("\t")
                 start, end, strand, *_ = fields
-                predictions[seq_id][strand].append(Interval(int(start), int(end)))
+                protein_id = f"{seq_id}_{start}_{end}_{strand}"
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
     return predictions
 
 
@@ -275,15 +282,17 @@ def main():
     caller_priority = args.priority.split("_")
     logging.info(f"Caller priority: 1. {caller_priority[0]}, 2. {caller_priority[1]}")
 
+    logging.info("Parsing Prodigal annotations...")
     if args.prodigal_out:
-        logging.info("Prodigal presented")
-        logging.info("Getting Prodigal regions...")
         all_predictions["prodigal"] = parse_prodigal_output(args.prodigal_out)
+    elif args.prodigal_gff:
+        all_predictions["prodigal"] = parse_gff(args.prodigal_gff)
 
+    logging.info("Parsing FragGeneScan annotations...")
     if args.fgs_out:
-        logging.info("FGS presented")
-        logging.info("Getting FragGeneScan regions ...")
         all_predictions["fgs"] = parse_fgs_output(args.fgs_out)
+    elif args.fgs_gff:
+        all_predictions["fgs"] = parse_gff(args.fgs_gff)
 
     summary["all"] = get_counts(all_predictions)
 

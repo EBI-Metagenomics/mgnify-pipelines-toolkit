@@ -54,6 +54,7 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 sequences = []
                 for record in SeqIO.parse(input_file, "fasta"):
                     if record.id in seqs:
+                        record.seq = record.seq.rstrip("*")
                         sequences.append(record)
                 SeqIO.write(sequences, output_file, "fasta")
 

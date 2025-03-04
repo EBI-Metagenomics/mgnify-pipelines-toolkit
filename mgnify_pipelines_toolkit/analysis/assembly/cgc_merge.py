@@ -262,14 +262,12 @@ def main():
         "--fgs-faa", "-fp", help="FragGeneScan *.faa file with proteins"
     )
     parser.add_argument(
-        "--verbose", "-v", action="count", help="Increase verbosity level"
+        "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
     )
 
     args = parser.parse_args()
 
-    log_level = logging.WARNING
-    if args.verbose:
-        log_level = logging.INFO if args.verbose == 1 else logging.DEBUG
+    log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(
         level=log_level,
         format="%(levelname)s %(asctime)s - %(message)s",

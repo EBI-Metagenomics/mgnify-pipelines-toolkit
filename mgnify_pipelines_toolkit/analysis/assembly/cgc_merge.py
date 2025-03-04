@@ -245,18 +245,24 @@ def main():
     parser.add_argument("--prodigal-gff", "-pg", help="Prodigal *.gff file")
     parser.add_argument("--prodigal-out", "-po", help="Prodigal *.out file")
     parser.add_argument(
-        "--prodigal-ffn", "-pt", help="Prodigal *.ffn file with transcripts"
+        "--prodigal-ffn",
+        "-pt",
+        required=True,
+        help="Prodigal *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--prodigal-faa", "-pp", help="Prodigal *.faa file with proteins"
+        "--prodigal-faa", "-pp", required=True, help="Prodigal *.faa file with proteins"
     )
     parser.add_argument("--fgs-gff", "-fg", help="FragGeneScan *.gff file")
     parser.add_argument("--fgs-out", "-fo", help="FragGeneScan *.out file")
     parser.add_argument(
-        "--fgs-ffn", "-ft", help="FragGeneScan *.ffn file with transcripts"
+        "--fgs-ffn",
+        "-ft",
+        required=True,
+        help="FragGeneScan *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--fgs-faa", "-fp", help="FragGeneScan *.faa file with proteins"
+        "--fgs-faa", "-fp", required=True, help="FragGeneScan *.faa file with proteins"
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
@@ -269,6 +275,14 @@ def main():
         format="%(levelname)s %(asctime)s - %(message)s",
         datefmt="%Y/%m/%d %H:%M:%S",
     )
+
+    if not args.prodigal_out and not args.prodigal_gff:
+        parser.error(
+            "For Prodigal, you must provide either --prodigal-out or --prodigal-gff"
+        )
+
+    if not args.fgs_out and not args.fgs_gff:
+        parser.error("For FragGeneScan, you must provide either --fgs-out or --fgs-gff")
 
     summary = {}
     all_predictions = {}

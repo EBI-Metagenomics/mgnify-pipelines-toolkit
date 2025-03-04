@@ -5,7 +5,7 @@
   command: python -m mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary --chromosome X
   stderr:
     contains:
-      - "markergene_study_summary.py: error: the following arguments are required: -i/--input, -r/--runs, -p/--prefix"
+      - "markergene_study_summary.py: error: the following arguments are required: -i/--input_path, -r/--runs, -p/--prefix"
 - name: markergene_study_summary test_correct_args
   tags:
     - markergene_study_summary

@@ -49,6 +49,7 @@ mapseq2biom = "mgnify_pipelines_toolkit.analysis.shared.mapseq2biom:main"
 fastq_suffix_header_check = "mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check:main"
 library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strategy_check:main"
 study_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.study_summary_generator:cli"
+markergene_study_summary = "mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary:main"
 # analysis.amplicon
 are_there_primers = "mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers:main"
 assess_inflection_point_mcp = "mgnify_pipelines_toolkit.analysis.amplicon.assess_inflection_point_mcp:main"

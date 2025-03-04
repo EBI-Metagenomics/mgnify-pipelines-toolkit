@@ -30,6 +30,8 @@ def parse_gff(gff_file):
                 predictions[seq_id][strand].append(
                     Interval(int(start), int(end), data={"protein_id": protein_id})
                 )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the GFF file")
     return predictions
 
 
@@ -59,6 +61,8 @@ def parse_prodigal_output(file):
                 predictions[seq_id][strand].append(
                     Interval(int(start), int(end), data={"protein_id": protein_id})
                 )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
 
 
@@ -81,6 +85,8 @@ def parse_fgs_output(file):
                 predictions[seq_id][strand].append(
                     Interval(int(start), int(end), data={"protein_id": protein_id})
                 )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
 
 
@@ -98,6 +104,8 @@ def parse_cmsearch_output(mask_file):
             if start > end:
                 start, end = end, start
             regions[seq_id].append(Interval(start, end))
+    if not regions:
+        raise ValueError("Zero intervals was read from the input masking file")
     return regions
 
 
@@ -105,27 +113,28 @@ def mask_regions(predictions, mask):
     masked = defaultdict(lambda: defaultdict(list))
 
     for seq_id, strand_dict in predictions.items():
-        mask_tree = create_interval_tree(mask[seq_id])
-        for strand, regions in strand_dict.items():
-            tree = create_interval_tree(regions)
-            masked_intervals = []
-            for region in tree:
-                # Check for overlaps greater than 5 base pairs
-                overlapping_intervals = mask_tree.overlap(region.begin, region.end)
-                overlap = False
-                for mask_region in overlapping_intervals:
-                    # If overlap is more than 5 base pairs, mark for masking
-                    # Add 1 to make bondaries inclusive
-                    overlap_len = 1 + abs(
-                        min(region.end, mask_region.end)
-                        - max(region.begin, mask_region.begin)
-                    )
-                    if overlap_len > MASK_OVERLAP_THRESHOLD:
-                        overlap = True
-                        break
-                if not overlap:
-                    masked_intervals.append(region)
-            masked[seq_id][strand] = sorted(masked_intervals)
+        if seq_id in mask:
+            mask_tree = create_interval_tree(mask[seq_id])
+            for strand, regions in strand_dict.items():
+                tree = create_interval_tree(regions)
+                masked_intervals = []
+                for region in tree:
+                    # Check for overlaps greater than 5 base pairs
+                    overlapping_intervals = mask_tree.overlap(region.begin, region.end)
+                    overlap = False
+                    for mask_region in overlapping_intervals:
+                        # If overlap is more than 5 base pairs, mark for masking
+                        # Add 1 to make bondaries inclusive
+                        overlap_len = 1 + abs(
+                            min(region.end, mask_region.end)
+                            - max(region.begin, mask_region.begin)
+                        )
+                        if overlap_len > MASK_OVERLAP_THRESHOLD:
+                            overlap = True
+                            break
+                    if not overlap:
+                        masked_intervals.append(region)
+                masked[seq_id][strand] = sorted(masked_intervals)
     return masked
 
 

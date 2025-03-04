@@ -1,5 +1,5 @@
 - name: prodigal_fraggenescan_with_masking
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.cgc_merge -n prodigal_fgs --prodigal-out tests/fixtures/cgc_merge/input_prodigal.out --prodigal-ffn tests/fixtures/cgc_merge/input_prodigal.ffn --prodigal-faa tests/fixtures/cgc_merge/input_prodigal.faa --fgs-out tests/fixtures/cgc_merge/input_fgs.out --fgs-ffn tests/fixtures/cgc_merge/input_fgs.ffn --fgs-faa tests/fixtures/cgc_merge/input_fgs.faa --mask tests/fixtures/cgc_merge/cmsearch.all.tblout.deoverlapped -vvv
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.cgc_merge -n prodigal_fgs --prodigal-out tests/fixtures/cgc_merge/input_prodigal.out --prodigal-ffn tests/fixtures/cgc_merge/input_prodigal.ffn --prodigal-faa tests/fixtures/cgc_merge/input_prodigal.faa --fgs-out tests/fixtures/cgc_merge/input_fgs.out --fgs-ffn tests/fixtures/cgc_merge/input_fgs.ffn --fgs-faa tests/fixtures/cgc_merge/input_fgs.faa --mask tests/fixtures/cgc_merge/cmsearch.all.tblout.deoverlapped -v
   files:
     - path: "prodigal_fgs.faa"
       md5sum: 1577a0613f7fa5c1d989dd5bd2b81397

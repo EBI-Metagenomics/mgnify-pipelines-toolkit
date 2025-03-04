@@ -207,8 +207,8 @@ def main():
         run_acc = runs_df.loc[i, "run"]
         ampregion_dict[run_acc]["amplified_regions"] = []
 
-        amp_regions = list(
-            pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv")
+        amp_regions = sorted(
+            list(pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv"))
         )
 
         for amp_region_path in amp_regions:

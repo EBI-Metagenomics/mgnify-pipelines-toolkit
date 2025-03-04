@@ -125,7 +125,7 @@ def mask_regions(predictions, mask):
                     overlap = False
                     for mask_region in overlapping_intervals:
                         # If overlap is more than 5 base pairs, mark for masking
-                        # Add 1 to make bondaries inclusive
+                        # Add 1 to make boundaries inclusive
                         overlap_len = 1 + abs(
                             min(region.end, mask_region.end)
                             - max(region.begin, mask_region.begin)
@@ -136,6 +136,9 @@ def mask_regions(predictions, mask):
                     if not overlap:
                         masked_intervals.append(region)
                 masked[seq_id][strand] = sorted(masked_intervals)
+        else:
+            # If no mask information exists, add the predictions directly
+            masked[seq_id] = strand_dict
     return masked
 
 

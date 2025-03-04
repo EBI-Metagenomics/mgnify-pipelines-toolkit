@@ -34,7 +34,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
-        "--input",
+        "--input_path",
         required=True,
         type=str,
         help="Input directory containing amplicon analysis pipeline results",
@@ -52,11 +52,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    INPUT = args.input
-    RUNS = args.runs
-    PREFIX = args.prefix
+    input_path = args.input_path
+    runs = args.runs
+    prefix = args.prefix
 
-    return INPUT, RUNS, PREFIX
+    return input_path, runs, prefix
 
 
 def get_read_count(read_path):
@@ -127,15 +127,15 @@ def add_read_count_to_markergene(marker_gene_dict, marker, label):
 
 def main():
 
-    INPUT, RUNS, PREFIX = parse_args()
+    input_path, runs, prefix = parse_args()
 
-    root_path = pathlib.Path(INPUT)
+    root_path = pathlib.Path(input_path)
 
     if not root_path.exists():
         logging.error(f"Results path does not exist: {root_path}")
         exit(1)
 
-    runs_df = pd.read_csv(RUNS, names=["run", "status"])
+    runs_df = pd.read_csv(runs, names=["run", "status"])
 
     # Marker gene study summary
     markergene_dict = defaultdict(dict)
@@ -189,7 +189,7 @@ def main():
                 ] = (proportion >= MAJORITY_MARKER_PROPORTION)
 
     if markergene_dict:
-        with open(f"{PREFIX}_markergene_study_summary.json", "w") as fw:
+        with open(f"{prefix}_markergene_study_summary.json", "w") as fw:
             fw.write(json.dumps(markergene_dict, indent=4))
     else:
         logging.warning(
@@ -233,7 +233,7 @@ def main():
             ampregion_dict[run_acc]["amplified_regions"].append(amp_dict)
 
     if ampregion_dict:
-        with open(f"{PREFIX}_ampregion_study_summary.json", "w") as fw:
+        with open(f"{prefix}_ampregion_study_summary.json", "w") as fw:
             fw.write(json.dumps(ampregion_dict, indent=4))
     else:
         logging.warning("No amplified region data found. No summary file created.")

@@ -13,11 +13,141 @@ from Bio import SeqIO
 MASK_OVERLAP_THRESHOLD = 5
 
 
-def create_interval_tree(regions):
-    tree = IntervalTree()
-    for region in regions:
-        tree.add(region)  # 'region' is already an Interval
-    return tree
+def parse_gff(gff_file):
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(gff_file, "r") as gff_in:
+        for line in gff_in:
+            if line.startswith("#"):
+                continue
+            fields = line.strip().split("\t")
+            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
+            if feature_type == "CDS":
+                # Parse attributes to get the ID value
+                attr_dict = dict(
+                    attr.split("=") for attr in attributes.split(";") if "=" in attr
+                )
+                protein_id = attr_dict["ID"]
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    return predictions
+
+
+def parse_prodigal_output(file):
+    """
+    Parse Prodigal *.out file.
+    Example:
+    # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
+    # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
+    >1_1_279_+
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith("# Model Data"):
+                continue
+            if line.startswith("# Sequence Data"):
+                matches = re.search(r'seqhdr="(\S+)"', line)
+                if matches:
+                    seq_id = matches.group(1)
+            else:
+                fields = line[1:].strip().split("_")
+                # Fragment_id is an index of the fragment
+                # Prodigal uses these (rather than coordinates) to identify sequences in the fasta output
+                fragment_id, start, end, strand = fields
+                protein_id = f"{seq_id}_{fragment_id}"
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    return predictions
+
+
+def parse_fgs_output(file):
+    """
+    Parse FGS *.out file.
+    Example:
+    >Bifidobacterium-longum-subsp-infantis-MC2-contig1
+    256	2133	-	1	1.263995	I:	D:
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith(">"):
+                seq_id = line.split()[0][1:]
+            else:
+                fields = line.strip().split("\t")
+                start, end, strand, *_ = fields
+                protein_id = f"{seq_id}_{start}_{end}_{strand}"
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    return predictions
+
+
+def parse_cmsearch_output(mask_file):
+    regions = defaultdict(list)
+    with open(mask_file) as file_in:
+        for line in file_in:
+            if line.startswith("#"):
+                continue
+            # TODO maybe it's TSV?
+            fields = line.rstrip().split()
+            seq_id = fields[0]
+            start = int(fields[7])
+            end = int(fields[8])
+            if start > end:
+                start, end = end, start
+            regions[seq_id].append(Interval(start, end))
+    return regions
+
+
+def mask_regions(predictions, mask):
+    masked = defaultdict(lambda: defaultdict(list))
+
+    for seq_id, strand_dict in predictions.items():
+        mask_tree = create_interval_tree(mask[seq_id])
+        for strand, regions in strand_dict.items():
+            tree = create_interval_tree(regions)
+            masked_intervals = []
+            for region in tree:
+                # Check for overlaps greater than 5 base pairs
+                overlapping_intervals = mask_tree.overlap(region.begin, region.end)
+                overlap = False
+                for mask_region in overlapping_intervals:
+                    # If overlap is more than 5 base pairs, mark for masking
+                    # Add 1 to make bondaries inclusive
+                    overlap_len = 1 + abs(
+                        min(region.end, mask_region.end)
+                        - max(region.begin, mask_region.begin)
+                    )
+                    if overlap_len > MASK_OVERLAP_THRESHOLD:
+                        overlap = True
+                        break
+                if not overlap:
+                    masked_intervals.append(region)
+            masked[seq_id][strand] = sorted(masked_intervals)
+    return masked
+
+
+def merge_predictions(predictions, priority):
+    merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
+    primary, secondary = priority
+
+    # Primary merge
+    merged[primary] = predictions[primary]
+
+    # Secondary merge: add non-overlapping regions from the secondary gene caller
+    for seq_id in predictions[secondary]:
+        for strand in ["+", "-"]:
+            secondary_regions = predictions[secondary][seq_id][strand]
+            if seq_id in predictions[primary]:
+                primary_regions = merged[primary][seq_id][strand]
+                merged[secondary][seq_id][strand].extend(
+                    check_against_gaps(primary_regions, secondary_regions)
+                )
+            else:
+                merged[secondary][seq_id][strand] = secondary_regions
+    return merged
 
 
 def check_against_gaps(regions, candidates):
@@ -72,146 +202,6 @@ def output_summary(summary, output_file):
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
 
 
-def parse_gff(gff_file):
-    predictions = defaultdict(lambda: defaultdict(list))
-    with open(gff_file, "r") as gff_in:
-        for line in gff_in:
-            if line.startswith("#"):
-                continue
-            fields = line.strip().split("\t")
-            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
-            if feature_type == "CDS":
-                # Parse attributes to get the ID value
-                attr_dict = dict(
-                    attr.split("=") for attr in attributes.split(";") if "=" in attr
-                )
-                protein_id = attr_dict["ID"]
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
-    return predictions
-
-
-def parse_cmsearch_output(mask_file):
-    regions = defaultdict(list)
-    with open(mask_file) as file_in:
-        for line in file_in:
-            if line.startswith("#"):
-                continue
-            # TODO maybe it's TSV?
-            fields = line.rstrip().split()
-            seq_id = fields[0]
-            start = int(fields[7])
-            end = int(fields[8])
-            if start > end:
-                start, end = end, start
-            regions[seq_id].append(Interval(start, end))
-    return regions
-
-
-def parse_prodigal_output(file):
-    """
-    Parse Prodigal *.out file.
-    Example:
-    # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
-    # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
-    >1_1_279_+
-    """
-    predictions = defaultdict(lambda: defaultdict(list))
-    with open(file) as file_in:
-        for line in file_in:
-            if line.startswith("# Model Data"):
-                continue
-            if line.startswith("# Sequence Data"):
-                matches = re.search(r'seqhdr="(\S+)"', line)
-                if matches:
-                    seq_id = matches.group(1)
-            else:
-                fields = line[1:].strip().split("_")
-                # fragment_id is an index of the fragment
-                # prodigal uses these (rather than coordinates) to identify sequences in the fasta output
-                fragment_id, start, end, strand = fields
-                protein_id = f"{seq_id}_{fragment_id}"
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
-    return predictions
-
-
-def parse_fgs_output(file):
-    """
-    Parse FGS *.out file.
-    Example:
-    >Bifidobacterium-longum-subsp-infantis-MC2-contig1
-    256	2133	-	1	1.263995	I:	D:
-    """
-    predictions = defaultdict(lambda: defaultdict(list))
-    with open(file) as file_in:
-        for line in file_in:
-            if line.startswith(">"):
-                seq_id = line.split()[0][1:]
-            else:
-                fields = line.strip().split("\t")
-                start, end, strand, *_ = fields
-                protein_id = f"{seq_id}_{start}_{end}_{strand}"
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
-    return predictions
-
-
-def mask_regions(predictions, mask):
-    masked = defaultdict(lambda: defaultdict(list))
-
-    for seq_id, strand_dict in predictions.items():
-        mask_tree = create_interval_tree(mask[seq_id])
-        for strand, regions in strand_dict.items():
-            tree = create_interval_tree(regions)
-            masked_intervals = []
-            for region in tree:
-                # Check for overlaps greater than 5 base pairs
-                overlapping_intervals = mask_tree.overlap(region.begin, region.end)
-                overlap = False
-                for mask_region in overlapping_intervals:
-                    # If overlap is more than 5 base pairs, mark for masking
-                    # Add 1 to make bondaries inclusive
-                    overlap_len = 1 + abs(
-                        min(region.end, mask_region.end)
-                        - max(region.begin, mask_region.begin)
-                    )
-                    if overlap_len > MASK_OVERLAP_THRESHOLD:
-                        overlap = True
-                        break
-                if not overlap:
-                    masked_intervals.append(region)
-            masked[seq_id][strand] = sorted(masked_intervals)
-
-    return masked
-
-
-def merge_predictions(predictions, priority):
-    merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
-    primary, secondary = priority
-
-    # Primary merge
-    merged[primary] = predictions[primary]
-
-    # Secondary merge: add non-overlapping regions from the secondary gene caller
-    for seq_id in predictions[secondary]:
-        for strand in ["+", "-"]:
-            if seq_id in predictions[primary]:
-                primary_regions = merged[primary][seq_id][strand]
-                secondary_regions = predictions[secondary][seq_id][strand]
-                merged[secondary][seq_id][strand].extend(
-                    check_against_gaps(primary_regions, secondary_regions)
-                )
-            else:
-                merged[secondary][seq_id][strand] = predictions[secondary][seq_id][
-                    strand
-                ]
-    return merged
-
-
 def get_counts(predictions):
     total = {}
     for caller, seq_data in predictions.items():
@@ -220,6 +210,13 @@ def get_counts(predictions):
         )
         total[caller] = count
     return total
+
+
+def create_interval_tree(regions):
+    tree = IntervalTree()
+    for region in regions:
+        tree.add(region)
+    return tree
 
 
 def main():
@@ -264,7 +261,6 @@ def main():
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
     )
-
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -294,7 +290,6 @@ def main():
 
     summary["all"] = get_counts(all_predictions)
 
-    # Apply mask of ncRNA search
     if args.mask:
         logging.info("Masking of non-coding RNA regions was enabled")
         logging.info(f"Parsing masking intervals from file {args.mask}")
@@ -308,14 +303,11 @@ def main():
 
     logging.info("Merging combined gene caller results")
     merged_predictions = merge_predictions(all_predictions, caller_priority)
+    summary["merged"] = get_counts(merged_predictions)
 
     logging.info("Writing output files...")
-
-    summary["merged"] = get_counts(merged_predictions)
     output_summary(summary, f"{args.name}.summary.txt")
-
     output_gff(merged_predictions, f"{args.name}.gff")
-
     files = {
         "prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
         "fgs": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},

@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 from collections import defaultdict
+import csv
 import re
 
 from intervaltree import Interval, IntervalTree
@@ -197,12 +198,23 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
 
 def output_gff(predictions, output_gff):
     with open(output_gff, "w") as gff_out:
+        writer = csv.writer(gff_out, delimiter="\t")
         for caller, seq_data in predictions.items():
             for seq_id, strand_dict in seq_data.items():
                 for strand, regions in strand_dict.items():
                     for region in regions:
-                        gff_out.write(
-                            f"{seq_id}\tMGnify\tgene\t{region.begin}\t{region.end}\t.\t{strand}\t.\tID=gene_{seq_id}_{region.begin}_{region.end}\n"
+                        writer.writerow(
+                            [
+                                seq_id,  # Sequence ID
+                                "MGnify",  # Source
+                                "CDS",  # Feature type
+                                region.begin,  # Start position
+                                region.end,  # End position
+                                ".",  # Score (not used, hence '.')
+                                strand,  # Strand (+/-)
+                                ".",  # Phase (not used, hence '.')
+                                f"ID={region.data['protein_id']}",  # Attributes
+                            ]
                         )
 
 

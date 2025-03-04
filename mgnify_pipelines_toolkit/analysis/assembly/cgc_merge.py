@@ -3,422 +3,364 @@
 import argparse
 import json
 import logging
-import os
+from collections import defaultdict
+import csv
 import re
 
+from intervaltree import Interval, IntervalTree
 from Bio import SeqIO
 
-__version__ = "1.0.4"
+
+MASK_OVERLAP_THRESHOLD = 5
 
 
-class Region:
-    def __init__(self, start, end):
-        # if end < start: # assuming that for +/- start always lower
-        #    start, end = end, start
-        self.start = int(start)
-        self.end = int(end)
-
-    def __str__(self):
-        return "[" + str(self.start) + "," + str(self.end) + "]"
-
-    def __ge__(self, other):
-        return self.start >= other.end
-
-    def __gt__(self, other):
-        return self.start > other.end
-
-    def __le__(self, other):
-        return self.end <= other.start
-
-    def __lt__(self, other):
-        return self.end < other.start
-
-    def length(self):
-        return self.end - self.start + 1
-
-    # If 'other' overlaps and has a greater end position
-    def extends_right(self, other):
-        if self.overlaps(other) and self.end > other.end:
-            return True
-        return False
-
-    # For overlapping fragments extend start and end to match other
-    def extend(self, other):
-        if self.overlaps(other):
-            if other.end > self.end:
-                self.end = other.end
-            if other.start < self.start:
-                self.start = other.start
-
-    def within(self, other):
-        if self.start >= other.start and self.end <= other.end:
-            return True
-        return False
-
-    # Return length of overlap between regions
-    def overlaps(self, other):
-        if self > other or other > self:
-            return False
-        # overlap = sum of the individual lengths ...
-        ltot = self.length() + other.length()
-        # ... minus length of the combined region (i.e. min start to max end)
-        lmax = max(self.end, other.end) - min(self.start, other.start) + 1
-        return ltot - lmax
+def parse_gff(gff_file):
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(gff_file, "r") as gff_in:
+        for line in gff_in:
+            if line.startswith("#"):
+                continue
+            fields = line.strip().split("\t")
+            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
+            if feature_type == "CDS":
+                # Parse attributes to get the ID value
+                attr_dict = dict(
+                    attr.split("=") for attr in attributes.split(";") if "=" in attr
+                )
+                protein_id = attr_dict["ID"]
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the GFF file")
+    return predictions
 
 
-# FGS has seq_id/start/end in the fasta files - use those to extract the sequences we want to keep;
-# for prodigal it uses a seq_id/index_number, so need to add an extra field
-class NumberedRegion(Region):
-    def __init__(self, start, end, nid):
-        super().__init__(start, end)
-        self.nid = nid
+def parse_prodigal_output(file):
+    """
+    Parse Prodigal *.out file.
+    Example:
+    # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
+    # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
+    >1_1_279_+
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith("# Model Data"):
+                continue
+            if line.startswith("# Sequence Data"):
+                matches = re.search(r'seqhdr="(\S+)"', line)
+                if matches:
+                    seq_id = matches.group(1)
+            else:
+                fields = line[1:].strip().split("_")
+                # Fragment_id is an index of the fragment
+                # Prodigal uses these (rather than coordinates) to identify sequences in the fasta output
+                fragment_id, start, end, strand = fields
+                protein_id = f"{seq_id}_{fragment_id}"
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the *.out file")
+    return predictions
 
 
-def flatten_regions(regions):
-    """Take a list of regions (possibly overlapping) and return the non-overlapping set"""
-    if len(regions) < 2:
-        return regions
+def parse_fgs_output(file):
+    """
+    Parse FGS *.out file.
+    Example:
+    >Bifidobacterium-longum-subsp-infantis-MC2-contig1
+    256	2133	-	1	1.263995	I:	D:
+    """
+    predictions = defaultdict(lambda: defaultdict(list))
+    with open(file) as file_in:
+        for line in file_in:
+            if line.startswith(">"):
+                seq_id = line.split()[0][1:]
+            else:
+                fields = line.strip().split("\t")
+                start, end, strand, *_ = fields
+                protein_id = f"{seq_id}_{start}_{end}_{strand}"
+                predictions[seq_id][strand].append(
+                    Interval(int(start), int(end), data={"protein_id": protein_id})
+                )
+    if not predictions:
+        raise ValueError("Zero gene predictions was read from the *.out file")
+    return predictions
 
-    flattened = []
-    regions = sorted(regions, key=lambda x: x.start)  # sort by start
-    flattened = [regions[0]]
-    regions = regions[1:]  # store the first
-    for region in regions:
-        if not region.overlaps(flattened[-1]):  # doesn't overlap: store new region
-            flattened.append(region)
-        elif region.extends_right(flattened[-1]):  # overlaps to the right: extend previous region
-            flattened[-1].extend(region)
-            # else end < prev end => new region within old: do nothing
-    return flattened
+
+def parse_cmsearch_output(mask_file):
+    regions = defaultdict(list)
+    with open(mask_file) as file_in:
+        for line in file_in:
+            if line.startswith("#"):
+                continue
+            # TODO maybe it's TSV?
+            fields = line.rstrip().split()
+            seq_id = fields[0]
+            start = int(fields[7])
+            end = int(fields[8])
+            if start > end:
+                start, end = end, start
+            regions[seq_id].append(Interval(start, end))
+    if not regions:
+        raise ValueError("Zero intervals was read from the input masking file")
+    return regions
+
+
+def mask_regions(predictions, mask):
+    masked = defaultdict(lambda: defaultdict(list))
+
+    for seq_id, strand_dict in predictions.items():
+        if seq_id in mask:
+            mask_tree = create_interval_tree(mask[seq_id])
+            for strand, regions in strand_dict.items():
+                tree = create_interval_tree(regions)
+                masked_intervals = []
+                for region in tree:
+                    # Check for overlaps greater than 5 base pairs
+                    overlapping_intervals = mask_tree.overlap(region.begin, region.end)
+                    overlap = False
+                    for mask_region in overlapping_intervals:
+                        # If overlap is more than 5 base pairs, mark for masking
+                        # Add 1 to make boundaries inclusive
+                        overlap_len = 1 + abs(
+                            min(region.end, mask_region.end)
+                            - max(region.begin, mask_region.begin)
+                        )
+                        if overlap_len > MASK_OVERLAP_THRESHOLD:
+                            overlap = True
+                            break
+                    if not overlap:
+                        masked_intervals.append(region)
+                masked[seq_id][strand] = sorted(masked_intervals)
+        else:
+            # If no mask information exists, add the predictions directly
+            masked[seq_id] = strand_dict
+    return masked
+
+
+def merge_predictions(predictions, priority):
+    merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
+    primary, secondary = priority
+
+    # Primary merge
+    merged[primary] = predictions[primary]
+
+    # Secondary merge: add non-overlapping regions from the secondary gene caller
+    for seq_id in predictions[secondary]:
+        for strand in ["+", "-"]:
+            secondary_regions = predictions[secondary][seq_id][strand]
+            if seq_id in predictions[primary]:
+                primary_regions = merged[primary][seq_id][strand]
+                merged[secondary][seq_id][strand].extend(
+                    check_against_gaps(primary_regions, secondary_regions)
+                )
+            else:
+                merged[secondary][seq_id][strand] = secondary_regions
+    return merged
 
 
 def check_against_gaps(regions, candidates):
-    """Given a set of non-overlapping gaps and a list of candidate regions, return the candidates that do not overlap"""
-    regions = sorted(regions, key=lambda line: line.start)
-    candidates = sorted(candidates, key=lambda line: line.start)
-    selected = []
-    r = 0
-    if not len(regions):
-        return candidates  # no existing predictions - all candidates accepted
-
-    for c in candidates:
-        if c < regions[0] or c > regions[-1]:  # outside any of the regions: just append
-            selected.append(c)
-        else:
-            while r < len(regions) - 1 and c >= regions[r]:
-                r += 1
-            if c < regions[r]:  # found a gap
-                selected.append(c)
-
-    return selected
+    # TODO there is no check if region is empty, is it a problem?
+    regions_tree = create_interval_tree(regions)
+    selected_candidates = []
+    for candidate in candidates:
+        # Check if the candidate overlaps with any existing region
+        if not regions_tree.overlap(candidate.begin, candidate.end):
+            selected_candidates.append(candidate)
+    return selected_candidates
 
 
-def output_prodigal(predictions, files, outputs):
-    """From the combined predictions output the prodigal data"""
+def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
+    with (
+        open(output_faa, "w") as output_faa_fh,
+        open(output_ffn, "w") as output_ffn_fh,
+    ):
+        for caller, seq_data in predictions.items():
+            proteins = set()
+            for seq_id, strand_dict in seq_data.items():
+                for strand, regions in strand_dict.items():
+                    for region in regions:
+                        protein_id = region.data["protein_id"]
+                        proteins.add(protein_id)
 
-    sequence_set = set()
-    for seq in predictions:
-        for strand in ["-", "+"]:
-            for region in predictions[seq][strand]:
-                sequence_set.add("_".join([seq, str(region.nid)]))
-
-    # files contains the .faa and .ffn fasta files
-    for index in [1, 2]:
-        sequences = []
-        for record in SeqIO.parse(files[index], "fasta"):
-            # remove anything after the first space
-            seq_name = record.id.split(" ")[0]
-            # Replace ending * #
-            record.seq = record.seq.rstrip("*")
-            if seq_name in sequence_set:
-                sequences.append(record)
-
-        with open(outputs[index], "a") as output_handle:
-            SeqIO.write(sequences, output_handle, "fasta")
-
-
-def output_fgs(predictions, files, outputs):
-    """From the combined predictions output the FGS data"""
-    sequence_set = set()
-    for seq in predictions:
-        for strand in ["-", "+"]:
-            for region in predictions[seq][strand]:
-                sequence_set.add("_".join([seq, str(region.start), str(region.end), strand]))
-
-    # files contains the .faa and .ffn fasta files
-    for index in [1, 2]:
-        sequences = []
-        for record in SeqIO.parse(files[index], "fasta"):
-            # remove anything after the first space
-            seq_name = record.id.split(" ")[0]
-            # Replace "*" with "X"
-            record.seq = record.seq.replace("*", "X")
-            if seq_name in sequence_set:
-                sequences.append(record)
-
-        with open(outputs[index], "a") as output_handle:
-            SeqIO.write(sequences, output_handle, "fasta")
+            for input_file, output_file in [
+                (files_dict[caller]["proteins"], output_faa_fh),
+                (files_dict[caller]["transcripts"], output_ffn_fh),
+            ]:
+                sequences = []
+                for record in SeqIO.parse(input_file, "fasta"):
+                    if record.id in proteins:
+                        record.seq = record.seq.rstrip("*")
+                        sequences.append(record)
+                SeqIO.write(sequences, output_file, "fasta")
 
 
-def output_files(predictions, summary, files):
-    """Output all files"""
-    # To avoid that sequences get appended to the merged output files after restart,
-    # make sure the files get deleted if they exist
-    logging.info("Removing output files if they exist.")
-    for file_ in files["merged"]:
-        if os.path.exists(file_):
-            logging.info(f"Removing {file_}")
-            os.remove(file_)
+def output_gff(predictions, output_gff):
+    with open(output_gff, "w") as gff_out:
+        writer = csv.writer(gff_out, delimiter="\t")
+        for caller, seq_data in predictions.items():
+            for seq_id, strand_dict in seq_data.items():
+                for strand, regions in strand_dict.items():
+                    for region in regions:
+                        writer.writerow(
+                            [
+                                seq_id,  # Sequence ID
+                                caller,  # Source
+                                "CDS",  # Feature type
+                                region.begin,  # Start position
+                                region.end,  # End position
+                                ".",  # Score (not used, hence '.')
+                                strand,  # Strand (+/-)
+                                ".",  # Phase (not used, hence '.')
+                                f"ID={region.data['protein_id']}",  # Attributes
+                            ]
+                        )
 
-    for caller in predictions:
-        if caller == "fgs":
-            output_fgs(predictions["fgs"], files["fgs"], files["merged"])
-        if caller == "prodigal":
-            output_prodigal(predictions["prodigal"], files["prodigal"], files["merged"])
 
-    with open(files["merged"][0], "w") as sf:
+def output_summary(summary, output_file):
+    with open(output_file, "w") as sf:
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
-
-
-def get_regions_fgs(fn):
-    """Parse FGS output.
-    Example:
-    # >Bifidobacterium-longum-subsp-infantis-MC2-contig1
-    # 256	2133	-	1	1.263995	I:	D:
-    """
-    regions = {}
-    with open(fn) as f:
-        for line in f:
-            if line[0] == ">":
-                id_ = line.split()[0][1:]
-                regions[id_] = {}
-                regions[id_]["+"] = []
-                regions[id_]["-"] = []
-            else:
-                r = line.split()  # start end strand
-                s = int(r[0])
-                e = int(r[1])
-                regions[id_][r[2]].append(Region(s, e))
-    return regions
-
-
-"""
-# noqa: E501
-This is from cmsearch
-ERR855786.1000054-HWI-M02024:111:000000000-A8H14:1:1115:23473:14586-1 -         LSU_rRNA_bacteria    RF02541   hmm     1224     1446        5      227      +     -    6 0.61   0.8  135.2   2.8e-38 !   -
-"""
-
-
-def get_regions_mask(mask_file):
-    """Parse masked region file (i.e. ncRNA)"""
-    regions = {}
-    with open(mask_file) as f:
-        for line in f:
-            if line[:1] == "#":
-                continue
-            r = line.rstrip().split()
-            id_ = r[0]
-            start = int(r[7])
-            end = int(r[8])
-            if id_ not in regions:
-                regions[id_] = []
-            if start > end:
-                start, end = end, start
-            regions[id_].append(Region(start, end))
-    return regions
-
-
-# # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
-# # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
-# >1_1_279_+
-def get_regions_prodigal(fn):
-    """Parse prodigal output"""
-    regions = {}
-    with open(fn) as f:
-        for line in f:
-            if line[:12] == "# Model Data":
-                continue
-            if line[:15] == "# Sequence Data":
-                m = re.search(r'seqhdr="(\S+)"', line)
-                if m:
-                    id_ = m.group(1)
-                regions[id_] = {}
-                regions[id_]["+"] = []
-                regions[id_]["-"] = []
-            else:
-                r = line[1:].rstrip().split("_")
-                n = int(
-                    r[0]
-                )  # also store the index of the fragment - prodigal uses these (rather than coords) to identify sequences in the fasta output
-                s = int(r[1])
-                e = int(r[2])
-                regions[id_][r[3]].append(NumberedRegion(s, e, n))
-    return regions
-
-
-def mask_regions(regions, mask):
-    """Look for overlaps of more than 5 base pairs of the supplied regions against a set of masks
-    This is probably O(N^2) but, in theory, there shouldn't be many mask regions
-    """
-    new_regions = {}
-    for seq in regions:
-        new_regions[seq] = {}
-        for strand in ["-", "+"]:
-            new_regions[seq][strand] = []
-            for r in regions[seq][strand]:
-                if seq in mask:
-                    overlap = 0
-                    for r2 in mask[seq]:
-                        if r.overlaps(r2) > 5:
-                            overlap = 1
-                    if not overlap:
-                        new_regions[seq][strand].append(r)
-                else:
-                    new_regions[seq][strand].append(r)
-
-    return new_regions
-
-
-# FIXME - This won't work if we have only a single set of predictions, but then
-# there's no point in trying to merge
-def merge_predictions(predictions, callers):
-    """Check that we have priorities set of for all callers we have data for"""
-    p = set(callers)
-    new_predictions = {}
-    for type_ in predictions:
-        if type_ not in p:
-            return None
-            # throw here? - if we've used a caller that we don't have a priority for
-
-    # first set of predictions takes priority - just transfer them
-    new_predictions[callers[0]] = predictions[callers[0]]
-
-    # for now assume only two callers, but can be extended
-    new_predictions[callers[1]] = {}  # empty set for second priority caller
-    for seq in predictions[callers[1]]:
-        new_predictions[callers[1]][seq] = {}
-        for strand in ["-", "+"]:
-            new_predictions[callers[1]][seq][strand] = []
-            if seq in predictions[callers[0]]:  # if this sequence already has predictions
-                prev_predictions = flatten_regions(
-                    predictions[callers[0]][seq][strand]
-                )  # non-overlapping set of existing predictions/regions
-                new_predictions[callers[1]][seq][strand] = check_against_gaps(
-                    prev_predictions, predictions[callers[1]][seq][strand]
-                )  # plug new predictions/regions into gaps
-            else:  # no existing predictions: just add them
-                new_predictions[callers[1]][seq][strand] = predictions[callers[1]][seq][strand]
-
-    return new_predictions
 
 
 def get_counts(predictions):
     total = {}
-    for caller in predictions:
-        total[caller] = 0
-        for sample in predictions[caller]:
-            for strand in ["-", "+"]:
-                total[caller] += len(predictions[caller][sample][strand])
+    for caller, seq_data in predictions.items():
+        count = sum(
+            len(seq_data[seq_id]["+"] + seq_data[seq_id]["-"]) for seq_id in seq_data
+        )
+        total[caller] = count
     return total
 
 
-def combine_main():
+def create_interval_tree(regions):
+    tree = IntervalTree()
+    for region in regions:
+        tree.add(region)
+    return tree
+
+
+def main():
     parser = argparse.ArgumentParser(
-        "MGnify gene caller combiner. This script will merge the gene called by prodigal and fraggenescan (in any order)"
+        """
+        MGnify gene caller combiner.
+        This script merges gene predictions made by Prodigal and FragGeneScan (FGS)
+        and outputs FASTA and GFF files.
+        For each gene caller, the script expects a set of files:
+        - GFF file with gene predictions OR *.out file
+        - FASTA file with protein sequences
+        - FASTA file with transcript sequences
+        """
     )
-    parser.add_argument("-n", "--name", action="store", dest="name", required=True, help="basename")
-    parser.add_argument("-k", "--mask", action="store", dest="mask", required=False, help="Sequence mask file")
-
-    parser.add_argument("-a", "--prodigal-out", action="store", dest="prodigal_out", required=False, help="Stats out prodigal")
-    parser.add_argument("-b", "--prodigal-ffn", action="store", dest="prodigal_ffn", required=False, help="Stats ffn prodigal")
-    parser.add_argument("-c", "--prodigal-faa", action="store", dest="prodigal_faa", required=False, help="Stats faa prodigal")
-
-    parser.add_argument("-d", "--fgs-out", action="store", dest="fgs_out", required=False, help="Stats out FGS")
-    parser.add_argument("-e", "--fgs-ffn", action="store", dest="fgs_ffn", required=False, help="Stats ffn FGS")
-    parser.add_argument("-f", "--fgs-faa", action="store", dest="fgs_faa", required=False, help="Stats faa FGS")
-
     parser.add_argument(
-        "-p",
-        "--caller-priority",
-        action="store",
-        dest="caller_priority",
-        required=False,
-        choices=["prodigal_fgs", "fgs_prodigal"],
-        default="prodigal_fgs",
-        help="Caller priority.",
+        "--name", "-n", required=True, help="Base name for output files"
     )
-
-    parser.add_argument("-v", "--verbose", help="verbose output", dest="verbose", action="count", required=False)
-
-    parser.add_argument("--version", action="version", version=f"{__version__}")
-
+    parser.add_argument(
+        "--priority",
+        "-P",
+        choices=["Prodigal_FragGeneScan", "FragGeneScan_Prodigal"],
+        default="Prodigal_FragGeneScan",
+        help="Merge priority",
+    )
+    parser.add_argument(
+        "--mask",
+        "-m",
+        help="Masked regions (in GFF or BED format)",  # TODO why GFF or BED?
+    )
+    parser.add_argument("--prodigal-gff", "-pg", help="Prodigal *.gff file")
+    parser.add_argument("--prodigal-out", "-po", help="Prodigal *.out file")
+    parser.add_argument(
+        "--prodigal-ffn",
+        "-pt",
+        required=True,
+        help="Prodigal *.ffn file with transcripts",
+    )
+    parser.add_argument(
+        "--prodigal-faa", "-pp", required=True, help="Prodigal *.faa file with proteins"
+    )
+    parser.add_argument("--fgs-gff", "-fg", help="FragGeneScan *.gff file")
+    parser.add_argument("--fgs-out", "-fo", help="FragGeneScan *.out file")
+    parser.add_argument(
+        "--fgs-ffn",
+        "-ft",
+        required=True,
+        help="FragGeneScan *.ffn file with transcripts",
+    )
+    parser.add_argument(
+        "--fgs-faa", "-fp", required=True, help="FragGeneScan *.faa file with proteins"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
+    )
     args = parser.parse_args()
 
-    # Set up logging system
-    verbose_mode = args.verbose or 0
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(
+        level=log_level,
+        format="%(levelname)s %(asctime)s - %(message)s",
+        datefmt="%Y/%m/%d %H:%M:%S",
+    )
 
-    log_level = logging.WARNING
-    if verbose_mode:
-        log_level = logging.DEBUG if verbose_mode > 1 else logging.INFO
+    if not args.prodigal_out and not args.prodigal_gff:
+        parser.error(
+            "For Prodigal, you must provide either --prodigal-out or --prodigal-gff"
+        )
 
-    logging.basicConfig(level=log_level, format="%(levelname)s %(asctime)s - %(message)s", datefmt="%Y/%m/%d %I:%M:%S %p")
+    if not args.fgs_out and not args.fgs_gff:
+        parser.error("For FragGeneScan, you must provide either --fgs-out or --fgs-gff")
 
     summary = {}
     all_predictions = {}
-    files = {}
-    caller_priority = []
-    if args.caller_priority:
-        caller_priority = args.caller_priority.split("_")
-    else:
-        caller_priority = ["prodigal", "fgs"]
 
+    caller_priority = args.priority.split("_")
     logging.info(f"Caller priority: 1. {caller_priority[0]}, 2. {caller_priority[1]}")
 
+    logging.info("Parsing Prodigal annotations...")
     if args.prodigal_out:
-        logging.info("Prodigal presented")
-        logging.info("Getting Prodigal regions...")
-        all_predictions["prodigal"] = get_regions_prodigal(args.prodigal_out)
+        all_predictions["Prodigal"] = parse_prodigal_output(args.prodigal_out)
+    elif args.prodigal_gff:
+        all_predictions["Prodigal"] = parse_gff(args.prodigal_gff)
 
-        files["prodigal"] = [args.prodigal_out, args.prodigal_ffn, args.prodigal_faa]
-
+    logging.info("Parsing FragGeneScan annotations...")
     if args.fgs_out:
-        logging.info("FGS presented")
-        logging.info("Getting FragGeneScan regions ...")
-        all_predictions["fgs"] = get_regions_fgs(args.fgs_out)
-
-        files["fgs"] = [args.fgs_out, args.fgs_ffn, args.fgs_faa]
+        all_predictions["FragGeneScan"] = parse_fgs_output(args.fgs_out)
+    elif args.fgs_gff:
+        all_predictions["FragGeneScan"] = parse_gff(args.fgs_gff)
 
     summary["all"] = get_counts(all_predictions)
 
-    # Apply mask of ncRNA search
-    logging.info("Masking non coding RNA regions...")
     if args.mask:
-        logging.info("Reading regions for masking...")
-        mask = get_regions_mask(args.mask)
-        if "prodigal" in all_predictions:
-            logging.info("Masking Prodigal outputs...")
-            all_predictions["prodigal"] = mask_regions(all_predictions["prodigal"], mask)
-        if "fgs" in all_predictions:
-            logging.info("Masking FragGeneScan outputs...")
-            all_predictions["fgs"] = mask_regions(all_predictions["fgs"], mask)
-        summary["masked"] = get_counts(all_predictions)
+        logging.info("Masking of non-coding RNA regions was enabled")
+        logging.info(f"Parsing masking intervals from file {args.mask}")
+        mask_regions_file = parse_cmsearch_output(args.mask)
+        for caller in all_predictions:
+            logging.info(f"Masking {caller} outputs...")
+            all_predictions[caller] = mask_regions(
+                all_predictions[caller], mask_regions_file
+            )
+        summary["after_masking"] = get_counts(all_predictions)
 
-    # Run the merging step
-    if len(all_predictions) > 1:
-        logging.info("Merging combined gene caller results...")
-        merged_predictions = merge_predictions(all_predictions, caller_priority)
-    else:
-        logging.info("Skipping merging step...")
-        merged_predictions = all_predictions
+    logging.info("Merging combined gene caller results")
+    merged_predictions = merge_predictions(all_predictions, caller_priority)
     summary["merged"] = get_counts(merged_predictions)
 
-    # Output fasta files and summary (json)
     logging.info("Writing output files...")
-
-    files["merged"] = [args.name + ext for ext in [".out", ".ffn", ".faa"]]
-
-    output_files(merged_predictions, summary, files)
+    output_summary(summary, f"{args.name}.summary.txt")
+    output_gff(merged_predictions, f"{args.name}.gff")
+    files = {
+        "Prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
+        "FragGeneScan": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},
+    }
+    output_fasta_files(
+        merged_predictions,
+        files,
+        f"{args.name}.faa",
+        f"{args.name}.ffn",
+    )
 
 
 if __name__ == "__main__":
-    combine_main()
+    main()

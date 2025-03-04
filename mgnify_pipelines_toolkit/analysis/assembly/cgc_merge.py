@@ -209,7 +209,7 @@ def output_gff(predictions, output_gff):
                         writer.writerow(
                             [
                                 seq_id,  # Sequence ID
-                                "MGnify",  # Source
+                                caller,  # Source
                                 "CDS",  # Feature type
                                 region.begin,  # Start position
                                 region.end,  # End position
@@ -247,8 +247,12 @@ def main():
     parser = argparse.ArgumentParser(
         """
         MGnify gene caller combiner.
-        This script merges gene predictions made by Prodigal and FragGeneScan
+        This script merges gene predictions made by Prodigal and FragGeneScan (FGS)
         and outputs FASTA and GFF files.
+        For each gene caller, the script expects a set of files:
+        - GFF file with gene predictions OR *.out file
+        - FASTA file with protein sequences
+        - FASTA file with transcript sequences
         """
     )
     parser.add_argument(
@@ -257,8 +261,8 @@ def main():
     parser.add_argument(
         "--priority",
         "-P",
-        choices=["prodigal_fgs", "fgs_prodigal"],
-        default="prodigal_fgs",
+        choices=["Prodigal_FragGeneScan", "FragGeneScan_Prodigal"],
+        default="Prodigal_FragGeneScan",
         help="Merge priority",
     )
     parser.add_argument(
@@ -316,15 +320,15 @@ def main():
 
     logging.info("Parsing Prodigal annotations...")
     if args.prodigal_out:
-        all_predictions["prodigal"] = parse_prodigal_output(args.prodigal_out)
+        all_predictions["Prodigal"] = parse_prodigal_output(args.prodigal_out)
     elif args.prodigal_gff:
-        all_predictions["prodigal"] = parse_gff(args.prodigal_gff)
+        all_predictions["Prodigal"] = parse_gff(args.prodigal_gff)
 
     logging.info("Parsing FragGeneScan annotations...")
     if args.fgs_out:
-        all_predictions["fgs"] = parse_fgs_output(args.fgs_out)
+        all_predictions["FragGeneScan"] = parse_fgs_output(args.fgs_out)
     elif args.fgs_gff:
-        all_predictions["fgs"] = parse_gff(args.fgs_gff)
+        all_predictions["FragGeneScan"] = parse_gff(args.fgs_gff)
 
     summary["all"] = get_counts(all_predictions)
 
@@ -347,8 +351,8 @@ def main():
     output_summary(summary, f"{args.name}.summary.txt")
     output_gff(merged_predictions, f"{args.name}.gff")
     files = {
-        "prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
-        "fgs": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},
+        "Prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
+        "FragGeneScan": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},
     }
     output_fasta_files(
         merged_predictions,

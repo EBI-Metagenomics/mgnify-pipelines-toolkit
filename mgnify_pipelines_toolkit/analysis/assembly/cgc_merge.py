@@ -15,6 +15,18 @@ MASK_OVERLAP_THRESHOLD = 5
 
 
 def parse_gff(gff_file):
+    """
+    Parse a GFF file and extract CDS features as Interval objects.
+
+    Args:
+        gff_file (str): Path to the GFF file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
+    """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(gff_file, "r") as gff_in:
         for line in gff_in:
@@ -38,11 +50,20 @@ def parse_gff(gff_file):
 
 def parse_prodigal_output(file):
     """
-    Parse Prodigal *.out file.
-    Example:
+    Parse Prodigal *.out file to extract gene predictions as Interval objects.
+    Example of *.out file:
     # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
     # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
     >1_1_279_+
+
+    Args:
+        file (str): Path to the Prodigal *.out file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(file) as file_in:
@@ -69,10 +90,19 @@ def parse_prodigal_output(file):
 
 def parse_fgs_output(file):
     """
-    Parse FGS *.out file.
-    Example:
+    Parse FGS *.out file to extract gene predictions as Interval objects.
+    Example of *.out file:
     >Bifidobacterium-longum-subsp-infantis-MC2-contig1
     256	2133	-	1	1.263995	I:	D:
+
+    Args:
+        file (str): Path to the FragGeneScan *.out file.
+
+    Returns:
+        dict: A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals for CDS regions.
+            Each Interval object apart from the start and end positions of the CDS region
+            also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
     with open(file) as file_in:
@@ -92,6 +122,15 @@ def parse_fgs_output(file):
 
 
 def parse_cmsearch_output(mask_file):
+    """
+    Parse masking regions from a cmsearch output file and store them as Intervals.
+
+    Args:
+        mask_file (str): Path to the masking file (possibly BED or GFF-like format).
+
+    Returns:
+        dict: A dictionary with sequence IDs as keys, and a list of Intervals representing masked regions.
+    """
     regions = defaultdict(list)
     with open(mask_file) as file_in:
         for line in file_in:
@@ -111,6 +150,19 @@ def parse_cmsearch_output(mask_file):
 
 
 def mask_regions(predictions, mask):
+    """
+    Apply masking to predictions by removing regions that overlap significantly
+    (more than MASK_OVERLAP_THRESHOLD)
+    with masked regions.
+
+    Args:
+        predictions (dict): A nested dictionary with sequence IDs as keys, and within each,
+            strand (+/-) as keys, containing a list of Intervals as values.
+        mask (dict): A dictionary with sequence IDs as keys, and a list of Intervals as values.
+
+    Returns:
+        dict: Updated predictions with masked regions removed.
+    """
     masked = defaultdict(lambda: defaultdict(list))
 
     for seq_id, strand_dict in predictions.items():
@@ -143,6 +195,17 @@ def mask_regions(predictions, mask):
 
 
 def merge_predictions(predictions, priority):
+    """
+    Merge gene predictions from two sources, applying a priority order.
+
+    Args:
+        predictions (dict): Nested dictionary containing gene predictions from both sources.
+        priority (list): List specifying the order of priority for merging the predictions.
+
+    Returns:
+        dict: Nested dictionary with all predictions of the first priority source merged with non-overlapping predictions
+            the secondary source.
+    """
     merged = defaultdict(lambda: defaultdict((lambda: defaultdict(list))))
     primary, secondary = priority
 
@@ -164,7 +227,17 @@ def merge_predictions(predictions, priority):
 
 
 def check_against_gaps(regions, candidates):
-    # TODO there is no check if region is empty, is it a problem?
+    """
+    Check candidate regions against existing regions and select those
+    that do not overlap with any existing ones.
+
+    Args:
+        regions (list): Interval objects for existing regions.
+        candidates (list): Interval objects for candidate regions.
+
+    Returns:
+        list: Selected candidate Intervals that do not overlap with existing ones.
+    """
     regions_tree = create_interval_tree(regions)
     selected_candidates = []
     for candidate in candidates:
@@ -175,6 +248,16 @@ def check_against_gaps(regions, candidates):
 
 
 def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
+    """
+    Write FASTA output files containing protein and transcript sequences for
+    the predicted genes after merging.
+
+    Args:
+        predictions (dict): Nested dictionary with merged gene predictions.
+        files_dict (dict): Dictionary containing input FASTA files for both Prodigal and FragGeneScan.
+        output_faa (str): Path to output protein FASTA file.
+        output_ffn (str): Path to output transcript FASTA file.
+    """
     with (
         open(output_faa, "w") as output_faa_fh,
         open(output_ffn, "w") as output_ffn_fh,
@@ -200,6 +283,13 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
 
 
 def output_gff(predictions, output_gff):
+    """
+    Write merged gene predictions to a GFF output file.
+
+    Args:
+        predictions (dict): Nested dictionary with merged gene predictions.
+        output_gff (str): Path to the output GFF file.
+    """
     with open(output_gff, "w") as gff_out:
         writer = csv.writer(gff_out, delimiter="\t")
         for caller, seq_data in predictions.items():
@@ -222,11 +312,27 @@ def output_gff(predictions, output_gff):
 
 
 def output_summary(summary, output_file):
+    """
+    Write a summary of gene counts to a text file in JSON format.
+
+    Args:
+        summary (dict): Summary of gene counts.
+        output_file (str): Path to the summary output file.
+    """
     with open(output_file, "w") as sf:
         sf.write(json.dumps(summary, sort_keys=True, indent=4) + "\n")
 
 
 def get_counts(predictions):
+    """
+    Count the number of gene predictions for each caller.
+
+    Args:
+        predictions (dict): Nested dictionary with gene predictions for each caller.
+
+    Returns:
+        dict: Total count of genes for each caller.
+    """
     total = {}
     for caller, seq_data in predictions.items():
         count = sum(
@@ -237,6 +343,15 @@ def get_counts(predictions):
 
 
 def create_interval_tree(regions):
+    """
+    Create an IntervalTree from a list of regions.
+
+    Args:
+        regions (list): List of Interval objects.
+
+    Returns:
+        IntervalTree: An interval tree for efficient overlap checking.
+    """
     tree = IntervalTree()
     for region in regions:
         tree.add(region)

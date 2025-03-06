@@ -1,4 +1,18 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 import json
@@ -48,16 +62,16 @@ def parse_gff(gff_file):
     return predictions
 
 
-def parse_prodigal_output(file):
+def parse_pyrodigal_output(file):
     """
-    Parse Prodigal *.out file to extract gene predictions as Interval objects.
+    Parse Pyrodigal *.out file to extract gene predictions as Interval objects.
     Example of *.out file:
     # Sequence Data: seqnum=1;seqlen=25479;seqhdr="Bifidobacterium-longum-subsp-infantis-MC2-contig1"
-    # Model Data: version=Prodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
+    # Model Data: version=Pyrodigal.v2.6.3;run_type=Single;model="Ab initio";gc_cont=59.94;transl_table=11;uses_sd=1
     >1_1_279_+
 
     Args:
-        file (str): Path to the Prodigal *.out file.
+        file (str): Path to the Pyrodigal *.out file.
 
     Returns:
         dict: A nested dictionary with sequence IDs as keys, and within each,
@@ -77,7 +91,7 @@ def parse_prodigal_output(file):
             else:
                 fields = line[1:].strip().split("_")
                 # Fragment_id is an index of the fragment
-                # Prodigal uses these (rather than coordinates) to identify sequences in the fasta output
+                # Pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
                 protein_id = f"{seq_id}_{fragment_id}"
                 predictions[seq_id][strand].append(
@@ -88,15 +102,15 @@ def parse_prodigal_output(file):
     return predictions
 
 
-def parse_fgs_output(file):
+def parse_fgsrs_output(file):
     """
-    Parse FGS *.out file to extract gene predictions as Interval objects.
+    Parse FragGeneScanRS *.out file to extract gene predictions as Interval objects.
     Example of *.out file:
     >Bifidobacterium-longum-subsp-infantis-MC2-contig1
     256	2133	-	1	1.263995	I:	D:
 
     Args:
-        file (str): Path to the FragGeneScan *.out file.
+        file (str): Path to the FragGeneScanRS *.out file.
 
     Returns:
         dict: A nested dictionary with sequence IDs as keys, and within each,
@@ -254,7 +268,7 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
     Args:
         predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
             Each Interval object stores a protein ID in the data attribute.
-        files_dict (dict): Dictionary containing input FASTA files for both Prodigal and FragGeneScan.
+        files_dict (dict): Dictionary containing input FASTA files for both Pyrodigal and FragGeneScanRS.
         output_faa (str): Path to output protein FASTA file.
         output_ffn (str): Path to output transcript FASTA file.
     """
@@ -293,6 +307,7 @@ def output_gff(predictions, output_gff):
     """
     with open(output_gff, "w") as gff_out:
         writer = csv.writer(gff_out, delimiter="\t")
+        gff_out.write("##gff-version 3\n")
         for caller, seq_data in predictions.items():
             for seq_id, strand_dict in seq_data.items():
                 for strand, regions in strand_dict.items():
@@ -363,7 +378,7 @@ def main():
     parser = argparse.ArgumentParser(
         """
         MGnify gene caller combiner.
-        This script merges gene predictions made by Prodigal and FragGeneScan (FGS)
+        This script merges gene predictions made by Pyrodigal and FragGeneScanRS (FGS)
         and outputs FASTA and GFF files.
         For each gene caller, the script expects a set of files:
         - GFF file with gene predictions OR *.out file
@@ -377,8 +392,8 @@ def main():
     parser.add_argument(
         "--priority",
         "-P",
-        choices=["Prodigal_FragGeneScan", "FragGeneScan_Prodigal"],
-        default="Prodigal_FragGeneScan",
+        choices=["Pyrodigal_FragGeneScanRS", "FragGeneScanRS_Pyrodigal"],
+        default="Pyrodigal_FragGeneScanRS",
         help="Merge priority",
     )
     parser.add_argument(
@@ -386,27 +401,33 @@ def main():
         "-m",
         help="Regions for masking (Infernal cmsearch output file)",
     )
-    parser.add_argument("--prodigal-gff", "-pg", help="Prodigal *.gff file")
-    parser.add_argument("--prodigal-out", "-po", help="Prodigal *.out file")
+    parser.add_argument("--pyrodigal-gff", "-pg", help="Pyrodigal *.gff file")
+    parser.add_argument("--pyrodigal-out", "-po", help="Pyrodigal *.out file")
     parser.add_argument(
-        "--prodigal-ffn",
+        "--pyrodigal-ffn",
         "-pt",
         required=True,
-        help="Prodigal *.ffn file with transcripts",
+        help="Pyrodigal *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--prodigal-faa", "-pp", required=True, help="Prodigal *.faa file with proteins"
+        "--pyrodigal-faa",
+        "-pp",
+        required=True,
+        help="Pyrodigal *.faa file with proteins",
     )
-    parser.add_argument("--fgs-gff", "-fg", help="FragGeneScan *.gff file")
-    parser.add_argument("--fgs-out", "-fo", help="FragGeneScan *.out file")
+    parser.add_argument("--fgsrs-gff", "-fg", help="FragGeneScanRS *.gff file")
+    parser.add_argument("--fgsrs-out", "-fo", help="FragGeneScanRS *.out file")
     parser.add_argument(
-        "--fgs-ffn",
+        "--fgsrs-ffn",
         "-ft",
         required=True,
-        help="FragGeneScan *.ffn file with transcripts",
+        help="FragGeneScanRS *.ffn file with transcripts",
     )
     parser.add_argument(
-        "--fgs-faa", "-fp", required=True, help="FragGeneScan *.faa file with proteins"
+        "--fgsrs-faa",
+        "-fp",
+        required=True,
+        help="FragGeneScanRS *.faa file with proteins",
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
@@ -420,13 +441,15 @@ def main():
         datefmt="%Y/%m/%d %H:%M:%S",
     )
 
-    if not args.prodigal_out and not args.prodigal_gff:
+    if not args.pyrodigal_out and not args.pyrodigal_gff:
         parser.error(
-            "For Prodigal, you must provide either --prodigal-out or --prodigal-gff"
+            "For Pyrodigal, you must provide either --pyrodigal-out or --pyrodigal-gff"
         )
 
-    if not args.fgs_out and not args.fgs_gff:
-        parser.error("For FragGeneScan, you must provide either --fgs-out or --fgs-gff")
+    if not args.fgsrs_out and not args.fgsrs_gff:
+        parser.error(
+            "For FragGeneScanRS, you must provide either --fgsrs-out or --fgsrs-gff"
+        )
 
     summary = {}
     all_predictions = {}
@@ -434,17 +457,17 @@ def main():
     caller_priority = args.priority.split("_")
     logging.info(f"Caller priority: 1. {caller_priority[0]}, 2. {caller_priority[1]}")
 
-    logging.info("Parsing Prodigal annotations...")
-    if args.prodigal_out:
-        all_predictions["Prodigal"] = parse_prodigal_output(args.prodigal_out)
-    elif args.prodigal_gff:
-        all_predictions["Prodigal"] = parse_gff(args.prodigal_gff)
+    logging.info("Parsing Pyrodigal annotations...")
+    if args.pyrodigal_out:
+        all_predictions["Pyrodigal"] = parse_pyrodigal_output(args.pyrodigal_out)
+    elif args.pyrodigal_gff:
+        all_predictions["Pyrodigal"] = parse_gff(args.pyrodigal_gff)
 
-    logging.info("Parsing FragGeneScan annotations...")
-    if args.fgs_out:
-        all_predictions["FragGeneScan"] = parse_fgs_output(args.fgs_out)
-    elif args.fgs_gff:
-        all_predictions["FragGeneScan"] = parse_gff(args.fgs_gff)
+    logging.info("Parsing FragGeneScanRS annotations...")
+    if args.fgsrs_out:
+        all_predictions["FragGeneScanRS"] = parse_fgsrs_output(args.fgsrs_out)
+    elif args.fgsrs_gff:
+        all_predictions["FragGeneScanRS"] = parse_gff(args.fgsrs_gff)
 
     summary["all"] = get_counts(all_predictions)
 
@@ -467,8 +490,11 @@ def main():
     output_summary(summary, f"{args.name}.summary.txt")
     output_gff(merged_predictions, f"{args.name}.gff")
     files = {
-        "Prodigal": {"proteins": args.prodigal_faa, "transcripts": args.prodigal_ffn},
-        "FragGeneScan": {"proteins": args.fgs_faa, "transcripts": args.fgs_ffn},
+        "Pyrodigal": {
+            "proteins": args.pyrodigal_faa,
+            "transcripts": args.pyrodigal_ffn,
+        },
+        "FragGeneScanRS": {"proteins": args.fgsrs_faa, "transcripts": args.fgsrs_ffn},
     }
     output_fasta_files(
         merged_predictions,

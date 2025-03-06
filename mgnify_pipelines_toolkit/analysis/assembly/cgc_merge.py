@@ -252,7 +252,8 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
     the predicted genes after merging.
 
     Args:
-        predictions (dict): Nested dictionary with merged gene predictions.
+        predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
+            Each Interval object stores a protein ID in the data attribute.
         files_dict (dict): Dictionary containing input FASTA files for both Prodigal and FragGeneScan.
         output_faa (str): Path to output protein FASTA file.
         output_ffn (str): Path to output transcript FASTA file.
@@ -286,7 +287,8 @@ def output_gff(predictions, output_gff):
     Write merged gene predictions to a GFF output file.
 
     Args:
-        predictions (dict): Nested dictionary with merged gene predictions.
+        predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
+            Each Interval object stores a protein ID in the data attribute.
         output_gff (str): Path to the output GFF file.
     """
     with open(output_gff, "w") as gff_out:

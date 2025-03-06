@@ -136,7 +136,6 @@ def parse_cmsearch_output(mask_file):
         for line in file_in:
             if line.startswith("#"):
                 continue
-            # TODO maybe it's TSV?
             fields = line.rstrip().split()
             seq_id = fields[0]
             start = int(fields[7])
@@ -383,7 +382,7 @@ def main():
     parser.add_argument(
         "--mask",
         "-m",
-        help="Masked regions (in GFF or BED format)",  # TODO why GFF or BED?
+        help="Regions for masking (Infernal cmsearch output file)",
     )
     parser.add_argument("--prodigal-gff", "-pg", help="Prodigal *.gff file")
     parser.add_argument("--prodigal-out", "-po", help="Prodigal *.out file")

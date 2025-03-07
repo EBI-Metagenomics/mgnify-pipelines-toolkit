@@ -1,0 +1,29 @@
+- name: Add Rhea and CHEBI annotation test (FILE)
+  tags:
+    - add_rhea_chebi_annotation
+  command: >
+    python
+    -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    -p tests/fixtures/diamond/proteins_short.faa
+    -o short_test.tsv
+    -d tests/fixtures/diamond/diamond_short.tsv
+    --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv
+  exit_code: 0
+  files:
+    - path: "short_test.tsv"
+      md5sum: cbc725c9af469858b8ed48eb23ebbd40
+
+- name: Add Rhea and CHEBI annotation test (STDIN)
+  tags:
+    - add_rhea_chebi_annotation
+  command: >
+    bash -c "cat tests/fixtures/diamond/diamond_short.tsv |
+    python -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    -p tests/fixtures/diamond/proteins_short.faa
+    -o short_test.tsv
+    -d -
+    --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv"
+  exit_code: 0
+  files:
+    - path: "short_test.tsv"
+      md5sum: cbc725c9af469858b8ed48eb23ebbd40

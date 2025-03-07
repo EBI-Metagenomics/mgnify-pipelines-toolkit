@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "0.1.6"
+version = "0.2.2"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -19,7 +19,11 @@ dependencies = [
     "biopython==1.82",
     "numpy==1.26.0",
     "pandas==2.0.2",
-    "regex==2023.12.25"
+    "regex==2023.12.25",
+    "requests==2.32.3",
+    "click==8.1.7",
+    "pandera==0.22.1",
+    "pyfastx>=2.2.0",
 ]
 
 [build-system]
@@ -31,8 +35,10 @@ packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis",
             "mgnify_pipelines_toolkit.constants",
             "mgnify_pipelines_toolkit.utils",
+            "mgnify_pipelines_toolkit.schemas",
             "mgnify_pipelines_toolkit.analysis.shared",
-            "mgnify_pipelines_toolkit.analysis.amplicon"
+            "mgnify_pipelines_toolkit.analysis.amplicon",
+            "mgnify_pipelines_toolkit.analysis.assembly",
             ]
 
 [project.scripts]
@@ -42,6 +48,8 @@ get_subunits_coords = "mgnify_pipelines_toolkit.analysis.shared.get_subunits_coo
 mapseq2biom = "mgnify_pipelines_toolkit.analysis.shared.mapseq2biom:main"
 fastq_suffix_header_check = "mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check:main"
 library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strategy_check:main"
+study_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.study_summary_generator:cli"
+markergene_study_summary = "mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary:main"
 # analysis.amplicon
 are_there_primers = "mgnify_pipelines_toolkit.analysis.amplicon.are_there_primers:main"
 assess_inflection_point_mcp = "mgnify_pipelines_toolkit.analysis.amplicon.assess_inflection_point_mcp:main"
@@ -54,6 +62,11 @@ rev_comp_se_primers = "mgnify_pipelines_toolkit.analysis.amplicon.rev_comp_se_pr
 standard_primer_matching = "mgnify_pipelines_toolkit.analysis.amplicon.standard_primer_matching:main"
 mapseq_to_asv_table = "mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_table:main"
 primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification:main"
+# analysis.assembly
+add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation:main"
+cgc_merge = "mgnify_pipelines_toolkit.analysis.assembly.cgc_merge:combine_main"
+generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
+summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
 # utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
@@ -66,7 +79,11 @@ tests = [
     "biopython==1.82",
     "pandas==2.0.2",
     "numpy==1.26.0",
-    "regex==2023.12.25"
+    "regex==2023.12.25",
+    "requests==2.32.3",
+    "click==8.1.7",
+    "pandera==0.22.1",
+    "pyfastx>=2.2.0"
 ]
 
 dev = [

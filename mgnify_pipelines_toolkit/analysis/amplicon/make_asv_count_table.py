@@ -277,6 +277,8 @@ def main():
     taxa_df = taxa_df.fillna("0")
     taxa_df = order_df(taxa_df)
 
+    asv_list = taxa_df.ASV.to_list()
+
     amp_reads = [read.strip() for read in list(open(amp, "r"))]
     headers = [read.split(" ")[0][1:] for read in list(open(headers, "r"))]
     amp_region = ".".join(amp.split(".")[1:3])
@@ -288,7 +290,7 @@ def main():
         counter += 1
         line_fwd = line_fwd.strip()
 
-        if line_fwd == "0":
+        if line_fwd == "0" or f"seq_{line_fwd}" not in asv_list:
             continue
 
         if headers[counter] in amp_reads:

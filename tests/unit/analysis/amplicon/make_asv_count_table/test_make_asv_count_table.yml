@@ -15,4 +15,4 @@
       md5sum: 5b9ee7fe1109d728ab18a95c232b0c1b
     - path: "sample_concat.txt_asv_read_counts.tsv"
       contains:
-      - "seq_1\t828"
+      - "seq_2\t641"

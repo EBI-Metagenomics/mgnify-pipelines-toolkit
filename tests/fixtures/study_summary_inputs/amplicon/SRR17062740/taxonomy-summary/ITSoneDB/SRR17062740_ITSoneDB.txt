@@ -1,0 +1,8 @@
+23	sk__Eukaryota
+70	sk__Eukaryota	k__	p__Apicomplexa
+1	sk__Eukaryota	k__	p__Apicomplexa	c__Conoidasida	o__Eucoccidiorida
+1	sk__Eukaryota	k__	p__Apicomplexa	c__Conoidasida	o__Eucoccidiorida	f__Eimeriidae	g__Eimeria	s__Eimeria_sp.
+2	sk__Eukaryota	k__Fungi	p__Ascomycota
+3	sk__Eukaryota	k__Viridiplantae	p__Chlorophyta
+3	sk__Eukaryota	k__Viridiplantae	p__Chlorophyta	c__Trebouxiophyceae	o__Chlorellales
+50	sk__Eukaryota	k__Viridiplantae	p__Chlorophyta	c__Trebouxiophyceae	o__Chlorellales	f__Chlorellaceae

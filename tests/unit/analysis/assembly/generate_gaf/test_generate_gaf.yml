@@ -1,0 +1,18 @@
+- name: generate_gaf test_wrong_args
+  tags:
+    - generate_gaf
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.generate_gaf --chromosome X
+  stderr:
+    contains:
+      - "generate_gaf.py: error: the following arguments are required: -i/--ips_input, -o/--output"
+- name: generate_gaf test_correct_args
+  tags:
+    - generate_gaf
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.generate_gaf -i tests/fixtures/goslim/ips_out.tsv -o ERRTESTING
+  files:
+    - path: "ERRTESTING_ips_annotations.gaf"
+      contains:
+        - "EMG	GO:0042773	GO		GO:0042773	PMID:12069591	IEA		P			protein	taxon:1310605	20160528	InterPro"
+        - "EMG	GO:0003723	GO		GO:0003723	PMID:12069591	IEA		P			protein	taxon:1310605	20160528	InterPro"
+        - "EMG	GO:0003700	GO		GO:0003700	PMID:12069591	IEA		P			protein	taxon:1310605	20160528	InterPro"

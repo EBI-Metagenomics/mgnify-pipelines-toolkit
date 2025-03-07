@@ -1,0 +1,17 @@
+- name: markergene_study_summary test_wrong_args
+  tags:
+    - markergene_study_summary
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary --chromosome X
+  stderr:
+    contains:
+      - "markergene_study_summary.py: error: the following arguments are required: -i/--input_path, -r/--runs, -p/--prefix"
+- name: markergene_study_summary test_correct_args
+  tags:
+    - markergene_study_summary
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -p chunk1
+  files:
+    - path: "chunk1_markergene_study_summary.json"
+      md5sum: 334010bda9a60b7f43798870ff42fcda
+    - path: "chunk1_ampregion_study_summary.json"
+      md5sum: 222554a162c24f57a1cd6ce677b57adb

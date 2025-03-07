@@ -27,7 +27,6 @@ from mgnify_pipelines_toolkit.analysis.amplicon.amplicon_utils import (
 
 
 def parse_args(argv=None):
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -63,7 +62,9 @@ def are_there_primers_in_this_sample(path, rev=False):
         False if a primer was not identified
     """
 
-    read_count = get_read_count(path, "fastq")  # Get read count for fastq file
+    read_count = get_read_count(
+        path, file_type="fastq"
+    )  # Get read count for fastq file
     mcp_len = 100  # Script will look at first 100 base mcps (for rev=True, it will look at first 100 from 3' to 5')
 
     mcp_count_dict = fetch_mcp(
@@ -133,7 +134,6 @@ def save_out(results, sample_id, output):
 
 
 def main(argv=None):
-
     path, sample, output = parse_args(argv)
 
     fwd_primer_flag = are_there_primers_in_this_sample(

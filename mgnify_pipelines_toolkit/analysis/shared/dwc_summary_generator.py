@@ -26,8 +26,8 @@ import pyfastx
 logging.basicConfig(level=logging.DEBUG)
 
 URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
-RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession%2Csample_accession&limit=10&format=json&download=false"
-SAMPLES_URL = f"{URL}=sample&fields=lat%2Clon%2Ccollection_date%2Cdepth&limit=10&format=json&download=false"
+RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
+SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
 
 
@@ -67,7 +67,7 @@ def get_metadata_from_run_acc(run_acc):
     res_run = requests.get(query, headers=HEADERS)
 
     if res_run.status_code != 200:
-        logging.warning(f"Data not found for run {run_acc}")
+        logging.error(f"Data not found for run {run_acc}")
         return False
 
     sample_acc = res_run.json()[0]["sample_accession"]

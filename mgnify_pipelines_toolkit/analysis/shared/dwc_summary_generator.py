@@ -163,7 +163,7 @@ def get_asv_dict(runs_df, root_path):
 
         tax_file = sorted(
             list(
-                pathlib.Path(f"{root_path}/{run_acc}/asv").glob(
+                (pathlib.Path(root_path) / run_acc / "asv").glob(
                     "*_DADA2-SILVA_asv_tax.tsv"
                 )
             )

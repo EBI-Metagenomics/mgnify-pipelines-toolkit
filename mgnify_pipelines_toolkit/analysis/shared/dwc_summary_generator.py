@@ -1,3 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 from collections import defaultdict
 import pathlib
@@ -9,10 +25,10 @@ import pyfastx
 
 logging.basicConfig(level=logging.DEBUG)
 
-url = "https://www.ebi.ac.uk/ena/portal/api/search?result"
-runs_url = f"{url}=read_run&fields=secondary_study_accession%2Csample_accession&limit=10&format=json&download=false"
-samples_url = f"{url}=sample&fields=lat%2Clon%2Ccollection_date%2Cdepth&limit=10&format=json&download=false"
-headers = {"Accept": "application/json"}
+URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
+RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession%2Csample_accession&limit=10&format=json&download=false"
+SAMPLES_URL = f"{URL}=sample&fields=lat%2Clon%2Ccollection_date%2Cdepth&limit=10&format=json&download=false"
+HEADERS = {"Accept": "application/json"}
 
 
 def parse_args():
@@ -47,8 +63,8 @@ def parse_args():
 
 def get_metadata_from_run_acc(run_acc):
 
-    query = f"{runs_url}&includeAccessions={run_acc}"
-    res_run = requests.get(query, headers=headers)
+    query = f"{RUNS_URL}&includeAccessions={run_acc}"
+    res_run = requests.get(query, headers=HEADERS)
 
     if res_run.status_code != 200:
         logging.warning(f"Data not found for run {run_acc}")
@@ -56,8 +72,8 @@ def get_metadata_from_run_acc(run_acc):
 
     sample_acc = res_run.json()[0]["sample_accession"]
 
-    query = f"{samples_url}&includeAccessions={sample_acc}"
-    res_sample = requests.get(query, headers=headers)
+    query = f"{SAMPLES_URL}&includeAccessions={sample_acc}"
+    res_sample = requests.get(query, headers=HEADERS)
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 

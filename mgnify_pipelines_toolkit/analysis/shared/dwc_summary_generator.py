@@ -85,24 +85,9 @@ def get_metadata_from_run_acc(run_acc):
             full_res_dict[field] = "NA"
 
     if full_res_dict["collection_date"] == "":
-        full_res_dict["Year"] = "NA"
-        full_res_dict["Month"] = "NA"
-        full_res_dict["Day"] = "NA"
+        full_res_dict["collectionDate"] = "NA"
     else:
-        split_date = full_res_dict["collection_date"].split("-")
-
-        if len(split_date) == 3:
-            full_res_dict["Year"] = split_date[0]
-            full_res_dict["Month"] = split_date[1]
-            full_res_dict["Day"] = split_date[2]
-        elif len(split_date) == 2:
-            full_res_dict["Year"] = split_date[0]
-            full_res_dict["Month"] = split_date[1]
-            full_res_dict["Day"] = "NA"
-        elif len(split_date) == 1:
-            full_res_dict["Year"] = split_date[0]
-            full_res_dict["Month"] = "NA"
-            full_res_dict["Day"] = "NA"
+        full_res_dict["collectionDate"] = full_res_dict["collection_date"]
 
     del full_res_dict["collection_date"]
 
@@ -114,9 +99,7 @@ def get_metadata_from_run_acc(run_acc):
         "decimalLongitude",
         "depth",
         "decimalLatitude",
-        "Year",
-        "Month",
-        "Day",
+        "collectionDate",
     ]
 
     return res_df
@@ -158,9 +141,7 @@ def cleanup_taxa(df):
             "decimalLongitude",
             "decimalLatitude",
             "depth",
-            "Year",
-            "Month",
-            "Day",
+            "collectionDate",
             "Kingdom",
             "Phylum",
             "Class",

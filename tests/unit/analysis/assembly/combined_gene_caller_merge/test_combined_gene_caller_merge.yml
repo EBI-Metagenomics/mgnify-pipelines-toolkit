@@ -1,0 +1,52 @@
+- name: Combined Gene Caller merge test (out input, masking)
+  # This is for the pre-pyrodigal version, we changed the parameters for this
+  tags:
+    - combined_gen_caller_merge
+  command: >
+    python
+    -m mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge
+    -n prodigal_fgs
+    --pyrodigal-out tests/fixtures/combined_gene_caller_merge/input_prodigal.out
+    --pyrodigal-ffn tests/fixtures/combined_gene_caller_merge/input_prodigal.ffn
+    --pyrodigal-faa tests/fixtures/combined_gene_caller_merge/input_prodigal.faa
+    --fgsrs-out tests/fixtures/combined_gene_caller_merge/input_fgs.out
+    --fgsrs-ffn tests/fixtures/combined_gene_caller_merge/input_fgs.ffn
+    --fgsrs-faa tests/fixtures/combined_gene_caller_merge/input_fgs.faa
+    --mask tests/fixtures/combined_gene_caller_merge/cmsearch.all.tblout.deoverlapped
+    -v
+  files:
+    - path: "prodigal_fgs.faa"
+      md5sum: 1577a0613f7fa5c1d989dd5bd2b81397
+    - path: "prodigal_fgs.ffn"
+      md5sum: 9bac7cc2f074517fd8af849f0f3839e6
+
+- name: Combined Gene Caller merge test (gff input, no masking)
+  tags:
+    - combined_gen_caller_merge
+  command: >
+    python
+    -m mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge
+    -n pyrodigal_fgsrs
+    --pyrodigal-gff tests/fixtures/combined_gene_caller_merge/input_pyrodigal.gff
+    --pyrodigal-ffn tests/fixtures/combined_gene_caller_merge/input_pyrodigal.ffn
+    --pyrodigal-faa tests/fixtures/combined_gene_caller_merge/input_pyrodigal.faa
+    --fgsrs-gff tests/fixtures/combined_gene_caller_merge/input_fgsrs.gff
+    --fgsrs-ffn tests/fixtures/combined_gene_caller_merge/input_fgsrs.ffn
+    --fgsrs-faa tests/fixtures/combined_gene_caller_merge/input_fgsrs.faa
+    -v
+  files:
+    - path: "pyrodigal_fgsrs.faa"
+      md5sum: 85bd33338eebe4c7f6a49121fe1b839c
+    - path: "pyrodigal_fgsrs.ffn"
+      md5sum: dbe4300ce254687e182d89b94759c5f4
+    - path: "pyrodigal_fgsrs.gff"
+      md5sum: 774a5966f0cef53d3b17d4b5f432128e
+
+# TODO: we need to run and validate this
+# - name: fraggenescan_prodigal_with_masking
+#   command: python combined_gene_caller/cli.py -n fgs_prodigal --prodigal-out tests/test_data/input_prodigal.out --prodigal-ffn tests/test_data/input_prodigal.ffn --prodigal-faa tests/test_data/input_prodigal.faa --fgs-out tests/test_data/input_fgs.out --fgs-ffn tests/test_data/input_fgs.ffn --fgs-faa tests/test_data/input_fgs.faa --mask tests/test_data/cmsearch.all.tblout.deoverlapped --caller-priority fgs_prodigal -vvv
+#   files:
+#     - path: "fgs_prodigal.faa"
+#       md5sum: 4af531ceb8d697a2f5d7c98f6d161291
+#     - path: "fgs_prodigal.ffn"
+#       md5sum: a48b72cbc3ce184aee06df12d1387a7e

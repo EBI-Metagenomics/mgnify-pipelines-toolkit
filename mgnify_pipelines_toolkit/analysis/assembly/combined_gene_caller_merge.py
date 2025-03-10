@@ -291,6 +291,8 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 sequences = []
                 for record in SeqIO.parse(input_file, "fasta"):
                     if record.id in proteins:
+                        # Prodigal appends * to the end of a truncated sequence
+                        # FGS uses * to mark an ambiguous amino acid
                         # Replace ending * and replace any other "*" with "X"
                         record.seq = record.seq.rstrip("*").replace("*", "X")
                         sequences.append(record)

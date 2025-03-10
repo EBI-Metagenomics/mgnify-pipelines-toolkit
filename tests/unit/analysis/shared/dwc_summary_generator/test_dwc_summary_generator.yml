@@ -1,0 +1,15 @@
+- name: dwc_summary_generator test_wrong_args
+  tags:
+    - dwc_summary_generator
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator --chromosome X
+  stderr:
+    contains:
+      - "dwc_summary_generator.py: error: the following arguments are required: -i/--input_path, -r/--runs, -o/--output"
+- name: dwc_summary_generator test_correct_args
+  tags:
+    - dwc_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -o test
+  files:
+    - path: "test_dwcready.csv"
+      md5sum: aae241b37c354b62a67ac50b80f5544d

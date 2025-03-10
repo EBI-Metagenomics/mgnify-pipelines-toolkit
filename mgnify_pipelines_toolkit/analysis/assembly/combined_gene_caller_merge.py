@@ -291,10 +291,8 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 sequences = []
                 for record in SeqIO.parse(input_file, "fasta"):
                     if record.id in proteins:
-                        # Replace ending * #
-                        record.seq = record.seq.rstrip("*")
-                        # Replace "*" with "X"
-                        record.seq = record.seq.replace("*", "X")
+                        # Replace ending * and replace any other "*" with "X"
+                        record.seq = record.seq.rstrip("*").replace("*", "X")
                         sequences.append(record)
                 SeqIO.write(sequences, output_file, "fasta")
 

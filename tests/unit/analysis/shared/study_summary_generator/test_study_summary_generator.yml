@@ -67,3 +67,25 @@
       md5sum: 89d3251dc5b143bd08ee17613417d3e7
     - path: "merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
       md5sum: 503fa9bf4df51de93482710679c11268
+- name: study_summary_generator test_singleton_summarise
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_3.csv -p singleton
+  files:
+    - path: "singleton_PR2_study_summary.tsv"
+      md5sum: 89dfddaa6d206627f2d3485988c28fec
+    - path: "singleton_SILVA-SSU_study_summary.tsv"
+      md5sum: ba9468fdbde331afe860ac37101bdd4c
+    - path: "singleton_DADA2-PR2_16S-V3-V4_asv_study_summary.tsv"
+      md5sum: f6a5ff7f68d6fec9c13a03c5a316a104
+    - path: "singleton_DADA2-SILVA_16S-V3-V4_asv_study_summary.tsv"
+      md5sum: e2bc6dda92eca3302a5168bb1274777a
+- name: study_summary_generator test_singleton_merge
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator merge -a tests/fixtures/study_summary_inputs/amplicon/singleton -p singleton-merged
+  files:
+    - path: "singleton-merged_SILVA-SSU_study_summary.tsv"
+      md5sum: ba9468fdbde331afe860ac37101bdd4c  # identical copy of single run
+    - path: "singleton-merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
+      md5sum: f6a5ff7f68d6fec9c13a03c5a316a104

@@ -89,3 +89,12 @@
       md5sum: ba9468fdbde331afe860ac37101bdd4c  # identical copy of single run
     - path: "singleton-merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
       md5sum: f6a5ff7f68d6fec9c13a03c5a316a104
+- name: study_summary_generator test_schema_error_handling
+  tags:
+    - study_summary_generator
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_4.csv -p empty --non_insdc
+  exit_code: 1
+  stderr:
+    contains:
+      - "TaxonSchema validation failure for tests/fixtures/study_summary_inputs/amplicon/EMPTY/taxonomy-summary/SILVA-SSU/EMPTY_SILVA-SSU.txt"
+      - "DATATYPE_COERCION"

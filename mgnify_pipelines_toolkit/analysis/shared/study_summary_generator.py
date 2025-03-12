@@ -35,6 +35,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     AmpliconNonINSDCPassedRunsSchema,
     TaxonSchema,
     PR2TaxonSchema,
+    validate_dataframe,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -129,9 +130,9 @@ def parse_one_tax_file(
     # Two different schemas used for validation depending on the database
     # because PR2 schema has different taxonomic ranks than the standard
     if len(long_tax_ranks) == 8:
-        TaxonSchema(res_df)
+        validate_dataframe(res_df, TaxonSchema, str(tax_file))
     elif len(long_tax_ranks) == 9:
-        PR2TaxonSchema(res_df)
+        validate_dataframe(res_df, PR2TaxonSchema, str(tax_file))
 
     res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
         lambda x: ";".join(x).strip(";"), axis=1

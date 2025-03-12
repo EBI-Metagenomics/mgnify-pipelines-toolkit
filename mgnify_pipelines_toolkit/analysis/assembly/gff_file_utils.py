@@ -28,8 +28,15 @@ def write_results_to_file(
         contig_list = check_for_additional_keys(
             ncrnas, trnas, crispr_annotations, contig_list
         )
-        # sort contigs by digit at the end of contig name e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
-        contig_list = sorted(list(contig_list), key=lambda x: int(x.split("_")[-1]))
+        # sort contigs by digit at the end of contig/genome accession
+        if (
+            contig_list[0][0:4] == "MGYG"
+        ):  # e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
+            contig_list = sorted(list(contig_list), key=lambda x: int(x.split("_")[-1]))
+        elif contig_list[0][0:4] == "MGYA":  # e.g. 'MGYA1', 'MGYA2', 'MGYA3'
+            contig_list = sorted(
+                list(contig_list), key=lambda x: int(x.split("MGYA")[-1])
+            )
 
         for contig in contig_list:
             sorted_pos_list = sort_positions(

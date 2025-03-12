@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import shutil
+from shutil import SameFileError
 
 # Copyright 2024-2025 EMBL - European Bioinformatics Institute
 #
@@ -33,6 +35,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     AmpliconNonINSDCPassedRunsSchema,
     TaxonSchema,
     PR2TaxonSchema,
+    validate_dataframe,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -127,9 +130,9 @@ def parse_one_tax_file(
     # Two different schemas used for validation depending on the database
     # because PR2 schema has different taxonomic ranks than the standard
     if len(long_tax_ranks) == 8:
-        TaxonSchema(res_df)
+        validate_dataframe(res_df, TaxonSchema, str(tax_file))
     elif len(long_tax_ranks) == 9:
-        PR2TaxonSchema(res_df)
+        validate_dataframe(res_df, PR2TaxonSchema, str(tax_file))
 
     res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
         lambda x: ";".join(x).strip(";"), axis=1
@@ -205,9 +208,7 @@ def generate_db_summary(
                 amp_region_dict[amp_region].append(amp_region_df)
 
         for amp_region, amp_region_dfs in amp_region_dict.items():
-            if (
-                len(amp_region_dfs) > 1
-            ):  # Need at least two analyses with this amp_region to bother with the summary
+            if amp_region_dfs:
                 amp_res_df = amp_region_dfs[0]
                 for amp_df in amp_region_dfs[1:]:
                     amp_res_df = amp_res_df.join(amp_df, how="outer")
@@ -319,9 +320,7 @@ def summarise_analyses(
             if tax_file:
                 tax_files[run_acc] = tax_file
 
-        if (
-            len(tax_files) > 1
-        ):  # If at least two analyses have results from the current DB, generate a study-level summary for it
+        if tax_files:
             generate_db_summary(db_label, tax_files, output_prefix)
 
 
@@ -356,12 +355,12 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
     :type output_prefix: str
     """
 
-    # TODO: The way we grab all the summaries might change depending on how the prefect side does things
     all_study_summaries = glob.glob(f"{analyses_dir}/*_study_summary.tsv")
 
     summaries_dict = organise_study_summaries(all_study_summaries)
 
     for db_label, summaries in summaries_dict.items():
+        merged_summary_name = f"{output_prefix}_{db_label}_study_summary.tsv"
         if len(summaries) > 1:
             res_df = pd.read_csv(summaries[0], sep="\t", index_col=0)
             for summary in summaries[1:]:
@@ -372,10 +371,18 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
 
             res_df = res_df.reindex(sorted(res_df.columns), axis=1)
             res_df.to_csv(
-                f"{output_prefix}_{db_label}_study_summary.tsv",
+                merged_summary_name,
                 sep="\t",
                 index_label="taxonomy",
             )
+        elif len(summaries) == 1:
+            logging.info(
+                f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
+            )
+            try:
+                shutil.copyfile(summaries[0], merged_summary_name)
+            except SameFileError:
+                pass
 
 
 if __name__ == "__main__":

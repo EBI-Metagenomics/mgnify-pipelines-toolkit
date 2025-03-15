@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.0.0"
+version = "1.0.1"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -65,7 +65,7 @@ mapseq_to_asv_table = "mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_
 primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification:main"
 # analysis.assembly
 add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation:main"
-combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge:combine_main"
+combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge:main"
 generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
 summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
 dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.assembly.dwc_summary_generator:main"

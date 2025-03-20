@@ -1,0 +1,7 @@
+- name: convert cmscan table into cmsearch table
+  tags:
+    - cmscan_to_cmsearch
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.convert_cmscan_to_cmsearch_tblout -i tests/fixtures/rna_prediction/test.cmscan_matches.tbl -o test.cmsearch_converted.tbl
+  files:
+    - path: "test.cmsearch.tbl"
+      md5sum: 3d7488f9388f179ab1e1ba45cfafe400

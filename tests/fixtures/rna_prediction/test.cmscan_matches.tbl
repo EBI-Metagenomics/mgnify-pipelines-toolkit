@@ -1,0 +1,17 @@
+#target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+SSU_rRNA_eukarya     RF01960   SRR17062740.1        -          cm      582     1025        1      452      + 5'&3'    4 0.46   0.1  274.7   6.3e-85 !   Eukaryotic small subunit ribosomal RNA
+SSU_rRNA_eukarya     RF01960   SRR17062740.10       -          cm      582     1025        1      437      + 5'&3'    4 0.48   0.0  287.5   7.9e-89 !   Eukaryotic small subunit ribosomal RNA
+SSU_rRNA_eukarya     RF01960   SRR17062740.100      -          cm      582     1025        1      450      + 5'&3'    4 0.42   2.4  296.7   1.2e-91 !   Eukaryotic small subunit ribosomal RNA
+SSU_rRNA_eukarya     RF01960   SRR17062740.1000     -          cm      582     1025        1      444      + 5'&3'    4 0.42   2.5  292.2   2.8e-90 !   Eukaryotic small subunit ribosomal RNA
+SSU_rRNA_eukarya     RF01960   SRR17062740.10000    -          cm      582     1025        1      442      + 5'&3'    4 0.41   0.6  303.9   7.8e-94 !   Eukaryotic small subunit ribosomal RNA
+#
+# Program:         cmscan
+# Version:         1.1.5 (Sep 2023)
+# Pipeline mode:   SCAN
+# Query file:      test.fasta
+# Target file:     rfam/test.cm
+# Option settings: cmscan --tblout test.cmscan_matches.tbl --cpu 2 rfam/test.cm test.fasta 
+# Current dir:     /Users/kates/Desktop/EBI/MGnify/nf-modules/work/51/6dd14b8e298979a61019e53615d49e
+# Date:            Thu Mar 20 10:10:55 2025
+# [ok]

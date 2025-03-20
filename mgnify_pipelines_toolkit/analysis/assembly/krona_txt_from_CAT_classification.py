@@ -110,9 +110,8 @@ def main():
             else:
                 taxid_lineage = row[3].split(";")
                 # TODO clean up this logic:
-                # If the sixth column (superkingdom) is 'NA' classify as unclassified
                 # It's the case when protein was classificated as environmental sample type, e.g. 'gut metagenome'
-                if len(taxid_lineage) > 1 and taxid_lineage[1] == 2787823:
+                if len(taxid_lineage) > 1 and taxid_lineage[1] == "2787823":
                     lineage = "unclassified"
                     lineage_counter[lineage] += 1
                     continue

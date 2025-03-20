@@ -1,6 +1,5 @@
 # contig	classification	reason	lineage	lineage scores (f: 0.5)	superkingdom	phylum	class	order	family	genus	species
 ERZ1761047.6904-contig-6071	taxid assigned	based on 2/2 ORFs	1;131567;2759	1.00;1.00;0.63	Eukaryota: 0.63	no support	no support	no support	no support	no support	no support
-ERZ1761047.10529-contig-9997	taxid assigned	based on 1/2 ORFs	1;10239;2731341;2731360;2731618;2731619;28883;10662;196896;2827612	1.00;1.00;1.00;1.00;1.00;1.00;1.00;1.00;1.00;1.00	Viruses: 1.00	Uroviricota: 1.00	Caudoviricetes: 1.00	Caudovirales: 1.00	Myoviridae: 1.00	NA	Myoviridae sp. ctfJc17: 1.00
 ERZ1761047.10257-contig-972	taxid assigned	based on 363/402 ORFs	1;131567;2;1783272;1239	1.00;0.96;0.95;0.92;0.91	Bacteria: 0.95	Firmicutes: 0.91	no support	no support	no support	no support	no support
 ERZ1761047.10258-contig-9720	taxid assigned	based on 1/1 ORFs	1;131567;2;1783272;1239	1.00;1.00;1.00;1.00;1.00	Bacteria: 1.00	Firmicutes: 1.00	no support	no support	no support	no support	no support
 ERZ1761047.10259-contig-9721	taxid assigned	based on 5/5 ORFs	1;131567;2;1783272;1239	1.00;0.69;0.69;0.61;0.61	Bacteria: 0.69	Firmicutes: 0.61	no support	no support	no support	no support	no support

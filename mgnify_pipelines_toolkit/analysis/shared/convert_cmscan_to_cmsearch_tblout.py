@@ -12,18 +12,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """
     Script to convert cmscan-table to cmsearch-table (swap columns 1 and 2 with 3 and 4)
 
     input example:
-    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
-    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
-    SSU_rRNA_eukarya     RF01960   SRR17062740.1        -          cm      582     1025        1      452      + 5'&3'    4 0.46   0.1  274.7   6.3e-85 !   Eukaryotic small subunit ribosomal RNA
+    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
+    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
+    SSU_rRNA_eukarya     RF01960   SRR17062740.1        -          cm      582     1025        1      452      + ..
 
     expected output:
-    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
-    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
-    SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      452      + 5'&3'    4 0.46   0.1  274.7   3.1e-84 !   1/1 merged_301_151
+    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
+    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
+    SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      452      + ..
 
 """
 
@@ -34,8 +35,12 @@ from itertools import accumulate
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(description="Convert cmscan table to cmsearch table")
-    parser.add_argument("-i", "--input", dest="input", help="Input cmscan file", required=True)
+    parser = argparse.ArgumentParser(
+        description="Convert cmscan table to cmsearch table"
+    )
+    parser.add_argument(
+        "-i", "--input", dest="input", help="Input cmscan file", required=True
+    )
     parser.add_argument(
         "-o", "--output", dest="output", help="Output filename", required=True
     )
@@ -45,9 +50,9 @@ def parse_args(argv):
 def open_file(filename):
     """Detects and opens a file, whether compressed or not."""
     if filename.endswith(".gz"):
-        return gzip.open(filename, 'rt')  # Read as text mode
+        return gzip.open(filename, "rt")  # Read as text mode
     else:
-        return open(filename, 'r')  # Regular uncompressed file
+        return open(filename, "r")  # Regular uncompressed file
 
 
 class TableModifier:
@@ -69,22 +74,40 @@ class TableModifier:
             self.output_file, "w"
         ) as file_out:
             header_written = False
-            separator_line, header = '', ''
+            separator_line, header = "", ""
             for line in file_in:
                 if line.startswith("#"):
-                    if '--' in line:
-                        separator_line = line.split(' ')
-                        separator_line[0] = separator_line[0].replace('#', '-')
-                        lengths = [0] + list(accumulate(len(s) + 1 for s in separator_line))
+                    if "--" in line:
+                        separator_line = line.split(" ")
+                        separator_line[0] = separator_line[0].replace("#", "-")
+                        lengths = [0] + list(
+                            accumulate(len(s) + 1 for s in separator_line)
+                        )
                     else:
                         header = line
                 else:
-                    coord_to_keep = len(' '.join(separator_line[0:4]))
+                    coord_to_keep = len(" ".join(separator_line[0:4]))
                     if not header_written:
                         file_out.write(header)
-                        file_out.write(' '.join(['#'+separator_line[2][1:], separator_line[3], separator_line[0].replace('#', ''), separator_line[1]] + separator_line[4:]))
+                        file_out.write(
+                            " ".join(
+                                [
+                                    "#" + separator_line[2][1:],
+                                    separator_line[3],
+                                    separator_line[0].replace("#", ""),
+                                    separator_line[1],
+                                ]
+                                + separator_line[4:]
+                            )
+                        )
                         header_written = True
-                    new_line = line[lengths[2]:lengths[3]] + line[lengths[3]:lengths[4]] + line[lengths[0]:lengths[1]] + line[lengths[1]:lengths[2]] + line[coord_to_keep+1:]
+                    new_line = (
+                        line[lengths[2] : lengths[3]]
+                        + line[lengths[3] : lengths[4]]
+                        + line[lengths[0] : lengths[1]]
+                        + line[lengths[1] : lengths[2]]
+                        + line[coord_to_keep + 1 :]
+                    )
                     file_out.write(new_line)
 
 

@@ -6,10 +6,29 @@
   stderr:
     contains:
       - "get_subunits.py: error: the following arguments are required: -i/--input, -n/--name"
-- name: get_subunits test_correct_args
+
+- name: get_subunits test_subunits
   tags:
     - get_subunits
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/sequences/test.fasta -n sample
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample
   files:
     - path: "sequence-categorisation/sample_SSU.fasta"
+      md5sum: fb23f13526672a300845b767dbc5fd44
+    - path: "sequence-categorisation/sample_other_ncRNA.fasta"
+      md5sum: 93a24d51016d608109b831647e2e6c8c
+    - path: "sequence-categorisation/sample_5_8S.fasta"
+      md5sum: 1e6f3b0c24ef337bcf7213d62d50884e
+
+- name: get_subunits test_subunits_and_models
+  tags:
+    - get_subunits
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample --separate-subunits-by-models
+  files:
+    - path: "sequence-categorisation/sample_SSU.fasta"
+      md5sum: fb23f13526672a300845b767dbc5fd44
+    - path: "sequence-categorisation/sample_other_ncRNA.fasta"
+      md5sum: 93a24d51016d608109b831647e2e6c8c
+    - path: "sequence-categorisation/sample_5_8S.fasta"
+      md5sum: 1e6f3b0c24ef337bcf7213d62d50884e
+    - path: "sequence-categorisation/sample_SSU_rRNA_eukarya.RF01960.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44

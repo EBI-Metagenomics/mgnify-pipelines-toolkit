@@ -1,10 +1,10 @@
-1	sk__Eukaryota
-5	sk__Bacteria	k__Bacillati	p__Bacillota
 9	unclassified
-1	sk__Bacteria	k__Bacillati	p__Bacillota	c__	o__	f__	g__	s__Firmicutes bacterium CAG:822
-1	sk__Bacteria	k__Bacillati	p__Bacillota	c__	o__	f__	g__Candidatus Faecenecus	s__Candidatus Faecenecus gallistercoris
+5	sk__Bacteria	k__Bacillati	p__Bacillota
 3	sk__Bacteria	k__	p__Bacteroidota	c__Bacteroidia	o__Bacteroidales	f__Rikenellaceae	g__Alistipes
 3	sk__Bacteria	k__Bacillati	p__Bacillota	c__Clostridia	o__Eubacteriales	f__Oscillospiraceae
+1	sk__Eukaryota
+1	sk__Bacteria	k__Bacillati	p__Bacillota	c__	o__	f__	g__	s__Firmicutes bacterium CAG:822
+1	sk__Bacteria	k__Bacillati	p__Bacillota	c__	o__	f__	g__Candidatus Faecenecus	s__Candidatus Faecenecus gallistercoris
 1	sk__Bacteria	k__Bacillati	p__Bacillota	c__Clostridia	o__Eubacteriales	f__Clostridiaceae	g__Clostridium	s__Clostridium sp. CAG:245_30_32
 1	sk__Bacteria	k__Bacillati	p__Bacillota	c__Clostridia	o__Eubacteriales	f__Clostridiaceae	g__Clostridium	s__Clostridium sp. 27_14
 1	sk__Bacteria	k__Bacillati	p__Bacillota	c__Clostridia	o__Eubacteriales	f__Clostridiaceae	g__Clostridium	s__Clostridium sp. 26_22

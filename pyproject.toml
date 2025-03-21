@@ -65,6 +65,7 @@ standard_primer_matching = "mgnify_pipelines_toolkit.analysis.amplicon.standard_
 mapseq_to_asv_table = "mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_table:main"
 primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification:main"
 # analysis.assembly
+krona_txt_from_cat_classification = "mgnify_pipelines_toolkit.analysis.assembly.krona_txt_from_cat_classification:main"
 add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation:main"
 combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge:main"
 generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"

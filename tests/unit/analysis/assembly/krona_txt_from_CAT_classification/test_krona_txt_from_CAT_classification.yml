@@ -1,14 +1,14 @@
-- name: krona_txt_from_CAT_classification_test
+- name: krona_txt_from_cat_classification_test
   tags:
-    - krona_txt_from_CAT_classification
+    - krona_txt_from_cat_classification
   command: >
     python
-    -m mgnify_pipelines_toolkit.analysis.assembly.krona_txt_from_CAT_classification
-    --input tests/fixtures/krona_txt_from_CAT/cat.tsv
+    -m mgnify_pipelines_toolkit.analysis.assembly.krona_txt_from_cat_classification
+    --input tests/fixtures/cat_classification/cat.tsv
     --output test_krona.txt
-    --names_dmp tests/fixtures/krona_txt_from_CAT/names.dmp
-    --nodes_dmp tests/fixtures/krona_txt_from_CAT/nodes.dmp
+    --names_dmp tests/fixtures/cat_classification/names.dmp
+    --nodes_dmp tests/fixtures/cat_classification/nodes.dmp
   exit_code: 0
   files:
     - path: "test_krona.txt"
-      md5sum: 5c40b76793cbd17b31662c29a5c39c2b
+      md5sum: 62e1bcaac47b979cafb7364cdc48eafa

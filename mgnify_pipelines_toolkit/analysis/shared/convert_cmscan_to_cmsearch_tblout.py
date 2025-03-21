@@ -30,7 +30,7 @@
 
 import sys
 import argparse
-import gzip
+import fileinput
 from itertools import accumulate
 
 
@@ -45,14 +45,6 @@ def parse_args(argv):
         "-o", "--output", dest="output", help="Output filename", required=True
     )
     return parser.parse_args(argv)
-
-
-def open_file(filename):
-    """Detects and opens a file, whether compressed or not."""
-    if filename.endswith(".gz"):
-        return gzip.open(filename, "rt")  # Read as text mode
-    else:
-        return open(filename, "r")  # Regular uncompressed file
 
 
 class TableModifier:
@@ -70,7 +62,7 @@ class TableModifier:
         self.output_file = output_file
 
     def modify_table(self):
-        with open_file(self.input_file) as file_in, open(
+        with fileinput.hook_compressed(self.input_file, "rt") as file_in, open(
             self.output_file, "w"
         ) as file_out:
             header_written = False

@@ -123,7 +123,7 @@ def main():
 
     logging.info(f"Writting output to {args.output}")
     with open(args.output, "w") as outfile:
-        for lineage, count in lineage_counter.items():
+        for lineage, count in lineage_counter.most_common():
             outfile.write(f"{count}\t{lineage}\n")
 
     logging.info("Done")

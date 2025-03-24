@@ -1,0 +1,8 @@
+- name: parse_tRNA
+  tags:
+    - parse_tRNA
+    - parse_trna
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.parse_tRNA --input tests/fixtures/rna_prediction/genome_sm_stats.out --output genome_tRNA_20aa.out
+  files:
+    - path: "genome_tRNA_20aa.out"
+      md5sum: bd45dd41c74347ef50da6ddd3dd6d2ab

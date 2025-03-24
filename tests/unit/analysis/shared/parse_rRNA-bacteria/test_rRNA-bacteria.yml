@@ -1,0 +1,9 @@
+- name: parse_rRNA-bacteria
+  tags:
+    - parse_rrna_bacteria
+    - parse_rRNA_bacteria
+    - parse_rrna_genome
+  command: python -m mgnify_pipelines_toolkit.analysis.shared.parse_rRNA-bacteria --input tests/fixtures/rna_prediction/genome.ncrna.deoverlap.tbl -o genome_rRNAs.out -s cmscan
+  files:
+    - path: "genome_rRNAs.out"
+      md5sum: e5cb88fdf863dbc1ae78fd3c9db5a549

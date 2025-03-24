@@ -12,6 +12,10 @@
   command: python -m mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims -go tests/fixtures/goslim/go-dummy.obo -gb tests/fixtures/goslim/goslim_banding_2024.txt -gaf tests/fixtures/goslim/ERRTESTING_ips_annotations.gaf  -i tests/fixtures/goslim/ips_out.tsv -o ERRTESTING_TERMS
   files:
     - path: "ERRTESTING_TERMS"
-      md5sum: ddf9aa47da0a848795fffb56d9ac3c96
+      md5sum: c24ea2f0b0763052a18190b77a61bd42
+      contains:
+        - "GO:0003824\tcatalytic activity\tmolecular_function\t3"
     - path: "ERRTESTING_TERMS_slim"
-      md5sum: ce50e0507a12ef0d70bd41b14926c5d5
+      md5sum: c2ce302a04dd3cfa52488edf0b08744a
+      contains:
+        - "GO:0003824\tcatalytic activity\tmolecular_function\t3"

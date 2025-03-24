@@ -52,7 +52,7 @@ library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strat
 study_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.study_summary_generator:cli"
 markergene_study_summary = "mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary:main"
 convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.convert_cmscan_to_cmsearch_tblout:main"
-parse_rRNA-bacteria = "mgnify_pipelines_toolkit.analysis.shared.parse_rRNA-bacteria.main"
+parse_rRNA_bacteria = "mgnify_pipelines_toolkit.analysis.shared.parse_rRNA_bacteria.main"
 parse_tRNA = "mgnify_pipelines_toolkit.analysis.shared.parse_tRNA.main"
 rRNA2seq = "mgnify_pipelines_toolkit.analysis.shared.rRNA2seq.main"
 # analysis.amplicon

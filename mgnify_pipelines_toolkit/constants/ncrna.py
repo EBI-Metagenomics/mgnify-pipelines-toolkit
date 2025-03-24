@@ -60,3 +60,25 @@ RFAM_MODELS = {
     LSU_rRNA_bacteria: "RF02541",
     LSU_rRNA_eukarya: "RF02543",
 }
+
+TRNA = [
+    "Ala",
+    "Gly",
+    "Pro",
+    "Thr",
+    "Val",
+    "Ser",
+    "Arg",
+    "Leu",
+    "Phe",
+    "Asn",
+    "Lys",
+    "Asp",
+    "Glu",
+    "His",
+    "Gln",
+    "Ile",
+    "Tyr",
+    "Cys",
+    "Trp",
+]

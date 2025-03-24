@@ -22,12 +22,18 @@ import argparse
 from mgnify_pipelines_toolkit.constants.ncrna import TRNA
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Script detects tRNA")
-    parser.add_argument("-i", "--input", dest="input", help="trnas_stats.out",
-                        required=True)
-    parser.add_argument("-o", "--output", dest="output", help="Name of the file to save the output to",
-                        required=False)
+    parser.add_argument(
+        "-i", "--input", dest="input", help="trnas_stats.out", required=True
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="output",
+        help="Name of the file to save the output to",
+        required=False,
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -48,9 +54,15 @@ if __name__ == "__main__":
                         if (aa_pred in TRNA or "Met" in aa_pred) and counts > 0:
                             trnas += 1
 
-        new_line = "{name}\t{trnas}".format(name=os.path.basename(args.input).split("_stats")[0], trnas=trnas)
+        new_line = "{name}\t{trnas}".format(
+            name=os.path.basename(args.input).split("_stats")[0], trnas=trnas
+        )
         if args.output:
             with open(args.output, "w") as file_out:
                 file_out.write(new_line)
         else:
             print(new_line)
+
+
+if __name__ == "__main__":
+    main()

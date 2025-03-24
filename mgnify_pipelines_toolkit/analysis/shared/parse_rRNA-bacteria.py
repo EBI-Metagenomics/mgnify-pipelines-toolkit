@@ -41,18 +41,26 @@ def get_tblout_column_indices(tool):
         return cmscan_indices
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Script detects bacretia rRNA")
     parser.add_argument(
         "-i", "--input", dest="input", help="rrna.tblout.deoverlapped", required=True
     )
     parser.add_argument(
-        "-s", "--source", dest="source", help="Program that generated the tblout file",
-        choices=['cmsearch', 'cmscan'], required=False, default="cmsearch"
+        "-s",
+        "--source",
+        dest="source",
+        help="Program that generated the tblout file",
+        choices=["cmsearch", "cmscan"],
+        required=False,
+        default="cmsearch",
     )
     parser.add_argument(
-        "-o", "--outfile", dest="outfile", help="Path to file where the output will be saved to",
-        required=False
+        "-o",
+        "--outfile",
+        dest="outfile",
+        help="Path to file where the output will be saved to",
+        required=False,
     )
 
     args = parser.parse_args()
@@ -85,7 +93,7 @@ if __name__ == "__main__":
                     saved[0] = i[0]
                     saved[1] = i[1]
             rRNAs_merged[ele].append(tuple(saved))
-        except:
+        except (KeyError, IndexError, TypeError):
             rRNAs_merged[ele] = [0, 0]
 
     # calculate total length based on merged intervals
@@ -100,12 +108,18 @@ if __name__ == "__main__":
         for interval in rRNAs_merged[rna]:
             try:
                 totalLen += interval[1] - interval[0]
-            except:
+            except (KeyError, IndexError, TypeError):
                 totalLen = 0
-        new_line = "{}\t{}\t{:.2f}\n".format(run_name, rna, float(totalLen) / rRNAs_exp[rna] * 100)
+        new_line = "{}\t{}\t{:.2f}\n".format(
+            run_name, rna, float(totalLen) / rRNAs_exp[rna] * 100
+        )
         if args.outfile:
             file_out.write(new_line)
         else:
             print(new_line)
     if args.outfile:
         file_out.close()
+
+
+if __name__ == "__main__":
+    main()

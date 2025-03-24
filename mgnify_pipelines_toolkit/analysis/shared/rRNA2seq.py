@@ -46,8 +46,10 @@ def get_tblout_column_indices(tool):
         return cmscan_indices
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Script generates a fasta file for rRNA")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Script generates a fasta file for rRNA"
+    )
     parser.add_argument(
         "-i", "--input", dest="input", help="Input fasta", required=True
     )
@@ -55,12 +57,20 @@ if __name__ == "__main__":
         "-d", "--drep", dest="drep", help="tblout.deoverlapped", required=True
     )
     parser.add_argument(
-        "-s", "--source", dest="source", help="Program that generated the tblout file",
-        choices=['cmsearch', 'cmscan'], required=False, default="cmsearch"
+        "-s",
+        "--source",
+        dest="source",
+        help="Program that generated the tblout file",
+        choices=["cmsearch", "cmscan"],
+        required=False,
+        default="cmsearch",
     )
     parser.add_argument(
-        "-o", "--outfile", dest="outfile", help="Path to file where the output FASTA will be saved to",
-        required=False
+        "-o",
+        "--outfile",
+        dest="outfile",
+        help="Path to file where the output FASTA will be saved to",
+        required=False,
     )
     args = parser.parse_args()
     hits = {}
@@ -105,13 +115,12 @@ if __name__ == "__main__":
                 if contig.split("__")[0] == record.id:
                     start = hits[contig][0] - 1
                     end = hits[contig][1]
-                    length = end - start
                     seq = record.seq[start:end]
                     name = (
-                            ">"
-                            + os.path.basename(sys.argv[2]).split(".")[0]
-                            + "__"
-                            + contig
+                        ">"
+                        + os.path.basename(sys.argv[2]).split(".")[0]
+                        + "__"
+                        + contig
                     )
                     if args.outfile:
                         file_out.write("{name}\n{seq}\n".format(name=name, seq=seq))
@@ -119,3 +128,7 @@ if __name__ == "__main__":
                         print("{name}\n{seq}".format(name=name, seq=seq))
     if args.outfile:
         file_out.close()
+
+
+if __name__ == "__main__":
+    main()

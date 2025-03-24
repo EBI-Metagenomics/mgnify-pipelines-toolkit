@@ -18,9 +18,17 @@
 import os
 import argparse
 
-rRNAs_exp = {"5S_rRNA": 119, "SSU_rRNA_bacteria": 1533, "LSU_rRNA_bacteria": 2925}
-rRNAs_obs = {"5S_rRNA": [], "SSU_rRNA_bacteria": [], "LSU_rRNA_bacteria": []}
-rRNAs_merged = {}
+rRNAs_exp = {  # noqa: N816
+    "5S_rRNA": 119,
+    "SSU_rRNA_bacteria": 1533,
+    "LSU_rRNA_bacteria": 2925,
+}
+rRNAs_obs = {  # noqa: N816
+    "5S_rRNA": [],
+    "SSU_rRNA_bacteria": [],
+    "LSU_rRNA_bacteria": [],
+}
+rRNAs_merged = {}  # noqa: N816
 
 
 def get_tblout_column_indices(tool):
@@ -106,14 +114,14 @@ def main():
         file_out = open(args.outfile, "w")
 
     for rna in rRNAs_merged.keys():
-        totalLen = 0
+        total_length = 0
         for interval in rRNAs_merged[rna]:
             try:
-                totalLen += interval[1] - interval[0]
+                total_length += interval[1] - interval[0]
             except (KeyError, IndexError, TypeError):
-                totalLen = 0
+                total_length = 0
         new_line = "{}\t{}\t{:.2f}\n".format(
-            run_name, rna, float(totalLen) / rRNAs_exp[rna] * 100
+            run_name, rna, float(total_length) / rRNAs_exp[rna] * 100
         )
         if args.outfile:
             file_out.write(new_line)

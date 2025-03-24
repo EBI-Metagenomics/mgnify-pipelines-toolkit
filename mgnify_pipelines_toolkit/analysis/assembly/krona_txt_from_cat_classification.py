@@ -109,12 +109,6 @@ def main():
                 lineage = "unclassified"
             else:
                 taxid_lineage = row[3].split(";")
-                # TODO clean up this logic:
-                # It's the case when protein was classificated as environmental sample type, e.g. 'gut metagenome'
-                if len(taxid_lineage) > 1 and taxid_lineage[1] == "2787823":
-                    lineage = "unclassified"
-                    lineage_counter[lineage] += 1
-                    continue
                 names_lineage = convert_to_official_names(
                     taxid_lineage, taxid2rank, taxid2name
                 )

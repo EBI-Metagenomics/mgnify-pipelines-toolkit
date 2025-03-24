@@ -2,21 +2,21 @@
   tags:
     - fastq_suffix_header_check
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check --chromosome X
+  command: fastq_suffix_header_check --chromosome X
   stderr:
     contains:
-      - "fastq_suffix_header_check.py: error: the following arguments are required: -f/--fwd, -s/--sample, -o/--output"
+      - "fastq_suffix_header_check: error: the following arguments are required: -f/--fwd, -s/--sample, -o/--output"
 - name: fastq_suffix_header_check test_correct_args_no_errors
   tags:
     - fastq_suffix_header_check
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check -f tests/fixtures/sequences/ERR4674038_1.fastq.gz -r tests/fixtures/sequences/ERR4674038_2.fastq.gz -s ERR4674038 -o ./
+  command: fastq_suffix_header_check -f tests/fixtures/sequences/ERR4674038_1.fastq.gz -r tests/fixtures/sequences/ERR4674038_2.fastq.gz -s ERR4674038 -o ./
   files:
     - path: "ERR4674038_suffix_header_err.json"
       md5sum: d41d8cd98f00b204e9800998ecf8427e
 - name: fastq_suffix_header_check test_correct_args_yes_errors
   tags:
     - fastq_suffix_header_check
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.fastq_suffix_header_check -f tests/fixtures/sequences/ERR4674038witherror_1.fastq.gz -r tests/fixtures/sequences/ERR4674038witherror_2.fastq.gz -s ERR4674038 -o ./
+  command: fastq_suffix_header_check -f tests/fixtures/sequences/ERR4674038witherror_1.fastq.gz -r tests/fixtures/sequences/ERR4674038witherror_2.fastq.gz -s ERR4674038 -o ./
   files:
     - path: "ERR4674038_suffix_header_err.json"
       md5sum: ed6e75d7d6b921ac5fce25e47e8809ca

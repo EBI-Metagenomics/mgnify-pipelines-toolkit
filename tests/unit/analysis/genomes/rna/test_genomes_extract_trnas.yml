@@ -1,0 +1,9 @@
+- name: genomes_extract_trnas
+  tags:
+    - genomes
+    - genomes/rna
+    - genomes/trna
+  command: genomes_extract_trnas --input tests/fixtures/rna_prediction/genome_sm_stats.out --output genome_tRNA_20aa.out
+  files:
+    - path: "genome_tRNA_20aa.out"
+      md5sum: bd45dd41c74347ef50da6ddd3dd6d2ab

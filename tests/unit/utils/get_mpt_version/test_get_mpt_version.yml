@@ -5,4 +5,4 @@
   stdout:
     contains_regex:
     - '\d\.\d\.\d'
-  command: python -m mgnify_pipelines_toolkit.utils.get_mpt_version
+  command: get_mpt_version

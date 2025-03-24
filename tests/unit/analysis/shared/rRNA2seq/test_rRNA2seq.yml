@@ -1,8 +1,0 @@
-- name: parse_rRNA2seq
-  tags:
-    - parse_rRNA2seq
-    - parse_rrna2seq
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.rRNA2seq -i tests/fixtures/rna_prediction/genome_rRNAs.fasta -d tests/fixtures/rna_prediction/genome.ncrna.deoverlap.tbl -s cmscan -o genome_rRNAs.fasta
-  files:
-    - path: "genome_rRNAs.fasta"
-      md5sum: 7bb392d4b45adf14bf1ecae8a7ee8578

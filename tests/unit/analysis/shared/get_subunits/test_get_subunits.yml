@@ -2,15 +2,15 @@
   tags:
     - get_subunits
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits --chromosome X
+  command: get_subunits --chromosome X
   stderr:
     contains:
-      - "get_subunits.py: error: the following arguments are required: -i/--input, -n/--name"
+      - "get_subunits: error: the following arguments are required: -i/--input, -n/--name"
 
 - name: get_subunits test_subunits
   tags:
     - get_subunits
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample
+  command: get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample
   files:
     - path: "sequence-categorisation/sample_SSU.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44
@@ -22,7 +22,7 @@
 - name: get_subunits test_subunits_and_models
   tags:
     - get_subunits
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample --separate-subunits-by-models
+  command: get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample --separate-subunits-by-models
   files:
     - path: "sequence-categorisation/sample_SSU.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44

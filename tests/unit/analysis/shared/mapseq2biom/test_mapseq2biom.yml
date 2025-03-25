@@ -2,14 +2,14 @@
   tags:
     - mapseq2biom
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.mapseq2biom --chromosome X
+  command: mapseq2biom --chromosome X
   stderr:
     contains:
-      - "mapseq2biom.py: error: the following arguments are required: --otu-table, --query, --out-file, --no-tax-id-file"
+      - "mapseq2biom: error: the following arguments are required: --otu-table, --query, --out-file, --no-tax-id-file"
 - name: mapseq2biom test_correct_args
   tags:
     - mapseq2biom
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.mapseq2biom --out-file sample.tsv --krona sample.txt --no-tax-id sample.notaxid.tsv --taxid --label sample --query tests/fixtures/misc/test.mseq --otu-table tests/fixtures/misc/silva_ssu.otu
+  command: mapseq2biom --out-file sample.tsv --krona sample.txt --no-tax-id sample.notaxid.tsv --taxid --label sample --query tests/fixtures/misc/test.mseq --otu-table tests/fixtures/misc/silva_ssu.otu
   files:
     - path: "sample.txt"
       md5sum: 8f5b16db9a82e4f2cc200d65ff500083

@@ -1,0 +1,9 @@
+- name: genomes_extract_bacterial_rrnas_as_tsv
+  tags:
+    - genomes
+    - genomes/rna
+    - genomes/rrna
+  command: genomes_extract_bacterial_rrnas_as_tsv --input tests/fixtures/rna_prediction/genome.ncrna.deoverlap.tbl -o genome_rRNAs.tsv -s cmscan
+  files:
+    - path: "genome_rRNAs.tsv"
+      md5sum: e5cb88fdf863dbc1ae78fd3c9db5a549

@@ -2,14 +2,14 @@
   tags:
     - antismash_gff_builder
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder --chromosome X
+  command: antismash_gff_builder --chromosome X
   stderr:
     contains:
-      - "antismash_gff_builder.py: error: the following arguments are required: -i/--input, -o/--output"
+      - "antismash_gff_builder: error: the following arguments are required: -i/--input, -o/--output"
 - name: antismash_gff_builder test_correct_args
   tags:
     - antismash_gff_builder
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder -i tests/fixtures/misc/test_antismash.json -o test.gff --cds_tag ID
+  command: antismash_gff_builder -i tests/fixtures/misc/test_antismash.json -o test.gff --cds_tag ID
   files:
     - path: "test.gff"
       md5sum: 381a0c0d7e221f8817d84f36153444c4
@@ -17,7 +17,7 @@
   tags:
     - antismash_gff_builder
   exit_code: 1
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder -i tests/fixtures/misc/test_antismash.json -o test.gff --cds_tag IDD
+  command: antismash_gff_builder -i tests/fixtures/misc/test_antismash.json -o test.gff --cds_tag IDD
   stderr:
     contains:
       - "KeyError: 'IDD'"

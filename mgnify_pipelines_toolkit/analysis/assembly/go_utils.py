@@ -84,52 +84,51 @@ def parse_interproscan_tsv(ips_file: Path, mapped_go_terms: dict = None) -> dict
     previous_protein_acc = None
     go_annotations_single_protein = set()
 
-    fr = open(ips_file, "r")
     go_pattern = re.compile("GO:\\d+")
 
-    for line in fr:
-        # IPS files are parsed line by line - the same protein accession will appear multiple lines in a row with different annotation
-        line_counter += 1
-        line = line.strip()
-        chunks = line.split("\t")
-        # Get protein accession
-        current_protein_acc = chunks[0]
+    with open(ips_file, "r") as fr:
 
-        # TODO: not sure if this line is needed - do we ever have more than one protein in a single line of IPS?
-        # Will keep just in case
-        num_of_proteins = len(current_protein_acc.split("|"))
+        for line in fr:
+            # IPS files are parsed line by line - the same protein accession will appear multiple lines in a row with different annotation
+            line_counter += 1
+            line = line.strip()
+            chunks = line.split("\t")
+            # Get protein accession
+            current_protein_acc = chunks[0]
 
-        # If we're at a new protein accession in the IPS file then we finally increment
-        # the go2protein_count dictionary for each term that was found in that protein
-        if current_protein_acc != previous_protein_acc:
-            total_num_of_proteins += 1
-            if len(go_annotations_single_protein) > 0:
-                num_of_proteins_with_go += 1
-                go2protein_count = count_and_assign_go_annotations(
-                    go2protein_count,
-                    go_annotations_single_protein,
-                    num_of_proteins,
-                    mapped_go_terms,
-                )
-            # reset GO id set because we hit a new protein accession
-            go_annotations_single_protein = set()
-            previous_protein_acc = current_protein_acc
+            # TODO: not sure if this line is needed - do we ever have more than one protein in a single line of IPS?
+            # Will keep just in case
+            num_of_proteins = len(current_protein_acc.split("|"))
 
-        # Parse out GO annotations
-        # GO annotations are associated to InterPro entries (InterPro entries start with 'IPR')
-        # Than use the regex to extract the GO Ids (e.g. GO:0009842)
-        if len(chunks) >= 13 and chunks[11].startswith("IPR"):
-            for go_annotation in go_pattern.findall(line):
-                go_annotations_single_protein.add(go_annotation)
+            # If we're at a new protein accession in the IPS file then we finally increment
+            # the go2protein_count dictionary for each term that was found in that protein
+            if current_protein_acc != previous_protein_acc:
+                total_num_of_proteins += 1
+                if len(go_annotations_single_protein) > 0:
+                    num_of_proteins_with_go += 1
+                    go2protein_count = count_and_assign_go_annotations(
+                        go2protein_count,
+                        go_annotations_single_protein,
+                        num_of_proteins,
+                        mapped_go_terms,
+                    )
+                # reset GO id set because we hit a new protein accession
+                go_annotations_single_protein = set()
+                previous_protein_acc = current_protein_acc
 
-    # Do final counting for the last protein
-    go2protein_count = count_and_assign_go_annotations(
-        go2protein_count,
-        go_annotations_single_protein,
-        num_of_proteins,
-        mapped_go_terms,
-    )
+            # Parse out GO annotations
+            # GO annotations are associated to InterPro entries (InterPro entries start with 'IPR')
+            # Than use the regex to extract the GO Ids (e.g. GO:0009842)
+            if len(chunks) >= 13 and chunks[11].startswith("IPR"):
+                for go_annotation in go_pattern.findall(line):
+                    go_annotations_single_protein.add(go_annotation)
 
-    fr.close()
+        # Do final counting for the last protein
+        go2protein_count = count_and_assign_go_annotations(
+            go2protein_count,
+            go_annotations_single_protein,
+            num_of_proteins,
+            mapped_go_terms,
+        )
 
     return go2protein_count

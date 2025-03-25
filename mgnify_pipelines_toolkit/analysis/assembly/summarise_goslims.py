@@ -15,9 +15,10 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
+import csv
 import logging
 import os
+from collections import defaultdict
 from pathlib import Path
 
 from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_interproscan_tsv
@@ -28,7 +29,6 @@ logging.basicConfig(
 
 
 def parse_args():
-
     description = "Go slim pipeline."
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
@@ -59,46 +59,56 @@ def parse_args():
 
 
 def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
-
     mapped_go_dict = defaultdict(set)
     if os.path.exists(gaf_file):
-        handle = open(gaf_file, "r")
-        for line in handle:
-            if not line.startswith("!"):
-                line = line.strip()
-                splitted_line = line.split("\t")
-                go_id = splitted_line[1]
-                mapped_go_id = splitted_line[4]
-                mapped_go_dict[go_id].add(mapped_go_id)
-
+        with open(gaf_file, "r") as handle:
+            for line in handle:
+                if not line.startswith("!"):
+                    line = line.strip()
+                    splitted_line = line.split("\t")
+                    go_id = splitted_line[1]
+                    mapped_go_id = splitted_line[4]
+                    mapped_go_dict[go_id].add(mapped_go_id)
     return mapped_go_dict
 
 
 def get_go_slim_summary(go_slim_banding_file, goslims2_protein_count):
     summary = []
 
-    fr = open(go_slim_banding_file, "r")
-
-    for line in fr:
-        if line.startswith("GO"):
-            line = line.strip()
-            line_chunks = line.split("\t")
-            go_id = line_chunks[0]
-            term = line_chunks[1]
-            category = line_chunks[2]
-            # Default value for the count
-            count = 0
-            if go_id in goslims2_protein_count:
-                count = goslims2_protein_count[go_id]
-            summary.append((go_id, term, category, count))
+    with open(go_slim_banding_file, "r") as fr:
+        for line in fr:
+            if line.startswith("GO"):
+                line = line.strip()
+                line_chunks = line.split("\t")
+                go_id = line_chunks[0]
+                term = line_chunks[1]
+                category = line_chunks[2]
+                # Default value for the count
+                count = 0
+                if go_id in goslims2_protein_count:
+                    count = goslims2_protein_count[go_id]
+                summary.append((go_id, term, category, count))
     return summary
 
 
 def write_go_summary_to_file(go_summary, output_file):
-    fw = open(output_file, "w")
-    for go, term, category, count in go_summary:
-        fw.write('","'.join(['"' + go, term, category, str(count) + '"']) + "\n")
-    fw.close()
+    """
+    Write a sorted GO summary to a TSV file.
+
+    :param go_summary: A list of tuples, where each tuple contains the following
+                       elements:
+                       - go (str): The GO identifier.
+                       - term (str): The GO term description.
+                       - category (str): The category of the GO term.
+                       - count (int): The count associated with the GO term.
+    :param output_file: The path to the output TSV file where the sorted GO
+    """
+    sorted_go_summary = sorted(go_summary, key=lambda x: x[3], reverse=True)
+    with open(output_file, "w", newline="") as fw:
+        tsv_writer = csv.writer(fw, delimiter="\t")
+        tsv_writer.writerow(["go", "term", "category", "count"])
+        for go, term, category, count in sorted_go_summary:
+            tsv_writer.writerow([go, term, category, count])
 
 
 def parse_gene_ontology(obo_file):
@@ -108,23 +118,22 @@ def parse_gene_ontology(obo_file):
     :return:
     """
     go_term_tuples = []
-    fr = open(obo_file, "r")
-    id, term, category = "", "", ""
-    for line in fr:
-        line = line.strip()
-        split_line = line.split(": ")
-        if line.startswith("id:"):
-            id = split_line[1]
-        elif line.startswith("name:"):
-            term = split_line[1]
-        elif line.startswith("namespace"):
-            category = split_line[1]
-        else:
-            if id.startswith("GO:") and id and term and category:
-                item = (id, term, category)
-                go_term_tuples.append(item)
-                id, term, category = "", "", ""
-    fr.close()
+    with open(obo_file, "r") as fr:
+        id, term, category = "", "", ""
+        for line in fr:
+            line = line.strip()
+            split_line = line.split(": ")
+            if line.startswith("id:"):
+                id = split_line[1]
+            elif line.startswith("name:"):
+                term = split_line[1]
+            elif line.startswith("namespace"):
+                category = split_line[1]
+            else:
+                if id.startswith("GO:") and id and term and category:
+                    item = (id, term, category)
+                    go_term_tuples.append(item)
+                    id, term, category = "", "", ""
     return go_term_tuples
 
 
@@ -132,7 +141,6 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_
     summary = []
 
     for go_id, term, category in core_gene_ontology:
-
         if (go_id in go2protein_count_dict) and (
             go_id not in top_level_go_ids
         ):  # make sure that top level terms are not included (they tell you nothing!)
@@ -143,7 +151,6 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_
 
 
 def main():
-
     go_obo, go_banding, gaf_input, ips_input, output = parse_args()
 
     logging.info("Parsing the InterProScan input: " + ips_input)

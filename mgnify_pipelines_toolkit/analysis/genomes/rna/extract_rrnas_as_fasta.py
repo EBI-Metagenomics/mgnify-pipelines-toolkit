@@ -67,7 +67,11 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-d", "--deoverlapped", dest="deoverlapped", help="tblout.deoverlapped", required=True
+        "-d",
+        "--deoverlapped",
+        dest="deoverlapped",
+        help="tblout.deoverlapped",
+        required=True,
     )
     parser.add_argument(
         "-s",

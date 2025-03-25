@@ -67,7 +67,7 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-d", "--drep", dest="drep", help="tblout.deoverlapped", required=True
+        "-d", "--deoverlaped", dest="deoverlaped", help="tblout.deoverlapped", required=True
     )
     parser.add_argument(
         "-s",
@@ -89,7 +89,7 @@ def main():
     hits = {}
     added = {}
     idx = get_tblout_column_indices(args.source)
-    with open(args.drep, "r") as f:
+    with open(args.deoverlaped, "r") as f:
         for line in f:
             line = line.strip("\n")
             if line.startswith("#"):

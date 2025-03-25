@@ -2,14 +2,14 @@
   tags:
     - summarise_goslims
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims --chromosome X
+  command: summarise_goslims --chromosome X
   stderr:
     contains:
-      - "summarise_goslims.py: error: the following arguments are required: -go/--go_obo, -gb/--go_banding, -gaf/--gaf_input, -i/--ips_input, -o/--output"
+      - "summarise_goslims: error: the following arguments are required: -go/--go_obo, -gb/--go_banding, -gaf/--gaf_input, -i/--ips_input, -o/--output"
 - name: summarise_goslims test_correct_args
   tags:
     - summarise_goslims
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims -go tests/fixtures/goslim/go-dummy.obo -gb tests/fixtures/goslim/goslim_banding_2024.txt -gaf tests/fixtures/goslim/ERRTESTING_ips_annotations.gaf  -i tests/fixtures/goslim/ips_out.tsv -o ERRTESTING_TERMS
+  command: summarise_goslims -go tests/fixtures/goslim/go-dummy.obo -gb tests/fixtures/goslim/goslim_banding_2024.txt -gaf tests/fixtures/goslim/ERRTESTING_ips_annotations.gaf  -i tests/fixtures/goslim/ips_out.tsv -o ERRTESTING_TERMS
   files:
     - path: "ERRTESTING_TERMS"
       md5sum: c24ea2f0b0763052a18190b77a61bd42

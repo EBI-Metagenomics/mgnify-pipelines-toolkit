@@ -2,8 +2,7 @@
   tags:
     - add_rhea_chebi_annotation
   command: >
-    python
-    -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    add_rhea_chebi_annotation
     -p tests/fixtures/diamond/proteins_short.faa
     -o short_test.tsv
     -d tests/fixtures/diamond/diamond_short.tsv
@@ -18,7 +17,7 @@
     - add_rhea_chebi_annotation
   command: >
     bash -c "cat tests/fixtures/diamond/diamond_short.tsv |
-    python -m mgnify_pipelines_toolkit.analysis.assembly.add_rhea_chebi_annotation
+    add_rhea_chebi_annotation
     -p tests/fixtures/diamond/proteins_short.faa
     -o short_test.tsv
     -d -

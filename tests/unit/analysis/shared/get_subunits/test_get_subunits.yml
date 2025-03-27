@@ -15,9 +15,9 @@
     - path: "sequence-categorisation/sample_SSU.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44
     - path: "sequence-categorisation/sample_other_ncRNA.fasta"
-      md5sum: 93a24d51016d608109b831647e2e6c8c
+      md5sum: a6c09d412a577463874374bffab17e37
     - path: "sequence-categorisation/sample_5_8S.fasta"
-      md5sum: 1e6f3b0c24ef337bcf7213d62d50884e
+      md5sum: 505fad1e25a2d322518c4116d0afea97
 
 - name: get_subunits test_subunits_and_models
   tags:

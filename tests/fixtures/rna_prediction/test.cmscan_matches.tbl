@@ -11,7 +11,7 @@ SSU_rRNA_eukarya     RF01960   SRR17062740.10000    -          cm      582     1
 # Pipeline mode:   SCAN
 # Query file:      test.fasta
 # Target file:     rfam/test.cm
-# Option settings: cmscan --tblout test.cmscan_matches.tbl --cpu 2 rfam/test.cm test.fasta 
+# Option settings: cmscan --tblout test.cmscan_matches.tbl --cpu 2 rfam/test.cm test.fasta
 # Current dir:     /Users/kates/Desktop/EBI/MGnify/nf-modules/work/51/6dd14b8e298979a61019e53615d49e
 # Date:            Thu Mar 20 10:10:55 2025
 # [ok]

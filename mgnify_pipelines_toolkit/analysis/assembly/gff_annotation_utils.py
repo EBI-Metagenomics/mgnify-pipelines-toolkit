@@ -18,7 +18,10 @@
 import re
 import sys
 
-from mgnify_pipelines_toolkit.constants.thresholds import EVALUE_CUTOFF_IPS, EVALUE_CUTOFF_EGGNOG
+from mgnify_pipelines_toolkit.constants.thresholds import (
+    EVALUE_CUTOFF_IPS,
+    EVALUE_CUTOFF_EGGNOG,
+)
 
 
 def get_iprs(ipr_annot):
@@ -138,7 +141,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                     type_value = ""
                     as_product = ""
                     for a in annotations.split(
-                            ";"
+                        ";"
                     ):  # go through all parts of the annotation field
                         if a.startswith("as_type="):
                             type_value = a.split("=")[1]
@@ -170,7 +173,9 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         {"bgc_function": type_value},
                     )
                     if as_product:
-                        tool_result[contig]["_".join([start_pos, end_pos])]["bgc_product"] = as_product
+                        tool_result[contig]["_".join([start_pos, end_pos])][
+                            "bgc_product"
+                        ] = as_product
     # identify CDSs that fall into each of the clusters annotated by the BGC tool
     with open(prokka_gff, "r") as gff_in:
         for line in gff_in:
@@ -228,8 +233,9 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                             },
                         )
                         if "bgc_product" in tool_result[contig][matching_interval]:
-                            bgc_annotations[cds_id]["antismash_product"] = tool_result[contig][matching_interval][
-                                "bgc_product"]
+                            bgc_annotations[cds_id]["antismash_product"] = tool_result[
+                                contig
+                            ][matching_interval]["bgc_product"]
             elif line.startswith("##FASTA"):
                 break
     return bgc_annotations
@@ -543,7 +549,11 @@ def get_ncrnas(ncrnas_file):
                     # Skip tRNAs, we add them from tRNAscan-SE
                     continue
                 strand = cols[11]
-                start, end = (int(cols[9]), int(cols[10])) if strand == "+" else (int(cols[10]), int(cols[9]))
+                start, end = (
+                    (int(cols[9]), int(cols[10]))
+                    if strand == "+"
+                    else (int(cols[10]), int(cols[9]))
+                )
                 rna_feature_name, ncrna_class = prepare_rna_gff_fields(cols)
                 annot = [
                     "ID=" + locus,
@@ -718,7 +728,10 @@ def prepare_rna_gff_fields(cols):
     }
 
     if rna_feature_name == "ncRNA":
-        ncrna_class = next((rna_type for rna_type, rfams in rna_types.items() if cols[2] in rfams), None)
+        ncrna_class = next(
+            (rna_type for rna_type, rfams in rna_types.items() if cols[2] in rfams),
+            None,
+        )
         if not ncrna_class:
             if "microRNA" in cols[-1]:
                 ncrna_class = "pre_miRNA"

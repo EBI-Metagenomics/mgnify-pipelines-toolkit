@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.0.3"
+version = "1.0.4"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -16,15 +16,15 @@ classifiers = [
 ]
 
 dependencies = [
-    "biopython==1.82",
-    "numpy==1.26.0",
-    "pandas==2.0.2",
-    "regex==2023.12.25",
-    "requests==2.32.3",
-    "click==8.1.7",
-    "pandera==0.22.1",
-    "pyfastx>=2.2.0",
-    "intervaltree==3.1.0",
+    "biopython>=1.85",
+    "numpy>=2.2.4,<3",
+    "pandas>=2.2.3,<3",
+    "regex>=2024.11.6",
+    "requests>=2.32.3,<3",
+    "click>=8.1.8,<9",
+    "pandera>=0.23.1,<0.24",
+    "pyfastx>=2.2.0,<3",
+    "intervaltree>=3.1.0,<4",
 ]
 
 [build-system]
@@ -84,23 +84,14 @@ get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
 [project.optional-dependencies]
 tests = [
-    "pytest==7.4.0",
-    "pytest-md==0.2.0",
-    "pytest-workflow==2.0.1",
-    "biopython==1.82",
-    "pandas==2.0.2",
-    "numpy==1.26.0",
-    "regex==2023.12.25",
-    "requests==2.32.3",
-    "click==8.1.7",
-    "pandera==0.22.1",
-    "pyfastx>=2.2.0"
+    "pytest>=8.3.5,<9",
+    "pytest-md>=0.2.0",
+    "pytest-workflow==2.1.0",
 ]
 
 dev = [
-    "mgnify_pipelines_toolkit[tests]",
-    "pre-commit==3.8.0",
-    "black==24.8.0",
-    "flake8==7.1.1",
-    "pep8-naming==0.14.1"
+    "pre-commit>=4.2.0",
+    "black>=25.1.0",
+    "flake8>=7.1.2",
+    "pep8-naming>=0.14.1"
 ]

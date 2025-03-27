@@ -1,0 +1,16 @@
+- name: mgnify2mimic_inputs_help
+  tags:
+    - mgnify2mimic_inputs
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.mgnify2mimc_inputs --help
+  stdout:
+    contains:
+      - "usage: mgnify2mimic_inputs --mgnify_study MGYGXXXXXX --metagenome_vector_prefix mgnify_metagenome_vector.tsv"
+- name: mgnify2mimic_inputs_test
+  tags:
+    - mgnify2mimic_inputs
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.mgnify2mimc_inputs --mgnify_study MGYS00006624 --metagenome_vector_file metagenome_pfam_vector.tsv
+  stdout:
+    contains:
+      - "extracting pfams for MGYA00725015"
+      - "extracting pfams for MGYA00725017"
+      - "extracting pfams for MGYA00725018"

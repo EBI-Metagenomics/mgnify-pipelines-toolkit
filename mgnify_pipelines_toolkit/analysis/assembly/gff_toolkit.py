@@ -166,8 +166,17 @@ def parse_args():
         "--pseudogene-report", help="Pseudogene report filename", required=False
     )
 
+<<<<<<< HEAD
     args = parser.parse_args()
     return (
+=======
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(
+>>>>>>> 3731144 (add mgnify_mimic_inputs scripts)
         args.gff_input,
         args.ips,
         args.eggnog,
@@ -185,7 +194,10 @@ def parse_args():
         args.outfile,
         args.pseudogene_report,
     )
+<<<<<<< HEAD
 
 
 if __name__ == "__main__":
     main()
+=======
+>>>>>>> 3731144 (add mgnify_mimic_inputs scripts)

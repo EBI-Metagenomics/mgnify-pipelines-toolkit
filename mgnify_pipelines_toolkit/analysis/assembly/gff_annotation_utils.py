@@ -23,6 +23,7 @@ from mgnify_pipelines_toolkit.constants.thresholds import (
     EVALUE_CUTOFF_IPS,
     EVALUE_CUTOFF_EGGNOG,
 )
+<<<<<<< HEAD
 
 DBCAN_CLASSES_DICT = {
     "TC": "dbcan_transporter_classification",
@@ -30,6 +31,8 @@ DBCAN_CLASSES_DICT = {
     "STP": "dbcan_signal_transduction_prot",
     "CAZyme": "dbcan_prot_family",
 }
+=======
+>>>>>>> 3731144 (add mgnify_mimic_inputs scripts)
 
 
 def get_iprs(ipr_annot):
@@ -601,9 +604,17 @@ def get_ncrnas(ncrnas_file):
                     # Skip tRNAs, we add them from tRNAscan-SE
                     continue
                 strand = cols[11]
+<<<<<<< HEAD
                 start, end = int(cols[10]), int(cols[9])
                 if strand == "+":
                     start, end = end, start
+=======
+                start, end = (
+                    (int(cols[9]), int(cols[10]))
+                    if strand == "+"
+                    else (int(cols[10]), int(cols[9]))
+                )
+>>>>>>> 3731144 (add mgnify_mimic_inputs scripts)
                 rna_feature_name, ncrna_class = prepare_rna_gff_fields(cols)
                 annot = [
                     "ID=" + locus,

@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.0.7"
+version = "1.0.8"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -72,26 +72,24 @@ add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea
 combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge:main"
 generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
 summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
-antismash_gff_builder = "mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder:main"
-summarise_sanntis_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_sanntis_bgcs:main"
-summarise_antismash_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_antismash_bgcs:main"
-gff_toolkit = "mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit:main"
-process_dbcan_clusters = "mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_clusters:main"
-process_dbcan_cazys = "mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_cazys:main"
-# genomes #
-genomes_extract_bacterial_rrnas_as_tsv = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_bacterial_rrnas_as_tsv:main"
-genomes_extract_rrnas_as_fasta = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_rrnas_as_fasta:main"
-genomes_extract_trnas = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_trnas:main"
-
+dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.assembly.dwc_summary_generator:main"
 # utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
 [project.optional-dependencies]
 tests = [
-    "pytest>=8.3.5,<9",
-    "pytest-md>=0.2.0",
-    "pytest-workflow==2.1.0",
+    "pytest==7.4.0",
+    "pytest-md==0.2.0",
+    "pytest-workflow==2.0.1",
+    "biopython==1.82",
+    "pandas==2.0.2",
+    "numpy==1.26.0",
+    "regex==2023.12.25",
+    "requests==2.32.3",
+    "click==8.1.7",
+    "pandera==0.22.1",
+    "pyfastx>=2.2.0"
 ]
 
 dev = [

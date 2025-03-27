@@ -63,9 +63,13 @@ class TableModifier:
 
     def modify_table(self):
         with (
+<<<<<<< HEAD
             fileinput.hook_compressed(
                 self.input_file, "r", encoding="utf-8"
             ) as file_in,
+=======
+            fileinput.hook_compressed(self.input_file, "rt") as file_in,
+>>>>>>> 3731144 (add mgnify_mimic_inputs scripts)
             open(self.output_file, "w") as file_out,
         ):
             header_written = False

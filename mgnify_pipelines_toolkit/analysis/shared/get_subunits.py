@@ -108,7 +108,7 @@ def main():
 
     open_files = {}
     for record in SeqIO.parse(args.input, "fasta"):
-        model = "-".join(record.id.split("/")[0].split("-")[-1:])
+        model = "-".join("/".join(record.id.split("/")[:-1]).split("-")[-1:])
         if model in SSU_MODELS:
             if SSU not in open_files:
                 file_out = open(pattern_dict[SSU], "w")

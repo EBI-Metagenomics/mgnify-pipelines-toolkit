@@ -40,10 +40,12 @@ def import_nodes(nodes_dmp):
     taxid2rank = {}
 
     with open(nodes_dmp) as f1:
-        reader = csv.reader(f1, delimiter="\t")
-        for line in reader:
-            taxid = line[0]
-            rank = line[4]
+        for line in f1:
+            fields = [part.strip() for part in line.split("|")]
+            if len(fields) != 14:
+                raise ValueError(f"Unexpected number of columns in line: {line}")
+            taxid = fields[0]
+            rank = fields[2]
             taxid2rank[taxid] = rank
 
     return taxid2rank
@@ -54,11 +56,13 @@ def import_names(names_dmp):
     taxid2name = {}
 
     with open(names_dmp, newline="") as f1:
-        reader = csv.reader(f1, delimiter="\t")
-        for line in reader:
-            if line[6] == "scientific name":
-                taxid = line[0]
-                name = line[2]
+        for line in f1:
+            fields = [part.strip() for part in line.split("|")]
+            if len(fields) != 5:
+                raise ValueError(f"Unexpected number of columns in line: {line}")
+            if fields[3] == "scientific name":
+                taxid = fields[0]
+                name = fields[1]
                 taxid2name[taxid] = name
 
     return taxid2name

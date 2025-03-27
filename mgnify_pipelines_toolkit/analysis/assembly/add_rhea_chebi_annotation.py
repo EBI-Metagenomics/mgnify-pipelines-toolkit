@@ -78,7 +78,11 @@ def main():
         "--output",
         required=True,
         type=Path,
-        help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, rhea_ids, CHEBI reaction participants",
+        help=(
+            "Output TSV file with columns: contig_id, protein_id, protein hash, "
+            "Rhea IDs, CHEBI reaction, reaction definition, 'top hit' if it is "
+            "the first hit for the protein"
+        ),
     )
     parser.add_argument(
         "-p",

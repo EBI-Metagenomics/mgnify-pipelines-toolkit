@@ -17,7 +17,6 @@
 import argparse
 import fileinput
 import logging
-import os
 import pandas as pd
 
 logging.basicConfig(
@@ -28,10 +27,10 @@ logging.basicConfig(
 def parse_args():
     description = "Sanntis output summary."
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("-i", "--sanntis-gff", help="Sanntis gff", required=True)
     parser.add_argument(
-        "-i", "--sanntis-gff", help="Sanntis gff", required=True
+        "-o", "--output", help="Sanntis summary output file.", required=True
     )
-    parser.add_argument("-o", "--output", help="Sanntis summary output file.", required=True)
     args = parser.parse_args()
     return args.sanntis_gff, args.output
 
@@ -41,21 +40,33 @@ def main():
     dict_list = []
     with fileinput.hook_compressed(input_gff, "r") as file_in:
         for line in file_in:
-            if line.startswith('#'):
+            if line.startswith("#"):
                 continue
-            info = line.strip().split('\t')[8].split(';')
+            info = line.strip().split("\t")[8].split(";")
             entry_dict = {}
             for pair in info:
-                key, value = pair.split('=', 1)  # Ensure split only occurs at the first '=' occurrence
+                key, value = pair.split(
+                    "=", 1
+                )  # Ensure split only occurs at the first '=' occurrence
                 entry_dict[key] = value
             dict_list.append(entry_dict)
 
             # Convert to DataFrame
         df = pd.DataFrame(dict_list)
-        df = df.rename(columns={"nearest_MiBIG": "nearest_MIBiG", "nearest_MiBIG_class": "nearest_MIBiG_class"})
-        df_grouped = df.groupby(['nearest_MIBiG', 'nearest_MIBiG_class']).size().reset_index(name='Count')
-        df_grouped = df_grouped.sort_values(by='Count', ascending=False)
+        df = df.rename(
+            columns={
+                "nearest_MiBIG": "nearest_MIBiG",
+                "nearest_MiBIG_class": "nearest_MIBiG_class",
+            }
+        )
+        df_grouped = (
+            df.groupby(["nearest_MIBiG", "nearest_MIBiG_class"])
+            .size()
+            .reset_index(name="Count")
+        )
+        df_grouped = df_grouped.sort_values(by="Count", ascending=False)
         df_grouped.to_csv(output_filename, sep="\t", index=False)
+
 
 if __name__ == "__main__":
     main()

@@ -1,19 +1,17 @@
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Mar 14 15:19:48 2025
 
-@author: jlu8
-
-
-range of scripts to manipulate mgnify data into vector files for creating syncoms with the mimic toolkit - https://github.com/thh32/MiMiC2.git
-
-- generate vector from assembly analysis (pfam)
-- generate vector from mgnify
-
-
-
-"""
+# Copyright 2025 EMBL - European Bioinformatics Institute 
+# 
+# Licensed under the Apache License, Version 2.0 (the "License"); 
+# you may not use this file except in compliance with the License. 
+# You may obtain a copy of the License at # http://www.apache.org/licenses/LICENSE-2.0 
+# 
+# Unless required by applicable law or agreed to in writing, software 
+# distributed under the License is distributed on an "AS IS" BASIS, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+# See the License for the specific language governing permissions and 
+# limitations under the License.
 
 
 import os
@@ -31,11 +29,9 @@ import shutil
 from pathlib import Path
 
 
-# Suppress FutureWarnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-# read pfam clan data file into memory
 def read_pfamClanInfo2df(pfam_clan_file):
 
     pfam_clan_df = pd.read_csv(
@@ -44,21 +40,18 @@ def read_pfamClanInfo2df(pfam_clan_file):
         names=["Protein_family", "class", "name", "target.name", "Description"],
     )
 
-    # rename Protein_family to PfamID
     pfam_clan_df.rename(columns={"Protein_family": "PfamID"}, inplace=True)
 
     return pfam_clan_df
 
 
-# get mgya_ids from mgys using api
 def extract_mgya_from_mgys(mgys_id):
 
-    max_retries = 3  # max retires for url accessing
+    max_retries = 3  
     retry_delay = 5
 
-    mgya_ids = []  # empty list for storing ids
+    mgya_ids = [] 
 
-    # api_Endpoint for getting all analyses information belonging to mgys_id.
     url = f"https://www.ebi.ac.uk/metagenomics/api/v1/studies/{mgys_id}/analyses"
 
     for attempt in range(max_retries):
@@ -68,14 +61,13 @@ def extract_mgya_from_mgys(mgys_id):
             if response.status_code == 200:
                 api_endpoint = response.json()
 
-                # get all analyses ids that are from analysis of assemblies
                 mgya_ids = [
                     data["id"]
                     for data in api_endpoint["data"]
                     if data["attributes"]["experiment-type"] == "assembly"
                 ]
 
-                # get all analyses ids that are from analysis of assemblies
+                
                 mgya_ids = [
                     data["id"]
                     for data in api_endpoint["data"]
@@ -85,7 +77,7 @@ def extract_mgya_from_mgys(mgys_id):
                 break
             else:
                 pass
-                # print(f"Attempt {attempt + 1} failed with status code: {response.status_code}")
+               
         except requests.exceptions.RequestException as e:
             print(f"Attempt {attempt + 1} failed due to error: {e}")
 
@@ -101,16 +93,15 @@ def extract_mgya_from_mgys(mgys_id):
     return mgya_ids
 
 
-# download pfam results for a given MGYA accession
+
 def download_pfam_from_mgya(mgya_id):
 
-    max_retries = 3  # max retires for url accessing
-    # retry_delay = 5
+    max_retries = 3  
 
     assembly_id = " "
     sample_id = " "
 
-    # api endpoint for downloads
+    
     url = f"https://www.ebi.ac.uk/metagenomics/api/v1/analyses/{mgya_id}/downloads"
 
     mgya_pfam_df = pd.DataFrame(columns=["protein", "PfamID", "pfam_description"])
@@ -130,7 +121,7 @@ def download_pfam_from_mgya(mgya_id):
                         ].lower()
                     ):
 
-                        # url of pfam file
+                        
                         url = downloadable_file["links"]["self"]
                         mgya_pfam_df = pd.read_csv(
                             url,
@@ -169,14 +160,14 @@ def download_pfam_from_mgya(mgya_id):
     return sample_id, assembly_id, mgya_pfams
 
 
-# for a given mgys_id, download list of pfams for each mgya and get pfams for each mgya into a pfam dict
+
 def download_pfams_from_mgys(mgys_id):
 
     samples_pfam_dict = {}
 
     mgya_list = extract_mgya_from_mgys(mgys_id)
 
-    # go through list and download pfams
+   
     for mgya_id in mgya_list:
         print(f"extracting pfams for {mgya_id}")
         sample_id, assembly_id, pfams_list = download_pfam_from_mgya(mgya_id)
@@ -185,8 +176,6 @@ def download_pfams_from_mgys(mgys_id):
 
         samples_pfam_dict[mgya_id] = pfams_list
 
-    # print (samples_pfam_dict)
-
     return samples_pfam_dict
 
 
@@ -194,7 +183,6 @@ def download_pfams_from_mgya_list(mgya_list):
 
     samples_pfam_dict = {}
 
-    # go through list and download pfams
     for mgya_id in mgya_list:
         print(f"extracting pfams for {mgya_id}")
         sample_id, assembly_id, pfams_list = download_pfam_from_mgya(mgya_id)
@@ -208,7 +196,7 @@ def download_pfams_from_mgya_list(mgya_list):
 
 def download_pfam_clan(version="32.0"):
 
-    # only proceed if pfam version is in list
+
     pfam_versions = [
         "32.0",
         "33.0",
@@ -266,10 +254,9 @@ def download_pfam_clan(version="32.0"):
 
 def generate_pfam_metagenome_vector(pfam_clan_df, samples_pfam_dict, pfam_vector_file):
 
-    # get list of pfamIDs
+
     pfam_clan_ids = list(pfam_clan_df["PfamID"])
 
-    # assign pfam dict
     pfam_vector_df = pfam_clan_df[["PfamID"]]
 
     title = ["PfamID"]
@@ -295,33 +282,32 @@ def generate_pfam_metagenome_vector(pfam_clan_df, samples_pfam_dict, pfam_vector
 
     except FileNotFoundError:
         print(
-            f"metagenome file path: {pfam_vector_file} is not correct. Please check check filepath and retry command."
+            f"metagenome file path: {pfam_vector_file} is not correct. Please check filepath and retry command."
         )
 
     return pfam_vector_df
 
 
-# for a given biome, download the functional profiles from the associated catalogue and parse the pfams into a vector
+
 def download_genome_functions(biome, download_directory):
 
     biomes_dict = {
         "chicken-gut": "v1.0.1",
-        # "cow-rumen": "v1.0.1",
+        "cow-rumen": "v1.0.1",
         "honeybee-gut": "v1.0.1",
-        # "human-gut":"v2.0.2",
-        # "human-oral":"v1.0.1",
+        "human-gut":"v2.0.2",
+        "human-oral":"v1.0.1",
         "human-vaginal": "v1.0",
         "marine": "v2.0",
         "mouse-gut": "v1.0",
         "non-model-fish-gut": "v2.0",
-        # "pig-gut":"v1.0",
+        "pig-gut":"v1.0",
         "sheep-rumen": "v1.0",
         "zebrafish-fecal": "v1.0",
     }
 
     biomes = ", ".join(biomes_dict.keys())
 
-    # if biome is not in biomes_dict (i.e. pangenomes functions doesn't exist at the moment for the specified catalogue)
     if biome not in biomes_dict:
         print(
             f"*** specified biome: no pfam files exist for the {biome} catalogue. Please use one from the following: {biomes}. ***"
@@ -330,14 +316,12 @@ def download_genome_functions(biome, download_directory):
         catalogue_version = biomes_dict[biome]
 
     ftp_url = (
-        f"https://ftp.ebi.ac.uk/pub/databases/metagenomics/mgnify_genomes/{biome}/"
-        f"{catalogue_version}/pangenome_functions/functional_profiles.tar.gz"
+        "https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/references/mgnify_genomes/"
+        f"{biome}_reps/{catalogue_version}/pangenome_functional_profiles.tar.gz"
     )
 
-    # downloaded functional folder path
-    download_path = os.path.join(download_directory, "functional_profiles.tar.gz")
+    download_path = os.path.join(download_directory, "pangenome_functional_profiles.tar.gz")
 
-    # directory of unzipped functional profiles
     directory = "functional_profiles_DB"
     functional_profiles_directory = os.path.join(download_directory, directory)
 
@@ -372,7 +356,6 @@ def download_genome_functions(biome, download_directory):
     return functional_profiles_directory
 
 
-# extact pfams from cluster files
 def extract_pfams_from_cluster(cluster_file):
     pfam_accessions = []
 
@@ -389,8 +372,6 @@ def extract_pfams_from_cluster(cluster_file):
     return pfam_accessions
 
 
-# extract pfams from each genome in the functional_profile_folder (biome)
-# scripts to generate pfam vector from metagenome
 def extract_pfams2dict(pfam_clan_df, functional_profiles_folder):
 
     functional_profiles = os.listdir(functional_profiles_folder)
@@ -415,12 +396,10 @@ def extract_pfams2dict(pfam_clan_df, functional_profiles_folder):
     return pfam_dict
 
 
-# geenrate pfam vector from folder of catalogue pfam files
 def genome_pfam2vector(
     pfam_clan_df, genome_func_profile_path, result_genome_matrix_file
 ):
 
-    # # get list of pfams (pfam-clans) and list of proteins
     pfam_list = list(pfam_clan_df["PfamID"])
 
     functional_files = os.listdir(genome_func_profile_path)
@@ -431,7 +410,6 @@ def genome_pfam2vector(
     title.extend(genomes_list)
     title = "\t".join(title) + "\n"
 
-    # reads pfams from each genome into dict
     genome_pfam_dict = extract_pfams2dict(pfam_clan_df, genome_func_profile_path)
 
     print("*** Generating pfam vector for genomes ***")
@@ -460,25 +438,20 @@ def genome_pfam2vector(
     return functional_files
 
 
-# harmonizes the pfam vectors from metagenome sample and genome to one another so they are usable in MiMiC2
 def vector_harmonisation(
     sample_vector_file, genome_vector_file, result_directory, pfam_clan_version="32.0"
 ):
 
-    # download pfam clan info. default-v32
     pfam_clan_df = download_pfam_clan(pfam_clan_version)
 
-    # read genome vector to df
     metagenome_vector_df = pd.read_csv(
         sample_vector_file, sep="\t", header=0
     )  # .set_index('PfamID')
 
-    # read genome_vector to df
     genome_vector_df = pd.read_csv(
         genome_vector_file, sep="\t", header=0
-    )  # .set_index('PfamID')
+    )  
 
-    # merge with old vector_df and fill in na with '0' and remove pfams not found in pfam_clan_df
     new_metagenome_vector_df = pfam_clan_df[["PfamID"]].merge(
         metagenome_vector_df, how="left", on="PfamID"
     )
@@ -486,7 +459,6 @@ def vector_harmonisation(
         genome_vector_df, how="left", on="PfamID"
     )
 
-    # file path for vector files
     new_metagenome_vector_file = os.path.join(
         result_directory, "sample_metagenome_pfam_vector_harmonised.tsv"
     )
@@ -497,7 +469,7 @@ def vector_harmonisation(
         result_directory, f"Pfam-A.clans-{pfam_clan_version}.tsv"
     )
 
-    # write to tsv file
+
     new_metagenome_vector_df.to_csv(
         new_metagenome_vector_file, sep="\t", na_rep="0", index=False
     )
@@ -505,15 +477,13 @@ def vector_harmonisation(
         new_genome_vector_file, sep="\t", na_rep="0", index=False
     )
 
-    # write pfam_clan to tsv file
+
     pfam_clan_df.to_csv(pfam_clan_vector_file, sep="\t", index=False)
 
     return new_metagenome_vector_df, new_genome_vector_df, pfam_clan_df
 
 
-# check if the input filepath exists
 def file_path_check(vector_file):
-    # check if sample vector file exists
     try:
         with open(vector_file, "w"):
             file_exists = True
@@ -534,11 +504,11 @@ def main():
         usage="mgnify2mimic_inputs --mgnify_study MGYGXXXXXX"
         "--metagenome_vector_prefix mgnify_metagenome_vector.tsv",
         description="The mgnify2mimic_inputs script is designed to support the conversion of MGnify assemblies analysis"
-        " and genomes outputs into a format that is usable by the MiMiC. The script downloads all needed files directly "
+        " and genomes outputs into a format that is usable by the MiMiC or MiMiC2 pipelines. The script downloads all needed files directly "
         "from MGnify's backend and transforms it into binary matrix (presence|absence (1|0) of pfams vector files which "
-        "can be used directly in MiMiC2 to estimate the microbial genomes that functionally represent a specific biom "
+        "can be used directly in MiMiC or MiMiC2 to estimate the microbial genomes that functionally represent a specific biome "
         "(synthetic community).",
-        epilog="The generated vector files can be used to generate synthetic communities using the MiMiC2 program"
+        epilog="The generated vector files can be used to generate synthetic communities using the MiMiC or MiMiC2 program"
         " - https://github.com/thh32/MiMiC2.git",
     )
     parser.add_argument(
@@ -604,25 +574,15 @@ def main():
 
     if len(sys.argv) == 1:
         parser.print_help()
-        # print (sys.argv)
         sys.exit(1)
 
     args = parser.parse_args()
 
-    # assign variable
     mgnify_study_id = args.mgnify_study
     mgnify_analysis_list_obj = args.mgnify_analysis_list
     result_directory = args.result_directory
     pfam_clan_version = args.pfam_clan_version
 
-    # assign prefixes for files
-    # if args.metagenome_vector_prefix is not None:
-    #     sample_pfam_vector_file = args.metagenome_vector_prefix+"_metagenome_pfam_vector.tsv"
-
-    # if args.genome_vector_prefix is not None:
-    #     genome_pfam_vector_file = args.genome_vector_prefix+"_genome_pfam_vector.tsv"
-
-    # option 1: vectorise sample metagenomes from mgys_id
     if mgnify_study_id is not None:
         sample_pfam_vector_file = (
             "metagenome_pfam_vector.tsv"
@@ -631,13 +591,12 @@ def main():
         )
 
         if file_path_check(sample_pfam_vector_file) is True:
-            pfam_clan_df = download_pfam_clan()
+            pfam_clan_df = download_pfam_clan(pfam_clan_version)
             samples_pfam_dict = download_pfams_from_mgys(mgnify_study_id)
             generate_pfam_metagenome_vector(
                 pfam_clan_df, samples_pfam_dict, sample_pfam_vector_file
             )
 
-    # option 2: vectorise sample metagenomes from individual mgya_id
     elif mgnify_analysis_list_obj is not None and mgnify_study_id is None:
         if "," in mgnify_analysis_list_obj:
             mgnify_analysis_list = mgnify_analysis_list_obj.split(",")
@@ -652,7 +611,7 @@ def main():
         else:
             print(
                 "mgnify analysis list was incorrectly provided. Please provide with a list of MGnify analysis "
-                "accessions (MGYA) of analysed assmeblies. "
+                "accessions (MGYA) of analysed assemblies. "
             )
             sys.exit(1)
 
@@ -663,13 +622,12 @@ def main():
         )
 
         if file_path_check(sample_pfam_vector_file) is True:
-            pfam_clan_df = download_pfam_clan()
+            pfam_clan_df = download_pfam_clan(pfam_clan_version)
             samples_pfam_dict = download_pfams_from_mgya_list(mgnify_analysis_list)
             generate_pfam_metagenome_vector(
                 pfam_clan_df, samples_pfam_dict, sample_pfam_vector_file
             )
 
-    # option 3 harmonize sample vector and genome vector to a given pfam version
     elif args.harmonize is True:
         sample_pfam_vector_file = args.metagenome_vector_file
         genome_pfam_vector_file = args.genome_vector_file
@@ -693,7 +651,6 @@ def main():
                 "pfam v32.0 by default."
             )
 
-    # option 4: for a given biome, generate pfam vector from mgnify genomes
     elif args.biome is not None:
         biome = args.biome.lower()
         genome_pfam_vector_file = (
@@ -702,12 +659,11 @@ def main():
             else "metagenome_pfam_vector.tsv"
         )
 
-        # proceed if vector genome_pfam_vector_file is accessible
         if (
             file_path_check(genome_pfam_vector_file) is True
             and Path(result_directory).exists() is True
         ):
-            pfam_clan_df = download_pfam_clan()
+            pfam_clan_df = download_pfam_clan(pfam_clan_version)
             genome_func_profile_path = download_genome_functions(
                 biome, result_directory
             )

@@ -1,16 +1,16 @@
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2025 EMBL - European Bioinformatics Institute 
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); 
-# you may not use this file except in compliance with the License. 
-# You may obtain a copy of the License at # http://www.apache.org/licenses/LICENSE-2.0 
-# 
-# Unless required by applicable law or agreed to in writing, software 
-# distributed under the License is distributed on an "AS IS" BASIS, 
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-# See the License for the specific language governing permissions and 
+# Copyright 2025 EMBL - European Bioinformatics Institute
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at # http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
 # limitations under the License.
 
 
@@ -27,6 +27,16 @@ import urllib.request
 import tarfile
 import shutil
 from pathlib import Path
+
+from mgnify_pipelines_toolkit.constants.mgnify2mimic2 import (
+    PFAM_VERSIONS,
+    BIOMES_DICT,
+    MAX_RETRIES,
+    RETRY_DELAY,
+    BASE_STUDY_API,
+    BASE_MGYA_URL,
+    BASE_MGYA_DOWNLOADS_URL,
+)
 
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -47,16 +57,12 @@ def read_pfamClanInfo2df(pfam_clan_file):
 
 def extract_mgya_from_mgys(mgys_id):
 
-    max_retries = 3  
-    retry_delay = 5
+    mgya_ids = []
 
-    mgya_ids = [] 
-
-    url = f"https://www.ebi.ac.uk/metagenomics/api/v1/studies/{mgys_id}/analyses"
-
-    for attempt in range(max_retries):
+    for attempt in range(MAX_RETRIES):
         try:
-            response = requests.get(url)
+            api_url = BASE_STUDY_API.format(mgys_id=mgys_id)
+            response = requests.get(api_url)
 
             if response.status_code == 200:
                 api_endpoint = response.json()
@@ -67,7 +73,6 @@ def extract_mgya_from_mgys(mgys_id):
                     if data["attributes"]["experiment-type"] == "assembly"
                 ]
 
-                
                 mgya_ids = [
                     data["id"]
                     for data in api_endpoint["data"]
@@ -77,13 +82,13 @@ def extract_mgya_from_mgys(mgys_id):
                 break
             else:
                 pass
-               
+
         except requests.exceptions.RequestException as e:
             print(f"Attempt {attempt + 1} failed due to error: {e}")
 
-        if attempt < max_retries - 1:
-            print(f"Retrying in {retry_delay} seconds...")
-            time.sleep(retry_delay)
+        if attempt < MAX_RETRIES - 1:
+            print(f"Retrying in {RETRY_DELAY} seconds...")
+            time.sleep(3)
 
         else:
             print(
@@ -93,24 +98,19 @@ def extract_mgya_from_mgys(mgys_id):
     return mgya_ids
 
 
-
 def download_pfam_from_mgya(mgya_id):
-
-    max_retries = 3  
 
     assembly_id = " "
     sample_id = " "
-
-    
-    url = f"https://www.ebi.ac.uk/metagenomics/api/v1/analyses/{mgya_id}/downloads"
 
     mgya_pfam_df = pd.DataFrame(columns=["protein", "PfamID", "pfam_description"])
 
     mgya_pfams = []
 
-    for attempt in range(max_retries):
+    for attempt in range(MAX_RETRIES):
         try:
-            response = requests.get(url)
+            api_url = BASE_MGYA_DOWNLOADS_URL.format(mgya_id=mgya_id)
+            response = requests.get(api_url)
             if response.status_code == 200:
                 for downloadable_file in response.json()["data"]:
 
@@ -121,7 +121,6 @@ def download_pfam_from_mgya(mgya_id):
                         ].lower()
                     ):
 
-                        
                         url = downloadable_file["links"]["self"]
                         mgya_pfam_df = pd.read_csv(
                             url,
@@ -140,9 +139,8 @@ def download_pfam_from_mgya(mgya_id):
             print(f"Connection attempt {attempt + 1} failed due to error: {e}")
 
         try:
-            response = requests.get(
-                f"https://www.ebi.ac.uk/metagenomics/api/v1/analyses/{mgya_id}"
-            )
+            api_url = BASE_MGYA_URL.format(mgya_id=mgya_id)
+            response = requests.get(api_url)
             if response.status_code == 200:
                 mgya_metadata = response.json()["data"]["relationships"]
                 sample_id = mgya_metadata["sample"]["data"]["id"]
@@ -160,14 +158,12 @@ def download_pfam_from_mgya(mgya_id):
     return sample_id, assembly_id, mgya_pfams
 
 
-
 def download_pfams_from_mgys(mgys_id):
 
     samples_pfam_dict = {}
 
     mgya_list = extract_mgya_from_mgys(mgys_id)
 
-   
     for mgya_id in mgya_list:
         print(f"extracting pfams for {mgya_id}")
         sample_id, assembly_id, pfams_list = download_pfam_from_mgya(mgya_id)
@@ -196,22 +192,9 @@ def download_pfams_from_mgya_list(mgya_list):
 
 def download_pfam_clan(version="32.0"):
 
-
-    pfam_versions = [
-        "32.0",
-        "33.0",
-        "33.1",
-        "34.0",
-        "35.0",
-        "36.0",
-        "37.0",
-        "37.1",
-        "37.2",
-    ]
-
     pfam_clan_df = []
 
-    if version in pfam_versions:
+    if version in PFAM_VERSIONS:
         try:
             # download pfam clans file of default version 32
             response = requests.get(
@@ -241,19 +224,17 @@ def download_pfam_clan(version="32.0"):
             )
 
     else:
+        pfams_label = ",".join(PFAM_VERSIONS)
         print(
             "This version of pfam is not compatible with the mgnify2mimic_inputs pipeline."
         )
-        print(
-            "Compatible versions: 32.0, 33.0, 33.1, 34.0, 35.0, 36.0, 37.0, 37.1, 37.2"
-        )
+        print(f"Compatible versions: {pfams_label}")
         sys.exit(1)
 
     return pfam_clan_df
 
 
 def generate_pfam_metagenome_vector(pfam_clan_df, samples_pfam_dict, pfam_vector_file):
-
 
     pfam_clan_ids = list(pfam_clan_df["PfamID"])
 
@@ -288,39 +269,25 @@ def generate_pfam_metagenome_vector(pfam_clan_df, samples_pfam_dict, pfam_vector
     return pfam_vector_df
 
 
-
 def download_genome_functions(biome, download_directory):
 
-    biomes_dict = {
-        "chicken-gut": "v1.0.1",
-        "cow-rumen": "v1.0.1",
-        "honeybee-gut": "v1.0.1",
-        "human-gut":"v2.0.2",
-        "human-oral":"v1.0.1",
-        "human-vaginal": "v1.0",
-        "marine": "v2.0",
-        "mouse-gut": "v1.0",
-        "non-model-fish-gut": "v2.0",
-        "pig-gut":"v1.0",
-        "sheep-rumen": "v1.0",
-        "zebrafish-fecal": "v1.0",
-    }
+    biomes = ", ".join(BIOMES_DICT.keys())
 
-    biomes = ", ".join(biomes_dict.keys())
-
-    if biome not in biomes_dict:
+    if biome not in BIOMES_DICT:
         print(
             f"*** specified biome: no pfam files exist for the {biome} catalogue. Please use one from the following: {biomes}. ***"
         )
     else:
-        catalogue_version = biomes_dict[biome]
+        catalogue_version = BIOMES_DICT[biome]
 
     ftp_url = (
         "https://ftp.ebi.ac.uk/pub/databases/metagenomics/pipelines/references/mgnify_genomes/"
         f"{biome}_reps/{catalogue_version}/pangenome_functional_profiles.tar.gz"
     )
 
-    download_path = os.path.join(download_directory, "pangenome_functional_profiles.tar.gz")
+    download_path = os.path.join(
+        download_directory, "pangenome_functional_profiles.tar.gz"
+    )
 
     directory = "functional_profiles_DB"
     functional_profiles_directory = os.path.join(download_directory, directory)
@@ -448,9 +415,7 @@ def vector_harmonisation(
         sample_vector_file, sep="\t", header=0
     )  # .set_index('PfamID')
 
-    genome_vector_df = pd.read_csv(
-        genome_vector_file, sep="\t", header=0
-    )  
+    genome_vector_df = pd.read_csv(genome_vector_file, sep="\t", header=0)
 
     new_metagenome_vector_df = pfam_clan_df[["PfamID"]].merge(
         metagenome_vector_df, how="left", on="PfamID"
@@ -469,14 +434,12 @@ def vector_harmonisation(
         result_directory, f"Pfam-A.clans-{pfam_clan_version}.tsv"
     )
 
-
     new_metagenome_vector_df.to_csv(
         new_metagenome_vector_file, sep="\t", na_rep="0", index=False
     )
     new_genome_vector_df.to_csv(
         new_genome_vector_file, sep="\t", na_rep="0", index=False
     )
-
 
     pfam_clan_df.to_csv(pfam_clan_vector_file, sep="\t", index=False)
 
@@ -501,7 +464,7 @@ def file_path_check(vector_file):
 def main():
     parser = argparse.ArgumentParser(
         prog="mgnify2mimic inputs",
-        usage="mgnify2mimic_inputs --mgnify_study MGYGXXXXXX"
+        usage="mgnify2mimic_inputs --mgnify_study MGYGXXXXXX "
         "--metagenome_vector_prefix mgnify_metagenome_vector.tsv",
         description="The mgnify2mimic_inputs script is designed to support the conversion of MGnify assemblies analysis"
         " and genomes outputs into a format that is usable by the MiMiC or MiMiC2 pipelines. The script downloads all needed files directly "

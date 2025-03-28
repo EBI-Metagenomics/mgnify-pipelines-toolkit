@@ -74,6 +74,7 @@ generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
 summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
 antismash_gff_builder = "mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder:main"
 summarise_sanntis_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_sanntis_bgcs:main"
+summarise_antismash_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_antismash_bgcs:main"
 # genomes #
 genomes_extract_bacterial_rrnas_as_tsv = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_bacterial_rrnas_as_tsv:main"
 genomes_extract_rrnas_as_fasta = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_rrnas_as_fasta:main"

@@ -1,0 +1,9 @@
+- name: summarise_antismash_bgcs
+  tags:
+    - summarise_antismash_bgcs
+  command: summarise_antismash_bgcs -i tests/fixtures/bgc/antismash.gff -o summary_antismash.tsv
+  files:
+    - path: "summary_antismash.tsv"
+      md5sum: 867293daed010374030d063daeb6c961
+      contains:
+        - "terpene\t16"

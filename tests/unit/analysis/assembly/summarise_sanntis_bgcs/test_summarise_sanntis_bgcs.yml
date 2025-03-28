@@ -1,0 +1,9 @@
+- name: summarise_sanntis_bgcs
+  tags:
+    - summarise_sanntis_bgcs
+  command: summarise_sanntis_bgcs -i tests/fixtures/bgc/test_sanntis.gff.gz -o summary_sanntis.tsv
+  files:
+    - path: "summary_sanntis.tsv"
+      md5sum: f4d9ba8661dbbf6e57e0c609cc57fb24
+      contains:
+        - "BGC0000866\tOther\t3"

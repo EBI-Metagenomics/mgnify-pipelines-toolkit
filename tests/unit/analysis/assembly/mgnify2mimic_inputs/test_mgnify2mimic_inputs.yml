@@ -2,6 +2,7 @@
   tags:
     - mgnify2mimic_inputs
   command: python -m mgnify_pipelines_toolkit.analysis.assembly.mgnify2mimc_inputs --help
+  exit_code: 0
   stdout:
     contains:
       - "usage: mgnify2mimic_inputs --mgnify_study MGYGXXXXXX --metagenome_vector_prefix mgnify_metagenome_vector.tsv"
@@ -14,3 +15,6 @@
       - "extracting pfams for MGYA00725015"
       - "extracting pfams for MGYA00725017"
       - "extracting pfams for MGYA00725018"
+  files:
+    - path: "metagenome_pfam_vector.tsv"
+      md5sum: b8126509da6fc82ad5ad2f0769200c42

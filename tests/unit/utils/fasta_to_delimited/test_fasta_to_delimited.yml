@@ -2,36 +2,36 @@
   tags:
     - fasta_to_delimited
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.utils.fasta_to_delimited
+  command: fasta_to_delimited
   stderr:
     contains:
-      - "fasta_to_delimited.py: error: the following arguments are required: input"
+      - "fasta_to_delimited: error: the following arguments are required: input"
 - name: fasta_to_delimited test_wrong_args
   tags:
     - fasta_to_delimited
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.utils.fasta_to_delimited -f foo tests/fixtures/sequences/uniprotkb.fasta
+  command: fasta_to_delimited -f foo tests/fixtures/sequences/uniprotkb.fasta
   stderr:
     contains:
-      - "fasta_to_delimited.py: error: argument -f/--format: invalid choice: 'foo'"
+      - "fasta_to_delimited: error: argument -f/--format: invalid choice: 'foo'"
 - name: fasta_to_delimited test_uniprotkb
   tags:
     - fasta_to_delimited
-  command: python -m mgnify_pipelines_toolkit.utils.fasta_to_delimited -o uniprotkb.tsv tests/fixtures/sequences/uniprotkb.fasta
+  command: fasta_to_delimited -o uniprotkb.tsv tests/fixtures/sequences/uniprotkb.fasta
   files:
     - path: "uniprotkb.tsv"
       md5sum: f925a73a26dacc41de0b140d1a19b390
 - name: fasta_to_delimited test_rpxx
   tags:
     - fasta_to_delimited
-  command: python -m mgnify_pipelines_toolkit.utils.fasta_to_delimited -o rpxx.tsv tests/fixtures/sequences/rpxx.fasta
+  command: fasta_to_delimited -o rpxx.tsv tests/fixtures/sequences/rpxx.fasta
   files:
     - path: "rpxx.tsv"
       md5sum: 698b25fa2966dd4cd77e5db398d28eba
 - name: fasta_to_delimited test_gzipped
   tags:
     - fasta_to_delimited
-  command: python -m mgnify_pipelines_toolkit.utils.fasta_to_delimited -o rpxx.tsv tests/fixtures/sequences/rpxx.fasta.gz
+  command: fasta_to_delimited -o rpxx.tsv tests/fixtures/sequences/rpxx.fasta.gz
   files:
     - path: "rpxx.tsv"
       md5sum: 698b25fa2966dd4cd77e5db398d28eba

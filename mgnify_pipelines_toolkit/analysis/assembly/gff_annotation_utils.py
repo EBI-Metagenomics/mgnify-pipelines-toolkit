@@ -24,13 +24,13 @@ from mgnify_pipelines_toolkit.constants.thresholds import (
     EVALUE_CUTOFF_EGGNOG,
 )
 
-
 def get_iprs(ipr_annot):
     iprs = {}
     antifams = list()
     if not ipr_annot:
         return iprs, antifams
     with fileinput.hook_compressed(ipr_annot, "rt") as f:
+
         for line in f:
             cols = line.strip().split("\t")
             protein = cols[0]
@@ -60,6 +60,7 @@ def get_eggnog(eggnog_annot):
     if not eggnog_annot:
         return eggnogs
     with fileinput.hook_compressed(eggnog_annot, "rt") as f:
+
         for line in f:
             line = line.rstrip()
             cols = line.split("\t")
@@ -109,6 +110,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
     # save positions of each BGC cluster to dictionary cluster_positions
     # and save the annotations to dictionary bgc_result
     with fileinput.hook_compressed(bgc_file, "rt") as bgc_in:
+
         for line in bgc_in:
             if not line.startswith("#"):
                 (
@@ -143,6 +145,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                     as_product = ""
                     for a in annotations.split(
                         ";"
+
                     ):  # go through all parts of the annotation field
                         if a.startswith("as_type="):
                             type_value = a.split("=")[1]
@@ -179,6 +182,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         ] = as_product
     # identify CDSs that fall into each of the clusters annotated by the BGC tool
     with fileinput.hook_compressed(prokka_gff, "rt") as gff_in:
+
         for line in gff_in:
             if not line.startswith("#"):
                 matching_interval = ""
@@ -360,13 +364,13 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
             dbcan_annotations[protein] = annotation_text
     return dbcan_annotations
 
-
 def get_defense_finder(df_file):
     defense_finder_annotations = dict()
     type_info = dict()
     if not df_file:
         return defense_finder_annotations
     with fileinput.hook_compressed(df_file, "rt") as f:
+
         for line in f:
             if "Anti-phage system" in line:
                 annot_fields = line.strip().split("\t")[8].split(";")
@@ -404,6 +408,7 @@ def load_annotations(
     gecco_file,
     dbcan_file,
     dbcan_cazys_file,
+
     defense_finder_file,
     pseudofinder_file,
 ):

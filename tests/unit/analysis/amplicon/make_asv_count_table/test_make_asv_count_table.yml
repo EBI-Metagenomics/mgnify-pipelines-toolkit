@@ -2,14 +2,14 @@
   tags:
     - make_asv_count_table
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table --chromosome X
+  command: make_asv_count_table --chromosome X
   stderr:
     contains:
-      - "make_asv_count_table.py: error: the following arguments are required: -t/--taxa, -f/--fwd, -a/--amp, -hd/--headers, -s/--sample"
+      - "make_asv_count_table: error: the following arguments are required: -t/--taxa, -f/--fwd, -a/--amp, -hd/--headers, -s/--sample"
 - name: make_asv_count_table test_correct_args
   tags:
     - make_asv_count_table
-  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table -t tests/fixtures/asv_count_table/test_taxa.tsv -f tests/fixtures/asv_count_table/test_1_map.txt -r tests/fixtures/asv_count_table/test_2_map.txt -a tests/fixtures/asv_count_table/test.concat.txt -hd tests/fixtures/asv_count_table/headers.txt -s sample
+  command: make_asv_count_table -t tests/fixtures/asv_count_table/test_taxa.tsv -f tests/fixtures/asv_count_table/test_1_map.txt -r tests/fixtures/asv_count_table/test_2_map.txt -a tests/fixtures/asv_count_table/test.concat.txt -hd tests/fixtures/asv_count_table/headers.txt -s sample
   files:
     - path: "sample_concat.txt_pr2_asv_krona_counts.txt"
       md5sum: 5b9ee7fe1109d728ab18a95c232b0c1b

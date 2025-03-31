@@ -2,14 +2,14 @@
   tags:
     - classify_var_regions
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions --chromosome X
+  command: classify_var_regions --chromosome X
   stderr:
     contains:
-      - "classify_var_regions.py: error: unrecognized arguments: --chromosome"
+      - "classify_var_regions: error: unrecognized arguments: --chromosome"
 - name: classify_var_regions test_correct_args
   tags:
     - classify_var_regions
-  command: python -m mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions -d ./ -o sample --statistics tests/fixtures/misc/test_success_single.tblout.deoverlapped
+  command: classify_var_regions -d ./ -o sample --statistics tests/fixtures/misc/test_success_single.tblout.deoverlapped
   files:
     - path: "sample.tsv"
       md5sum: aba8ff1cc6df1ce076633dd844b95d28

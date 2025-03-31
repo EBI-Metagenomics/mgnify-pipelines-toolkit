@@ -1,0 +1,25 @@
+#idx target name          accession query name           accession clan name mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc olp anyidx afrct1 afrct2 winidx wfrct1 wfrct2 mdl len seq len description of target
+#--- -------------------- --------- -------------------- --------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- --- ------ ------ ------ ------ ------ ------ ------- ------- ---------------------
+1    Bacteria_small_SRP   RF00169   MGYG000296009_1      -         CL00003   hmm       13       85    61967    61896      -     -    6 0.43   0.0   43.9   7.3e-09  !   *       -      -      -      -      -      -      97  131613 Bacterial small signal recognition particle RNA
+2    tRNA                 RF00005   MGYG000296009_1      -         CL00001   hmm        6       63     1043     1102      +     -    6 0.52   0.0   30.4   0.00013  !   *       -      -      -      -      -      -      71  131613 tRNA
+1    tmRNA                RF00023   MGYG000296009_2      -         CL00001   hmm        1      354    51663    51317      -     -    6 0.47   0.0  112.3   1.3e-30  !   *       -      -      -      -      -      -     354   85803 transfer-messenger RNA
+2    tRNA                 RF00005   MGYG000296009_2      -         CL00001   hmm        3       68    77554    77487      -     -    6 0.53   0.0   30.4   8.1e-05  !   *       -      -      -      -      -      -      71   85803 tRNA
+1    cspA                 RF01766   MGYG000296009_5      -         -         hmm      123      425    31426    31137      -     -    6 0.36   0.5  114.9   3.4e-31  !   *       -      -      -      -      -      -     428   54383 cspA thermoregulator
+1    tRNA                 RF00005   MGYG000296009_11     -         CL00001   hmm        2       68    27417    27485      +     -    6 0.52   0.0   33.9   2.8e-06  !   *       -      -      -      -      -      -      71   38300 tRNA
+1    tRNA                 RF00005   MGYG000296009_13     -         CL00001   hmm        5       66     5483     5547      +     -    6 0.58   0.0   31.9   1.1e-05  !   *       -      -      -      -      -      -      71   32560 tRNA
+1    RNaseP_bact_a        RF00010   MGYG000296009_14     -         CL00002   hmm        3      364    16453    16791      +     -    6 0.51   0.1  205.1   2.9e-59  !   *       -      -      -      -      -      -     367   32285 Bacterial RNase P class A
+1    tRNA                 RF00005   MGYG000296009_16     -         CL00001   hmm        3       70    21156    21087      -     -    6 0.50   0.0   30.6   2.4e-05  !   *       -      -      -      -      -      -      71   29886 tRNA
+1    SSU_rRNA_bacteria    RF00177   MGYG000296009_20     -         CL00111   hmm        4      338      338        1      -     -    6 0.50   0.1  199.1     1e-57  !   ^       -      -      -      -      -      -    1533   21155 Bacterial small subunit ribosomal RNA
+1    tRNA                 RF00005   MGYG000296009_21     -         CL00001   hmm        7       66      125      186      +     -    6 0.56   0.0   30.1   2.5e-05  !   *       -      -      -      -      -      -      71   20570 tRNA
+1    LSU_rRNA_bacteria    RF02541   MGYG000296009_23     -         CL00112   hmm     1014     2923        2     1913      +     -    6 0.51  11.4 1380.3         0  !   ^       -      -      -      -      -      -    2925   17205 Bacterial large subunit ribosomal RNA
+5    5S_rRNA              RF00001   MGYG000296009_23     -         CL00113   hmm        4      116     2115     2224      +     -    6 0.53   0.0   51.5   2.7e-12  !   *       -      -      -      -      -      -     119   17205 5S ribosomal RNA
+#
+# Program:         cmscan
+# Version:         1.1.5 (Sep 2023)
+# Pipeline mode:   SCAN
+# Query file:      /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes/dereplication/drep_reps/dereplicated_genomes/MGYG000296009.fna
+# Target file:     /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.cm
+# Option settings: /opt/conda/bin/cmscan -o /dev/null --tblout overlapped_MGYG000296009 --fmt 2 --noali --cut_ga --hmmonly --clanin /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.clanin --cpu 8 /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.cm /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes/dereplication/drep_reps/dereplicated_genomes/MGYG000296009.fna 
+# Current dir:     /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes
+# Date:            Sun Mar  9 15:09:53 2025
+# [ok]

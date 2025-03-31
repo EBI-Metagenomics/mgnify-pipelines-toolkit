@@ -2,14 +2,33 @@
   tags:
     - get_subunits
   exit_code: 2
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits --chromosome X
+  command: get_subunits --chromosome X
   stderr:
     contains:
-      - "get_subunits.py: error: the following arguments are required: -i/--input, -n/--name"
-- name: get_subunits test_correct_args
+      - "get_subunits: error: the following arguments are required: -i/--input, -n/--name"
+
+- name: get_subunits test_subunits
   tags:
     - get_subunits
-  command: python -m mgnify_pipelines_toolkit.analysis.shared.get_subunits -i tests/fixtures/sequences/test.fasta -n sample
+  command: get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample
   files:
     - path: "sequence-categorisation/sample_SSU.fasta"
+      md5sum: fb23f13526672a300845b767dbc5fd44
+    - path: "sequence-categorisation/sample_other_ncRNA.fasta"
+      md5sum: a6c09d412a577463874374bffab17e37
+    - path: "sequence-categorisation/sample_5_8S.fasta"
+      md5sum: 505fad1e25a2d322518c4116d0afea97
+
+- name: get_subunits test_subunits_and_models
+  tags:
+    - get_subunits
+  command: get_subunits -i tests/fixtures/rna_prediction/test_get_coords.fasta -n sample --separate-subunits-by-models
+  files:
+    - path: "sequence-categorisation/sample_SSU.fasta"
+      md5sum: fb23f13526672a300845b767dbc5fd44
+    - path: "sequence-categorisation/sample_other_ncRNA.fasta"
+      md5sum: a6c09d412a577463874374bffab17e37
+    - path: "sequence-categorisation/sample_5_8S.fasta"
+      md5sum: 505fad1e25a2d322518c4116d0afea97
+    - path: "sequence-categorisation/sample_SSU_rRNA_eukarya.RF01960.fasta"
       md5sum: fb23f13526672a300845b767dbc5fd44

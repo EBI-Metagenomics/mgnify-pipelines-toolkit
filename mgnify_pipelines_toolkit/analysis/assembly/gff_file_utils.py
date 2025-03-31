@@ -37,7 +37,6 @@ def write_results_to_file(
             contig_list = sorted(
                 list(contig_list), key=lambda x: int(x.split("MGYA")[-1])
             )
-
         for contig in contig_list:
             sorted_pos_list = sort_positions(
                 contig, main_gff_extended, ncrnas, trnas, crispr_annotations

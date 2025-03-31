@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2024 EMBL - European Bioinformatics Institute
+# Copyright 2024-2025 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,7 +78,11 @@ def main():
         "--output",
         required=True,
         type=Path,
-        help="Output TSV file with columns: contig_id, protein_id, UniRef90 cluster, rhea_ids, CHEBI reaction participants",
+        help=(
+            "Output TSV file with columns: contig_id, protein_id, protein hash, "
+            "Rhea IDs, CHEBI reaction, reaction definition, 'top hit' if it is "
+            "the first hit for the protein"
+        ),
     )
     parser.add_argument(
         "-p",

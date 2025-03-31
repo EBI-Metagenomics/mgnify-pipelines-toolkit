@@ -1,0 +1,7 @@
+#target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand trunc pass   gc  bias  score   E-value inc description of target
+#------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ----- ---- ---- ----- ------ --------- --- ---------------------
+SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      452      + 5'&3'    4 0.46   0.1  274.7   6.3e-85 !   Eukaryotic small subunit ribosomal RNA
+SRR17062740.10       -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      437      + 5'&3'    4 0.48   0.0  287.5   7.9e-89 !   Eukaryotic small subunit ribosomal RNA
+SRR17062740.100      -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      450      + 5'&3'    4 0.42   2.4  296.7   1.2e-91 !   Eukaryotic small subunit ribosomal RNA
+SRR17062740.1000     -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      444      + 5'&3'    4 0.42   2.5  292.2   2.8e-90 !   Eukaryotic small subunit ribosomal RNA
+SRR17062740.10000    -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      442      + 5'&3'    4 0.41   0.6  303.9   7.8e-94 !   Eukaryotic small subunit ribosomal RNA

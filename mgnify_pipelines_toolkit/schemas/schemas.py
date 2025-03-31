@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Copyright 2024 EMBL - European Bioinformatics Institute
+# Copyright 2024-2025 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import re
 
 from enum import Enum
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, Type
+
+import pandas as pd
 import pandera as pa
+from pandera.typing.common import DataFrameBase
 
 from pydantic import (
     Field,
@@ -215,3 +218,18 @@ class PR2TaxonSchema(pa.DataFrameModel):
 
         dtype = PydanticModel(PR2TaxonRecord)
         coerce = True
+
+
+def validate_dataframe(
+    df: pd.DataFrame, schema: Type[pa.DataFrameModel], df_metadata: str
+) -> DataFrameBase:
+    """
+    Validate a pandas dataframe using a pandera schema.
+    df_metadata will be shown in logs on failure: example, the TSV filename from which the df was read.
+    """
+    try:
+        dfs = schema.validate(df, lazy=True)
+    except pa.errors.SchemaErrors as e:
+        logging.error(f"{schema.__name__} validation failure for {df_metadata}")
+        raise e
+    return dfs

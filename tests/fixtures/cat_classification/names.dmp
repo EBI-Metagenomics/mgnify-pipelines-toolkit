@@ -1,0 +1,464 @@
+1	|	all	|		|	synonym	|
+1	|	root	|		|	scientific name	|
+1224	|	"Alphaproteobacteriota" Whitman et al. 2018	|		|	synonym	|
+1224	|	"Proteobacteria" Garrity et al. 2005	|		|	authority	|
+1224	|	"Proteobacteriota" Panda et al. 2022	|		|	authority	|
+1224	|	Alphaproteobacteriota	|		|	synonym	|
+1224	|	Proteobacteria	|		|	synonym	|
+1224	|	Proteobacteria Stackebrandt et al. 1988	|		|	authority	|
+1224	|	Proteobacteriota	|		|	synonym	|
+1224	|	Pseudomonadota	|		|	scientific name	|
+1224	|	Pseudomonadota corrig. Garrity et al. 2021	|		|	authority	|
+1224	|	proteobacteria	|		|	blast name	|
+1224	|	purple photosynthetic bacteria and relatives	|		|	common name	|
+1239	|	"Bacillaeota" Oren et al. 2015	|		|	authority	|
+1239	|	Bacillaeota	|		|	synonym	|
+1239	|	Bacillota	|		|	scientific name	|
+1239	|	Bacillota corrig. Gibbons and Murray 2021	|		|	synonym	|
+1239	|	Bacillus/Clostridium group	|		|	synonym	|
+1239	|	Clostridium group firmicutes	|		|	synonym	|
+1239	|	Low G+C firmicutes	|		|	synonym	|
+1239	|	clostridial firmicutes	|		|	synonym	|
+1239	|	firmicutes	|		|	blast name	|
+1239	|	low G+C Gram-positive bacteria	|		|	common name	|
+1239	|	low GC Gram+	|		|	common name	|
+1263032	|	Firmicutes bacterium CAG:822	|		|	scientific name	|
+131567	|	biota	|		|	synonym	|
+131567	|	cellular organisms	|		|	scientific name	|
+1485	|	Anaerobacter	|		|	synonym	|
+1485	|	Anaerobacter Duda et al. 1996	|		|	synonym	|
+1485	|	Clostridium	|		|	scientific name	|
+1485	|	Clostridium Prazmowski 1880 (Approved Lists 1980) emend. Lawson and Rainey 2016	|		|	authority	|
+171549	|	Bacteroidales	|		|	scientific name	|
+171549	|	Bacteroidales Krieg 2012 emend. Pikuta et al. 2017	|		|	authority	|
+171550	|	Rikenellaceae	|		|	scientific name	|
+171550	|	Rikenellaceae Krieg et al. 2012	|		|	authority	|
+1783270	|	FCB group	|		|	scientific name	|
+1783270	|	Fibrobacter/Acidobacteria group	|	Fibrobacter/Acidobacteria group <FCB group>	|	in-part	|
+1783270	|	Fibrobacteres-Chlorobi-Bacteroidetes superphylum	|		|	synonym	|
+1783270	|	Fibrobacteres/Acidobacteria group	|	Fibrobacteres/Acidobacteria group <FCB group>	|	in-part	|
+1783272	|	"Firmicuteota" Panda et al. 2022	|		|	authority	|
+1783272	|	"Terrabacteria" Battistuzzi et al. 2004	|		|	authority	|
+1783272	|	"Terrabacterida" Luketa 2012	|		|	authority	|
+1783272	|	Bacillati	|		|	scientific name	|
+1783272	|	Bacillati (Gibbons and Murray 1978) Oren and Goker 2024	|		|	authority	|
+1783272	|	Firmacutes	|		|	synonym	|
+1783272	|	Firmacutes Gibbons and Murray 1978 (Approved Lists 1980)	|		|	authority	|
+1783272	|	Firmicuteota	|		|	synonym	|
+1783272	|	Firmicutes	|		|	synonym	|
+1783272	|	Firmicutes corrig. Gibbons and Murray 1978 (Approved Lists 1980)	|		|	synonym	|
+1783272	|	Terrabacteria	|		|	synonym	|
+1783272	|	Terrabacteria group	|		|	common name	|
+1783272	|	Terrabacterida	|		|	synonym	|
+186801	|	Clostridia	|		|	scientific name	|
+186801	|	Clostridia Rainey 2010	|		|	authority	|
+186802	|	Clostridiales	|		|	synonym	|
+186802	|	Eubacteriales	|		|	scientific name	|
+186802	|	Eubacteriales Buchanan 1917 (Approved Lists 1980)	|		|	authority	|
+186802	|	Eubacteriales Buchanan 1917 (Approved Lists 1980) emend. Gerritsen et al. 2014	|		|	authority	|
+186802	|	Eubacteriales Buchanan 1917 (Approved Lists 1980) emend. Tindall 2019	|		|	authority	|
+186803	|	Lachnospiraceae	|		|	scientific name	|
+186803	|	Lachnospiraceae Rainey 2010	|		|	authority	|
+1896978	|	Clostridium sp. 26_22	|		|	scientific name	|
+1896979	|	Clostridium sp. 27_14	|		|	scientific name	|
+1896986	|	Clostridium sp. CAG:245_30_32	|		|	scientific name	|
+194924	|	Desulfovibrionaceae	|		|	scientific name	|
+194924	|	Desulfovibrionaceae Kuever et al. 2006	|		|	authority	|
+2	|	"Bacteria" Cavalier-Smith 1987	|		|	authority	|
+2	|	"Bacteriobiota" Luketa 2012	|		|	authority	|
+2	|	Bacteria	|	Bacteria <bacteria>	|	scientific name	|
+2	|	Bacteria (ex Cavalier-Smith 1987)	|		|	synonym	|
+2	|	Bacteria Woese et al. 2024	|		|	synonym	|
+2	|	Bacteriobiota	|		|	synonym	|
+2	|	Monera	|	Monera <bacteria>	|	in-part	|
+2	|	Procaryotae	|	Procaryotae <bacteria>	|	in-part	|
+2	|	Prokaryota	|	Prokaryota <bacteria>	|	in-part	|
+2	|	Prokaryotae	|	Prokaryotae <bacteria>	|	in-part	|
+2	|	bacteria	|		|	blast name	|
+2	|	eubacteria	|		|	genbank common name	|
+2	|	prokaryote	|	prokaryote <bacteria>	|	in-part	|
+2	|	prokaryotes	|	prokaryotes <bacteria>	|	in-part	|
+200643	|	Bacteroidetes	|	Bacteroidetes <Bacteroidia>	|	synonym	|
+200643	|	Bacteroidia	|		|	scientific name	|
+200643	|	Bacteroidia Krieg 2012	|		|	authority	|
+213115	|	Desulfovibrionales	|		|	scientific name	|
+213115	|	Desulfovibrionales Kuever et al. 2006	|		|	authority	|
+216572	|	Hungateiclostridiaceae	|		|	synonym	|
+216572	|	Hungateiclostridiaceae Zhang et al. 2018	|		|	authority	|
+216572	|	Oscillospiraceae	|		|	scientific name	|
+216572	|	Oscillospiraceae Peshkoff 1940 (Approved Lists 1980) emend. Tindall 2019	|		|	authority	|
+216572	|	Ruminococcaceae	|		|	synonym	|
+216572	|	Ruminococcaceae Rainey 2010	|		|	authority	|
+2211178	|	"Evtepia" Strandwitz et al. 2016	|		|	authority	|
+2211178	|	Evtepia	|		|	scientific name	|
+239759	|	Alistipes	|		|	scientific name	|
+239759	|	Alistipes Rautio et al. 2003	|		|	authority	|
+239759	|	Alistipes Rautio et al. 2003 emend. Sakamoto et al. 2020	|		|	authority	|
+2614128	|	unclassified Clostridium	|		|	scientific name	|
+2759	|	Eucarya	|		|	synonym	|
+2759	|	Eucaryotae	|		|	synonym	|
+2759	|	Eukarya	|		|	synonym	|
+2759	|	Eukaryota	|		|	scientific name	|
+2759	|	Eukaryotae	|		|	synonym	|
+2759	|	eucaryotes	|		|	genbank common name	|
+2759	|	eukaryotes	|	eukaryotes <blast name>	|	blast name	|
+2759	|	eukaryotes	|	eukaryotes <common name>	|	common name	|
+2773932	|	unclassified Evtepia	|		|	scientific name	|
+2773933	|	Evtepia sp.	|		|	scientific name	|
+28221	|	"Deltabacteria" Cavalier-Smith 1992	|		|	synonym	|
+28221	|	Deltabacteria Cavalier-Smith 2002	|		|	synonym	|
+28221	|	Deltaproteobacteria	|		|	scientific name	|
+28221	|	Deltaproteobacteria Kuever et al. 2006 emend. Hahn et al. 2017	|		|	authority	|
+28221	|	Dissimilatory sulfate or sulfur reducers	|		|	includes	|
+28221	|	Proteobacteria delta subdivision	|		|	synonym	|
+28221	|	Purple bacteria, delta subdivision	|		|	synonym	|
+28221	|	Sulfate- or sulfur-reducing dissimilatory bacteria	|		|	includes	|
+28221	|	Sulfate-reducing or sulfur-reducing dissimilatory bacteria	|		|	includes	|
+28221	|	d-proteobacteria	|		|	blast name	|
+28221	|	delta proteobacteria	|		|	synonym	|
+28221	|	delta subdivision	|		|	synonym	|
+28221	|	delta subgroup	|		|	synonym	|
+2840488	|	Bacillota incertae sedis	|		|	scientific name	|
+2840488	|	Firmicutes incertae sedis	|		|	synonym	|
+2840543	|	"Candidatus Faecenecus" Gilroy et al. 2021	|		|	authority	|
+2840543	|	Candidatus Faecenecus	|		|	scientific name	|
+2840543	|	Faecenecus	|		|	equivalent name	|
+2840793	|	"Candidatus Faecenecus gallistercoris" Gilroy et al. 2021	|		|	authority	|
+2840793	|	Candidatus Faecenecus gallistercoris	|		|	scientific name	|
+31979	|	Clostridiaceae	|		|	scientific name	|
+31979	|	Clostridiaceae Pribram 1933	|		|	authority	|
+357276	|	Bacteroides dorei Bakir et al. 2006	|		|	synonym	|
+357276	|	Bacteroides sp. 175T	|		|	includes	|
+357276	|	Bacteroides sp. 219	|		|	includes	|
+357276	|	DSM 17855	|	DSM 17855 <type strain>	|	type material	|
+357276	|	JCM 13471	|	JCM 13471 <type strain>	|	type material	|
+357276	|	Phocaeicola dorei	|		|	scientific name	|
+357276	|	Phocaeicola dorei (Bakir et al. 2006) Garcia-Lopez et al. 2020	|		|	synonym	|
+357276	|	strain 175	|	strain 175 <type strain>	|	type material	|
+47928	|	environmental samples	|	environmental samples <firmicutes,phylum Bacillota>	|	scientific name	|
+47928	|	low G+C firmicute environmental samples	|		|	synonym	|
+538999	|	Clostridiales incertae sedis	|		|	synonym	|
+538999	|	Eubacteriales incertae sedis	|		|	scientific name	|
+68336	|	Bacteroidetes/Chlorobi group	|		|	equivalent name	|
+68336	|	Bacteroidota/Chlorobiota group	|		|	scientific name	|
+68336	|	CFB/Chlorobi group	|		|	synonym	|
+68336	|	CFB/Green sulfur bacteria group	|		|	synonym	|
+68336	|	Cytophagales/Green sulfur bacteria group	|		|	synonym	|
+68525	|	delta/epsilon subdivisions	|		|	scientific name	|
+815	|	Bacteroidaceae	|		|	scientific name	|
+815	|	Bacteroidaceae Pribram 1933	|		|	authority	|
+841	|	Roseburia	|		|	scientific name	|
+841	|	Roseburia Stanton and Savage 1983	|		|	authority	|
+841	|	Roseburya	|		|	equivalent name	|
+841	|	Roseburyella	|		|	equivalent name	|
+872	|	"Sporovibrio" Starkey 1938	|		|	authority	|
+872	|	Desulfomonas	|		|	synonym	|
+872	|	Desulfomonas Moore et al. 1976 (Approved Lists 1980)	|		|	authority	|
+872	|	Desulfovibrio	|		|	scientific name	|
+872	|	Desulfovibrio Kluyver and van Niel 1936 (Approved Lists 1980) emend. Loubinoux et al. 2002	|		|	authority	|
+872	|	Sporovibrio	|		|	synonym	|
+901	|	ATCC 29098	|	ATCC 29098 <type strain>	|	type material	|
+901	|	DSM 749	|	DSM 749 <type strain>	|	type material	|
+901	|	Desulfomonas pigra	|		|	synonym	|
+901	|	Desulfomonas pigra Moore et al. 1976 (Approved Lists 1980)	|		|	authority	|
+901	|	Desulfovibrio piger	|		|	scientific name	|
+901	|	Desulfovibrio piger (Moore et al. 1976) Loubinoux et al. 2002	|		|	authority	|
+909656	|	Phocaeicola	|		|	scientific name	|
+909656	|	Phocaeicola Al Masalma et al. 2009	|		|	authority	|
+976	|	"Bacteroidetes" Krieg et al. 2012	|		|	authority	|
+976	|	"Bacteroidota" Whitman et al. 2018	|		|	synonym	|
+976	|	"Sphingobacteria" Cavalier-Smith 2002	|		|	authority	|
+976	|	BCF group	|		|	equivalent name	|
+976	|	Bacteroides-Cytophaga-Flexibacter group	|		|	common name	|
+976	|	Bacteroidetes	|	Bacteroidetes <Bacteroidota>	|	synonym	|
+976	|	Bacteroidota	|		|	scientific name	|
+976	|	Bacteroidota corrig. Krieg et al. 2021	|		|	authority	|
+976	|	CFB group	|		|	equivalent name	|
+976	|	CFB group bacteria	|		|	blast name	|
+976	|	Cytophaga-Flexibacter-Bacteroides phylum	|		|	common name	|
+976	|	Sphingobacteria	|		|	synonym	|
+171288	|	ATCC 27746	|	ATCC 27746 <type strain>	|	type material	|
+171288	|	Mesomycoplasma molare corrig. (Rosendal 1974) Gupta et al. 2018	|		|	synonym	|
+171288	|	Mesomycoplasma molare	|		|	scientific name	|
+171288	|	"Mesomycoplasma molaris (Rosendal 1974) Gupta et al. 2018	|		|	authority	|
+171288	|	NCTC 10144	|	NCTC 10144 <type strain>	|	type material	|
+171288	|	strain H 542	|	strain H 542 <type strain>	|	type material	|
+171288	|	strain H542	|	strain H542 <type strain>	|	type material	|
+171289	|	AMRC-C 1486	|	AMRC-C 1486 <type strain>	|	type material	|
+171289	|	ATCC 35214	|	ATCC 35214 <type strain>	|	type material	|
+171289	|	Mycoplasma mustelae Salih et al. 1983	|		|	authority	|
+171289	|	Mycoplasma mustelae	|		|	synonym	|
+171289	|	Mycoplasmopsis mustelae (Salih et al. 1983) Gupta et al. 2018	|		|	authority	|
+171289	|	Mycoplasmopsis mustelae	|		|	scientific name	|
+171289	|	NCTC 10193	|	NCTC 10193 <type strain>	|	type material	|
+171289	|	strain MX9	|	strain MX9 <type strain>	|	type material	|
+171290	|	ATCC 49694	|	ATCC 49694 <type strain>	|	type material	|
+171290	|	Mycoplasma oxonense	|		|	equivalent name	|
+171290	|	Mycoplasma oxoniensis Hill 1991	|		|	authority	|
+171290	|	Mycoplasma oxoniensis	|		|	scientific name	|
+171290	|	NCTC 11712	|	NCTC 11712 <type strain>	|	type material	|
+171290	|	strain 128	|	strain 128 <type strain>	|	type material	|
+171291	|	ATCC 27862	|	ATCC 27862 <type strain>	|	type material	|
+171291	|	Mycoplasmopsis verecunda (Gourlay et al. 1974) Gupta et al. 2018	|		|	synonym	|
+171291	|	Mycoplasmopsis verecunda	|		|	scientific name	|
+171291	|	NCTC 10145	|	NCTC 10145 <type strain>	|	type material	|
+171291	|	strain 107	|	strain 107 <type strain>	|	type material	|
+171292	|	uncultured Mycobacterium sp.	|		|	scientific name	|
+171293	|	Macaca hecki x tonkeana	|		|	scientific name	|
+171294	|	Farfantepenaeus californiensis	|		|	synonym	|
+171294	|	Penaeus californiensis Holmes, 1900	|		|	authority	|
+171294	|	Penaeus californiensis	|		|	scientific name	|
+171294	|	Penaeus (Farfantepenaeus) californiensis	|		|	synonym	|
+171295	|	Achimenes candida Lindl., 1848	|		|	authority	|
+171295	|	Achimenes candida	|		|	scientific name	|
+171296	|	Achimenes cettoana H.E.Moore, 1961	|		|	authority	|
+171296	|	Achimenes cettoana	|		|	scientific name	|
+171297	|	Achimenes misera Lindl., 1848	|		|	authority	|
+171297	|	Achimenes misera	|		|	scientific name	|
+171298	|	Aeschynanthus hildebrandii	|		|	equivalent name	|
+171298	|	Aeschynanthus hildebrandtii Hemsl. ex Hook.f., 1894	|		|	authority	|
+171298	|	Aeschynanthus hildebrandtii	|		|	scientific name	|
+171299	|	Alloplectus bolivianus (Britton ex Rusby) Wiehler	|		|	authority	|
+171299	|	Alloplectus bolivianus	|		|	synonym	|
+171299	|	Columnea boliviana Britton ex Rusby, 1895	|		|	authority	|
+171299	|	Columnea boliviana	|		|	synonym	|
+171299	|	Glossoloma bolivianum (Britton ex Rusby) J.L.Clark, 2005	|		|	authority	|
+171299	|	Glossoloma bolivianum	|		|	scientific name	|
+171300	|	Besleria labiosa Hanst., 1865	|		|	authority	|
+171300	|	Besleria labiosa	|		|	scientific name	|
+171301	|	Besleria pulchella Donn ex Sims, 1808	|		|	authority	|
+171301	|	Besleria pulchella	|		|	synonym	|
+171301	|	Chrysothemis pulchella (Donn ex Sims) Decne., 1849	|		|	authority	|
+171301	|	Chrysothemis pulchella	|		|	scientific name	|
+171302	|	Codonanthe carnosa Hanst., 1864	|		|	authority	|
+171302	|	Codonanthe carnosa	|		|	scientific name	|
+171303	|	Columnea spathulata Mansf., 1938	|		|	authority	|
+171303	|	Columnea spathulata	|		|	scientific name	|
+171304	|	Corytoplectus cutucuensis	|		|	scientific name	|
+171304	|	Corytoplectus cutucuensis Wiehler, 1995	|		|	authority	|
+171305	|	Episcia lilacina Hanst., 1866	|		|	authority	|
+171305	|	Episcia lilacina	|		|	scientific name	|
+171308	|	Eucodonia verticillata (M.Martens & Galeotti) Wiehler, 1976	|		|	authority	|
+171308	|	Eucodonia verticillata	|		|	scientific name	|
+171308	|	Gloxinia verticillata M.Martens & Galeotti, 1842	|		|	authority	|
+171308	|	Gloxinia verticillata	|		|	synonym	|
+171309	|	Gasteranthus quitensis Benth., 1846	|		|	authority	|
+171309	|	Gasteranthus quitensis	|		|	scientific name	|
+171310	|	Gesneria acaulis L., 1759	|		|	authority	|
+171310	|	Gesneria acaulis	|		|	scientific name	|
+171311	|	Gesneria citrina	|		|	scientific name	|
+171311	|	Gesneria citrina Urb., 1900	|		|	authority	|
+171312	|	Conradia cuneifolia DC., 1839	|		|	authority	|
+171312	|	Conradia cuneifolia	|		|	synonym	|
+171312	|	Gesneria cuneifolia (DC.) Fritsch, 1894	|		|	authority	|
+171312	|	Gesneria cuneifolia	|		|	scientific name	|
+171313	|	Gesneria humilis L., 1753	|		|	authority	|
+171313	|	Gesneria humilis	|		|	scientific name	|
+171314	|	Gesneria pedunculosa Fritsch, 1894	|		|	authority	|
+171314	|	Gesneria pedunculosa	|		|	scientific name	|
+171315	|	Conradia reticulata Griseb., 1868	|		|	authority	|
+171315	|	Conradia reticulata	|		|	synonym	|
+171315	|	Gesneria reticulata (Griseb.) Urb., 1900	|		|	authority	|
+171315	|	Gesneria reticulata	|		|	scientific name	|
+171317	|	Gesneria ventricosa	|		|	scientific name	|
+171317	|	Gesneria ventricosa Sw., 1788	|		|	authority	|
+171318	|	Duchartrea viridiflora Decne., 1846	|		|	authority	|
+171318	|	Duchartrea viridiflora	|		|	synonym	|
+171318	|	Gesneria viridiflora (Decne.) Kuntze, 1891	|		|	authority	|
+171318	|	Gesneria viridiflora	|		|	scientific name	|
+171319	|	Gloxinia perennis (L.) Druce, 1914	|		|	authority	|
+171319	|	Gloxinia perennis	|		|	scientific name	|
+171319	|	Martynia perennis L., 1753	|		|	authority	|
+171319	|	Martynia perennis	|		|	synonym	|
+171320	|	Gloxinia purpurascens (Rusby) Wiehler	|		|	authority	|
+171320	|	Gloxinia purpurascens	|		|	synonym	|
+171320	|	Seemannia purpurascens Rusby, 1895	|		|	authority	|
+171320	|	Seemannia purpurascens	|		|	scientific name	|
+171321	|	Gloxinia sarmentiana Gardner ex Hook., 1841	|		|	authority	|
+171321	|	Gloxinia sarmentiana	|		|	synonym	|
+171321	|	Sphaerorrhiza sarmentiana (Gardner ex Hook.) Roalson & Boggan, 2005	|		|	authority	|
+171321	|	Sphaerorrhiza sarmentiana	|		|	scientific name	|
+171322	|	Gesneria rugata Scheidw., 1847	|		|	authority	|
+171322	|	Gesneria rugata	|		|	synonym	|
+171322	|	Kohleria rugata (Scheidw.) L.P.Kvist & L.E.Skog, 1992	|		|	authority	|
+171322	|	Kohleria rugata	|		|	scientific name	|
+171323	|	Kohleria villosa	|		|	scientific name	|
+171323	|	Kohleria villosa Wiehler, 1978	|		|	authority	|
+171324	|	Moussonia septentrionalis (D.L.Denham) Wiehler, 1975	|		|	authority	|
+171324	|	Moussonia septentrionalis	|		|	scientific name	|
+171325	|	Napeanthus jelskii Fritsch, 1925	|		|	authority	|
+171325	|	Napeanthus jelskii	|		|	scientific name	|
+171326	|	Alloplectus melittifolius Mart. ex Loudon	|		|	authority	|
+171326	|	Alloplectus melittifolius	|		|	synonym	|
+171326	|	Nautilocalyx melittifolius (L.) Wiehler, 1973	|		|	authority	|
+171326	|	Nautilocalyx melittifolius	|		|	scientific name	|
+171327	|	Alloplectus scabridus Lem.	|		|	authority	|
+171327	|	Alloplectus scabridus	|		|	synonym	|
+171327	|	Hypocyrta strigillosa Mart., 1829	|		|	authority	|
+171327	|	Hypocyrta strigillosa	|		|	synonym	|
+171327	|	Nematanthus strigillosus (Mart.) H.E.Moore, 1973	|		|	authority	|
+171327	|	Nematanthus strigillosus	|		|	scientific name	|
+171328	|	Paradrymonia binata	|		|	synonym	|
+171328	|	Paradrymonia binata Wiehler	|		|	authority	|
+171328	|	Trichodrymonia binata	|		|	scientific name	|
+171328	|	Trichodrymonia binata (Wiehler) M.M.Mora & J.L.Clark, 2016	|		|	authority	|
+171329	|	Pearcea abunda L.P.Kvist & L.E.Skog, 1996	|		|	authority	|
+171329	|	Pearcea abunda	|		|	scientific name	|
+171330	|	Achimenes divaricata (Poepp.) Walp.	|		|	authority	|
+171330	|	Achimenes divaricata	|		|	synonym	|
+171330	|	Amalophyllon divaricatum (Poepp.) Boggan, L.E.Skog & Roalson, 2009	|		|	authority	|
+171330	|	Amalophyllon divaricatum	|		|	scientific name	|
+171330	|	Diastema divaricatum (Poepp.) Benth. ex Walp.	|		|	authority	|
+171330	|	Diastema divaricatum	|		|	synonym	|
+171330	|	Phinaea divaricata	|		|	synonym	|
+171330	|	Phinaea ecuadorana	|		|	synonym	|
+171330	|	Phinaea ecuadorana Wiehler	|		|	authority	|
+171330	|	Trevirana divaricata Poepp., 1840	|		|	authority	|
+171330	|	Trevirana divaricata	|		|	synonym	|
+171333	|	Rhytidophyllum exsertum Griseb., 1866	|		|	authority	|
+171333	|	Rhytidophyllum exsertum	|		|	scientific name	|
+171335	|	Rhytidophyllum vernicosum	|		|	scientific name	|
+171335	|	Rhytidophyllum vernicosum Urb. & Ekman, 1929	|		|	authority	|
+171336	|	Besleria incarnata Aubl., 1775	|		|	authority	|
+171336	|	Besleria incarnata	|		|	synonym	|
+171336	|	Sinningia incarnata (Aubl.) D.L.Denham, 1974	|		|	authority	|
+171336	|	Sinningia incarnata	|		|	scientific name	|
+171337	|	Sinningia lindleyi L.Schauer, 1834	|		|	authority	|
+171337	|	Sinningia lindleyi	|		|	scientific name	|
+171338	|	Smithiantha aurantiaca	|		|	scientific name	|
+171338	|	Smithiantha aurantiaca Wiehler, 1995	|		|	authority	|
+171339	|	Smithiantha canarina	|		|	scientific name	|
+171339	|	Smithiantha canarina Wiehler, 1992	|		|	authority	|
+171340	|	Lactarius ruginosus Romagn., 1957	|		|	authority	|
+171340	|	Lactarius ruginosus	|		|	scientific name	|
+171342	|	Bidens squarrosa Kunth, 1818	|		|	authority	|
+171342	|	Bidens squarrosa	|		|	scientific name	|
+171343	|	Bidens mitis	|		|	scientific name	|
+171343	|	Bidens mitis Sherff, 1926	|		|	authority	|
+171344	|	Bidens laevis (L.) Britton, Sterns & Poggenb., 1888	|		|	authority	|
+171344	|	Bidens laevis	|		|	scientific name	|
+171344	|	Helianthus laevis L., 1753	|		|	authority	|
+171344	|	Helianthus laevis	|		|	synonym	|
+171345	|	Bidens serrulata (Poir.) Desf., 1829	|		|	authority	|
+171345	|	Bidens serrulata	|		|	scientific name	|
+171345	|	Coreopsis serrulata Poir., 1811	|		|	authority	|
+171345	|	Coreopsis serrulata	|		|	synonym	|
+171346	|	Bidens cynapifolia Kunth, 1818	|		|	authority	|
+171346	|	Bidens cynapifolia	|		|	synonym	|
+171346	|	Bidens cynapiifolia Kunth, 1818	|		|	authority	|
+171346	|	Bidens cynapiifolia	|		|	scientific name	|
+171347	|	Agaricus eurrhizus Berk., 1847	|		|	authority	|
+171347	|	Agaricus eurrhizus	|		|	synonym	|
+171347	|	Termitomyces eurhizus	|		|	synonym	|
+171347	|	Termitomyces eurrhizus (Berk.) R. Heim, 1942	|		|	authority	|
+171347	|	Termitomyces eurrhizus	|		|	scientific name	|
+171348	|	Schulzeria striata Beeli, 1938	|		|	authority	|
+171348	|	Schulzeria striata	|		|	synonym	|
+171348	|	Termitomyces striatus (Beeli) R. Heim, 1942	|		|	authority	|
+171348	|	Termitomyces striatus	|		|	scientific name	|
+171349	|	Termitomyces sp. SS1	|		|	scientific name	|
+171350	|	Termitomyces sp. AG1	|		|	scientific name	|
+171351	|	Termitomyces sp. AS1	|		|	scientific name	|
+171352	|	Termitomyces sp. BS1	|		|	scientific name	|
+171353	|	Termitomyces sp. MG1	|		|	scientific name	|
+171354	|	Termitomyces sp. MiG1	|		|	scientific name	|
+171355	|	Termitomyces sp. MiS1	|		|	scientific name	|
+171356	|	Termitomyces sp. NG1	|		|	scientific name	|
+171357	|	Termitomyces sp. OS1	|		|	scientific name	|
+171358	|	Termitomyces sp. OS2	|		|	scientific name	|
+171359	|	Termitomyces sp. PG1	|		|	scientific name	|
+171360	|	Termitomyces sp. ST1	|		|	scientific name	|
+171361	|	Termitomyces sp. ST2	|		|	scientific name	|
+171362	|	ectomycorrhizal sp. K47A	|		|	scientific name	|
+171363	|	ectomycorrhizal sp. K50B	|		|	scientific name	|
+171364	|	ectomycorrhizal sp. K53A	|		|	scientific name	|
+171366	|	Alytes obstetricans pertinax Garcia-Paris & Martinez-Solano, 2001	|		|	authority	|
+171366	|	Alytes obstetricans pertinax	|		|	scientific name	|
+171367	|	southern marbled newt	|		|	genbank common name	|
+171367	|	Triton marmoratus forma pygmaea	|		|	synonym	|
+171367	|	Triton marmoratus forma pygmaea Wolterstorff, 1905	|		|	authority	|
+171367	|	Triturus marmoratus pygmaeus	|		|	synonym	|
+171367	|	Triturus marmoratus pygmeus	|		|	synonym	|
+171367	|	Triturus pygmaeus	|		|	scientific name	|
+171367	|	Triturus pygmaeus (Wolterstorff, 1905)	|		|	authority	|
+171367	|	Triturus pygmeus	|		|	synonym	|
+171368	|	Eupolybothrus	|		|	scientific name	|
+171369	|	Eupolybothrus grossipes	|		|	scientific name	|
+171369	|	Lithobius grossipes Koch, 1847	|		|	authority	|
+171369	|	Lithobius grossipes	|		|	synonym	|
+171370	|	human papillomavirus 86	|		|	scientific name	|
+171370	|	Human papillomavirus - cand86	|		|	equivalent name	|
+171370	|	Human papillomavirus type 86	|		|	equivalent name	|
+171371	|	Pan troglodytes rhadinovirus 2	|		|	scientific name	|
+171372	|	Rhynchostomataceae	|		|	scientific name	|
+171372	|	Rhynchostomataceae Winka & O.E. Erikss., 2000	|		|	authority	|
+171373	|	Entosphenus	|		|	scientific name	|
+171374	|	Hypnum pristocalyx Mull.Hal., 1854	|		|	authority	|
+171374	|	Hypnum pristocalyx	|		|	synonym	|
+171374	|	Thuidium pristocalyx (Mull.Hal.) A.Jaeger, 1878	|		|	authority	|
+171374	|	Thuidium pristocalyx	|		|	scientific name	|
+171375	|	Trismegistia pulchella Herzog, 1926	|		|	authority	|
+171375	|	Trismegistia pulchella	|		|	scientific name	|
+171376	|	Mastopoma Cardot, 1901	|		|	authority	|
+171376	|	Mastopoma	|		|	scientific name	|
+171377	|	Mastopoma subfiliferum Horik. & Ando, 1964	|		|	authority	|
+171377	|	Mastopoma subfiliferum	|		|	scientific name	|
+171378	|	Acanthocladium uncinifolium Broth., 1900	|		|	authority	|
+171378	|	Acanthocladium uncinifolium	|		|	synonym	|
+171378	|	Mastopoma uncinifolium (Broth.) Broth.	|		|	authority	|
+171378	|	Mastopoma uncinifolium	|		|	scientific name	|
+171379	|	Rhaphidostegium pulchellum Cardot, 1912	|		|	authority	|
+171379	|	Rhaphidostegium pulchellum	|		|	synonym	|
+171379	|	Sematophyllum pulchellum (Cardot) Broth	|		|	authority	|
+171379	|	Sematophyllum pulchellum	|		|	scientific name	|
+171380	|	Trismegistia aff. calderensis H.Tsubota-4387	|		|	scientific name	|
+171382	|	Pseudotrismegistia perundulata H.Akiy. & Tsub.	|		|	authority	|
+171382	|	Pseudotrismegistia perundulata	|		|	scientific name	|
+171382	|	Trismegistia perundulata Dixon	|		|	authority	|
+171382	|	Trismegistia perundulata	|		|	synonym	|
+171383	|	CAIM 693	|	CAIM 693 <type strain>	|	type material	|
+171383	|	culture-collection:CAIM:693	|	culture-collection:CAIM:693 <type strain>	|	type material	|
+171383	|	DSM 19134	|	DSM 19134 <type strain>	|	type material	|
+171383	|	LMG 20362	|	LMG 20362 <type strain>	|	type material	|
+171383	|	LMG:20362	|	LMG:20362 <type strain>	|	type material	|
+171383	|	strain 1P	|	strain 1P <type strain>	|	type material	|
+171383	|	strain P62	|	strain P62 <type strain>	|	type material	|
+171383	|	Vibrio hepatarius	|		|	scientific name	|
+171383	|	Vibrio hepatarius Thompson et al. 2003	|		|	authority	|
+171383	|	Vibrio sp. LMG 20362	|		|	includes	|
+171384	|	Vibrio sp. LMG 20363	|		|	scientific name	|
+171385	|	Vibrio sp. LMG 20369	|		|	scientific name	|
+171387	|	Chroococcidiopsis sp. Bu 79.2	|		|	equivalent name	|
+171387	|	Chroococcidiopsis sp. SAG 2023	|		|	scientific name	|
+171388	|	Chroococcidiopsis sp. BB82.3	|		|	scientific name	|
+171389	|	Chroococcidiopsis sp. Bu 84.1	|		|	equivalent name	|
+171389	|	Chroococcidiopsis sp. SAG 2025	|		|	scientific name	|
+171390	|	Chroococcidiopsis sp. BB96.1	|		|	scientific name	|
+171391	|	Chroococcidiopsis polansiana CCMP1489	|		|	scientific name	|
+171391	|	Chroococcidiopsis sp. CCMP1489	|		|	equivalent name	|
+171392	|	CCALA 043	|	CCALA 043 <reference strain>	|	type material	|
+171392	|	CCALA-043	|	CCALA-043 <reference strain>	|	type material	|
+171392	|	CCALA:043	|	CCALA:043 <reference strain>	|	type material	|
+171392	|	CCALA043	|	CCALA043 <reference strain>	|	type material	|
+171392	|	Chroococcidiopsis cubana Komarek & Hindak, 1975	|		|	authority	|
+171392	|	Chroococcidiopsis cubana	|		|	scientific name	|
+171392	|	Hindak 1965/27	|	Hindak 1965/27 <reference strain>	|	type material	|
+171392	|	HINDAK 1965/27	|	HINDAK 1965/27 <reference strain>	|	type material	|
+171392	|	strain Hindak 1965/27	|	strain Hindak 1965/27 <reference strain>	|	type material	|
+171393	|	Myxosarcina sp. ATCC 29377	|		|	synonym	|
+171393	|	Myxosarcina sp. PCC 7312	|		|	scientific name	|
+171393	|	Myxosarcina sp. PCC7312	|		|	synonym	|
+171394	|	Myxosarcina sp. PCC 7325	|		|	scientific name	|
+171395	|	Fischerella sp. BB98.1	|		|	scientific name	|
+171396	|	Nostoc sp. DM103	|		|	scientific name	|
+171397	|	Pseudoalteromonas sp. OI-15-3	|		|	scientific name	|
+171398	|	Paenibacillus sp. DSM 1352	|		|	scientific name	|
+171399	|	Paenibacillus sp. DSM 6358	|		|	scientific name	|
+171400	|	Paenibacillus sp. DSM 1482	|		|	scientific name	|
+171401	|	"Bacillus agar-exedens" (sic) Wieringa 1941	|		|	authority	|
+171401	|	Bacillus agar-exedens	|		|	synonym	|
+171401	|	Bacillus agarexedens	|		|	synonym	|
+171401	|	CIP 107437	|	CIP 107437 <type strain>	|	type material	|
+171401	|	DSM 1327	|	DSM 1327 <type strain>	|	type material	|
+171401	|	Paenibacillus agarexedens (ex Wieringa 1941) Uetanabaro et al. 2003	|		|	authority	|
+171401	|	Paenibacillus agarexedens	|		|	scientific name	|

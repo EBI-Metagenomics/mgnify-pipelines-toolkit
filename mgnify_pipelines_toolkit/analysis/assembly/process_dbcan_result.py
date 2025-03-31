@@ -17,25 +17,31 @@
 import argparse
 import fileinput
 import logging
-import os
-import sys
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 
 
-def main(input_folder, outfile, dbcan_version):
-    if not check_folder_completeness(input_folder):
-        sys.exit("Missing dbCAN outputs. Exiting.")
-    substrates = load_substrates(input_folder)
-    cgc_locations = load_cgcs(input_folder)
-    print_gff(input_folder, outfile, dbcan_version, substrates, cgc_locations)
+def main(standard_file, substrate_file, outfile, dbcan_version):
+    standard_path = Path(standard_file)
+    substrate_path = Path(substrate_file)
+
+    if not standard_path.exists():
+        raise FileNotFoundError(f"Input standards path does not exist: {standard_file}")
+
+    if not substrate_path.exists():
+        raise FileNotFoundError(
+            f"Input substrate path does not exist: {substrate_file}"
+        )
+
+    substrates = load_substrates(substrate_path)
+    cgc_locations = load_cgcs(standard_path)
+    print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations)
 
 
-def load_cgcs(input_folder):
+def load_cgcs(standard_path):
     cgc_locations = dict()
-    with fileinput.hook_compressed(
-        os.path.join(input_folder, "ERZ1049444_001_cgc_standard.out.gz"), "rt"
-    ) as file_in:
+    with fileinput.hook_compressed(standard_path, "rt") as file_in:
         for line in file_in:
             if not line.startswith("CGC#"):
                 cgc, _, contig, _, start, end, _, _ = line.strip().split("\t")
@@ -54,16 +60,13 @@ def load_cgcs(input_folder):
     return cgc_locations
 
 
-def print_gff(input_folder, outfile, dbcan_version, substrates, cgc_locations):
+def print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations):
     with open(outfile, "w") as file_out:
         file_out.write("##gff-version 3\n")
         cgcs_printed = list()
-        with fileinput.hook_compressed(
-            os.path.join(input_folder, "ERZ1049444_001_cgc_standard.out.gz"), "rt"
-        ) as file_in:
+        with fileinput.hook_compressed(standard_path, "rt") as file_in:
             for line in file_in:
                 if not line.startswith("CGC#"):
-                    print(line.strip().split("\t"))
                     cgc, gene_type, contig, prot_id, start, end, strand, protein_fam = (
                         line.strip().split("\t")
                     )
@@ -89,16 +92,14 @@ def print_gff(input_folder, outfile, dbcan_version, substrates, cgc_locations):
                     file_out.write(
                         (
                             f"{contig}\tdbCAN:{dbcan_version}\t{gene_type}\t{start}"
-                            + "\t{end}\t.\t{strand}\t.\tID={prot_id};Parent={cgc_id};protein_family={protein_fam}\n"
+                            + f"\t{end}\t.\t{strand}\t.\tID={prot_id};Parent={cgc_id};protein_family={protein_fam}\n"
                         )
                     )
 
 
-def load_substrates(input_folder):
+def load_substrates(substrate_path):
     substrates = dict()
-    with fileinput.hook_compressed(
-        os.path.join(input_folder, "ERZ1049444_001_substrate.out.gz"), "rt"
-    ) as file_in:
+    with fileinput.hook_compressed(substrate_path, "rt") as file_in:
         for line in file_in:
             if not line.startswith("#"):
                 parts = line.strip().split("\t")
@@ -119,21 +120,8 @@ def load_substrates(input_folder):
                 substrates[cgc] = (
                     f"substrate_dbcan-pul={substrate_pul};substrate_dbcan-sub={substrate_ecami}"
                 )
-    print(substrates)
+
     return substrates
-
-
-def check_folder_completeness(input_folder):
-    status = True
-    for file in [
-        "ERZ1049444_001_cgc_standard.out.gz",
-        "ERZ1049444_001_overview.txt.gz",
-        "ERZ1049444_001_substrate.out.gz",
-    ]:
-        if not os.path.exists(os.path.join(input_folder, file)):
-            logging.error(f"File {file} does not exist.")
-            status = False
-    return status
 
 
 def parse_args():
@@ -143,10 +131,16 @@ def parse_args():
         )
     )
     parser.add_argument(
-        "-i",
-        dest="input_folder",
+        "-st",
+        dest="standard_file",
         required=True,
-        help="Path to the folder with dbCAN results.",
+        help="Path to the standard file.",
+    )
+    parser.add_argument(
+        "-sb",
+        dest="substrate_file",
+        required=True,
+        help="Path to the substrate file.",
     )
     parser.add_argument(
         "-o",
@@ -165,4 +159,4 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.input_folder, args.outfile, args.dbcan_ver)
+    main(args.standard_file, args.substrate_file, args.outfile, args.dbcan_ver)

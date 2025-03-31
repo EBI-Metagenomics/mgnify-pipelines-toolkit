@@ -18,19 +18,27 @@
 import argparse
 import fileinput
 import logging
-import os
+from pathlib import Path
 import re
-import sys
 
 logging.basicConfig(level=logging.INFO)
 
 
-def main(input_folder, genome_gff, outfile, dbcan_version):
-    if not check_folder_completeness(input_folder):
-        sys.exit("Missing dbCAN outputs. Exiting.")
-    substrates = load_substrates(input_folder)
+def main(hmm_file, overview_file, genome_gff, outfile, dbcan_version):
+
+    hmm_path = Path(hmm_file)
+    overview_path = Path(overview_file)
+
+    if not hmm_path.exists():
+        raise FileNotFoundError(f"Input hmm path does not exist: {hmm_file}")
+
+    if not overview_path.exists():
+        raise FileNotFoundError(f"Input overview path does not exist: {overview_file}")
+
+    substrates = load_substrates(hmm_path)
     genome_gff_lines = load_gff(genome_gff)
-    print_gff(input_folder, outfile, dbcan_version, substrates, genome_gff_lines)
+
+    print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_lines)
 
 
 def load_gff(gff):
@@ -44,20 +52,27 @@ def load_gff(gff):
             if len(fields) != 9 or fields[2] != "CDS":
                 continue
 
-            # Get transcript name from the 9th column
-            # match = re.search(r'Parent=([^;]+)', fields[8])
-            match = re.search(r"ID=([^;]+)", fields[8])
+            if "Parent=" in line:
+                # Get transcript name from the 9th column for mettannotator
+                match = re.search(r"Parent=([^;]+)", fields[8])
+            elif "ID=" in line:
+                # Get transcript name from the 9th column for ASA
+                match = re.search(r"ID=([^;]+)", fields[8])
+            else:
+                logging.error(
+                    "Not sure what gff annotation delimiter is in use. Exiting"
+                )
+                exit(1)
+
             transcript_name = match.group(1)
             genome_gff_lines.setdefault(transcript_name, []).append(line)
     return genome_gff_lines
 
 
-def print_gff(input_folder, outfile, dbcan_version, substrates, genome_gff_lines):
+def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_lines):
     with open(outfile, "w") as file_out:
         file_out.write("##gff-version 3\n")
-        with fileinput.hook_compressed(
-            os.path.join(input_folder, "ERZ1049444_001_overview.txt.gz"), "rt"
-        ) as file_in:
+        with fileinput.hook_compressed(overview_file, "rt") as file_in:
             for line in file_in:
                 if line.startswith("MGYG") or line.startswith("ERZ"):
                     (
@@ -81,10 +96,24 @@ def print_gff(input_folder, outfile, dbcan_version, substrates, genome_gff_lines
                     else:
                         continue
 
+                    cleaned_substrates = ",".join(
+                        sorted(
+                            list(
+                                set(
+                                    [
+                                        subsrate.strip()
+                                        for subsrate in substrates.get(
+                                            transcript, "N/A"
+                                        ).split(",")
+                                    ]
+                                )
+                            )
+                        )
+                    )
                     # Assemble information to add to the 9th column
                     col9_parts = [
                         f"protein_family={subfamily}",
-                        f"substrate_dbcan-sub={substrates.get(transcript, 'N/A')}",
+                        f"substrate_dbcan-sub={cleaned_substrates}",
                     ]
 
                     if ec_number != "-":
@@ -109,11 +138,9 @@ def print_gff(input_folder, outfile, dbcan_version, substrates, genome_gff_lines
                         file_out.write("\t".join(fields) + "\n")
 
 
-def load_substrates(input_folder):
+def load_substrates(hmm_path):
     substrates = dict()
-    with fileinput.hook_compressed(
-        os.path.join(input_folder, "ERZ1049444_001_dbcan-sub.hmm.out.gz"), "rt"
-    ) as file_in:
+    with fileinput.hook_compressed(hmm_path, "rt") as file_in:
         header = next(file_in)
         header_fields = header.strip().split("\t")
         substrate_idx = header_fields.index("Substrate")
@@ -136,18 +163,6 @@ def load_substrates(input_folder):
     return substrates
 
 
-def check_folder_completeness(input_folder):
-    status = True
-    for file in [
-        "ERZ1049444_001_dbcan-sub.hmm.out.gz",
-        "ERZ1049444_001_overview.txt.gz",
-    ]:
-        if not os.path.exists(os.path.join(input_folder, file)):
-            logging.error("File {} does not exist.".format(file))
-            status = False
-    return status
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description=(
@@ -155,10 +170,16 @@ def parse_args():
         )
     )
     parser.add_argument(
-        "-i",
-        dest="input_folder",
+        "-hmm",
+        dest="hmm_file",
         required=True,
-        help="Path to the folder with dbCAN results.",
+        help="Path to the hmm file.",
+    )
+    parser.add_argument(
+        "-ov",
+        dest="overview_file",
+        required=True,
+        help="Path to the overview file.",
     )
     parser.add_argument(
         "-g",
@@ -183,4 +204,6 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    main(args.input_folder, args.genome_gff, args.outfile, args.dbcan_ver)
+    main(
+        args.hmm_file, args.overview_file, args.genome_gff, args.outfile, args.dbcan_ver
+    )

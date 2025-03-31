@@ -1,9 +1,9 @@
 - name: summarise_sanntis_bgcs
   tags:
     - summarise_sanntis_bgcs
-  command: summarise_sanntis_bgcs -i tests/fixtures/bgc/test_sanntis.gff.gz -o summary_sanntis.tsv
+  command: summarise_sanntis_bgcs -i tests/fixtures/bgc/test_sanntis.gff.gz -o summary_sanntis.tsv -d mgnify_pipelines_toolkit/constants/bgc_descriptions/sanntis.txt
   files:
     - path: "summary_sanntis.tsv"
-      md5sum: f4d9ba8661dbbf6e57e0c609cc57fb24
       contains:
-        - "BGC0000866\tOther\t3"
+        - "BGC0000427\tNRP\tNonribosomal Peptide\t1"
+        - "BGC0000470\tRiPP\tRibosomally synthesised and Post-translationally modified Peptide\t1"

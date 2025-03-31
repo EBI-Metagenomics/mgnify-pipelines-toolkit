@@ -1,0 +1,8 @@
+MIBiG_class	Description
+Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA
+Terpene	Composed of isoprene (C5) units derived from isopentenyl pyrophosphate
+Alkaloid	Nitrogen-containing compounds derived from amino acids (e.g., ornithine, lysine, tyrosine, tryptophan)
+RiPP	Ribosomally synthesised and Post-translationally modified Peptide
+NRP	Nonribosomal Peptide
+Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)
+Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).

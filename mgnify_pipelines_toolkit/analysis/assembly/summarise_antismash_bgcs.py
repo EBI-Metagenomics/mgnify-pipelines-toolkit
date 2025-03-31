@@ -18,10 +18,18 @@ import argparse
 import fileinput
 import logging
 import pandas as pd
+import os
+import re
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
 )
+
+"""
+Script parses antismash GFF output and adds descriptions from glossary https://docs.antismash.secondarymetabolites.org/glossary/.
+
+Descriptions took from antismash GitHub repo under documentation/docs/glossary.md
+"""
 
 
 def parse_args():
@@ -31,12 +39,36 @@ def parse_args():
     parser.add_argument(
         "-o", "--output", help="Antisamsh summary output file.", required=True
     )
+    parser.add_argument(
+        "-d",
+        "--descriptions",
+        help="antiSMASH descriptions file.",
+        required=False,
+        default="mgnify_pipelines_toolkit/constants/bgc_descriptions/antismash_glossary_7.1.x.md",
+    )
     args = parser.parse_args()
-    return args.antismash_gff, args.output
+    return args.antismash_gff, args.output, args.descriptions
+
+
+def parse_description(filename):
+    pattern = r'\|<span id="([^"]+)">(?:<span id="[^"]+">)?([^<]+)</span>(?:</span>)?\|([^|]+)\|'
+    desc_dict, strict_level = {}, {}
+    with open(filename, "r", encoding="utf-8") as f:
+        for line in f:
+            if "#" in line:
+                current_level = line.strip().replace("#", "")
+            if "span" in line:
+                match = re.search(pattern, line)
+                if match:
+                    label = match.group(2)
+                    description = match.group(3)
+                    desc_dict[label.lower()] = description.replace("<br/>", "")
+                    strict_level[label.lower()] = current_level.strip()
+    return desc_dict, strict_level
 
 
 def main():
-    input_gff, output_filename = parse_args()
+    input_gff, output_filename, descriptions = parse_args()
     dict_list = []
     with fileinput.hook_compressed(input_gff, "r") as file_in:
         for line in file_in:
@@ -63,7 +95,27 @@ def main():
                 "product": "ClassID",
             }
         )
-
+        if descriptions and os.path.exists(descriptions):
+            desc_dict, strict_level = parse_description(descriptions)
+            df_grouped["Description"] = df_grouped["ClassID"].apply(
+                lambda x: ",".join(
+                    [
+                        desc_dict.get(cls.strip().lower(), cls.strip())
+                        for cls in x.split(",")
+                    ]
+                )
+            )
+            df_grouped["Strictness level"] = df_grouped["ClassID"].apply(
+                lambda x: ",".join(
+                    [
+                        strict_level.get(cls.strip().lower(), cls.strip())
+                        for cls in x.split(",")
+                    ]
+                )
+            )
+            df_grouped = df_grouped[
+                ["ClassID", "Description", "Strictness level", "Count"]
+            ]
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 
 

@@ -1,8 +1,9 @@
 - name: summarise_antismash_bgcs
   tags:
     - summarise_antismash_bgcs
-  command: summarise_antismash_bgcs -i tests/fixtures/bgc/antismash.gff -o summary_antismash.tsv
+  command: summarise_antismash_bgcs -i tests/fixtures/bgc/antismash.gff -o summary_antismash.tsv -d mgnify_pipelines_toolkit/constants/bgc_descriptions/antismash_glossary_7.1.x.md
   files:
     - path: "summary_antismash.tsv"
       contains:
-        - "terpene\t16"
+        - "terpene\tTerpene\tStrict\t16"
+        - "transAT-PKS,NRPS\tTrans-AT PKS,Non-ribosomal peptide synthetase\tStrict,Strict\t1"

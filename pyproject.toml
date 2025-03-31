@@ -40,7 +40,8 @@ packages = ["mgnify_pipelines_toolkit",
             "mgnify_pipelines_toolkit.analysis.shared",
             "mgnify_pipelines_toolkit.analysis.amplicon",
             "mgnify_pipelines_toolkit.analysis.assembly",
-            "mgnify_pipelines_toolkit.analysis.genomes"
+            "mgnify_pipelines_toolkit.analysis.genomes",
+            "mgnify_pipelines_toolkit.constants.bgc_descriptions",
 ]
 
 [project.scripts]

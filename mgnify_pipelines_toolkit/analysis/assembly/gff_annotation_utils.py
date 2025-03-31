@@ -331,6 +331,36 @@ def get_dbcan(dbcan_file):
     return dbcan_annotations
 
 
+def get_dbcan_individual_cazys(dbcan_cazys_file):
+    dbcan_annotations = dict()
+    if not dbcan_cazys_file:
+        return dbcan_annotations
+    with fileinput.hook_compressed(dbcan_cazys_file, "rt") as f:
+        for line in f:
+            if line.startswith("#"):
+                continue
+            attributes = line.strip().split("\t")[8]
+            attributes_dict = dict(
+                re.split(r"(?<!\\)=", item)
+                for item in re.split(r"(?<!\\);", attributes.rstrip(";"))
+            )
+            if "num_tools" in attributes_dict and int(attributes_dict["num_tools"]) < 2:
+                continue  # don't keep annotations supported by only one tool within dbcan
+            cds_pattern = r"\.CDS\d+$"
+            protein = re.sub(
+                cds_pattern, "", attributes_dict["ID"]
+            )  # remove the CDS number
+            annotation_text = ""
+            for field in ["protein_family", "substrate_dbcan-sub", "eC_number"]:
+                if field in attributes_dict:
+                    annotation_text += (
+                        f"{'dbcan_prot_family' if field == 'protein_family' else field}"
+                        f"={attributes_dict[field]};"
+                    )
+            dbcan_annotations[protein] = annotation_text
+    return dbcan_annotations
+
+
 def get_defense_finder(df_file):
     defense_finder_annotations = dict()
     type_info = dict()
@@ -373,6 +403,7 @@ def load_annotations(
     antismash_file,
     gecco_file,
     dbcan_file,
+    dbcan_cazys_file,
     defense_finder_file,
     pseudofinder_file,
 ):
@@ -383,6 +414,7 @@ def load_annotations(
     antismash_bgcs = get_bgcs(antismash_file, in_gff, tool="antismash")
     amr_annotations = get_amr(amr_file)
     dbcan_annotations = get_dbcan(dbcan_file)
+    dbcan_cazys_annotations = get_dbcan_individual_cazys(dbcan_cazys_file)
     defense_finder_annotations = get_defense_finder(defense_finder_file)
     pseudogenes = get_pseudogenes(pseudofinder_file)
     pseudogene_report_dict = dict()
@@ -501,6 +533,11 @@ def load_annotations(
                     try:
                         dbcan_annotations[protein]
                         added_annot[protein]["dbCAN"] = dbcan_annotations[protein]
+                    except KeyError:
+                        pass
+                    try:
+                        dbcan_cazys_annotations[protein]
+                        added_annot[protein]["dbCAN"] = dbcan_cazys_annotations[protein]
                     except KeyError:
                         pass
                     try:

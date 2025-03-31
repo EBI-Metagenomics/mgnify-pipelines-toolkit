@@ -39,6 +39,7 @@ def main(
     antismash_file,
     gecco_file,
     dbcan_file,
+    dbcan_cazys_file,
     defense_finder_file,
     pseudofinder_file,
     rfam_file,
@@ -61,6 +62,7 @@ def main(
         antismash_file,
         gecco_file,
         dbcan_file,
+        dbcan_cazys_file,
         defense_finder_file,
         pseudofinder_file,
     )
@@ -138,6 +140,11 @@ def parse_args():
         required=False,
     )
     parser.add_argument(
+        "--dbcan-cazys",
+        help="The GFF file produced by dbCAN-CAZYs post-processing script",
+        required=False,
+    )
+    parser.add_argument(
         "--defense-finder",
         help="The GFF file produced by Defense Finder post-processing script",
         required=False,
@@ -171,6 +178,7 @@ if __name__ == "__main__":
         args.antismash,
         args.gecco,
         args.dbcan,
+        args.dbcan_cazys,
         args.defense_finder,
         args.pseudofinder,
         args.rfam,

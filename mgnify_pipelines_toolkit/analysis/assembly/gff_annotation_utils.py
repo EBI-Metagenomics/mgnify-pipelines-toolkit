@@ -24,6 +24,7 @@ from mgnify_pipelines_toolkit.constants.thresholds import (
     EVALUE_CUTOFF_EGGNOG,
 )
 
+
 def get_iprs(ipr_annot):
     iprs = {}
     antifams = list()
@@ -145,7 +146,6 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                     as_product = ""
                     for a in annotations.split(
                         ";"
-
                     ):  # go through all parts of the annotation field
                         if a.startswith("as_type="):
                             type_value = a.split("=")[1]
@@ -364,6 +364,7 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
             dbcan_annotations[protein] = annotation_text
     return dbcan_annotations
 
+
 def get_defense_finder(df_file):
     defense_finder_annotations = dict()
     type_info = dict()
@@ -408,7 +409,6 @@ def load_annotations(
     gecco_file,
     dbcan_file,
     dbcan_cazys_file,
-
     defense_finder_file,
     pseudofinder_file,
 ):

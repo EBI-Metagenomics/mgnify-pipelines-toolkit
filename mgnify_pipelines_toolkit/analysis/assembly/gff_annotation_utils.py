@@ -292,49 +292,6 @@ def get_amr(amr_file):
     return amr_annotations
 
 
-def get_dbcan(dbcan_file):
-    dbcan_annotations = dict()
-    substrates = dict()
-    if not dbcan_file:
-        return dbcan_annotations
-    with fileinput.hook_compressed(dbcan_file, "rt") as f:
-        for line in f:
-            if "predicted PUL" in line:
-                annot_fields = line.strip().split("\t")[8].split(";")
-                for a in annot_fields:
-                    if a.startswith("ID="):
-                        cgc = a.split("=")[1]
-                    elif a.startswith("substrate_dbcan-pul"):
-                        substrate_pul = a.split("=")[1]
-                    elif a.startswith("substrate_dbcan-sub"):
-                        substrate_ecami = a.split("=")[1]
-                substrates.setdefault(cgc, {})["substrate_ecami"] = substrate_ecami
-                substrates.setdefault(cgc, {})["substrate_pul"] = substrate_pul
-            elif line.startswith("#"):
-                continue
-            else:
-                cols = line.strip().split("\t")
-                prot_type = cols[2]
-                annot_fields = cols[8].split(";")
-                if not prot_type == "null":
-                    for a in annot_fields:
-                        if a.startswith("ID"):
-                            acc = a.split("=")[1]
-                        elif a.startswith("protein_family"):
-                            prot_fam = a.split("=")[1]
-                        elif a.startswith("Parent"):
-                            parent = a.split("=")[1]
-                    dbcan_annotations[acc] = (
-                        "dbcan_prot_type={};dbcan_prot_family={};substrate_dbcan-pul={};substrate_dbcan-sub={}".format(
-                            prot_type,
-                            prot_fam,
-                            substrates[parent]["substrate_pul"],
-                            substrates[parent]["substrate_ecami"],
-                        )
-                    )
-    return dbcan_annotations
-
-
 def get_dbcan_individual_cazys(dbcan_cazys_file):
     dbcan_annotations = dict()
     if not dbcan_cazys_file:
@@ -354,14 +311,14 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
             protein = re.sub(
                 cds_pattern, "", attributes_dict["ID"]
             )  # remove the CDS number
-            annotation_text = ""
+            annotation_text = "dbcan_prot_type=CAZyme;"
             for field in ["protein_family", "substrate_dbcan-sub", "eC_number"]:
                 if field in attributes_dict:
                     annotation_text += (
                         f"{'dbcan_prot_family' if field == 'protein_family' else field}"
                         f"={attributes_dict[field]};"
                     )
-            dbcan_annotations[protein] = annotation_text
+            dbcan_annotations[protein] = annotation_text.strip(";")
     return dbcan_annotations
 
 
@@ -418,7 +375,6 @@ def load_annotations(
     gecco_bgcs = get_bgcs(gecco_file, in_gff, tool="gecco")
     antismash_bgcs = get_bgcs(antismash_file, in_gff, tool="antismash")
     amr_annotations = get_amr(amr_file)
-    dbcan_annotations = get_dbcan(dbcan_file)
     dbcan_cazys_annotations = get_dbcan_individual_cazys(dbcan_cazys_file)
     defense_finder_annotations = get_defense_finder(defense_finder_file)
     pseudogenes = get_pseudogenes(pseudofinder_file)
@@ -533,11 +489,6 @@ def load_annotations(
                     try:
                         amr_annotations[protein]
                         added_annot[protein]["AMR"] = amr_annotations[protein]
-                    except KeyError:
-                        pass
-                    try:
-                        dbcan_annotations[protein]
-                        added_annot[protein]["dbCAN"] = dbcan_annotations[protein]
                     except KeyError:
                         pass
                     try:

@@ -84,7 +84,14 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         num_of_tools,
                     ) = line.strip().split("\t")
                     # EC is reported as 2.4.99.-:5 with :5 meaning 5 proteins in the subfamily have EC 2.4.99.-
-                    ec_number = ec_number_raw.split(":")[0]
+
+                    ec_number = ""
+                    ec_list = ec_number_raw.split("|")
+                    for ec in ec_list:
+                        if ec != "-":
+                            ec_number += ec.split(":")[0] + "|"
+
+                    ec_number = ec_number.strip("|")
 
                     # Dbcan recommends to use subfamily preference as dbcan_hmmer > dbcan_sub_ecami > diamond
                     # diamond is messier, so we don't report it here
@@ -116,7 +123,7 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         f"substrate_dbcan-sub={cleaned_substrates}",
                     ]
 
-                    if ec_number != "-":
+                    if ec_number != "":
                         col9_parts.append(f"eC_number={ec_number}")
 
                     col9_parts.append(f"num_tools={num_of_tools}")

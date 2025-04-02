@@ -37,7 +37,7 @@ def get_iprs(ipr_annot):
     antifams = list()
     if not ipr_annot:
         return iprs, antifams
-    with fileinput.hook_compressed(ipr_annot, "rt") as f:
+    with fileinput.hook_compressed(ipr_annot, "r", encoding="utf-8") as f:
 
         for line in f:
             cols = line.strip().split("\t")
@@ -67,7 +67,7 @@ def get_eggnog(eggnog_annot):
     eggnogs = {}
     if not eggnog_annot:
         return eggnogs
-    with fileinput.hook_compressed(eggnog_annot, "rt") as f:
+    with fileinput.hook_compressed(eggnog_annot, "r", encoding="utf-8") as f:
 
         for line in f:
             line = line.rstrip()
@@ -117,7 +117,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
         return bgc_annotations
     # save positions of each BGC cluster to dictionary cluster_positions
     # and save the annotations to dictionary bgc_result
-    with fileinput.hook_compressed(bgc_file, "rt") as bgc_in:
+    with fileinput.hook_compressed(bgc_file, "r", encoding="utf-8") as bgc_in:
 
         for line in bgc_in:
             if not line.startswith("#"):
@@ -188,7 +188,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                             "bgc_product"
                         ] = as_product
     # identify CDSs that fall into each of the clusters annotated by the BGC tool
-    with fileinput.hook_compressed(prokka_gff, "rt") as gff_in:
+    with fileinput.hook_compressed(prokka_gff, "r", encoding="utf-8") as gff_in:
 
         for line in gff_in:
             if not line.startswith("#"):
@@ -257,7 +257,7 @@ def get_amr(amr_file):
     amr_annotations = {}
     if not amr_file:
         return amr_annotations
-    with fileinput.hook_compressed(amr_file, "rt") as f:
+    with fileinput.hook_compressed(amr_file, "r", encoding="utf-8") as f:
         for line in f:
             if line.startswith("Protein identifier"):
                 continue
@@ -304,7 +304,7 @@ def get_dbcan(dbcan_file):
     substrates = dict()
     if not dbcan_file:
         return dbcan_annotations
-    with fileinput.hook_compressed(dbcan_file, "rt") as f:
+    with fileinput.hook_compressed(dbcan_file, "r", encoding="utf-8") as f:
         for line in f:
             if "predicted PUL" in line:
                 annot_fields = line.strip().split("\t")[8].split(";")
@@ -348,7 +348,7 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
     dbcan_annotations = dict()
     if not dbcan_cazys_file:
         return dbcan_annotations
-    with fileinput.hook_compressed(dbcan_cazys_file, "rt") as f:
+    with fileinput.hook_compressed(dbcan_cazys_file, "r", encoding="utf-8") as f:
         for line in f:
             if line.startswith("#"):
                 continue
@@ -379,7 +379,7 @@ def get_defense_finder(df_file):
     type_info = dict()
     if not df_file:
         return defense_finder_annotations
-    with fileinput.hook_compressed(df_file, "rt") as f:
+    with fileinput.hook_compressed(df_file, "r", encoding="utf-8") as f:
 
         for line in f:
             if "Anti-phage system" in line:
@@ -437,7 +437,7 @@ def load_annotations(
     header = []
     fasta = []
     fasta_flag = False
-    with fileinput.hook_compressed(in_gff, "rt") as f:
+    with fileinput.hook_compressed(in_gff, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line[0] != "#" and not fasta_flag:
@@ -588,7 +588,7 @@ def load_annotations(
 def get_ncrnas(ncrnas_file):
     ncrnas = {}
     counts = 0
-    with fileinput.hook_compressed(ncrnas_file, "rt") as f:
+    with fileinput.hook_compressed(ncrnas_file, "r", encoding="utf-8") as f:
         for line in f:
             if not line.startswith("#"):
                 cols = line.strip().split()
@@ -794,7 +794,7 @@ def prepare_rna_gff_fields(cols):
 
 def get_trnas(trnas_file):
     trnas = {}
-    with fileinput.hook_compressed(trnas_file, "rt") as f:
+    with fileinput.hook_compressed(trnas_file, "r", encoding="utf-8") as f:
         for line in f:
             if not line.startswith("#"):
                 cols = line.split("\t")
@@ -809,7 +809,7 @@ def get_trnas(trnas_file):
 
 def load_crispr(crispr_file):
     crispr_annotations = dict()
-    with fileinput.hook_compressed(crispr_file, "rt") as f:
+    with fileinput.hook_compressed(crispr_file, "r", encoding="utf-8") as f:
         record = list()
         left_coord = ""
         loc_contig = ""
@@ -856,7 +856,7 @@ def get_pseudogenes(pseudofinder_file):
     pseudogenes = dict()
     if not pseudofinder_file:
         return pseudogenes
-    with fileinput.hook_compressed(pseudofinder_file, "rt") as file_in:
+    with fileinput.hook_compressed(pseudofinder_file, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if not line.startswith("#"):
                 col9 = line.strip().split("\t")[8]

@@ -46,7 +46,11 @@ def generate_taxonomy_summary(file_dict: dict[str, Path], output_prefix: str) ->
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
     :param output_prefix: Prefix for the output summary file.
-    #TODO add example of the taxonomy file
+
+    Example of the taxonomy file:
+    23651	sk__Bacteria
+    4985	sk__Archaea	k__Thermoproteati	p__Nitrososphaerota
+    882	sk__Archaea	k__Nanobdellati	p__	c__	o__	f__	g__	s__Candidatus Pacearchaeota archaeon
     """
     tax_columns = [
         "Count",
@@ -91,6 +95,16 @@ def generate_functional_summary(
 
     Output:
         A TSV file.
+
+    Example of the Interpro summary file:
+    count	interpro_accession	description
+    16503	IPR036291	NAD(P)-binding domain superfamily
+    14694	IPR019734	Tetratricopeptide repeat
+
+    Example of the GO summary file:
+    go	term	category	count
+    GO:0016020	membrane	cellular_component	30626
+    GO:0005524	ATP binding	molecular_function	30524
     """
     merged_df = None
 
@@ -152,6 +166,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
     assembly_list = assemblies_df["assembly"].tolist()
 
+    # TODO for now there is no check if files exist, this should be added
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
         return {
             acc: study_dir / acc / subdir / filename_template.format(acc=acc)

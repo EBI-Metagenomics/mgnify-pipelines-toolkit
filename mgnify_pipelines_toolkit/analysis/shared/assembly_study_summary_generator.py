@@ -308,7 +308,7 @@ def merge_functional_summaries(
     TODO: Add docstring
 
     Input summary file example:
-    go	term	category	ERZ1049444	ERZ1049446
+    GO	description	category	ERZ1049444	ERZ1049446
     GO:0016020	membrane	cellular_component	30626	673
     GO:0005524	ATP binding	molecular_function	30524	2873
     """
@@ -321,6 +321,10 @@ def merge_functional_summaries(
 
         # Fill NaNs with 0 and make sure count columns are integers
         count_columns = [col for col in merged_df.columns if col not in merge_keys]
+
+        # Reorder columns: merge_keys first, then sorted count columns
+        sorted_columns = merge_keys + sorted(count_columns)
+        merged_df = merged_df[sorted_columns]
         merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
 
     merged_df.to_csv(output_file_name, sep="\t", index=False)

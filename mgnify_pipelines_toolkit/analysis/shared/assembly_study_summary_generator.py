@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+# Copyright 2025 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import click
+import glob
 import logging
 from pathlib import Path
 
@@ -40,9 +41,11 @@ def cli():
     pass
 
 
-def generate_taxonomy_summary(file_dict: dict[str, Path], output_prefix: str) -> None:
+def generate_taxonomy_summary(
+    file_dict: dict[str, Path], output_file_name: str
+) -> None:
     """
-    Generates a combined taxonomy summary from multiple taxonomy files.
+    Generates a combined taxonomy summary from multiple taxonomy summary_files.
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
     :param output_prefix: Prefix for the output summary file.
@@ -52,6 +55,14 @@ def generate_taxonomy_summary(file_dict: dict[str, Path], output_prefix: str) ->
     4985	sk__Archaea	k__Thermoproteati	p__Nitrososphaerota
     882	sk__Archaea	k__Nanobdellati	p__	c__	o__	f__	g__	s__Candidatus Pacearchaeota archaeon
     """
+    missing_summary_files = [
+        str(path) for path in file_dict.values() if not path.exists()
+    ]
+    if missing_summary_files:
+        raise FileNotFoundError(
+            f"The following required summary_files are missing: {', '.join(missing_summary_files)}"
+        )
+
     tax_columns = [
         "Count",
         "superkingdom",
@@ -64,9 +75,11 @@ def generate_taxonomy_summary(file_dict: dict[str, Path], output_prefix: str) ->
         "species",
     ]
     tax_dfs = []
-
     for assembly_acc, path in file_dict.items():
         df = pd.read_csv(path, sep="\t", names=tax_columns).fillna("")
+
+        # TODO: Add validation for the dataframe
+        # validate_dataframe(res_df, TaxonSchema, str(tax_file))
 
         # Combine all taxonomic levels into a single string per row
         df["full_taxon"] = df[tax_columns[1:]].agg(";".join, axis=1).str.strip(";")
@@ -78,16 +91,16 @@ def generate_taxonomy_summary(file_dict: dict[str, Path], output_prefix: str) ->
 
     summary_df = pd.concat(tax_dfs, axis=1).fillna(0).astype(int).sort_index()
 
-    summary_df.to_csv(
-        f"{output_prefix}_taxonomy_summary.tsv", sep="\t", index_label="taxonomy"
-    )
+    summary_df.to_csv(output_file_name, sep="\t", index_label="taxonomy")
 
 
 def generate_functional_summary(
-    file_dict: dict[str, Path], column_names: dict[str, str], output_prefix, label: str
+    file_dict: dict[str, Path],
+    column_names: dict[str, str],
+    output_file_name: str,
 ) -> None:
     """
-    Merge multiple summary files into a single summary table.
+    Merge multiple summary summary_files into a single summary table.
 
     Parameters:
         file_dict (dict): Dictionary with assembly IDs as keys and file paths as values.
@@ -111,6 +124,9 @@ def generate_functional_summary(
     for assembly_acc, filepath in file_dict.items():
         df = pd.read_csv(filepath, sep="\t")
 
+        # TODO: Add validation for the dataframe
+        # validate_dataframe(res_df, FunctionalSummarySchema, str(tax_file))
+
         df = df.rename(columns={**column_names, "count": assembly_acc})
 
         if merged_df is None:
@@ -130,7 +146,7 @@ def generate_functional_summary(
     ]
     merged_df = merged_df[cols]
 
-    merged_df.to_csv(f"{output_prefix}_{label}_summary.tsv", sep="\t", index=False)
+    merged_df.to_csv(output_file_name, sep="\t", index=False)
 
 
 @cli.command(
@@ -153,51 +169,56 @@ def generate_functional_summary(
     type=click.Path(exists=True, path_type=Path, file_okay=False),
 )
 @click.option(
-    "-p", "--output_prefix", required=True, help="Prefix to summary files", type=str
+    "-p",
+    "--output_prefix",
+    required=True,
+    help="Prefix to summary summary_files",
+    type=str,
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
-    """Generate study-level summary files for successfuly proccessed assemblies.
+    """Generate study-level summary summary_files for successfuly proccessed assemblies.
 
     :param assemblies: Path to a file listing successful assembly accessions and their status.
     :param study_dir: Path to the directory containing analysis results for each assembly.
-    :param output_prefix: Prefix for the generated summary files.
+    :param output_prefix: Prefix for the generated summary summary_files.
     """
     # TODO: this file with successful jobs is not yet published by pipeline
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
+    # TODO: Add validation for the assemblies_df
+    # AssemblyPassedJobsSchema(
+    #         assemblies_df
+    #     )
     assembly_list = assemblies_df["assembly"].tolist()
 
-    # TODO for now there is no check if files exist, this should be added
+    # TODO for now there is no check if summary_files exist, this should be added
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
         return {
             acc: study_dir / acc / subdir / filename_template.format(acc=acc)
             for acc in assembly_list
         }
 
-    # TODO: Add validation for the assemblies_df
-    # TODO handle both gz and non-gz files
+    # TODO handle both gz and non-gz summary_files
     generate_taxonomy_summary(
-        get_file_paths("taxonomy", "{acc}.krona.txt"), output_prefix
+        get_file_paths("taxonomy", "{acc}.krona.txt"),
+        f"{output_prefix}_taxonomy_summary.tsv",
     )
 
     generate_functional_summary(
         get_file_paths("functional-annotation/interpro", "{acc}_interpro_summary.tsv"),
         INTERPRO_COLUMN_NAMES,
-        output_prefix,
-        "interpro",
+        f"{output_prefix}_interpro_summary.tsv",
     )
 
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_go_summary.tsv"),
         GO_COLUMN_NAMES,
-        output_prefix,
-        "go",
+        f"{output_prefix}_go_summary.tsv",
     )
 
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_goslim_summary.tsv"),
         GO_COLUMN_NAMES,
-        output_prefix,
-        "goslim",
+        f"{output_prefix}_goslim_summary.tsv",
     )
 
 
@@ -217,7 +238,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     "-p",
     "--output_prefix",
     required=True,
-    help="Prefix to merged summary files",
+    help="Prefix to merged summary summary_files",
     type=str,
 )
 def merge_summaries(study_dir: str, output_prefix: str) -> None:
@@ -230,7 +251,79 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
     :param output_prefix: Prefix to be added to the generated summary file.
     :type output_prefix: str
     """
-    pass
+
+    def get_file_paths(summary_type: str) -> list[str]:
+        return glob.glob(f"{study_dir}/*_{summary_type}_summary.tsv")
+
+    # TODO: what if there are no summaries files?
+    merge_taxonomy_summaries(
+        get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_summary.tsv"
+    )
+
+    merge_functional_summaries(
+        get_file_paths("interpro"),
+        list(INTERPRO_COLUMN_NAMES.values()),
+        f"{output_prefix}_interpro_summary.tsv",
+    )
+
+    merge_functional_summaries(
+        get_file_paths("go"),
+        list(GO_COLUMN_NAMES.values()),
+        f"{output_prefix}_go_summary.tsv",
+    )
+
+    merge_functional_summaries(
+        get_file_paths("goslim"),
+        list(GO_COLUMN_NAMES.values()),
+        f"{output_prefix}_goslim_summary.tsv",
+    )
+
+
+def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) -> None:
+    """
+    TODO: Add docstring
+
+    Input summary file example:
+    taxonomy	ERZ1049444	ERZ1049446
+    sk__Eukaryota;k__Metazoa;p__Chordata	2	10
+    sk__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
+    """
+    summary_dfs = []
+    for file in summary_files:
+        df = pd.read_csv(file, sep="\t", index_col=0)
+        summary_dfs.append(df)
+    merged_df = pd.concat(summary_dfs, axis=1).fillna(0).astype(int)
+    merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
+    merged_df.to_csv(
+        output_file_name,
+        sep="\t",
+        index_label="taxonomy",
+    )
+
+
+def merge_functional_summaries(
+    summary_files: list[str], merge_keys: list[str], output_file_name: str
+) -> None:
+    """
+    TODO: Add docstring
+
+    Input summary file example:
+    go	term	category	ERZ1049444	ERZ1049446
+    GO:0016020	membrane	cellular_component	30626	673
+    GO:0005524	ATP binding	molecular_function	30524	2873
+    """
+    merged_df = pd.read_csv(summary_files[0], sep="\t")
+
+    if len(summary_files) > 1:
+        for path in summary_files[1:]:
+            df = pd.read_csv(path, sep="\t")
+            merged_df = pd.merge(merged_df, df, on=merge_keys, how="outer")
+
+        # Fill NaNs with 0 and make sure count columns are integers
+        count_columns = [col for col in merged_df.columns if col not in merge_keys]
+        merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
+
+    merged_df.to_csv(output_file_name, sep="\t", index=False)
 
 
 if __name__ == "__main__":

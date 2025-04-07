@@ -1,0 +1,10 @@
+7	sk__Archaea;k__Thermoproteati;p__Nitrososphaerota;c__Nitrososphaeria;o__Nitrosopumilales;f__Nitrosopumilaceae;g__Nitrosopumilus;s__Candidatus Nitrosopumilus koreensis
+3	sk__Archaea;k__Thermoproteati;p__Nitrososphaerota;c__Nitrososphaeria;o__Nitrosotaleales;f__Nitrosotaleaceae;g__Nitrosotalea;s__Nitrosotalea devaniterrae
+98	sk__Bacteria
+2	sk__Bacteria;k__Bacillati
+3	sk__Bacteria;k__Bacillati;p__Chloroflexota;c__Chloroflexia;o__;f__;g__;s__Chloroflexia bacterium
+2	sk__Bacteria;k__Bacillati;p__Chloroflexota;c__Dehalococcoidia
+8	sk__Bacteria;k__Bacillati;p__Actinomycetota;c__Acidimicrobiia;o__Acidimicrobiales
+1	sk__Bacteria;k__Bacillati;p__Actinomycetota;c__Actinomycetes
+1	sk__Bacteria;k__Pseudomonadati;p__Bacteroidota;c__Bacteroidia
+46	unclassified

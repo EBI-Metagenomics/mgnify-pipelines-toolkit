@@ -1,0 +1,6 @@
+go	term	category	count
+GO:0003824	catalytic activity	molecular_function	18626
+GO:0003674	DNA binding	molecular_function	16417
+GO:0055085	transmembrane transport	biological_process	13926
+GO:0005513	protein binding	molecular_function	11917
+GO:0016491	oxidoreductase activity	molecular_function	16064

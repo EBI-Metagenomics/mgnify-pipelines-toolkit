@@ -1,4 +1,4 @@
-- name: assembly_study_summary_generator test_correct_summarise
+- name: assembly_study_summary_generator correct_summarise
   tags:
     - assembly_study_summary_generator
   command:  >
@@ -16,7 +16,27 @@
       md5sum: ccdb11f77c1631ec3dad99226e791cbb
     - path: "test_taxonomy_summary.tsv"
       md5sum: 6260f20e4237d81c00d9787e02653734
-- name: assembly_study_summary_generator test_correct_merge
+
+- name: assembly_study_summary_generator summarise_singleton
+  tags:
+    - assembly_study_summary_generator
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_singleton.csv
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: 171e1981d6dff62859e530ac77027942
+    - path: "test_goslim_summary.tsv"
+      md5sum: 526b5d4442eeca094b27bdacea8b2465
+    - path: "test_interpro_summary.tsv"
+      md5sum: 74052714ef73f76649d9396b7fd9532e
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: ff1a1a359bad0f23dd90a6fa71c38d75
+
+- name: assembly_study_summary_generator correct_merge
   tags:
     - assembly_study_summary_generator
   command: >
@@ -33,6 +53,79 @@
       md5sum: 04713e331bfbfdfa9a04c7c88dcc1004
     - path: "test_taxonomy_summary.tsv"
       md5sum: a5a1e769c58396ce276f17210d3039da
+
+- name: assembly_study_summary_generator merge_singleton
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    merge
+    -a tests/fixtures/study_summary_inputs/assembly/merge/only_1_chunk
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_goslim_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_interpro_summary.tsv"
+      md5sum: 1d7bcc504c4a762c6fd080852c31c208
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: 9e1ffd9f7b04a90a59c6c82e885975f3
+
+- name: assembly_study_summary_generator summarise_no_tax_file
+  tags:
+    - assembly_study_summary_generator
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_no_tax_file.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "The following required files are missing: tests/fixtures/study_summary_inputs/assembly/summarise/ERZ1049449/taxonomy/ERZ1049449.krona.txt"
+
+- name: assembly_study_summary_generator summarise_no_funct_file
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_no_func_file.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "The following required files are missing: tests/fixtures/study_summary_inputs/assembly/summarise/ERZ1049450/functional-annotation/interpro/ERZ1049450_interpro_summary.tsv"
+
+# - name: assembly_study_summary_generator merge_no_tax_summary
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     merge
+#     -a tests/fixtures/study_summary_inputs/assembly/merge/no_tax_summary
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - "The following required files are missing: "
+
+# - name: assembly_study_summary_generator merge_no_func_summary
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     merge
+#     -a tests/fixtures/study_summary_inputs/assembly/merge/no_func_summary
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - "The following required files are missing: "
+
 # - name: assembly_study_summary_generator test_invalid_success_status
 #   tags:
 #     - assembly_study_summary_generator

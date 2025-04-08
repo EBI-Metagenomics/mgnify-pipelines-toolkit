@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pandas as pd
 
+# TODO add logging to the script
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -41,6 +42,14 @@ def cli():
     pass
 
 
+def check_files_exist(file_list: list[Path]) -> None:
+    missing_files = [str(path) for path in file_list if not path.exists()]
+    if missing_files:
+        raise FileNotFoundError(
+            f"The following required files are missing: {', '.join(missing_files)}"
+        )
+
+
 def generate_taxonomy_summary(
     file_dict: dict[str, Path], output_file_name: str
 ) -> None:
@@ -55,13 +64,7 @@ def generate_taxonomy_summary(
     4985	sk__Archaea	k__Thermoproteati	p__Nitrososphaerota
     882	sk__Archaea	k__Nanobdellati	p__	c__	o__	f__	g__	s__Candidatus Pacearchaeota archaeon
     """
-    missing_summary_files = [
-        str(path) for path in file_dict.values() if not path.exists()
-    ]
-    if missing_summary_files:
-        raise FileNotFoundError(
-            f"The following required summary_files are missing: {', '.join(missing_summary_files)}"
-        )
+    check_files_exist(list(file_dict.values()))
 
     tax_columns = [
         "Count",
@@ -119,6 +122,8 @@ def generate_functional_summary(
     GO:0016020	membrane	cellular_component	30626
     GO:0005524	ATP binding	molecular_function	30524
     """
+    check_files_exist(list(file_dict.values()))
+
     merged_df = None
 
     for assembly_acc, filepath in file_dict.items():
@@ -190,7 +195,6 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     #     )
     assembly_list = assemblies_df["assembly"].tolist()
 
-    # TODO for now there is no check if summary_files exist, this should be added
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
         return {
             acc: study_dir / acc / subdir / filename_template.format(acc=acc)

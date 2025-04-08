@@ -1,11 +1,11 @@
 - name: assembly_study_summary_generator test_correct_summarise
   tags:
     - assembly_study_summary_generator
-  command: |
-    assembly_study_summary_generator \
-    summarise \
-    -a tests/fixtures/study_summary_inputs/assembly/summarise \
-    -r tests/fixtures/study_summary_inputs/assembly/summarise/input.csv \
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input.csv
     -p test
   files:
     - path: "test_go_summary.tsv"
@@ -19,10 +19,10 @@
 - name: assembly_study_summary_generator test_correct_merge
   tags:
     - assembly_study_summary_generator
-  command: |
-    assembly_study_summary_generator \
-    merge \
-    -a tests/fixtures/study_summary_inputs/assembly/merge \
+  command: >
+    assembly_study_summary_generator
+    merge
+    -a tests/fixtures/study_summary_inputs/assembly/merge
     -p test
   files:
     - path: "test_go_summary.tsv"

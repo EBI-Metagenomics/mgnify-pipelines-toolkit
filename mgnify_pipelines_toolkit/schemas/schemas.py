@@ -110,38 +110,30 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
-class INSDCAnalysisAccession(RootModel):
+class INSDCAnalysisAccession(RootModel[str]):
     """
     Class for modelling for INSDC-specific analysis accessions.
     Essentially is just a special string with regex-based validation of the accession.
     """
 
-    # RootModel example:
-    # https://stackoverflow.com/questions/78393675/how-to-make-a-custom-type-inheriting-from-uuid-work-as-a-pydantic-model
-
-    root: str = Field(
-        unique=True,
-        description="The analysis needs to be a valid ENA accession",
-        examples=["ERZ123456", "ERZ789012"],
-    )
-
+    # TODO: this is not idiomatic Pydantic, should be deleted
+    # TODO: especially because unique=True can be igored silently, check it!
+    # root: str = Field(
+    #
+    #     unique=True,
+    #     description="The analysis needs to be a valid ENA accession",
+    #     examples=["ERZ123456", "ERZ789012"],
+    # )
     @field_validator("root", mode="after")
     @classmethod
-    def analysis_validity_check(cls, analysis: str) -> bool:
+    def validate_format(cls, accession: str) -> str:
         """
         Checks that the analysis string matches the regex code of an INSDC analysis accession.
         Throws a `ValueError` exception if not, which is what Pydantic prefers for validation errors.
         """
-
-        analysis_accession_regex = "ERZ[0-9]{6,}"
-        regex_res = re.match(analysis_accession_regex, analysis)
-
-        if regex_res is None:
-            raise ValueError(
-                f"Accession `{analysis}` does not fit INSDC format [ERZ*]."
-            )
-
-        return analysis
+        if not re.match(r"ERZ[0-9]{6,}", accession):
+            raise ValueError("Invalid accession")
+        return accession
 
 
 class AssemblyAnalysisResultTypes(str, Enum):

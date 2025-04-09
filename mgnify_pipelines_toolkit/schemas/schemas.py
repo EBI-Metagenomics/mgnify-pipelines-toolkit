@@ -21,6 +21,7 @@ from typing import ClassVar, Optional, Type
 
 import pandas as pd
 import pandera as pa
+from pandera.typing import Series
 from pandera.typing.common import DataFrameBase
 
 from pydantic import (
@@ -110,21 +111,15 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
-class INSDCAnalysisAccession(RootModel[str]):
-    """
-    Class for modelling for INSDC-specific analysis accessions.
-    Essentially is just a special string with regex-based validation of the accession.
+class CompletedAnalysisRecord(BaseModel):
+    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file.
+    Uses the previous two classes.
     """
 
-    # TODO: this is not idiomatic Pydantic, should be deleted
-    # TODO: especially because unique=True can be igored silently, check it!
-    # root: str = Field(
-    #
-    #     unique=True,
-    #     description="The analysis needs to be a valid ENA accession",
-    #     examples=["ERZ123456", "ERZ789012"],
-    # )
-    @field_validator("root", mode="after")
+    assembly: str = Field(..., description="Assembly accession", examples=["ERZ789012"])
+    status: str = Field(..., description="")
+
+    @field_validator("assembly")
     @classmethod
     def validate_format(cls, accession: str) -> str:
         """
@@ -135,33 +130,101 @@ class INSDCAnalysisAccession(RootModel[str]):
             raise ValueError("Invalid accession")
         return accession
 
-
-class AssemblyAnalysisResultTypes(str, Enum):
-    """Class that models the two allowed statuses for successful assembly analysis jobs.
-    Pydantic validates Enums very simply without needing to declare a new function.
-    """
-
-    success = "success"
-
-
-class AnalysisPassedAssembliesRecord(BaseModel):
-    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file.
-    Uses the previous two classes.
-    """
-
-    assembly: INSDCAnalysisAccession
-    status: AssemblyAnalysisResultTypes
+    @field_validator("status")
+    @classmethod
+    def validate_status(cls, value: str) -> str:
+        allowed = {"success"}
+        if value not in allowed:
+            raise ValueError(
+                f"Invalid assembly job status: {value}. Allowed values: {', '.join(allowed)}"
+            )
+        return value
 
 
-class AnalysisPassedAssembliesSchema(pa.DataFrameModel):
+class CompletedAnalysisSchema(pa.DataFrameModel):
     """Class modelling a Pandera dataframe schema that uses the AnalysisPassedAssembliesRecord class as dtype.
     This is what actually validates the generated dataframe when read by pandas.read_csv.
     """
 
+    assembly: Series[str]
+
+    @pa.check("assembly")
+    def accessions_unique(cls, series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
     class Config:
         """Config with dataframe-level data type."""
 
-        dtype = PydanticModel(AnalysisPassedAssembliesRecord)
+        dtype = PydanticModel(CompletedAnalysisRecord)
+        coerce = True
+
+
+class InterProSummaryRecord(BaseModel):
+    """Model of a row in the InterPro summary file."""
+
+    count: int = Field(
+        ..., ge=0, description="Number of hits for the InterPro accession"
+    )
+    interpro_accession: str = Field(
+        ..., description="InterPro accession ID", examples=["IPR123456"]
+    )
+    description: str = Field(..., description="Description of the InterPro domain")
+
+    @field_validator("interpro_accession")
+    @classmethod
+    def check_interpro_format(cls, id) -> str:
+        # TODO: check if this is the correct regex for InterPro accessions
+        if not re.fullmatch(r"IPR\d{6}", id):
+            raise ValueError(f"Invalid InterPro accession: {id}")
+        return id
+
+
+class GOSummaryRecord(BaseModel):
+    """Model of a row in the GO summary file."""
+
+    go: str = Field(..., description="GO term identifier", examples=["GO:1234567"])
+    term: str = Field(..., description="GO term name")
+    category: str = Field(
+        ...,
+        description="GO category",
+        examples=["biological_process", "molecular_function", "cellular_component"],
+    )
+    count: int = Field(..., ge=0, description="Number of times the GO term is observed")
+
+    @field_validator("go")
+    @classmethod
+    def check_goterm_format(cls, id) -> str:
+        # TODO: check if this is the correct regex
+        if not re.fullmatch(r"GO:\d{7}", id):
+            raise ValueError(f"Invalid GO term format: {id}")
+        return id
+
+
+class InterProSummarySchema(pa.DataFrameModel):
+    """Schema for InterPro summary file validation."""
+
+    interpro_accession: Series[str]
+
+    @pa.check("interpro_accession")
+    def interpro_ids_unique(cls, series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+    class Config:
+        dtype = PydanticModel(InterProSummaryRecord)
+        coerce = True
+
+
+class GOSummarySchema(pa.DataFrameModel):
+    """Schema for GO or GOslim summary file validation."""
+
+    go: Series[str]
+
+    @pa.check("go")
+    def go_ids_unique(cls, series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+    class Config:
+        dtype = PydanticModel(GOSummaryRecord)
         coerce = True
 
 

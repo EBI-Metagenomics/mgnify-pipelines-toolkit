@@ -26,6 +26,8 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     TaxonSchema,
     GOSummarySchema,
     InterProSummarySchema,
+    GOStudySummarySchema,
+    InterProStudySummarySchema,
     validate_dataframe,
 )
 
@@ -287,23 +289,18 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
         get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_summary.tsv"
     )
 
-    merge_functional_summaries(
-        get_file_paths("interpro"),
-        list(INTERPRO_COLUMN_NAMES.values()),
-        f"{output_prefix}_interpro_summary.tsv",
-    )
-
-    merge_functional_summaries(
-        get_file_paths("go"),
-        list(GO_COLUMN_NAMES.values()),
-        f"{output_prefix}_go_summary.tsv",
-    )
-
-    merge_functional_summaries(
-        get_file_paths("goslim"),
-        list(GO_COLUMN_NAMES.values()),
-        f"{output_prefix}_goslim_summary.tsv",
-    )
+    column_names_mapping = {
+        "go": GO_COLUMN_NAMES,
+        "goslim": GO_COLUMN_NAMES,
+        "interpro": INTERPRO_COLUMN_NAMES,
+    }
+    for summary_type, column_names in column_names_mapping.items():
+        merge_functional_summaries(
+            get_file_paths(summary_type),
+            list(column_names.values()),
+            output_prefix,
+            summary_type,
+        )
 
 
 def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) -> None:
@@ -336,7 +333,7 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
 
 
 def merge_functional_summaries(
-    summary_files: list[str], merge_keys: list[str], output_file_name: str
+    summary_files: list[str], merge_keys: list[str], output_prefix: str, label: str
 ) -> None:
     """
     TODO: Add docstring
@@ -346,28 +343,34 @@ def merge_functional_summaries(
     GO:0016020	membrane	cellular_component	30626	673
     GO:0005524	ATP binding	molecular_function	30524	2873
     """
+    output_file_name = f"{output_prefix}_{label}_summary.tsv"
+
     if not summary_files:
         logging.warning(
             f"Skipping creation of {output_file_name} because no summaries were found for this type of functional annotation."
         )
         return
 
-    # TODO validate the summary_files, can't be empty
+    merged_df = None
+    for filepath in summary_files:
+        df = pd.read_csv(filepath, sep="\t")
 
-    merged_df = pd.read_csv(summary_files[0], sep="\t")
-    if len(summary_files) > 1:
-        for path in summary_files[1:]:
-            df = pd.read_csv(path, sep="\t")
+        if label in ["go", "goslim"]:
+            validate_dataframe(df, GOStudySummarySchema, str(filepath))
+        elif label == "interpro":
+            validate_dataframe(df, InterProStudySummarySchema, str(filepath))
+
+        if merged_df is None:
+            merged_df = df
+        else:
             merged_df = pd.merge(merged_df, df, on=merge_keys, how="outer")
 
-        # Fill NaNs with 0 and make sure count columns are integers
-        count_columns = [col for col in merged_df.columns if col not in merge_keys]
-
-        # Reorder columns: merge_keys first, then sorted count columns
-        sorted_columns = merge_keys + sorted(count_columns)
-        merged_df = merged_df[sorted_columns]
-        merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
-
+    # Fill NaNs with 0 and make sure count columns are integers
+    count_columns = [col for col in merged_df.columns if col not in merge_keys]
+    # Reorder columns: merge_keys first, then sorted count columns
+    sorted_columns = merge_keys + sorted(count_columns)
+    merged_df = merged_df[sorted_columns]
+    merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
     merged_df.to_csv(output_file_name, sep="\t", index=False)
 
 

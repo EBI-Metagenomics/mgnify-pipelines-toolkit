@@ -228,6 +228,35 @@ class GOSummarySchema(pa.DataFrameModel):
         coerce = True
 
 
+class GOStudySummarySchema(pa.DataFrameModel):
+    """Schema for GO or GOslim study summary file validation."""
+
+    GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$")
+    description: Series[str]
+    category: Series[str]
+
+    @pa.check(regex=r"^ERZ\d+")
+    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
+        return s >= 0
+
+    class Config:
+        strict = False  # allow extra ERZ* columns not declared above
+
+
+class InterProStudySummarySchema(pa.DataFrameModel):
+    """Schema for InterPro study summary file validation."""
+
+    IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$")
+    description: Series[str]
+
+    @pa.check(regex=r"^ERZ\d+")
+    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
+        return s >= 0
+
+    class Config:
+        strict = False  # allow extra ERZ* columns not declared above
+
+
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
     Uses the AmpliconNonINSDCSPassedRunsRecord as a dtype to achieve this.

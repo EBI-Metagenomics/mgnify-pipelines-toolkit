@@ -110,6 +110,69 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
+class INSDCAnalysisAccession(RootModel):
+    """
+    Class for modelling for INSDC-specific analysis accessions.
+    Essentially is just a special string with regex-based validation of the accession.
+    """
+
+    # RootModel example:
+    # https://stackoverflow.com/questions/78393675/how-to-make-a-custom-type-inheriting-from-uuid-work-as-a-pydantic-model
+
+    root: str = Field(
+        unique=True,
+        description="The analysis needs to be a valid ENA accession",
+        examples=["ERZ123456", "ERZ789012"],
+    )
+
+    @field_validator("root", mode="after")
+    @classmethod
+    def analysis_validity_check(cls, analysis: str) -> bool:
+        """
+        Checks that the analysis string matches the regex code of an INSDC analysis accession.
+        Throws a `ValueError` exception if not, which is what Pydantic prefers for validation errors.
+        """
+
+        analysis_accession_regex = "ERZ[0-9]{6,}"
+        regex_res = re.match(analysis_accession_regex, analysis)
+
+        if regex_res is None:
+            raise ValueError(
+                f"Accession `{analysis}` does not fit INSDC format [ERZ*]."
+            )
+
+        return analysis
+
+
+class AssemblyAnalysisResultTypes(str, Enum):
+    """Class that models the two allowed statuses for successful assembly analysis jobs.
+    Pydantic validates Enums very simply without needing to declare a new function.
+    """
+
+    success = "success"
+
+
+class AnalysisPassedAssembliesRecord(BaseModel):
+    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file.
+    Uses the previous two classes.
+    """
+
+    assembly: INSDCAnalysisAccession
+    status: AssemblyAnalysisResultTypes
+
+
+class AnalysisPassedAssembliesSchema(pa.DataFrameModel):
+    """Class modelling a Pandera dataframe schema that uses the AnalysisPassedAssembliesRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(AnalysisPassedAssembliesRecord)
+        coerce = True
+
+
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
     Uses the AmpliconNonINSDCSPassedRunsRecord as a dtype to achieve this.

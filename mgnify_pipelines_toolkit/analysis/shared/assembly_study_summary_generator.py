@@ -21,6 +21,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from mgnify_pipelines_toolkit.schemas.schemas import (
+    CompletedAnalysisSchema,
+    TaxonSchema,
+    GOSummarySchema,
+    InterProSummarySchema,
+    validate_dataframe,
+)
+
 # TODO add logging to the script
 logging.basicConfig(level=logging.DEBUG)
 
@@ -81,8 +89,9 @@ def generate_taxonomy_summary(
     for assembly_acc, path in file_dict.items():
         df = pd.read_csv(path, sep="\t", names=tax_columns).fillna("")
 
-        # TODO: Add validation for the dataframe
-        # validate_dataframe(res_df, TaxonSchema, str(tax_file))
+        # TODO Now if the dataframe is empty, SchemaErrors will be raised, but message is not clear
+        # Maybe we should fix it?
+        validate_dataframe(df, TaxonSchema, str(path))
 
         # Combine all taxonomic levels into a single string per row
         df["full_taxon"] = df[tax_columns[1:]].agg(";".join, axis=1).str.strip(";")
@@ -100,10 +109,11 @@ def generate_taxonomy_summary(
 def generate_functional_summary(
     file_dict: dict[str, Path],
     column_names: dict[str, str],
-    output_file_name: str,
+    output_prefix: str,
+    label: str,
 ) -> None:
     """
-    Merge multiple summary summary_files into a single summary table.
+    Merge multiple summary files into a single summary table.
 
     Parameters:
         file_dict (dict): Dictionary with assembly IDs as keys and file paths as values.
@@ -124,13 +134,20 @@ def generate_functional_summary(
     """
     check_files_exist(list(file_dict.values()))
 
+    output_file_name = f"{output_prefix}_{label}_summary.tsv"
+
     merged_df = None
-
     for assembly_acc, filepath in file_dict.items():
-        df = pd.read_csv(filepath, sep="\t")
+        try:
+            df = pd.read_csv(filepath, sep="\t")
+        except pd.errors.EmptyDataError:
+            logging.warning(f"File {filepath} is empty. Skipping.")
+            continue
 
-        # TODO: Add validation for the dataframe
-        # validate_dataframe(res_df, FunctionalSummarySchema, str(tax_file))
+        if label in ["go", "goslim"]:
+            validate_dataframe(df, GOSummarySchema, str(filepath))
+        elif label == "interpro":
+            validate_dataframe(df, InterProSummarySchema, str(filepath))
 
         df = df.rename(columns={**column_names, "count": assembly_acc})
 
@@ -140,6 +157,13 @@ def generate_functional_summary(
             merged_df = pd.merge(
                 merged_df, df, on=list(column_names.values()), how="outer"
             )
+
+    if merged_df is None:
+        logging.warning(
+            f"No valid files with functional annotation summary were found. Skipping creation of {output_file_name}."
+        )
+        return
+
     # Fill NaNs with 0 and make sure count columns are integers
     count_columns = [
         col for col in merged_df.columns if col not in column_names.values()
@@ -189,10 +213,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     """
     # TODO: this file with successful jobs is not yet published by pipeline
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
-    # TODO: Add validation for the assemblies_df
-    # AssemblyPassedJobsSchema(
-    #         assemblies_df
-    #     )
+    CompletedAnalysisSchema(assemblies_df)
     assembly_list = assemblies_df["assembly"].tolist()
 
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
@@ -210,19 +231,22 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     generate_functional_summary(
         get_file_paths("functional-annotation/interpro", "{acc}_interpro_summary.tsv"),
         INTERPRO_COLUMN_NAMES,
-        f"{output_prefix}_interpro_summary.tsv",
+        output_prefix,
+        "interpro",
     )
 
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_go_summary.tsv"),
         GO_COLUMN_NAMES,
-        f"{output_prefix}_go_summary.tsv",
+        output_prefix,
+        "go",
     )
 
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_goslim_summary.tsv"),
         GO_COLUMN_NAMES,
-        f"{output_prefix}_goslim_summary.tsv",
+        output_prefix,
+        "goslim",
     )
 
 
@@ -259,7 +283,6 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
     def get_file_paths(summary_type: str) -> list[str]:
         return glob.glob(f"{study_dir}/*_{summary_type}_summary.tsv")
 
-    # TODO: what if there are no summaries files?
     merge_taxonomy_summaries(
         get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_summary.tsv"
     )
@@ -292,9 +315,16 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
     sk__Eukaryota;k__Metazoa;p__Chordata	2	10
     sk__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
     """
+    if not summary_files:
+        raise FileNotFoundError(
+            "The required taxonomic classification summary files are missing. Exiting."
+        )
+
     summary_dfs = []
     for file in summary_files:
         df = pd.read_csv(file, sep="\t", index_col=0)
+        # TODO: Add validation for the dataframe
+        # and check if dataframe is empty, raise error in this case
         summary_dfs.append(df)
     merged_df = pd.concat(summary_dfs, axis=1).fillna(0).astype(int)
     merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
@@ -316,8 +346,15 @@ def merge_functional_summaries(
     GO:0016020	membrane	cellular_component	30626	673
     GO:0005524	ATP binding	molecular_function	30524	2873
     """
-    merged_df = pd.read_csv(summary_files[0], sep="\t")
+    if not summary_files:
+        logging.warning(
+            f"Skipping creation of {output_file_name} because no summaries were found for this type of functional annotation."
+        )
+        return
 
+    # TODO validate the summary_files, can't be empty
+
+    merged_df = pd.read_csv(summary_files[0], sep="\t")
     if len(summary_files) > 1:
         for path in summary_files[1:]:
             df = pd.read_csv(path, sep="\t")

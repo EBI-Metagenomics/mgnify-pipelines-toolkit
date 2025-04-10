@@ -32,9 +32,9 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     validate_dataframe,
 )
 
-# TODO add logging to the script
-logging.basicConfig(level=logging.DEBUG)
-
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 GO_COLUMN_NAMES = {
     "go": "GO",
@@ -224,9 +224,11 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     :param output_prefix: Prefix for the generated summary files.
     """
     # TODO: this file with successful jobs is not yet published by pipeline
+    logging.info(f"Reading assembly list from {assemblies.resolve()}")
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
     CompletedAnalysisSchema(assemblies_df)
     assembly_list = assemblies_df["assembly"].tolist()
+    logging.info("Assembly list was read successfully.")
 
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
         return {
@@ -235,31 +237,43 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
         }
 
     # TODO handle both gz and non-gz summary_files
+    logging.info("Start processing of assembly-level summaries.")
+    logging.info(
+        "Generating taxonomy summary from assembly-level summaries <accession>.krona.txt"
+    )
     generate_taxonomy_summary(
         get_file_paths("taxonomy", "{acc}.krona.txt"),
         f"{output_prefix}_taxonomy_summary.tsv",
     )
-
+    logging.info(
+        "Generating functional summaries from assembly-level summaries <accession>_interpro_summary.tsv"
+    )
     generate_functional_summary(
         get_file_paths("functional-annotation/interpro", "{acc}_interpro_summary.tsv"),
         INTERPRO_COLUMN_NAMES,
         output_prefix,
         "interpro",
     )
-
+    logging.info(
+        "Generating functional summaries from assembly-level summaries <accession>_go_summary.tsv"
+    )
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_go_summary.tsv"),
         GO_COLUMN_NAMES,
         output_prefix,
         "go",
     )
-
+    logging.info(
+        "Generating functional summaries from assembly-level summaries <accession>_goslim_summary.tsv"
+    )
     generate_functional_summary(
         get_file_paths("functional-annotation/go", "{acc}_goslim_summary.tsv"),
         GO_COLUMN_NAMES,
         output_prefix,
         "goslim",
     )
+    logging.info("Assembly-level summaries were generated successfully.")
+    logging.info("Done.")
 
 
 @cli.command(
@@ -292,6 +306,8 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
     def get_file_paths(summary_type: str) -> list[str]:
         return glob.glob(f"{study_dir}/*_{summary_type}_summary.tsv")
 
+    logging.info("Generating combined assembly-level summaries")
+    logging.info("Parsing summary files for taxonomic classification")
     merge_taxonomy_summaries(
         get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_summary.tsv"
     )
@@ -302,12 +318,15 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
         "interpro": INTERPRO_COLUMN_NAMES,
     }
     for summary_type, column_names in column_names_mapping.items():
+        logging.info(f"Parsing summary files for {summary_type.capitalize()}.")
         merge_functional_summaries(
             get_file_paths(summary_type),
             list(column_names.values()),
             output_prefix,
             summary_type,
         )
+    logging.info("Merged assembly-level summaries were generated successfully.")
+    logging.info("Done.")
 
 
 def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) -> None:

@@ -149,7 +149,7 @@ class CompletedAnalysisSchema(pa.DataFrameModel):
     assembly: Series[str]
 
     @pa.check("assembly")
-    def accessions_unique(cls, series: Series[str]) -> Series[bool]:
+    def accessions_unique(self, series: Series[str]) -> Series[bool]:
         return ~series.duplicated()
 
     class Config:
@@ -204,7 +204,7 @@ class InterProSummarySchema(pa.DataFrameModel):
     interpro_accession: Series[str]
 
     @pa.check("interpro_accession")
-    def interpro_ids_unique(cls, series: Series[str]) -> Series[bool]:
+    def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
         return ~series.duplicated()
 
     class Config:
@@ -218,7 +218,7 @@ class GOSummarySchema(pa.DataFrameModel):
     go: Series[str]
 
     @pa.check("go")
-    def go_ids_unique(cls, series: Series[str]) -> Series[bool]:
+    def go_ids_unique(self, series: Series[str]) -> Series[bool]:
         return ~series.duplicated()
 
     class Config:
@@ -234,7 +234,7 @@ class BaseStudySummarySchema(pa.DataFrameModel):
         return ~series.duplicated()
 
     @pa.check(regex=r"^ERZ\d+")
-    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
+    def count_columns_are_non_negative(self, s: Series[int]) -> Series[bool]:
         return s >= 0
 
     class Config:
@@ -247,8 +247,8 @@ class GOStudySummarySchema(BaseStudySummarySchema):
     category: Series[str]
 
     @pa.check("GO")
-    def go_ids_unique(cls, series: Series[str]) -> Series[bool]:
-        return cls.is_unique(series)
+    def go_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
 
 
 class InterProStudySummarySchema(BaseStudySummarySchema):
@@ -256,8 +256,8 @@ class InterProStudySummarySchema(BaseStudySummarySchema):
     description: Series[str]
 
     @pa.check("IPR")
-    def interpro_ids_unique(cls, series: Series[str]) -> Series[bool]:
-        return cls.is_unique(series)
+    def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
 
 
 class TaxonomyStudySummarySchema(BaseStudySummarySchema):

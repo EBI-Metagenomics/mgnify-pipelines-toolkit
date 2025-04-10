@@ -28,6 +28,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     InterProSummarySchema,
     GOStudySummarySchema,
     InterProStudySummarySchema,
+    TaxonomyStudySummarySchema,
     validate_dataframe,
 )
 
@@ -45,6 +46,18 @@ INTERPRO_COLUMN_NAMES = {
     "interpro_accession": "IPR",
     "description": "description",
 }
+
+TAXONOMY_COLUMN_NAMES = [
+    "Count",
+    "superkingdom",
+    "kingdom",
+    "phylum",
+    "class",
+    "order",
+    "family",
+    "genus",
+    "species",
+]
 
 
 @click.group()
@@ -64,7 +77,7 @@ def generate_taxonomy_summary(
     file_dict: dict[str, Path], output_file_name: str
 ) -> None:
     """
-    Generates a combined taxonomy summary from multiple taxonomy summary_files.
+    Generates a combined taxonomy summary from multiple taxonomy summary files.
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
     :param output_prefix: Prefix for the output summary file.
@@ -76,35 +89,24 @@ def generate_taxonomy_summary(
     """
     check_files_exist(list(file_dict.values()))
 
-    tax_columns = [
-        "Count",
-        "superkingdom",
-        "kingdom",
-        "phylum",
-        "class",
-        "order",
-        "family",
-        "genus",
-        "species",
-    ]
     tax_dfs = []
     for assembly_acc, path in file_dict.items():
-        df = pd.read_csv(path, sep="\t", names=tax_columns).fillna("")
+        df = pd.read_csv(path, sep="\t", names=TAXONOMY_COLUMN_NAMES).fillna("")
 
-        # TODO Now if the dataframe is empty, SchemaErrors will be raised, but message is not clear
-        # Maybe we should fix it?
+        # Note: schema validation will fail if the taxonomy file is empty
         validate_dataframe(df, TaxonSchema, str(path))
 
-        # Combine all taxonomic levels into a single string per row
-        df["full_taxon"] = df[tax_columns[1:]].agg(";".join, axis=1).str.strip(";")
+        # Combine all taxonomic ranks in the classification into a single string
+        df["full_taxon"] = (
+            df[TAXONOMY_COLUMN_NAMES[1:]].agg(";".join, axis=1).str.strip(";")
+        )
 
-        # Create a DataFrame with taxonomy as index and count as the only column
+        # Create a new DataFrame with taxonomy as index and count as the only column
         result = df[["Count", "full_taxon"]].set_index("full_taxon")
         result.columns = [assembly_acc]
         tax_dfs.append(result)
 
     summary_df = pd.concat(tax_dfs, axis=1).fillna(0).astype(int).sort_index()
-
     summary_df.to_csv(output_file_name, sep="\t", index_label="taxonomy")
 
 
@@ -166,12 +168,13 @@ def generate_functional_summary(
         )
         return
 
-    # Fill NaNs with 0 and make sure count columns are integers
+    # Fill NaNs with 0 and make sure counts are integers
     count_columns = [
         col for col in merged_df.columns if col not in column_names.values()
     ]
     merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
 
+    # Reorder columns: merge_keys first, then sorted assembly accessions
     cols = list(column_names.values()) + [
         col for col in merged_df.columns if col not in column_names.values()
     ]
@@ -320,8 +323,7 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
     summary_dfs = []
     for file in summary_files:
         df = pd.read_csv(file, sep="\t", index_col=0)
-        # TODO: Add validation for the dataframe
-        # and check if dataframe is empty, raise error in this case
+        validate_dataframe(df, TaxonomyStudySummarySchema, file)
         summary_dfs.append(df)
     merged_df = pd.concat(summary_dfs, axis=1).fillna(0).astype(int)
     merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
@@ -351,26 +353,27 @@ def merge_functional_summaries(
         )
         return
 
-    merged_df = None
-    for filepath in summary_files:
-        df = pd.read_csv(filepath, sep="\t")
+    validation_schema = (
+        InterProStudySummarySchema if label == "interpro" else GOStudySummarySchema
+    )
 
-        if label in ["go", "goslim"]:
-            validate_dataframe(df, GOStudySummarySchema, str(filepath))
-        elif label == "interpro":
-            validate_dataframe(df, InterProStudySummarySchema, str(filepath))
+    merged_df = pd.read_csv(summary_files[0], sep="\t")
+    validate_dataframe(merged_df, validation_schema, summary_files[0])
 
-        if merged_df is None:
-            merged_df = df
-        else:
+    if len(summary_files) > 1:
+        for filepath in summary_files[1:]:
+            df = pd.read_csv(filepath, sep="\t")
+            validate_dataframe(df, validation_schema, filepath)
             merged_df = pd.merge(merged_df, df, on=merge_keys, how="outer")
 
-    # Fill NaNs with 0 and make sure count columns are integers
-    count_columns = [col for col in merged_df.columns if col not in merge_keys]
-    # Reorder columns: merge_keys first, then sorted count columns
-    sorted_columns = merge_keys + sorted(count_columns)
-    merged_df = merged_df[sorted_columns]
-    merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
+        # Fill NaNs with 0 and make sure count columns are integers
+        count_columns = [col for col in merged_df.columns if col not in merge_keys]
+
+        # Reorder columns: merge_keys first, then sorted count columns
+        sorted_columns = merge_keys + sorted(count_columns)
+        merged_df = merged_df[sorted_columns]
+        merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
+
     merged_df.to_csv(output_file_name, sep="\t", index=False)
 
 

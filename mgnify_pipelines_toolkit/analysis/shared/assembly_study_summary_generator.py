@@ -353,7 +353,11 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
         validate_dataframe(df, TaxonomyStudySummarySchema, file)
         summary_dfs.append(df)
     merged_df = pd.concat(summary_dfs, axis=1).fillna(0).astype(int)
-    merged_df = merged_df.reindex(sorted(merged_df.columns), axis=1)
+
+    # Reorder columns: taxonomy first, then sorted assembly accessions
+    merged_df = merged_df[sorted(merged_df.columns)]
+    merged_df = merged_df.sort_index()
+
     merged_df.to_csv(
         output_file_name,
         sep="\t",

@@ -257,6 +257,17 @@ class InterProStudySummarySchema(pa.DataFrameModel):
         strict = False  # allow extra ERZ* columns not declared above
 
 
+class TaxonomyStudySummarySchema(pa.DataFrameModel):
+    """Schema for validation of study summary file with taxonomic classification."""
+
+    @pa.check(regex=r"^ERZ\d+")
+    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
+        return s >= 0
+
+    class Config:
+        strict = False  # allow extra ERZ* columns not declared above
+
+
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
     Uses the AmpliconNonINSDCSPassedRunsRecord as a dtype to achieve this.

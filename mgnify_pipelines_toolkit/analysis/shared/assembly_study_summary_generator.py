@@ -66,6 +66,12 @@ def cli():
 
 
 def check_files_exist(file_list: list[Path]) -> None:
+    """
+    Check that all files in the given list exist on disk.
+
+    :param file_list: List of file paths to check.
+    :raises FileNotFoundError: If any file does not exist.
+    """
     missing_files = [str(path) for path in file_list if not path.exists()]
     if missing_files:
         raise FileNotFoundError(
@@ -77,7 +83,8 @@ def generate_taxonomy_summary(
     file_dict: dict[str, Path], output_file_name: str
 ) -> None:
     """
-    Generates a combined taxonomy summary from multiple taxonomy summary files.
+    Generate a combined study-level taxonomic classification summary from multiple input
+    assembly-level summary files.
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
     :param output_prefix: Prefix for the output summary file.
@@ -117,24 +124,23 @@ def generate_functional_summary(
     label: str,
 ) -> None:
     """
-    Merge multiple summary files into a single summary table.
+    Generate a combined study-level functional annotation summary from multiple input
+    assembly-level summary files.
 
-    Parameters:
-        file_dict (dict): Dictionary with assembly IDs as keys and file paths as values.
-        output_file (str): Path to write the merged summary file.
+    :param file_dict: Dictionary mapping assembly accession to its summary file path.
+    :param column_names: Dictionary mapping original column names to standard column names.
+    :param output_prefix: Prefix for the output summary file.
+    :param label: Label for the functional annotation type (expected one of ["go", "goslim", "interpro"]).
 
-    Output:
-        A TSV file.
-
-    Example of the Interpro summary file:
-    count	interpro_accession	description
-    16503	IPR036291	NAD(P)-binding domain superfamily
-    14694	IPR019734	Tetratricopeptide repeat
-
-    Example of the GO summary file:
+    Example of GO summary input file:
     go	term	category	count
     GO:0016020	membrane	cellular_component	30626
     GO:0005524	ATP binding	molecular_function	30524
+
+    Example of InterPro summary input file:
+    count	interpro_accession	description
+    16503	IPR036291	NAD(P)-binding domain superfamily
+    14694	IPR019734	Tetratricopeptide repeat
     """
     check_files_exist(list(file_dict.values()))
 
@@ -210,11 +216,12 @@ def generate_functional_summary(
     type=str,
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
-    """Generate study-level summary summary_files for successfuly proccessed assemblies.
+    """
+    Generate study-level summaries for successfuly proccessed assemblies.
 
-    :param assemblies: Path to a file listing successful assembly accessions and their status.
+    :param assemblies: Path to a file listing completed assembly accessions and their status.
     :param study_dir: Path to the directory containing analysis results for each assembly.
-    :param output_prefix: Prefix for the generated summary summary_files.
+    :param output_prefix: Prefix for the generated summary files.
     """
     # TODO: this file with successful jobs is not yet published by pipeline
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
@@ -275,14 +282,11 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     type=str,
 )
 def merge_summaries(study_dir: str, output_prefix: str) -> None:
-    """Function that will take a file path containing study-level
-    summaries that should be merged together.
-    \f
+    """
+    Merge multiple study-level summary files into combined summary files.
 
-    :param study_dir: The filepath to the directory containing all of the analyses.
-    :type study_dir: str
-    :param output_prefix: Prefix to be added to the generated summary file.
-    :type output_prefix: str
+    :param study_dir: Path to the directory containing study-level summary files.
+    :param output_prefix: Prefix for the output merged summary files.
     """
 
     def get_file_paths(summary_type: str) -> list[str]:
@@ -308,9 +312,13 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
 
 def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) -> None:
     """
-    TODO: Add docstring
+    Merge multiple taxonomy study-level summary files into a single study-level summary.
 
-    Input summary file example:
+    :param summary_files: List of paths to taxonomy summary files, each containing
+                        taxonomic classifications and counts for an individual analysis.
+    :param output_file_name: Output path for the merged taxonomy summary.
+
+    Example of input taxonomy summary file:
     taxonomy	ERZ1049444	ERZ1049446
     sk__Eukaryota;k__Metazoa;p__Chordata	2	10
     sk__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
@@ -338,12 +346,23 @@ def merge_functional_summaries(
     summary_files: list[str], merge_keys: list[str], output_prefix: str, label: str
 ) -> None:
     """
-    TODO: Add docstring
+    Merge multiple functional study-level summary files into a single study-level summary.
 
-    Input summary file example:
+    :param summary_files: List of paths to functional summary files, each containing
+                        annotation terms and counts for an individual analysis.
+    :param merge_keys: List of column names to merge on (e.g. term ID, description).
+    :param output_prefix: Prefix for the generated output file.
+    :param label: Label describing the functional annotation type (expected one of ["go", "goslim", "interpro"]).
+
+    Example of GO summary input:
     GO	description	category	ERZ1049444	ERZ1049446
     GO:0016020	membrane	cellular_component	30626	673
     GO:0005524	ATP binding	molecular_function	30524	2873
+
+    Example of InterPro summary input:
+    IPR	description	ERZ1049444	ERZ1049446
+    IPR036291	NAD(P)-binding domain superfamily	16503	13450
+    IPR019734	Tetratricopeptide repeat	14694	11021
     """
     output_file_name = f"{output_prefix}_{label}_summary.tsv"
 

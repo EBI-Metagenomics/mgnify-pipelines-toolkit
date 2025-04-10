@@ -126,7 +126,7 @@ class CompletedAnalysisRecord(BaseModel):
         Checks that the analysis string matches the regex code of an INSDC analysis accession.
         Throws a `ValueError` exception if not, which is what Pydantic prefers for validation errors.
         """
-        if not re.match(r"ERZ[0-9]{6,}", accession):
+        if not re.match(r"ERZ\d{6,}", accession):
             raise ValueError("Invalid accession")
         return accession
 
@@ -142,7 +142,7 @@ class CompletedAnalysisRecord(BaseModel):
 
 
 class CompletedAnalysisSchema(pa.DataFrameModel):
-    """Class modelling a Pandera dataframe schema that uses the AnalysisPassedAssembliesRecord class as dtype.
+    """Class modelling a Pandera dataframe schema that uses the CompletedAnalysisSchema class as dtype.
     This is what actually validates the generated dataframe when read by pandas.read_csv.
     """
 
@@ -173,7 +173,6 @@ class InterProSummaryRecord(BaseModel):
     @field_validator("interpro_accession")
     @classmethod
     def check_interpro_format(cls, id) -> str:
-        # TODO: check if this is the correct regex for InterPro accessions
         if not re.fullmatch(r"IPR\d{6}", id):
             raise ValueError(f"Invalid InterPro accession: {id}")
         return id
@@ -194,7 +193,6 @@ class GOSummaryRecord(BaseModel):
     @field_validator("go")
     @classmethod
     def check_goterm_format(cls, id) -> str:
-        # TODO: check if this is the correct regex
         if not re.fullmatch(r"GO:\d{7}", id):
             raise ValueError(f"Invalid GO term format: {id}")
         return id
@@ -228,44 +226,42 @@ class GOSummarySchema(pa.DataFrameModel):
         coerce = True
 
 
-class GOStudySummarySchema(pa.DataFrameModel):
-    """Schema for GO or GOslim study summary file validation."""
+class BaseStudySummarySchema(pa.DataFrameModel):
+    """Base schema for study summary files with ERZ* columns and count checks."""
 
+    @staticmethod
+    def is_unique(series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+    @pa.check(regex=r"^ERZ\d+")
+    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
+        return s >= 0
+
+    class Config:
+        strict = False  # allow extra ERZ* columns not declared above
+
+
+class GOStudySummarySchema(BaseStudySummarySchema):
     GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$")
     description: Series[str]
     category: Series[str]
 
-    @pa.check(regex=r"^ERZ\d+")
-    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
-        return s >= 0
-
-    class Config:
-        strict = False  # allow extra ERZ* columns not declared above
+    @pa.check("GO")
+    def go_ids_unique(cls, series: Series[str]) -> Series[bool]:
+        return cls.is_unique(series)
 
 
-class InterProStudySummarySchema(pa.DataFrameModel):
-    """Schema for InterPro study summary file validation."""
-
+class InterProStudySummarySchema(BaseStudySummarySchema):
     IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$")
     description: Series[str]
 
-    @pa.check(regex=r"^ERZ\d+")
-    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
-        return s >= 0
-
-    class Config:
-        strict = False  # allow extra ERZ* columns not declared above
+    @pa.check("IPR")
+    def interpro_ids_unique(cls, series: Series[str]) -> Series[bool]:
+        return cls.is_unique(series)
 
 
-class TaxonomyStudySummarySchema(pa.DataFrameModel):
-    """Schema for validation of study summary file with taxonomic classification."""
-
-    @pa.check(regex=r"^ERZ\d+")
-    def count_columns_are_non_negative(cls, s: Series[int]) -> Series[bool]:
-        return s >= 0
-
-    class Config:
-        strict = False  # allow extra ERZ* columns not declared above
+class TaxonomyStudySummarySchema(BaseStudySummarySchema):
+    pass
 
 
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):

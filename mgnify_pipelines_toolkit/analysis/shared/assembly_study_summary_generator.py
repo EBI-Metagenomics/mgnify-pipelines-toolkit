@@ -59,6 +59,10 @@ TAXONOMY_COLUMN_NAMES = [
     "species",
 ]
 
+INPUT_SUFFIX = "summary.tsv.gz"
+
+OUTPUT_SUFFIX = "summary.tsv"
+
 
 @click.group()
 def cli():
@@ -144,7 +148,7 @@ def generate_functional_summary(
     """
     check_files_exist(list(file_dict.values()))
 
-    output_file_name = f"{output_prefix}_{label}_summary.tsv"
+    output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
     merged_df = None
     for assembly_acc, filepath in file_dict.items():
@@ -223,7 +227,6 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     :param study_dir: Path to the directory containing analysis results for each assembly.
     :param output_prefix: Prefix for the generated summary files.
     """
-    # TODO: this file with successful jobs is not yet published by pipeline
     logging.info(f"Reading assembly list from {assemblies.resolve()}")
     assemblies_df = pd.read_csv(assemblies, names=["assembly", "status"])
     CompletedAnalysisSchema(assemblies_df)
@@ -236,38 +239,43 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
             for acc in assembly_list
         }
 
-    # TODO handle both gz and non-gz summary_files
     logging.info("Start processing of assembly-level summaries.")
     logging.info(
         "Generating taxonomy summary from assembly-level summaries <accession>.krona.txt"
     )
     generate_taxonomy_summary(
-        get_file_paths("taxonomy", "{acc}.krona.txt"),
-        f"{output_prefix}_taxonomy_summary.tsv",
+        get_file_paths("taxonomy", "{acc}.krona.txt.gz"),
+        f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}",
     )
     logging.info(
-        "Generating functional summaries from assembly-level summaries <accession>_interpro_summary.tsv"
+        f"Generating functional summaries from assembly-level summaries <accession>_interpro_{INPUT_SUFFIX}"
     )
     generate_functional_summary(
-        get_file_paths("functional-annotation/interpro", "{acc}_interpro_summary.tsv"),
+        get_file_paths(
+            "functional-annotation/interpro", "{{acc}}_interpro_{}".format(INPUT_SUFFIX)
+        ),
         INTERPRO_COLUMN_NAMES,
         output_prefix,
         "interpro",
     )
     logging.info(
-        "Generating functional summaries from assembly-level summaries <accession>_go_summary.tsv"
+        f"Generating functional summaries from assembly-level summaries <accession>_go_{INPUT_SUFFIX}"
     )
     generate_functional_summary(
-        get_file_paths("functional-annotation/go", "{acc}_go_summary.tsv"),
+        get_file_paths(
+            "functional-annotation/go", "{{acc}}_go_{}".format(INPUT_SUFFIX)
+        ),
         GO_COLUMN_NAMES,
         output_prefix,
         "go",
     )
     logging.info(
-        "Generating functional summaries from assembly-level summaries <accession>_goslim_summary.tsv"
+        f"Generating functional summaries from assembly-level summaries <accession>_goslim_{INPUT_SUFFIX}"
     )
     generate_functional_summary(
-        get_file_paths("functional-annotation/go", "{acc}_goslim_summary.tsv"),
+        get_file_paths(
+            "functional-annotation/go", "{{acc}}_goslim_{}".format(INPUT_SUFFIX)
+        ),
         GO_COLUMN_NAMES,
         output_prefix,
         "goslim",
@@ -304,12 +312,12 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
     """
 
     def get_file_paths(summary_type: str) -> list[str]:
-        return glob.glob(f"{study_dir}/*_{summary_type}_summary.tsv")
+        return glob.glob(f"{study_dir}/*_{summary_type}_{OUTPUT_SUFFIX}")
 
     logging.info("Generating combined assembly-level summaries")
     logging.info("Parsing summary files for taxonomic classification")
     merge_taxonomy_summaries(
-        get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_summary.tsv"
+        get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}"
     )
 
     column_names_mapping = {
@@ -387,7 +395,7 @@ def merge_functional_summaries(
     IPR036291	NAD(P)-binding domain superfamily	16503	13450
     IPR019734	Tetratricopeptide repeat	14694	11021
     """
-    output_file_name = f"{output_prefix}_{label}_summary.tsv"
+    output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
     if not summary_files:
         logging.warning(

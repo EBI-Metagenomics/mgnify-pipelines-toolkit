@@ -1,0 +1,9 @@
+- name: summarise_sanntis_bgcs
+  tags:
+    - summarise_sanntis_bgcs
+  command: summarise_sanntis_bgcs -i tests/fixtures/bgc/test_sanntis.gff.gz -o summary_sanntis.tsv
+  files:
+    - path: "summary_sanntis.tsv"
+      contains:
+        - "BGC0000427\tNRP\tNonribosomal Peptide\t1"
+        - "BGC0000470\tRiPP\tRibosomally synthesised and Post-translationally modified Peptide\t1"

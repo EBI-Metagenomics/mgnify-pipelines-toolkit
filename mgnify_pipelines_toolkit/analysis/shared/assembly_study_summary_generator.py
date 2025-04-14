@@ -36,6 +36,8 @@ logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+# Keys are the original column names in the input files,
+# values are the standardised column names used in the generated study summary files
 GO_COLUMN_NAMES = {
     "go": "GO",
     "term": "description",
@@ -47,6 +49,8 @@ INTERPRO_COLUMN_NAMES = {
     "description": "description",
 }
 
+# The taxonomy file is a tab-separated file without any header
+# containing of following columns:
 TAXONOMY_COLUMN_NAMES = [
     "Count",
     "superkingdom",
@@ -91,7 +95,7 @@ def generate_taxonomy_summary(
     assembly-level summary files.
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
-    :param output_prefix: Prefix for the output summary file.
+    :param output_file_name: Output path for the output summary file.
 
     Example of the taxonomy file:
     23651	sk__Bacteria
@@ -216,7 +220,7 @@ def generate_functional_summary(
     "-p",
     "--output_prefix",
     required=True,
-    help="Prefix to summary summary_files",
+    help="Prefix to summary files",
     type=str,
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:

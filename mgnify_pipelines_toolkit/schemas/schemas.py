@@ -17,7 +17,7 @@ import logging
 import re
 
 from enum import Enum
-from typing import ClassVar, Optional, Type
+from typing import ClassVar, Optional, Type, Literal
 
 import pandas as pd
 import pandera as pa
@@ -112,33 +112,18 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
 
 
 class CompletedAnalysisRecord(BaseModel):
-    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file.
-    Uses the previous two classes.
-    """
+    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file."""
 
-    assembly: str = Field(..., description="Assembly accession", examples=["ERZ789012"])
-    status: str = Field(..., description="")
-
-    @field_validator("assembly")
-    @classmethod
-    def validate_format(cls, accession: str) -> str:
-        """
-        Checks that the analysis string matches the regex code of an INSDC analysis accession.
-        Throws a `ValueError` exception if not, which is what Pydantic prefers for validation errors.
-        """
-        if not re.match(r"ERZ\d{6,}", accession):
-            raise ValueError("Invalid accession")
-        return accession
-
-    @field_validator("status")
-    @classmethod
-    def validate_status(cls, value: str) -> str:
-        allowed = {"success"}
-        if value not in allowed:
-            raise ValueError(
-                f"Invalid assembly job status: {value}. Allowed values: {', '.join(allowed)}"
-            )
-        return value
+    assembly: str = Field(
+        ...,
+        description="Assembly accession",
+        examples=["ERZ789012"],
+        pattern=r"ERZ\d{6,}",
+    )
+    status: Literal["success"] = Field(
+        ...,
+        description="Pipeline output for whether this assembly's analysis succeeded or not",
+    )
 
 
 class CompletedAnalysisSchema(pa.DataFrameModel):
@@ -166,22 +151,23 @@ class InterProSummaryRecord(BaseModel):
         ..., ge=0, description="Number of hits for the InterPro accession"
     )
     interpro_accession: str = Field(
-        ..., description="InterPro accession ID", examples=["IPR123456"]
+        ...,
+        description="InterPro accession ID",
+        examples=["IPR123456"],
+        pattern=r"IPR\d{6}",
     )
     description: str = Field(..., description="Description of the InterPro domain")
-
-    @field_validator("interpro_accession")
-    @classmethod
-    def check_interpro_format(cls, id) -> str:
-        if not re.fullmatch(r"IPR\d{6}", id):
-            raise ValueError(f"Invalid InterPro accession: {id}")
-        return id
 
 
 class GOSummaryRecord(BaseModel):
     """Model of a row in the GO summary file."""
 
-    go: str = Field(..., description="GO term identifier", examples=["GO:1234567"])
+    go: str = Field(
+        ...,
+        description="GO term identifier",
+        examples=["GO:1234567"],
+        pattern=r"GO:\d{7}",
+    )
     term: str = Field(..., description="GO term name")
     category: str = Field(
         ...,
@@ -189,13 +175,6 @@ class GOSummaryRecord(BaseModel):
         examples=["biological_process", "molecular_function", "cellular_component"],
     )
     count: int = Field(..., ge=0, description="Number of times the GO term is observed")
-
-    @field_validator("go")
-    @classmethod
-    def check_goterm_format(cls, id) -> str:
-        if not re.fullmatch(r"GO:\d{7}", id):
-            raise ValueError(f"Invalid GO term format: {id}")
-        return id
 
 
 class InterProSummarySchema(pa.DataFrameModel):

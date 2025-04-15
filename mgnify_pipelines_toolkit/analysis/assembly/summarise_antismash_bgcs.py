@@ -222,7 +222,7 @@ def main():
         df_grouped = df_grouped.rename(columns={
             "Description": "description",
             "Count": "count",
-            "ClassID": "class"
+            "ClassID": "class_id"
         })
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 

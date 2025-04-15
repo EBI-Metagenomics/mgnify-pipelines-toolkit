@@ -16,7 +16,7 @@
 - name: test_gff_toolkit test_correct_args_assemblies
   tags:
     - test_gff_toolkit
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/assemblies/ERZ1049444_predicted_cds.gff.gz -i tests/fixtures/gff_toolkit/assemblies/ERZ1049444_interproscan.tsv -e tests/fixtures/gff_toolkit/assemblies/ERZ1049444_emapper_annotations.tsv -s tests/fixtures/gff_toolkit/assemblies/ERZ1049444_sanntis.gff.gz --dbcan-cazys tests/fixtures/gff_toolkit/assemblies/ERZ1049444_dbcan_cazyonly.gff -o gff_toolkit_testing.gff
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/assemblies/ERZ1049444_predicted_cds.gff.gz -i tests/fixtures/gff_toolkit/assemblies/ERZ1049444_interproscan.tsv -e tests/fixtures/gff_toolkit/assemblies/ERZ1049444_emapper_annotations.tsv --antismash tests/fixtures/gff_toolkit/assemblies/ERZ1049444_concatenated.gff.gz -s tests/fixtures/gff_toolkit/assemblies/ERZ1049444_sanntis.gff.gz --dbcan-cazys tests/fixtures/gff_toolkit/assemblies/ERZ1049444_dbcan_cazyonly.gff -o gff_toolkit_testing.gff
   files:
     - path: "gff_toolkit_testing.gff"
-      md5sum: 1f9baf8bd2b10b638d62897f8002dbcd
+      md5sum: c2c29375be8ddd2fac5949a220328c1b

@@ -801,7 +801,7 @@ def get_trnas(trnas_file):
                     line = line.replace("tRNAscan-SE", "tRNAscan-SE:2.0.9")
                     trnas.setdefault(contig, dict()).setdefault(
                         int(start), list()
-                    ).append(line.strip())
+                    ).append(line.strip().strip(";"))
     return trnas
 
 

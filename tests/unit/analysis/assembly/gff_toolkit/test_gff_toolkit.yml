@@ -12,11 +12,11 @@
   command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/genomes/MGYG000500002.gff -i tests/fixtures/gff_toolkit/genomes/MGYG000500002_InterProScan_trimmed.tsv -e tests/fixtures/gff_toolkit/genomes/MGYG000500002_eggNOG.tsv -s tests/fixtures/gff_toolkit/genomes/MGYG000500002_sanntis.gff -c tests/fixtures/gff_toolkit/genomes/MGYG000500002_crisprcasfinder_hq.gff -a tests/fixtures/gff_toolkit/genomes/MGYG000500002_amrfinderplus.tsv --antismash tests/fixtures/gff_toolkit/genomes/MGYG000500002_antismash.gff --gecco tests/fixtures/gff_toolkit/genomes/MGYG000500002_gecco.gff --dbcan tests/fixtures/gff_toolkit/genomes/MGYG000500002_dbcan.gff --defense-finder tests/fixtures/gff_toolkit/genomes/MGYG000500002_defense_finder.gff -r tests/fixtures/gff_toolkit/genomes/MGYG000500002.ncrna.deoverlap.tbl -t tests/fixtures/gff_toolkit/genomes/MGYG000500002_trna.gff  -o gff_toolkit_testing.gff
   files:
     - path: "gff_toolkit_testing.gff"
-      md5sum: 2538bbd9046a7c0f2a7712603b28183b
+      md5sum: e907506934ba197c13f9738d28488517
 - name: test_gff_toolkit test_correct_args_assemblies
   tags:
     - test_gff_toolkit
-  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/assemblies/ERZ1049444_predicted_cds.gff.gz -i tests/fixtures/gff_toolkit/assemblies/ERZ1049444_interproscan.tsv -e tests/fixtures/gff_toolkit/assemblies/ERZ1049444_emapper_annotations.tsv --antismash tests/fixtures/gff_toolkit/assemblies/ERZ1049444_concatenated.gff.gz -s tests/fixtures/gff_toolkit/assemblies/ERZ1049444_sanntis.gff.gz --dbcan-cazys tests/fixtures/gff_toolkit/assemblies/ERZ1049444_dbcan_cazyonly.gff -o gff_toolkit_testing.gff
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/assemblies/ERZ1049444_predicted_cds.gff.gz -i tests/fixtures/gff_toolkit/assemblies/ERZ1049444_interproscan.tsv -e tests/fixtures/gff_toolkit/assemblies/ERZ1049444_emapper_annotations.tsv --antismash tests/fixtures/gff_toolkit/assemblies/ERZ1049444_concatenated.gff.gz -s tests/fixtures/gff_toolkit/assemblies/ERZ1049444_sanntis.gff.gz --dbcan-cazys tests/fixtures/gff_toolkit/assemblies/ERZ1049444_dbcan_cazyonly.gff -t tests/fixtures/gff_toolkit/assemblies/ERZ1049444_trna_mock.gff -r tests/fixtures/gff_toolkit/assemblies/ERZ1049444_mock.ncrna.deoverlap.tbl -o gff_toolkit_testing.gff
   files:
     - path: "gff_toolkit_testing.gff"
-      md5sum: c2c29375be8ddd2fac5949a220328c1b
+      md5sum: 814d435a39bceb929e2fd1555c1a4011

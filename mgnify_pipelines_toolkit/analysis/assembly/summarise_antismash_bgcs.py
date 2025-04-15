@@ -219,6 +219,11 @@ def main():
             )
         )
         df_grouped = df_grouped[["ClassID", "Description", "Count"]]
+        df_grouped = df_grouped.rename(columns={
+            "Description": "description",
+            "Count": "count",
+            "ClassID": "class"
+        })
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 
 

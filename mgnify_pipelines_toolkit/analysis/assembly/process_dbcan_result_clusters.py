@@ -134,13 +134,13 @@ def parse_args():
         "-st",
         dest="standard_file",
         required=True,
-        help="Path to the standard file.",
+        help="Path to the standard file (*cgc_standard.out)",
     )
     parser.add_argument(
         "-sb",
         dest="substrate_file",
         required=True,
-        help="Path to the substrate file.",
+        help="Path to the substrate file (*substrate.out)",
     )
     parser.add_argument(
         "-o",

@@ -25,7 +25,7 @@ from mgnify_pipelines_toolkit.constants.thresholds import (
 )
 
 DBCAN_CLASSES_DICT = {
-    "TC": "dbcan_transcription_classification",
+    "TC": "dbcan_transporter_classification",
     "TF": "dbcan_transcription_factor",
     "STP": "dbcan_signal_transduction_prot",
     "CAZyme": "dbcan_prot_family",

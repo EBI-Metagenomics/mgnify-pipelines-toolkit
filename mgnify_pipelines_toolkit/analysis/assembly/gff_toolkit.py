@@ -136,7 +136,7 @@ def parse_args():
     )
     parser.add_argument(
         "--dbcan",
-        help="The GFF file produced by dbCAN post-processing script",
+        help="The GFF file produced by dbCAN post-processing script that uses cluster annotations",
         required=False,
     )
     parser.add_argument(

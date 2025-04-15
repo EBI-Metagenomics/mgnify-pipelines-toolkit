@@ -33,7 +33,9 @@ def write_results_to_file(
             contig_list[0][0:4] == "MGYG"
         ):  # e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
             contig_list = sorted(list(contig_list), key=lambda x: int(x.split("_")[-1]))
-        elif contig_list[0][0:3] == "ERZ":  # e.g. 'MGYA1', 'MGYA2', 'MGYA3'
+        elif (
+            contig_list[0][0:3] == "ERZ"
+        ):  # e.g. 'ERZ1049444', 'ERZ1049445', 'ERZ1049446'
             contig_list = sorted(
                 list(contig_list), key=lambda x: int(x.split("ERZ")[-1])
             )

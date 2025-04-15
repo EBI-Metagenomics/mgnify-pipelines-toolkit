@@ -12,7 +12,7 @@
   command: python -m mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit -g tests/fixtures/gff_toolkit/genomes/MGYG000500002.gff -i tests/fixtures/gff_toolkit/genomes/MGYG000500002_InterProScan_trimmed.tsv -e tests/fixtures/gff_toolkit/genomes/MGYG000500002_eggNOG.tsv -s tests/fixtures/gff_toolkit/genomes/MGYG000500002_sanntis.gff -c tests/fixtures/gff_toolkit/genomes/MGYG000500002_crisprcasfinder_hq.gff -a tests/fixtures/gff_toolkit/genomes/MGYG000500002_amrfinderplus.tsv --antismash tests/fixtures/gff_toolkit/genomes/MGYG000500002_antismash.gff --gecco tests/fixtures/gff_toolkit/genomes/MGYG000500002_gecco.gff --dbcan tests/fixtures/gff_toolkit/genomes/MGYG000500002_dbcan.gff --defense-finder tests/fixtures/gff_toolkit/genomes/MGYG000500002_defense_finder.gff -r tests/fixtures/gff_toolkit/genomes/MGYG000500002.ncrna.deoverlap.tbl -t tests/fixtures/gff_toolkit/genomes/MGYG000500002_trna.gff  -o gff_toolkit_testing.gff
   files:
     - path: "gff_toolkit_testing.gff"
-      md5sum: 65ef970c87f798b971f28d9f9649919d
+      md5sum: 2538bbd9046a7c0f2a7712603b28183b
 - name: test_gff_toolkit test_correct_args_assemblies
   tags:
     - test_gff_toolkit

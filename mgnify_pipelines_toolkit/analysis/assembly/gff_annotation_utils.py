@@ -601,7 +601,7 @@ def get_ncrnas(ncrnas_file):
                     # Skip tRNAs, we add them from tRNAscan-SE
                     continue
                 strand = cols[11]
-                start, end, strand = int(cols[9]), int(cols[10]), cols[11]
+                start, end = int(cols[10]), int(cols[9])
                 if strand == "+":
                     start, end = end, start
                 rna_feature_name, ncrna_class = prepare_rna_gff_fields(cols)

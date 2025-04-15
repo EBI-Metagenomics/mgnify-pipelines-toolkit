@@ -62,9 +62,12 @@ class TableModifier:
         self.output_file = output_file
 
     def modify_table(self):
-        with fileinput.hook_compressed(self.input_file, "rt") as file_in, open(
-            self.output_file, "w"
-        ) as file_out:
+        with (
+            fileinput.hook_compressed(
+                self.input_file, "r", encoding="utf-8"
+            ) as file_in,
+            open(self.output_file, "w") as file_out,
+        ):
             header_written = False
             separator_line, header = "", ""
             for line in file_in:

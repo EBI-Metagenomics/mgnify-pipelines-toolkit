@@ -146,13 +146,13 @@ def parse_args():
         "-o",
         dest="outfile",
         required=True,
-        help=("Path to the output file."),
+        help="Path to the output file.",
     )
     parser.add_argument(
         "-v",
         dest="dbcan_ver",
         required=True,
-        help=("dbCAN version used."),
+        help="dbCAN version used.",
     )
     return parser.parse_args()
 

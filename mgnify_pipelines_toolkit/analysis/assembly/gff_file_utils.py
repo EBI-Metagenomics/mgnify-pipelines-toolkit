@@ -29,12 +29,12 @@ def write_results_to_file(
             ncrnas, trnas, crispr_annotations, contig_list
         )
         # sort contigs by digit at the end of contig/genome accession
-        if (
-            contig_list[0][0:4] == "MGYG"
+        if contig_list[0].startswith(
+            "MGYG"
         ):  # e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
             contig_list = sorted(list(contig_list), key=lambda x: int(x.split("_")[-1]))
-        elif (
-            contig_list[0][0:3] == "ERZ"
+        elif contig_list[0].startswith(
+            "ERZ"
         ):  # e.g. 'ERZ1049444', 'ERZ1049445', 'ERZ1049446'
             contig_list = sorted(
                 list(contig_list), key=lambda x: int(x.split("ERZ")[-1])

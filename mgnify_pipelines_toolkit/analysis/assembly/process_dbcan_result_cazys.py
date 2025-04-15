@@ -29,10 +29,10 @@ def main(hmm_file, overview_file, genome_gff, outfile, dbcan_version):
     hmm_path = Path(hmm_file)
     overview_path = Path(overview_file)
 
-    if not hmm_path.exists():
+    if not hmm_path.is_file():
         raise FileNotFoundError(f"Input hmm path does not exist: {hmm_file}")
 
-    if not overview_path.exists():
+    if not overview_path.is_file():
         raise FileNotFoundError(f"Input overview path does not exist: {overview_file}")
 
     substrates = load_substrates(hmm_path)
@@ -102,19 +102,14 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         subfamily = dbcan_sub_ecami
                     else:
                         continue
-
                     cleaned_substrates = ",".join(
                         sorted(
-                            list(
-                                set(
-                                    [
-                                        subsrate.strip()
-                                        for subsrate in substrates.get(
-                                            transcript, "N/A"
-                                        ).split(",")
-                                    ]
+                            {
+                                subsrate.strip()
+                                for subsrate in substrates.get(transcript, "N/A").split(
+                                    ","
                                 )
-                            )
+                            }
                         )
                     )
                     # Assemble information to add to the 9th column
@@ -123,7 +118,7 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         f"substrate_dbcan-sub={cleaned_substrates}",
                     ]
 
-                    if ec_number != "":
+                    if ec_number:
                         col9_parts.append(f"eC_number={ec_number}")
 
                     col9_parts.append(f"num_tools={num_of_tools}")
@@ -198,13 +193,13 @@ def parse_args():
         "-o",
         dest="outfile",
         required=True,
-        help=("Path to the output file."),
+        help="Path to the output file.",
     )
     parser.add_argument(
         "-v",
         dest="dbcan_ver",
         required=True,
-        help=("dbCAN version used."),
+        help="dbCAN version used.",
     )
     return parser.parse_args()
 

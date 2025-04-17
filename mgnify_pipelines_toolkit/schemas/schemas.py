@@ -177,40 +177,177 @@ class GOSummaryRecord(BaseModel):
     count: int = Field(..., ge=0, description="Number of times the GO term is observed")
 
 
-class InterProSummarySchema(pa.DataFrameModel):
+class BaseSummarySchema(pa.DataFrameModel):
+    """Base schema for summary files."""
+
+    @staticmethod
+    def is_unique(series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+
+class InterProSummarySchema(BaseSummarySchema):
     """Schema for InterPro summary file validation."""
 
     interpro_accession: Series[str]
 
     @pa.check("interpro_accession")
     def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return ~series.duplicated()
+        return self.is_unique(series)
 
     class Config:
         dtype = PydanticModel(InterProSummaryRecord)
         coerce = True
 
 
-class GOSummarySchema(pa.DataFrameModel):
+class GOSummarySchema(BaseSummarySchema):
     """Schema for GO or GOslim summary file validation."""
 
     go: Series[str]
 
     @pa.check("go")
     def go_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return ~series.duplicated()
+        return self.is_unique(series)
 
     class Config:
         dtype = PydanticModel(GOSummaryRecord)
         coerce = True
 
 
-class BaseStudySummarySchema(pa.DataFrameModel):
-    """Base schema for study summary files with ERZ* columns and count checks."""
+class SanntisSummaryRecord(BaseModel):
+    """Model of a row in the Sanntis summary file."""
 
-    @staticmethod
-    def is_unique(series: Series[str]) -> Series[bool]:
-        return ~series.duplicated()
+    nearest_MIBiG: str = Field(
+        ...,
+        description="The accession ID of the closest matching biosynthetic gene cluster (BGC) in the MIBiG database",
+        examples=["BGC0000073"],
+        pattern=r"BGC\d{7}",
+    )
+    nearest_MIBiG_class: str = Field(
+        ...,
+        description="The biosynthetic class of the nearest MIBiG BGC",
+        examples=["Polyketide"],
+    )
+    description: str = Field(
+        ...,
+        description="A brief summary of the biosynthetic process or type of metabolite associated with the nearest MIBiG cluster",
+    )
+    count: int = Field(
+        ..., ge=0, description="Number of times the MIBiG entry is observed"
+    )
+
+
+class SourmashSummaryRecord(BaseModel):
+    """Model of a row in the Sourmash summary file."""
+
+    label: str = Field(
+        ...,
+        description="Biosynthetic class or label assigned by Sourmash based on sequence similarity to known biosynthetic gene clusters.",
+        examples=["RiPP-like", "T1PKS", "terpene"],
+    )
+    description: str = Field(
+        ...,
+        description="Brief explanation of the biosynthetic class, often indicating compound type or functional characteristics.",
+        examples=["Type I PKS (Polyketide synthase)", "Redox-cofactors such as PQQ"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of BGCs (biosynthetic gene clusters) in the dataset assigned to this label.",
+    )
+
+
+class KOSummaryRecord(BaseModel):
+    """Model of a row in the KEGG summary file."""
+
+    ko: str = Field(
+        ...,
+        description="KEGG Orthology (KO) identifier representing a functional gene or pathway component.",
+        examples=["K07547", "K04874", "K19946"],
+        pattern=r"K\d{5,}",
+    )
+    description: str = Field(
+        ...,
+        description="Name or function of the KO, sometimes including EC numbers and protein families.",
+        examples=["optineurin", "MFS transporter, POT/PTR family"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of times this KO identifier is observed in the dataset.",
+    )
+
+
+class PFAMSummaryRecord(BaseModel):
+    """Model of a row in the PFAM summary file."""
+
+    pfam: str = Field(
+        ...,
+        description="PFAM accession identifier representing a protein domain or family.",
+        examples=["PF00265", "PF01956", "PF00673"],
+        pattern=r"PF\d{5}",
+    )
+    description: str = Field(
+        ...,
+        description="Description of the protein domain or family associated with the PFAM ID.",
+        examples=["Thymidine kinase", "Integral membrane protein EMC3/TMCO1-like"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of times the PFAM domain is observed in the dataset.",
+    )
+
+
+class SanntisSummarySchema(BaseSummarySchema):
+    nearest_MIBiG: Series[str]
+
+    @pa.check("nearest_MIBiG")
+    def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(SanntisSummaryRecord)
+        coerce = True
+
+
+class SourmashSummarySchema(BaseSummarySchema):
+    label: Series[str]
+
+    @pa.check("label")
+    def class_names_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(SourmashSummaryRecord)
+        coerce = True
+
+
+class KOSummarySchema(BaseSummarySchema):
+    ko: Series[str]
+
+    @pa.check("ko")
+    def ko_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(KOSummaryRecord)
+        coerce = True
+
+
+class PFAMSummarySchema(BaseSummarySchema):
+    pfam: Series[str]
+
+    @pa.check("pfam")
+    def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(PFAMSummaryRecord)
+        coerce = True
+
+
+class BaseStudySummarySchema(BaseSummarySchema):
+    """Base schema for study summary files with ERZ* columns and count checks."""
 
     @pa.check(regex=r"^ERZ\d+")
     def count_columns_are_non_negative(self, s: Series[int]) -> Series[bool]:
@@ -236,6 +373,38 @@ class InterProStudySummarySchema(BaseStudySummarySchema):
 
     @pa.check("IPR")
     def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class SourmashStudySummarySchema(BaseStudySummarySchema):
+    label: Series[str]
+
+    @pa.check("label")
+    def class_names_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class SanntisStudySummarySchema(BaseStudySummarySchema):
+    nearest_MIBiG: Series[str]
+
+    @pa.check("nearest_MIBiG")
+    def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class KOStudySummarySchema(BaseStudySummarySchema):
+    KO: Series[str]
+
+    @pa.check("KO")
+    def ko_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class PFAMStudySummarySchema(BaseStudySummarySchema):
+    PFAM: Series[str]
+
+    @pa.check("PFAM")
+    def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
         return self.is_unique(series)
 
 

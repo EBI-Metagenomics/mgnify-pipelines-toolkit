@@ -18,6 +18,7 @@ import click
 import glob
 import logging
 from pathlib import Path
+from typing import Literal
 
 import pandas as pd
 
@@ -26,9 +27,17 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     TaxonSchema,
     GOSummarySchema,
     InterProSummarySchema,
+    KOSummarySchema,
+    SanntisSummarySchema,
+    SourmashSummarySchema,
+    PFAMSummarySchema,
     GOStudySummarySchema,
     InterProStudySummarySchema,
     TaxonomyStudySummarySchema,
+    KOStudySummarySchema,
+    SanntisStudySummarySchema,
+    SourmashStudySummarySchema,
+    PFAMStudySummarySchema,
     validate_dataframe,
 )
 
@@ -38,6 +47,7 @@ logging.basicConfig(
 
 # Keys are the original column names in the input files,
 # values are the standardised column names used in the generated study summary files
+# Note: "Count" or "count" column should be excluded
 GO_COLUMN_NAMES = {
     "go": "GO",
     "term": "description",
@@ -47,6 +57,72 @@ GO_COLUMN_NAMES = {
 INTERPRO_COLUMN_NAMES = {
     "interpro_accession": "IPR",
     "description": "description",
+}
+
+SANNTIS_COLUMN_NAMES = {
+    "nearest_MIBiG": "nearest_MIBiG",
+    "nearest_MIBiG_class": "nearest_MIBiG_class",
+    "description": "description",
+}
+
+SOURMASH_COLUMN_NAMES = {
+    "label": "label",
+    "description": "description",
+}
+
+KEGG_COLUMN_NAMES = {
+    "ko": "KO",
+    "description": "description",
+}
+
+PFAM_COLUMN_NAMES = {
+    "pfam": "PFAM",
+    "description": "description",
+}
+
+SUMMARY_TYPES_MAP = {
+    "go": {
+        "folder": "functional-annotation/go",
+        "column_names": GO_COLUMN_NAMES,
+        "schema": GOSummarySchema,
+        "study_schema": GOStudySummarySchema,
+    },
+    "goslim": {
+        "folder": "functional-annotation/go",
+        "column_names": GO_COLUMN_NAMES,
+        "schema": GOSummarySchema,
+        "study_schema": GOStudySummarySchema,
+    },
+    "interpro": {
+        "folder": "functional-annotation/interpro",
+        "column_names": INTERPRO_COLUMN_NAMES,
+        "schema": InterProSummarySchema,
+        "study_schema": InterProStudySummarySchema,
+    },
+    "ko": {
+        "folder": "functional-annotation/kegg",
+        "column_names": KEGG_COLUMN_NAMES,
+        "schema": KOSummarySchema,
+        "study_schema": KOStudySummarySchema,
+    },
+    "sanntis": {
+        "folder": "pathways-and-systems/sanntis",
+        "column_names": SANNTIS_COLUMN_NAMES,
+        "schema": SanntisSummarySchema,
+        "study_schema": SanntisStudySummarySchema,
+    },
+    "sourmash": {
+        "folder": "pathways-and-systems/sourmash",
+        "column_names": SOURMASH_COLUMN_NAMES,
+        "schema": SourmashSummarySchema,
+        "study_schema": SourmashStudySummarySchema,
+    },
+    "pfam": {
+        "folder": "functional-annotation/pfam",
+        "column_names": PFAM_COLUMN_NAMES,
+        "schema": PFAMSummarySchema,
+        "study_schema": PFAMStudySummarySchema,
+    },
 }
 
 # The taxonomy file is a tab-separated file without any header
@@ -62,8 +138,6 @@ TAXONOMY_COLUMN_NAMES = [
     "genus",
     "species",
 ]
-
-INPUT_SUFFIX = "summary.tsv.gz"
 
 OUTPUT_SUFFIX = "summary.tsv"
 
@@ -129,7 +203,7 @@ def generate_functional_summary(
     file_dict: dict[str, Path],
     column_names: dict[str, str],
     output_prefix: str,
-    label: str,
+    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"],
 ) -> None:
     """
     Generate a combined study-level functional annotation summary from multiple input
@@ -138,7 +212,7 @@ def generate_functional_summary(
     :param file_dict: Dictionary mapping assembly accession to its summary file path.
     :param column_names: Dictionary mapping original column names to standard column names.
     :param output_prefix: Prefix for the output summary file.
-    :param label: Label for the functional annotation type (expected one of ["go", "goslim", "interpro"]).
+    :param label: Label for the functional annotation type (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"]).
 
     Example of GO summary input file:
     go	term	category	count
@@ -149,6 +223,30 @@ def generate_functional_summary(
     count	interpro_accession	description
     16503	IPR036291	NAD(P)-binding domain superfamily
     14694	IPR019734	Tetratricopeptide repeat
+
+    Example of KEGG summary input file:
+    count   ko      description
+    562     K01552  energy-coupling factor transport system ATP-binding protein [EC:7.-.-.-]
+    537     K18889  ATP-binding cassette, subfamily B, multidrug efflux pump
+    517     K15497  molybdate/tungstate transport system ATP-binding protein [EC:7.3.2.5 7.3.2.6]
+
+    Example of Sanntis summary input file:
+    nearest_MIBiG	nearest_MIBiG_class	description	count
+    BGC0000787	Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)	1
+    BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	3
+    BGC0001327	NRP Polyketide	Nonribosomal Peptide Polyketide	2
+
+    Example of Sourmash summary input file:
+    label	description	count
+    terpene	Terpene	16
+    betalactone	Beta-lactone containing protease inhibitor	8
+    T1PKS	Type I PKS (Polyketide synthase)	3
+
+    Example of PFAM summary input file:
+    count	pfam	description
+    457	PF00265	Thymidine kinase
+    368	PF01852	START domain
+    397	PF13756	Stimulus-sensing domain
     """
     check_files_exist(list(file_dict.values()))
 
@@ -162,10 +260,8 @@ def generate_functional_summary(
             logging.warning(f"File {filepath} is empty. Skipping.")
             continue
 
-        if label in ["go", "goslim"]:
-            validate_dataframe(df, GOSummarySchema, str(filepath))
-        elif label == "interpro":
-            validate_dataframe(df, InterProSummarySchema, str(filepath))
+        schema = SUMMARY_TYPES_MAP[label]["schema"]
+        validate_dataframe(df, schema, str(filepath))
 
         df = df.rename(columns={**column_names, "count": assembly_acc})
 
@@ -244,6 +340,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
         }
 
     logging.info("Start processing of assembly-level summaries.")
+
     logging.info(
         "Generating taxonomy summary from assembly-level summaries <accession>.krona.txt"
     )
@@ -251,39 +348,23 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
         get_file_paths("taxonomy", "{acc}.krona.txt.gz"),
         f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}",
     )
-    logging.info(
-        f"Generating functional summaries from assembly-level summaries <accession>_interpro_{INPUT_SUFFIX}"
-    )
-    generate_functional_summary(
-        get_file_paths(
-            "functional-annotation/interpro", "{{acc}}_interpro_{}".format(INPUT_SUFFIX)
-        ),
-        INTERPRO_COLUMN_NAMES,
-        output_prefix,
-        "interpro",
-    )
-    logging.info(
-        f"Generating functional summaries from assembly-level summaries <accession>_go_{INPUT_SUFFIX}"
-    )
-    generate_functional_summary(
-        get_file_paths(
-            "functional-annotation/go", "{{acc}}_go_{}".format(INPUT_SUFFIX)
-        ),
-        GO_COLUMN_NAMES,
-        output_prefix,
-        "go",
-    )
-    logging.info(
-        f"Generating functional summaries from assembly-level summaries <accession>_goslim_{INPUT_SUFFIX}"
-    )
-    generate_functional_summary(
-        get_file_paths(
-            "functional-annotation/go", "{{acc}}_goslim_{}".format(INPUT_SUFFIX)
-        ),
-        GO_COLUMN_NAMES,
-        output_prefix,
-        "goslim",
-    )
+
+    for summary_type in SUMMARY_TYPES_MAP:
+        logging.info(
+            f"Generating study-level {summary_type.capitalize()} summary from file <accession>_{summary_type}_summary.tsv.gz"
+        )
+        folder = SUMMARY_TYPES_MAP[summary_type]["folder"]
+        column_names = SUMMARY_TYPES_MAP[summary_type]["column_names"]
+        summary_file_name = "{{acc}}_{}_summary.tsv.gz".format(summary_type)
+        # TODO remove this once the script is tested
+        if summary_type in ["sanntis", "sourmash", "ko", "pfam"]:
+            summary_file_name = "{{acc}}_{}_summary.tsv".format(summary_type)
+        generate_functional_summary(
+            get_file_paths(folder, summary_file_name),
+            column_names,
+            output_prefix,
+            summary_type,
+        )
     logging.info("Assembly-level summaries were generated successfully.")
     logging.info("Done.")
 
@@ -324,13 +405,9 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
         get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}"
     )
 
-    column_names_mapping = {
-        "go": GO_COLUMN_NAMES,
-        "goslim": GO_COLUMN_NAMES,
-        "interpro": INTERPRO_COLUMN_NAMES,
-    }
-    for summary_type, column_names in column_names_mapping.items():
+    for summary_type in SUMMARY_TYPES_MAP:
         logging.info(f"Parsing summary files for {summary_type.capitalize()}.")
+        column_names = SUMMARY_TYPES_MAP[summary_type]["column_names"]
         merge_functional_summaries(
             get_file_paths(summary_type),
             list(column_names.values()),
@@ -378,7 +455,10 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
 
 
 def merge_functional_summaries(
-    summary_files: list[str], merge_keys: list[str], output_prefix: str, label: str
+    summary_files: list[str],
+    merge_keys: list[str],
+    output_prefix: str,
+    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"],
 ) -> None:
     """
     Merge multiple functional study-level summary files into a single study-level summary.
@@ -387,7 +467,7 @@ def merge_functional_summaries(
                         annotation terms and counts for an individual analysis.
     :param merge_keys: List of column names to merge on (e.g. term ID, description).
     :param output_prefix: Prefix for the generated output file.
-    :param label: Label describing the functional annotation type (expected one of ["go", "goslim", "interpro"]).
+    :param label: Label describing the functional annotation type (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"]).
 
     Example of GO summary input:
     GO	description	category	ERZ1049444	ERZ1049446
@@ -398,6 +478,26 @@ def merge_functional_summaries(
     IPR	description	ERZ1049444	ERZ1049446
     IPR036291	NAD(P)-binding domain superfamily	16503	13450
     IPR019734	Tetratricopeptide repeat	14694	11021
+
+    Example of KEGG summary input:
+    GO	description	category	ERZ1049440	ERZ1049443
+    GO:0003677	DNA binding	molecular_function	6125	16417
+    GO:0055085	transmembrane transport	biological_process	144	13926
+
+    Example of Sanntis summary input:
+    nearest_MIBiG	nearest_MIBiG_class	description	ERZ1049440	ERZ1049443
+    BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide	230	185
+    BGC0001432	NRP Polyketide	Nonribosomal Peptide Polyketide	0	8
+
+    Example of Sourmash summary input:
+    label	description	ERZ1049440	ERZ1049443
+    NRPS	Non-ribosomal peptide synthetase	368	0
+    arylpolyene	Aryl polyene	149	447
+
+    Example of PFAM summary input:
+    description	PFAM	ERZ1049440	ERZ1049443
+    HTH-like domain	PF24718	468	1
+    Malate:quinone oxidoreductase (Mqo)	PF06039	490	21
     """
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
@@ -407,10 +507,7 @@ def merge_functional_summaries(
         )
         return
 
-    validation_schema = (
-        InterProStudySummarySchema if label == "interpro" else GOStudySummarySchema
-    )
-
+    validation_schema = SUMMARY_TYPES_MAP[label]["study_schema"]
     merged_df = pd.read_csv(summary_files[0], sep="\t")
     validate_dataframe(merged_df, validation_schema, summary_files[0])
 

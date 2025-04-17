@@ -1,0 +1,6 @@
+GO	description	category	ERZ1049444	ERZ1049445
+GO:0003824	catalytic activity	molecular_function	18626	2145
+GO:0003677	DNA binding	molecular_function	16417	6125
+GO:0016491	oxidoreductase activity	molecular_function	16064	1513
+GO:0055085	transmembrane transport	biological_process	13926	144
+GO:0005515	protein binding	molecular_function	11917	0

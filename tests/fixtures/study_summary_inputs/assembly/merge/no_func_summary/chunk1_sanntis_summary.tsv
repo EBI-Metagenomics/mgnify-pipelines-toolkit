@@ -1,0 +1,11 @@
+nearest_MIBiG	nearest_MIBiG_class	description	ERZ1049444	ERZ1049445
+BGC0000073	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	436	0
+BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	190	146
+BGC0000648	Terpene	Composed of isoprene (C5) units derived from isopentenyl pyrophosphate	0	432
+BGC0000790	Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)	179	19
+BGC0000838	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	0	405
+BGC0000866	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).	427	0
+BGC0001191	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).	70	471
+BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide	182	410
+BGC0001432	NRP Polyketide	Nonribosomal Peptide Polyketide	6	287
+BGC0001651	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).	233	178

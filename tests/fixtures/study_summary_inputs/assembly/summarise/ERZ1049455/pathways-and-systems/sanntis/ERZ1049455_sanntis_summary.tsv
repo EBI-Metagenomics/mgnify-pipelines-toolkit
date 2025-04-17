@@ -1,0 +1,9 @@
+count	nearest_MIBiG	nearest_MIBiG_class	description
+328	BGC0001651	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).
+131	BGC0000866	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).
+255	BGC0000790	Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)
+357	BGC0000648	Terpene	Composed of isoprene (C5) units derived from isopentenyl pyrophosphate
+306	BGC0000073	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA
+15	BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA
+230	BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide
+419	BGC0001191	Other	Catch-all class for clusters encoding metabolites outside main classes (cyclitols, indolocarbazoles, and phosphonates).

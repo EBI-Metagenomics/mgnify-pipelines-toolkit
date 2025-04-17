@@ -14,6 +14,14 @@
       md5sum: 0c23dcda7a38197680cab263ca90292f
     - path: "test_interpro_summary.tsv"
       md5sum: ccdb11f77c1631ec3dad99226e791cbb
+    - path: "test_ko_summary.tsv"
+      md5sum: 9a0e4ebc8d3c096738ab9be5658fbc0d
+    - path: "test_pfam_summary.tsv"
+      md5sum: 314ec298af0a15fbc764b731a120e54d
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 0c700abc1b2ea9930339332e4ab8bac0
+    - path: "test_sourmash_summary.tsv"
+      md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
       md5sum: 6260f20e4237d81c00d9787e02653734
 
@@ -33,6 +41,14 @@
       md5sum: 526b5d4442eeca094b27bdacea8b2465
     - path: "test_interpro_summary.tsv"
       md5sum: 74052714ef73f76649d9396b7fd9532e
+    - path: "test_ko_summary.tsv"
+      md5sum: bf40ea416ded1c424e5daced25ca3fdb
+    - path: "test_pfam_summary.tsv"
+      md5sum: 0132c105324d369daccfa54042651fd3
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 049ac8d5993c34000cd9dc1e4dbe65c5
+    - path: "test_sourmash_summary.tsv"
+      md5sum: 7b231682fccb3685b9795dae7d54c3b3
     - path: "test_taxonomy_summary.tsv"
       md5sum: ff1a1a359bad0f23dd90a6fa71c38d75
 
@@ -51,6 +67,14 @@
       md5sum: 3783ef924b0f7d598888334025de1834
     - path: "test_interpro_summary.tsv"
       md5sum: 04713e331bfbfdfa9a04c7c88dcc1004
+    - path: "test_ko_summary.tsv"
+      md5sum: 9a0e4ebc8d3c096738ab9be5658fbc0d
+    - path: "test_pfam_summary.tsv"
+      md5sum: 314ec298af0a15fbc764b731a120e54d
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 0c700abc1b2ea9930339332e4ab8bac0
+    - path: "test_sourmash_summary.tsv"
+      md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
       md5sum: c8d5afd57dd58bc9e9f78c1f9c88c6a5
 
@@ -69,6 +93,14 @@
       md5sum: af45e45eb3808b84ccf81c871fa30a70
     - path: "test_interpro_summary.tsv"
       md5sum: 1d7bcc504c4a762c6fd080852c31c208
+    - path: "test_ko_summary.tsv"
+      md5sum: c910e023cc6747909b4a06dcbadb360f
+    - path: "test_pfam_summary.tsv"
+      md5sum: 8919ac386fcd4967a98eb6f37848290f
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 4d32f2448b32483e1c489bbab2b07433
+    - path: "test_sourmash_summary.tsv"
+      md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_summary.tsv"
       md5sum: 59484d7492be580e531df86d4b96ddcb
 
@@ -241,3 +273,60 @@
   stderr:
     contains:
       - "Column 'interpro_accession' failed element-wise validator number 0: <Check interpro_ids_unique> failure cases: IPR036188"
+
+# TODO add tests for the schema validation of the summary files
+# - name: assembly_study_summary_generator summarise_invalid_sanntis_summary # id fails pattern validation
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     summarise
+#     -a tests/fixtures/study_summary_inputs/assembly/summarise
+#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sanntis.csv
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - ""
+
+# - name: assembly_study_summary_generator summarise_invalid_sourmash_summary # id fails pattern validation
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     summarise
+#     -a tests/fixtures/study_summary_inputs/assembly/summarise
+#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sourmash.csv
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - ""
+
+# - name: assembly_study_summary_generator summarise_invalid_ko_summary # id fails pattern validation
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     summarise
+#     -a tests/fixtures/study_summary_inputs/assembly/summarise
+#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_ko.csv
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - ""
+
+# - name: assembly_study_summary_generator summarise_invalid_pfam_summary # id fails pattern validation
+#   tags:
+#     - assembly_study_summary_generator
+#   command: >
+#     assembly_study_summary_generator
+#     summarise
+#     -a tests/fixtures/study_summary_inputs/assembly/summarise
+#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_pfam.csv
+#     -p test
+#   exit_code: 1
+#   stderr:
+#     contains:
+#       - ""

@@ -274,59 +274,58 @@
     contains:
       - "Column 'interpro_accession' failed element-wise validator number 0: <Check interpro_ids_unique> failure cases: IPR036188"
 
-# TODO add tests for the schema validation of the summary files
-# - name: assembly_study_summary_generator summarise_invalid_sanntis_summary # id fails pattern validation
-#   tags:
-#     - assembly_study_summary_generator
-#   command: >
-#     assembly_study_summary_generator
-#     summarise
-#     -a tests/fixtures/study_summary_inputs/assembly/summarise
-#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sanntis.csv
-#     -p test
-#   exit_code: 1
-#   stderr:
-#     contains:
-#       - ""
+- name: assembly_study_summary_generator summarise_invalid_sanntis_summary # missing column
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sanntis.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "failure_case      1  {'count': 131, 'nearest_MIBiG': 'BGC0000866',"
 
-# - name: assembly_study_summary_generator summarise_invalid_sourmash_summary # id fails pattern validation
-#   tags:
-#     - assembly_study_summary_generator
-#   command: >
-#     assembly_study_summary_generator
-#     summarise
-#     -a tests/fixtures/study_summary_inputs/assembly/summarise
-#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sourmash.csv
-#     -p test
-#   exit_code: 1
-#   stderr:
-#     contains:
-#       - ""
+- name: assembly_study_summary_generator summarise_invalid_sourmash_summary # duplicated "label" value
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sourmash.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "Column 'label' failed element-wise validator"
 
-# - name: assembly_study_summary_generator summarise_invalid_ko_summary # id fails pattern validation
-#   tags:
-#     - assembly_study_summary_generator
-#   command: >
-#     assembly_study_summary_generator
-#     summarise
-#     -a tests/fixtures/study_summary_inputs/assembly/summarise
-#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_ko.csv
-#     -p test
-#   exit_code: 1
-#   stderr:
-#     contains:
-#       - ""
+- name: assembly_study_summary_generator summarise_invalid_ko_summary # missing column
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_ko.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "column 'ko' not in dataframe. Columns in dataframe: ['count', 'kodescription']"
 
-# - name: assembly_study_summary_generator summarise_invalid_pfam_summary # id fails pattern validation
-#   tags:
-#     - assembly_study_summary_generator
-#   command: >
-#     assembly_study_summary_generator
-#     summarise
-#     -a tests/fixtures/study_summary_inputs/assembly/summarise
-#     -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_pfam.csv
-#     -p test
-#   exit_code: 1
-#   stderr:
-#     contains:
-#       - ""
+- name: assembly_study_summary_generator summarise_invalid_pfam_summary # id fails pattern validation, PFF13558 instead of PF13558
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    -a tests/fixtures/study_summary_inputs/assembly/summarise
+    -r tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_pfam.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "'pfam': 'PFF13558'}"

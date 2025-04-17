@@ -80,6 +80,7 @@ PFAM_COLUMN_NAMES = {
     "description": "description",
 }
 
+# this mapping allows using for cycle later to process all summary types in one way
 SUMMARY_TYPES_MAP = {
     "go": {
         "folder": "functional-annotation/go",

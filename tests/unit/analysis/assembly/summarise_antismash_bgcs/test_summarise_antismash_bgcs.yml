@@ -1,0 +1,9 @@
+- name: summarise_antismash_bgcs
+  tags:
+    - summarise_antismash_bgcs
+  command: summarise_antismash_bgcs -i tests/fixtures/bgc/antismash.gff -o summary_antismash.tsv
+  files:
+    - path: "summary_antismash.tsv"
+      contains:
+        - "terpene\tTerpene\t16"
+        - "transAT-PKS,NRPS\tTrans-AT PKS,Non-ribosomal peptide synthetase\t1"

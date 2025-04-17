@@ -1,0 +1,1000 @@
+ERZ1049444_172_63	e7613f4e37dfa84d4adca4b355525920	133	SUPERFAMILY	SSF55298	YjgF-like	5	131	4.08E-31	T	26-03-2025	IPR035959	RutC-like superfamily	-	-
+ERZ1049444_172_63	e7613f4e37dfa84d4adca4b355525920	133	CDD	cd00448	YjgF_YER057c_UK114_family	11	129	5.3998E-35	T	26-03-2025	-	-	-	-
+ERZ1049444_172_63	e7613f4e37dfa84d4adca4b355525920	133	Gene3D	G3DSA:3.30.1330.40	-	1	132	8.4E-37	T	26-03-2025	IPR035959	RutC-like superfamily	-	-
+ERZ1049444_172_63	e7613f4e37dfa84d4adca4b355525920	133	Pfam	PF01042	Endoribonuclease L-PSP	2	130	1.5E-22	T	26-03-2025	IPR006175	YjgF/YER057c/UK114 family	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	Gene3D	G3DSA:1.20.58.100	-	420	534	3.1E-46	T	26-03-2025	-	-	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	SUPERFAMILY	SSF56425	Succinate dehydrogenase/fumarate reductase flavoprotein, catalytic domain	233	348	8.82E-42	T	26-03-2025	IPR027477	Succinate dehydrogenase/fumarate reductase flavoprotein, catalytic domain superfamily	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	PIRSF	PIRSF000171	SDHA_APRA_LASPO	2	529	5.9E-34	T	26-03-2025	-	-	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	Gene3D	G3DSA:3.50.50.60	-	8	399	9.9E-163	T	26-03-2025	IPR036188	FAD/NAD(P)-binding domain superfamily	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	PRINTS	PR00368	FAD-dependent pyridine nucleotide reductase signature	350	372	7.4E-7	T	26-03-2025	-	-	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	PRINTS	PR00368	FAD-dependent pyridine nucleotide reductase signature	9	28	7.4E-7	T	26-03-2025	-	-	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	SUPERFAMILY	SSF46977	Succinate dehydrogenase/fumarate reductase flavoprotein C-terminal domain	420	518	2.62E-29	T	26-03-2025	IPR037099	Fumarate reductase/succinate dehydrogenase flavoprotein-like, C-terminal domain superfamily	GO:0016491(InterPro)	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	NCBIfam	NF006567	L-aspartate oxidase	2	530	3.8E-274	T	26-03-2025	-	-	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	SUPERFAMILY	SSF51905	FAD/NAD(P)-binding domain	2	443	1.59E-70	T	26-03-2025	IPR036188	FAD/NAD(P)-binding domain superfamily	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	Pfam	PF02910	Fumarate reductase flavoprotein C-term	436	517	1.4E-9	T	26-03-2025	IPR015939	Fumarate reductase/succinate dehydrogenase flavoprotein-like, C-terminal	GO:0016491(InterPro)	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	Pfam	PF00890	FAD binding domain	8	387	4.0E-95	T	26-03-2025	IPR003953	FAD-dependent oxidoreductase 2, FAD-binding domain	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	Gene3D	G3DSA:3.90.700.10	Succinate dehydrogenase/fumarate reductase flavoprotein, catalytic domain	243	356	9.9E-163	T	26-03-2025	IPR027477	Succinate dehydrogenase/fumarate reductase flavoprotein, catalytic domain superfamily	-	-
+ERZ1049444_25_29	b2e22408eca04cd00f6c78bced3a5438	534	NCBIfam	TIGR00551	L-aspartate oxidase	7	515	6.9E-185	T	26-03-2025	IPR005288	L-aspartate oxidase	GO:0008734(InterPro)|GO:0009435(InterPro)	-
+ERZ1049444_50_23	05c6be930c2d396131f660e31f08c886	290	Gene3D	G3DSA:1.10.8.550	-	215	265	5.2E-13	T	26-03-2025	IPR042298	Proto-chlorophyllide reductase, C-terminal	-	-
+ERZ1049444_50_23	05c6be930c2d396131f660e31f08c886	290	Pfam	PF02596	Uncharacterised ArCR, COG2043	3	165	2.9E-18	T	26-03-2025	IPR003748	Protein of unknown function DUF169	-	-
+ERZ1049444_50_23	05c6be930c2d396131f660e31f08c886	290	Pfam	PF08369	Proto-chlorophyllide reductase 57 kD subunit	217	259	5.4E-7	T	26-03-2025	IPR013580	Light-independent protochlorophyllide reductase subunit B-like, C-terminal	GO:0015979(InterPro)|GO:0015995(InterPro)|GO:0016491(InterPro)	-
+ERZ1049444_283_37	9b7799dc0151c323f82647d6de372c57	105	SUPERFAMILY	SSF102829	Cell division protein ZapA-like	6	75	1.28E-21	T	26-03-2025	IPR036192	Cell division protein ZapA-like superfamily	-	-
+ERZ1049444_283_37	9b7799dc0151c323f82647d6de372c57	105	Gene3D	G3DSA:3.30.160.880	-	1	48	4.6E-21	T	26-03-2025	IPR042233	Cell division protein ZapA, N-terminal	-	-
+ERZ1049444_283_37	9b7799dc0151c323f82647d6de372c57	105	Coils	Coil	Coil	85	105	-	T	26-03-2025	-	-	-	-
+ERZ1049444_283_37	9b7799dc0151c323f82647d6de372c57	105	Gene3D	G3DSA:1.20.5.50	-	49	101	4.4E-14	T	26-03-2025	-	-	-	-
+ERZ1049444_283_37	9b7799dc0151c323f82647d6de372c57	105	Pfam	PF05164	Cell division protein ZapA	7	77	7.8E-19	T	26-03-2025	IPR007838	Cell division protein ZapA-like	-	-
+ERZ1049444_74_41	07d1773e80c2e2d0b92de6832eb26abc	277	Gene3D	G3DSA:3.60.130.10	-	1	275	1.1E-85	T	26-03-2025	IPR042098	Taurine dioxygenase TauD-like superfamily	-	-
+ERZ1049444_74_41	07d1773e80c2e2d0b92de6832eb26abc	277	Pfam	PF02668	Taurine catabolism dioxygenase TauD, TfdA family	4	270	1.2E-64	T	26-03-2025	IPR003819	TauD/TfdA-like domain	GO:0016491(InterPro)	-
+ERZ1049444_74_41	07d1773e80c2e2d0b92de6832eb26abc	277	SUPERFAMILY	SSF51197	Clavaminate synthase-like	8	273	5.49E-79	T	26-03-2025	-	-	-	-
+ERZ1049444_186_21	0c776edff2b1b1f2ac0b2d72999500b7	132	Gene3D	G3DSA:3.60.90.10	-	3	131	4.2E-25	T	26-03-2025	-	-	-	-
+ERZ1049444_186_21	0c776edff2b1b1f2ac0b2d72999500b7	132	NCBIfam	TIGR03330	adenosylmethionine decarboxylase	13	124	6.2E-19	T	26-03-2025	IPR017716	S-adenosylmethionine decarboxylase proenzyme	GO:0004014(InterPro)|GO:0008295(InterPro)	-
+ERZ1049444_186_21	0c776edff2b1b1f2ac0b2d72999500b7	132	Pfam	PF02675	S-adenosylmethionine decarboxylase	17	124	2.4E-16	T	26-03-2025	IPR003826	S-adenosylmethionine decarboxylase family, prokaryotic	GO:0004014(InterPro)|GO:0008295(InterPro)	-
+ERZ1049444_186_21	0c776edff2b1b1f2ac0b2d72999500b7	132	SUPERFAMILY	SSF56276	S-adenosylmethionine decarboxylase	14	113	2.28E-13	T	26-03-2025	IPR016067	S-adenosylmethionine decarboxylase, core	GO:0004014(InterPro)|GO:0008295(InterPro)	-
+ERZ1049444_305_45	3b4bab8a337888be7fc9a0acb7ce266a	176	Pfam	PF09335	VTT domain	37	165	1.2E-18	T	26-03-2025	IPR032816	VTT domain	-	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	Pfam	PF04715	Anthranilate synthase component I, N terminal region	20	142	2.1E-8	T	26-03-2025	IPR006805	Anthranilate synthase component I, N-terminal	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	Gene3D	G3DSA:3.60.120.10	Anthranilate synthase	11	450	4.6E-138	T	26-03-2025	IPR005801	ADC synthase	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	SUPERFAMILY	SSF56322	ADC synthase	22	449	1.7E-124	T	26-03-2025	IPR005801	ADC synthase	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	Pfam	PF00425	chorismate binding enzyme	186	440	1.1E-85	T	26-03-2025	IPR015890	Chorismate-utilising enzyme, C-terminal	-	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	NCBIfam	TIGR00553	aminodeoxychorismate synthase component I	98	441	1.4E-106	T	26-03-2025	IPR005802	Aminodeoxychorismate synthase, component I	GO:0009396(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	PRINTS	PR00095	Anthranilate synthase component I signature	302	315	1.6E-13	T	26-03-2025	IPR019999	Anthranilate synthase component I-like	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	PRINTS	PR00095	Anthranilate synthase component I signature	382	396	1.6E-13	T	26-03-2025	IPR019999	Anthranilate synthase component I-like	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	PRINTS	PR00095	Anthranilate synthase component I signature	397	411	1.6E-13	T	26-03-2025	IPR019999	Anthranilate synthase component I-like	GO:0009058(InterPro)	-
+ERZ1049444_21_44	64b8b8711e36e059c098ebe46440e411	452	PRINTS	PR00095	Anthranilate synthase component I signature	288	301	1.6E-13	T	26-03-2025	IPR019999	Anthranilate synthase component I-like	GO:0009058(InterPro)	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	5	262	3.47E-70	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	Gene3D	G3DSA:3.40.50.300	-	1	316	6.0E-79	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	ProSitePatterns	PS00211	ABC transporters family signature.	163	177	-	T	26-03-2025	IPR017871	ABC transporter-like, conserved site	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	SMART	SM00382	AAA_5	40	240	9.3E-13	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	Pfam	PF00005	ABC transporter	32	191	2.4E-28	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	ProSiteProfiles	PS50893	ATP-binding cassette, ABC transporter-type domain profile.	5	263	24.62328	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	CDD	cd03257	ABC_NikE_OppD_transporters	4	245	3.42022E-112	T	26-03-2025	-	-	-	-
+ERZ1049444_66_113	6acc8d2bfaff96b55ae79d325d63d5c9	317	Pfam	PF08352	Oligopeptide/dipeptide transporter, C-terminal region	242	274	1.1E-5	T	26-03-2025	IPR013563	Oligopeptide/dipeptide ABC transporter, C-terminal	GO:0000166(InterPro)|GO:0005524(InterPro)|GO:0015833(InterPro)	-
+ERZ1049444_170_30	d1ce97a162a7f99de091f1e848a73602	312	SUPERFAMILY	SSF103481	Multidrug resistance efflux transporter EmrE	209	305	4.97E-9	T	26-03-2025	-	-	-	-
+ERZ1049444_170_30	d1ce97a162a7f99de091f1e848a73602	312	Pfam	PF00892	EamA-like transporter family	20	153	2.1E-13	T	26-03-2025	IPR000620	EamA domain	GO:0016020(InterPro)	-
+ERZ1049444_170_30	d1ce97a162a7f99de091f1e848a73602	312	Pfam	PF00892	EamA-like transporter family	166	301	1.2E-5	T	26-03-2025	IPR000620	EamA domain	GO:0016020(InterPro)	-
+ERZ1049444_170_30	d1ce97a162a7f99de091f1e848a73602	312	SUPERFAMILY	SSF103481	Multidrug resistance efflux transporter EmrE	54	156	3.01E-10	T	26-03-2025	-	-	-	-
+ERZ1049444_198_51	0ae9ddabb0c38e063650999f8946d1ce	421	Pfam	PF05684	Protein of unknown function (DUF819)	25	416	2.4E-85	T	26-03-2025	IPR008537	Protein of unknown function DUF819	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Pfam	PF20258	Aminomethyltransferase beta-barrel domain	286	359	3.7E-19	T	26-03-2025	IPR046885	tRNA-specific 2-thiouridylase MnmA-like, C-terminal domain	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Gene3D	G3DSA:2.30.30.280	-	213	281	1.8E-26	T	26-03-2025	IPR023382	tRNA-specific 2-thiouridylase MnmA-like, central domain superfamily	GO:0016783(InterPro)	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Gene3D	G3DSA:2.40.30.10	Translation factors	282	363	8.9E-29	T	26-03-2025	-	-	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	SUPERFAMILY	SSF52402	Adenine nucleotide alpha hydrolases-like	4	294	1.21E-54	T	26-03-2025	-	-	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	NCBIfam	NF001138	tRNA 2-thiouridine(34) synthase MnmA	8	359	1.7E-140	T	26-03-2025	-	-	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Hamap	MF_00144	tRNA-specific 2-thiouridylase MnmA [mnmA].	7	360	39.874809	T	26-03-2025	IPR004506	tRNA-specific 2-thiouridylase MnmA-like	GO:0008033(InterPro)|GO:0016740(InterPro)	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Pfam	PF20259	tRNA methyl transferase PRC-barrel domain	208	275	7.5E-21	T	26-03-2025	IPR046884	tRNA-specific 2-thiouridylase MnmA-like, central domain	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Gene3D	G3DSA:3.40.50.620	HUPs	1	212	7.7E-91	T	26-03-2025	IPR014729	Rossmann-like alpha/beta/alpha sandwich fold	-	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	NCBIfam	TIGR00420	tRNA 2-thiouridine(34) synthase MnmA	7	359	5.5E-135	T	26-03-2025	IPR004506	tRNA-specific 2-thiouridylase MnmA-like	GO:0008033(InterPro)|GO:0016740(InterPro)	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	CDD	cd01998	MnmA_TRMU-like	8	359	0.0	T	26-03-2025	IPR004506	tRNA-specific 2-thiouridylase MnmA-like	GO:0008033(InterPro)|GO:0016740(InterPro)	-
+ERZ1049444_21_30	4c147eaf28438b9745390dfc0a431a94	363	Pfam	PF03054	tRNA methyl transferase HUP domain	7	202	2.4E-77	T	26-03-2025	-	-	-	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	Gene3D	G3DSA:3.20.20.70	Aldolase class I	1	379	7.6E-133	T	26-03-2025	IPR013785	Aldolase-type TIM barrel	-	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	ProSiteProfiles	PS51349	FMN-dependent alpha-hydroxy acid dehydrogenase domain profile.	1	380	111.723984	T	26-03-2025	IPR037396	FMN hydroxy acid dehydrogenase domain	-	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	PIRSF	PIRSF000138	Al-hdrx_acd_dh	1	379	5.3E-126	T	26-03-2025	IPR012133	Alpha-hydroxy acid dehydrogenase, FMN-dependent	GO:0010181(InterPro)|GO:0016491(InterPro)	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	SUPERFAMILY	SSF51395	FMN-linked oxidoreductases	2	374	7.94E-104	T	26-03-2025	-	-	-	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	ProSitePatterns	PS00557	FMN-dependent alpha-hydroxy acid dehydrogenases active site.	273	279	-	T	26-03-2025	IPR008259	FMN-dependent alpha-hydroxy acid dehydrogenase, active site	GO:0016491(InterPro)	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	CDD	cd02809	alpha_hydroxyacid_oxid_FMN	7	368	9.77099E-156	T	26-03-2025	IPR012133	Alpha-hydroxy acid dehydrogenase, FMN-dependent	GO:0010181(InterPro)|GO:0016491(InterPro)	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	NCBIfam	NF008398	L-lactate dehydrogenase	1	374	1.5E-122	T	26-03-2025	-	-	-	-
+ERZ1049444_18_15	97fb4780b38d3fb2776900f7e7a7f9ec	381	Pfam	PF01070	FMN-dependent dehydrogenase	14	376	2.5E-133	T	26-03-2025	IPR000262	FMN-dependent dehydrogenase	GO:0016491(InterPro)	-
+ERZ1049444_164_53	84f36afcccce03a3c736edf2ab3c54fc	332	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	2	149	4.3E-7	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_164_53	84f36afcccce03a3c736edf2ab3c54fc	332	SUPERFAMILY	SSF48452	TPR-like	12	144	9.01E-8	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	Pfam	PF00117	Glutamine amidotransferase class-I	198	374	1.5E-49	T	26-03-2025	IPR017926	Glutamine amidotransferase	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	Gene3D	G3DSA:3.40.50.880	-	155	379	4.7E-79	T	26-03-2025	IPR029062	Class I glutamine amidotransferase-like	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00096	Glutamine amidotransferase superfamily signature	351	364	4.4E-11	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00096	Glutamine amidotransferase superfamily signature	266	277	4.4E-11	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00096	Glutamine amidotransferase superfamily signature	238	247	4.4E-11	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	ProSiteProfiles	PS51273	Glutamine amidotransferase type 1 domain profile.	195	382	29.15447	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	CDD	cd01744	GATase1_CPSase	196	373	1.01514E-111	T	26-03-2025	IPR035686	Carbamoyl-phosphate synthase small subunit, GATase1 domain	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	NCBIfam	TIGR01368	glutamine-hydrolyzing carbamoyl-phosphate synthase small subunit	9	377	2.0E-144	T	26-03-2025	IPR006274	Carbamoyl-phosphate synthase, small subunit	GO:0004088(InterPro)|GO:0006207(InterPro)|GO:0006541(InterPro)	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	Pfam	PF00988	Carbamoyl-phosphate synthase small chain, CPSase domain	11	136	5.6E-48	T	26-03-2025	IPR002474	Carbamoyl-phosphate synthase small subunit, N-terminal domain	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	NCBIfam	NF009475	carbamoyl phosphate synthase small subunit	8	380	4.9E-123	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00097	Anthranilate synthase component II signature	266	277	1.6E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00097	Anthranilate synthase component II signature	351	364	1.6E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00097	Anthranilate synthase component II signature	238	247	1.6E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	Hamap	MF_01209	Carbamoyl phosphate synthase small chain [carA].	7	380	47.915077	T	26-03-2025	IPR006274	Carbamoyl-phosphate synthase, small subunit	GO:0004088(InterPro)|GO:0006207(InterPro)|GO:0006541(InterPro)	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	SMART	SM01097	CPSase_sm_chain_2	7	137	1.3E-88	T	26-03-2025	IPR002474	Carbamoyl-phosphate synthase small subunit, N-terminal domain	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	SUPERFAMILY	SSF52021	Carbamoyl phosphate synthetase, small subunit N-terminal domain	8	152	3.53E-56	T	26-03-2025	IPR036480	Carbamoyl-phosphate synthase small subunit, N-terminal domain superfamily	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00099	Carbamoyl-phosphate synthase protein GATase domain signature	196	210	1.0E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00099	Carbamoyl-phosphate synthase protein GATase domain signature	266	282	1.0E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00099	Carbamoyl-phosphate synthase protein GATase domain signature	283	300	1.0E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00099	Carbamoyl-phosphate synthase protein GATase domain signature	308	319	1.0E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	PRINTS	PR00099	Carbamoyl-phosphate synthase protein GATase domain signature	235	249	1.0E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	SUPERFAMILY	SSF52317	Class I glutamine amidotransferase-like	156	376	7.25E-60	T	26-03-2025	IPR029062	Class I glutamine amidotransferase-like	-	-
+ERZ1049444_139_73	b9de2cd6a1b720c33c0d7cbbe93a62e3	385	Gene3D	G3DSA:3.50.30.20	-	6	154	5.9E-61	T	26-03-2025	IPR036480	Carbamoyl-phosphate synthase small subunit, N-terminal domain superfamily	-	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	ProSiteProfiles	PS51387	PCMH-type FAD-binding domain profile.	16	179	9.436909	T	26-03-2025	IPR016166	FAD-binding domain, PCMH-type	GO:0071949(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	NCBIfam	TIGR00179	UDP-N-acetylmuramate dehydrogenase	8	281	2.1E-55	T	26-03-2025	IPR003170	UDP-N-acetylenolpyruvoylglucosamine reductase	GO:0008762(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Pfam	PF02873	UDP-N-acetylenolpyruvoylglucosamine reductase, C-terminal domain	184	281	1.1E-25	T	26-03-2025	IPR011601	UDP-N-acetylenolpyruvoylglucosamine reductase, C-terminal	GO:0008762(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	SUPERFAMILY	SSF56176	FAD-binding/transporter-associated domain-like	8	193	2.1E-29	T	26-03-2025	IPR036318	FAD-binding, type PCMH-like superfamily	GO:0050660(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Gene3D	G3DSA:3.30.465.10	-	73	199	1.1E-31	T	26-03-2025	IPR016169	FAD-binding, type PCMH, subdomain 2	-	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	SUPERFAMILY	SSF56194	Uridine diphospho-N-Acetylenolpyruvylglucosamine reductase, MurB, C-terminal domain	180	284	4.05E-30	T	26-03-2025	IPR036635	UDP-N-acetylenolpyruvoylglucosamine reductase, C-terminal domain superfamily	GO:0008762(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Gene3D	G3DSA:3.30.43.10	-	1	71	2.7E-14	T	26-03-2025	IPR016167	FAD-binding, type PCMH, subdomain 1	-	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	NCBIfam	NF010480	UDP-N-acetylmuramate dehydrogenase	4	285	2.3E-75	T	26-03-2025	-	-	-	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Gene3D	G3DSA:3.90.78.10	-	200	286	1.9E-26	T	26-03-2025	IPR036635	UDP-N-acetylenolpyruvoylglucosamine reductase, C-terminal domain superfamily	GO:0008762(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Hamap	MF_00037	UDP-N-acetylenolpyruvoylglucosamine reductase [murB].	1	286	66.100357	T	26-03-2025	IPR003170	UDP-N-acetylenolpyruvoylglucosamine reductase	GO:0008762(InterPro)	-
+ERZ1049444_384_39	1945ccbe0b872dc3f42690a7b558d0fa	286	Pfam	PF01565	FAD binding domain	40	140	1.7E-9	T	26-03-2025	IPR006094	FAD linked oxidase, N-terminal	GO:0050660(InterPro)	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	NCBIfam	TIGR03499	flagellar biosynthesis protein FlhF	1	295	2.0E-65	T	26-03-2025	IPR020006	Flagellar biosynthesis protein FlhF	GO:0003924(InterPro)|GO:0044781(InterPro)	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	SMART	SM00962	SRP54_3	207	398	2.0E-24	T	26-03-2025	IPR000897	Signal recognition particle, SRP54 subunit, GTPase domain	GO:0005525(InterPro)|GO:0006614(InterPro)	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	CDD	cd17873	FlhF	208	394	9.15427E-54	T	26-03-2025	IPR047040	Flagellar biosynthesis protein FlhF, GTPase domain	GO:0003924(InterPro)	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	Gene3D	G3DSA:1.20.120.1380	Flagellar FlhF biosynthesis protein, N domain	180	202	2.1E-41	T	26-03-2025	-	-	-	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	Gene3D	G3DSA:3.40.50.300	-	203	385	2.1E-41	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	204	384	1.89E-25	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	Pfam	PF00448	SRP54-type protein, GTPase domain	210	395	2.3E-25	T	26-03-2025	IPR000897	Signal recognition particle, SRP54 subunit, GTPase domain	GO:0005525(InterPro)|GO:0006614(InterPro)	-
+ERZ1049444_24_137	dc6d6cd54b3c31c15325531f0aea33eb	459	SMART	SM00382	AAA_5	206	377	3.7E-5	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_229_51	297a35e17a032818feb65a5dde883880	271	CDD	cd00254	LT-like	144	248	7.55835E-43	T	26-03-2025	-	-	-	-
+ERZ1049444_229_51	297a35e17a032818feb65a5dde883880	271	Gene3D	G3DSA:1.10.530.10	-	127	265	1.3E-34	T	26-03-2025	-	-	-	-
+ERZ1049444_229_51	297a35e17a032818feb65a5dde883880	271	Pfam	PF01464	Transglycosylase SLT domain	134	227	1.1E-19	T	26-03-2025	IPR008258	Transglycosylase SLT domain 1	-	-
+ERZ1049444_229_51	297a35e17a032818feb65a5dde883880	271	SUPERFAMILY	SSF53955	Lysozyme-like	95	252	8.09E-38	T	26-03-2025	IPR023346	Lysozyme-like domain superfamily	-	-
+ERZ1049444_19_13	878a4750ffd091af526566a882cfc1f3	153	CDD	cd04301	NAT_SF	54	101	4.22561E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_19_13	878a4750ffd091af526566a882cfc1f3	153	Gene3D	G3DSA:3.40.630.30	-	1	147	7.1E-36	T	26-03-2025	-	-	-	-
+ERZ1049444_19_13	878a4750ffd091af526566a882cfc1f3	153	Pfam	PF00583	Acetyltransferase (GNAT) family	23	127	0.0043	T	26-03-2025	IPR000182	GNAT domain	GO:0016747(InterPro)	-
+ERZ1049444_19_13	878a4750ffd091af526566a882cfc1f3	153	ProSiteProfiles	PS51186	Gcn5-related N-acetyltransferase (GNAT) domain profile.	6	149	11.176528	T	26-03-2025	IPR000182	GNAT domain	GO:0016747(InterPro)	-
+ERZ1049444_19_13	878a4750ffd091af526566a882cfc1f3	153	SUPERFAMILY	SSF55729	Acyl-CoA N-acyltransferases (Nat)	1	149	2.13E-33	T	26-03-2025	IPR016181	Acyl-CoA N-acyltransferase	-	-
+ERZ1049444_3_235	6714462486ce5d2cb3028aceb454ed31	287	Pfam	PF03575	Peptidase family S51	40	221	2.9E-16	T	26-03-2025	IPR005320	Peptidase S51	GO:0006508(InterPro)|GO:0008236(InterPro)	-
+ERZ1049444_3_235	6714462486ce5d2cb3028aceb454ed31	287	NCBIfam	TIGR02069	cyanophycinase	8	270	1.1E-58	T	26-03-2025	IPR011811	Peptidase S51, cyanophycinase	GO:0016787(InterPro)|GO:0043170(InterPro)	-
+ERZ1049444_3_235	6714462486ce5d2cb3028aceb454ed31	287	SUPERFAMILY	SSF52317	Class I glutamine amidotransferase-like	37	239	1.83E-19	T	26-03-2025	IPR029062	Class I glutamine amidotransferase-like	-	-
+ERZ1049444_3_235	6714462486ce5d2cb3028aceb454ed31	287	CDD	cd03145	GAT1_cyanophycinase	8	236	1.25759E-57	T	26-03-2025	-	-	-	-
+ERZ1049444_3_235	6714462486ce5d2cb3028aceb454ed31	287	Gene3D	G3DSA:3.40.50.880	-	4	280	7.7E-69	T	26-03-2025	IPR029062	Class I glutamine amidotransferase-like	-	-
+ERZ1049444_296_1	98d89e6bb9246898e7f4531fa61dd9df	409	Gene3D	G3DSA:3.40.710.10	-	28	398	6.5E-90	T	26-03-2025	IPR012338	Beta-lactamase/transpeptidase-like	-	-
+ERZ1049444_296_1	98d89e6bb9246898e7f4531fa61dd9df	409	Pfam	PF00144	Beta-lactamase	54	388	8.2E-41	T	26-03-2025	IPR001466	Beta-lactamase-related	-	-
+ERZ1049444_296_1	98d89e6bb9246898e7f4531fa61dd9df	409	SUPERFAMILY	SSF56601	beta-lactamase/transpeptidase-like	36	384	1.25E-69	T	26-03-2025	IPR012338	Beta-lactamase/transpeptidase-like	-	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	CDD	cd01296	Imidazolone-5PH	38	414	1.90024E-163	T	26-03-2025	IPR005920	Imidazolonepropionase	GO:0005737(InterPro)|GO:0016812(InterPro)|GO:0019556(InterPro)	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	Pfam	PF01979	Amidohydrolase family	75	417	5.2E-18	T	26-03-2025	IPR006680	Amidohydrolase-related	GO:0016787(InterPro)	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	Gene3D	G3DSA:3.20.20.140	-	79	376	4.8E-142	T	26-03-2025	-	-	-	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	NCBIfam	TIGR01224	imidazolonepropionase	35	416	1.3E-122	T	26-03-2025	IPR005920	Imidazolonepropionase	GO:0005737(InterPro)|GO:0016812(InterPro)|GO:0019556(InterPro)	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	SUPERFAMILY	SSF51556	Metallo-dependent hydrolases	78	377	1.82E-77	T	26-03-2025	IPR032466	Metal-dependent hydrolase	-	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	Gene3D	G3DSA:2.30.40.10	Urease, subunit C, domain 1	27	414	4.8E-142	T	26-03-2025	IPR011059	Metal-dependent hydrolase, composite domain superfamily	GO:0016810(InterPro)	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	Hamap	MF_00372	Imidazolonepropionase [hutI].	2	417	40.026474	T	26-03-2025	IPR005920	Imidazolonepropionase	GO:0005737(InterPro)|GO:0016812(InterPro)|GO:0019556(InterPro)	-
+ERZ1049444_11_160	ba01cd39586f4cdef85964e55dd027f9	421	SUPERFAMILY	SSF51338	Composite domain of metallo-dependent hydrolases	30	99	4.32E-10	T	26-03-2025	IPR011059	Metal-dependent hydrolase, composite domain superfamily	GO:0016810(InterPro)	-
+ERZ1049444_54_109	23b532c874098ffed3e6a0cdfcbb0914	128	PIRSF	PIRSF002889	Rod_FlgB	1	128	1.0E-35	T	26-03-2025	IPR006300	Flagellar basal-body rod protein FlgB	GO:0030694(InterPro)|GO:0071973(InterPro)	-
+ERZ1049444_54_109	23b532c874098ffed3e6a0cdfcbb0914	128	Pfam	PF00460	Flagella basal body rod protein	10	38	1.1E-4	T	26-03-2025	IPR001444	Flagellar basal body rod protein, N-terminal	-	-
+ERZ1049444_54_109	23b532c874098ffed3e6a0cdfcbb0914	128	NCBIfam	TIGR01396	flagellar basal body rod protein FlgB	5	126	4.6E-28	T	26-03-2025	IPR006300	Flagellar basal-body rod protein FlgB	GO:0030694(InterPro)|GO:0071973(InterPro)	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	ProSiteProfiles	PS01124	Bacterial regulatory proteins, araC family DNA-binding domain profile.	233	329	17.9534	T	26-03-2025	IPR018060	DNA binding HTH domain, AraC-type	GO:0003700(InterPro)|GO:0006355(InterPro)|GO:0043565(InterPro)	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	SUPERFAMILY	SSF46689	Homeodomain-like	283	329	1.25E-9	T	26-03-2025	IPR009057	Homedomain-like superfamily	-	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	Pfam	PF12625	Arabinose-binding domain of AraC transcription regulator, N-term	45	200	7.5E-21	T	26-03-2025	IPR032687	HTH-type transcriptional regulator AraC-type, N-terminal	-	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	Pfam	PF12833	Helix-turn-helix domain	254	329	1.7E-12	T	26-03-2025	IPR018060	DNA binding HTH domain, AraC-type	GO:0003700(InterPro)|GO:0006355(InterPro)|GO:0043565(InterPro)	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	SMART	SM00342	aracneu4	247	329	2.1E-16	T	26-03-2025	IPR018060	DNA binding HTH domain, AraC-type	GO:0003700(InterPro)|GO:0006355(InterPro)|GO:0043565(InterPro)	-
+ERZ1049444_109_1	6ee6ee8a8cf47c9bf4a973c68bcf2629	329	Gene3D	G3DSA:1.10.10.60	-	229	329	5.7E-18	T	26-03-2025	-	-	-	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	Pfam	PF00849	RNA pseudouridylate synthase	4	153	1.7E-15	T	26-03-2025	IPR006145	Pseudouridine synthase, RsuA/RluA-like	GO:0001522(InterPro)|GO:0003723(InterPro)|GO:0009451(InterPro)|GO:0009982(InterPro)	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	SUPERFAMILY	SSF55120	Pseudouridine synthase	4	181	1.92E-41	T	26-03-2025	IPR020103	Pseudouridine synthase, catalytic domain superfamily	GO:0001522(InterPro)|GO:0003723(InterPro)|GO:0009451(InterPro)|GO:0009982(InterPro)	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	Gene3D	G3DSA:3.30.70.580	-	1	71	5.9E-26	T	26-03-2025	IPR020094	Pseudouridine synthase TruA/RsuA/RluB/E/F, N-terminal	GO:0003723(InterPro)|GO:0009982(InterPro)	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	ProSitePatterns	PS01149	Rsu family of pseudouridine synthase signature.	43	57	-	T	26-03-2025	IPR018496	Pseudouridine synthase, RsuA/RluB/E/F, conserved site	GO:0001522(InterPro)|GO:0003723(InterPro)|GO:0009451(InterPro)|GO:0016866(InterPro)	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	NCBIfam	TIGR00093	pseudouridine synthase	8	181	4.8E-48	T	26-03-2025	IPR000748	Pseudouridine synthase, RsuA/RluB/E/F	GO:0001522(InterPro)|GO:0003723(InterPro)|GO:0009451(InterPro)|GO:0016866(InterPro)	-
+ERZ1049444_229_3	ef9e1368cc432b7c32f59e245f304f1a	182	Gene3D	G3DSA:3.30.70.1560	-	72	172	2.3E-28	T	26-03-2025	IPR042092	Pseudouridine synthase, RsuA/RluB/E/F, catalytic domain	-	-
+ERZ1049444_223_9	989b69c8d7b3824706dd0077b22d41df	246	Gene3D	G3DSA:3.40.50.300	-	2	245	6.4E-18	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_223_9	989b69c8d7b3824706dd0077b22d41df	246	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	3	228	1.02E-16	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_223_9	989b69c8d7b3824706dd0077b22d41df	246	Pfam	PF00685	Sulfotransferase domain	3	170	3.8E-4	T	26-03-2025	IPR000863	Sulfotransferase domain	GO:0008146(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PIRSF	PIRSF000532	ATP_PFK_prok	1	307	8.2E-101	T	26-03-2025	IPR012003	ATP-dependent 6-phosphofructokinase, prokaryotic-type	GO:0005524(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)|GO:0008443(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	Gene3D	G3DSA:3.40.50.450	-	1	269	1.4E-95	T	26-03-2025	-	-	-	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	NCBIfam	NF002872	ATP-dependent 6-phosphofructokinase	1	307	6.9E-104	T	26-03-2025	-	-	-	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	Pfam	PF00365	Phosphofructokinase	1	263	1.2E-91	T	26-03-2025	IPR000023	Phosphofructokinase domain	GO:0003872(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	SUPERFAMILY	SSF53784	Phosphofructokinase	1	300	5.89E-99	T	26-03-2025	IPR035966	Phosphofructokinase superfamily	GO:0003872(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	16	29	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	198	210	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	106	123	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	144	160	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	228	250	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	78	94	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	124	142	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	PRINTS	PR00476	ATP-dependent phosphofructokinase family signature	162	179	5.2E-59	T	26-03-2025	IPR022953	ATP-dependent 6-phosphofructokinase	GO:0003872(InterPro)|GO:0006002(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	ProSitePatterns	PS00433	Phosphofructokinase signature.	232	250	-	T	26-03-2025	IPR015912	Phosphofructokinase, conserved site	GO:0003872(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_19_86	7e777e646b3b519d496b595973426f28	308	Gene3D	G3DSA:3.40.50.460	Phosphofructokinase domain	128	240	1.4E-95	T	26-03-2025	IPR035966	Phosphofructokinase superfamily	GO:0003872(InterPro)|GO:0006096(InterPro)	-
+ERZ1049444_42_71	b65b0631a880d66d42bc23b5ef6b3ef4	391	Gene3D	G3DSA:1.20.1050.10	-	188	282	1.9E-7	T	26-03-2025	-	-	-	-
+ERZ1049444_42_71	b65b0631a880d66d42bc23b5ef6b3ef4	391	Pfam	PF13410	Glutathione S-transferase, C-terminal domain	212	271	0.0047	T	26-03-2025	-	-	-	-
+ERZ1049444_42_71	b65b0631a880d66d42bc23b5ef6b3ef4	391	SUPERFAMILY	SSF47616	GST C-terminal domain-like	185	272	2.23E-9	T	26-03-2025	IPR036282	Glutathione S-transferase, C-terminal domain superfamily	-	-
+ERZ1049444_42_59	54a7e11d838954fa2475acc86b478f16	106	Pfam	PF20090	Family of unknown function (DUF6482)	1	97	2.3E-32	T	26-03-2025	IPR045508	Protein of unknown function DUF6482	-	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	SUPERFAMILY	SSF81799	Putative methyltransferase TM0872, insert domain	109	207	3.14E-30	T	26-03-2025	IPR023397	S-adenosyl-L-methionine-dependent methyltransferase, MraW, recognition domain superfamily	GO:0008168(InterPro)	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	Gene3D	G3DSA:3.40.50.150	Vaccinia Virus protein VP39	8	298	2.7E-96	T	26-03-2025	IPR029063	S-adenosyl-L-methionine-dependent methyltransferase superfamily	-	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	Gene3D	G3DSA:1.10.150.170	Putative methyltransferase TM0872, insert domain	107	208	2.7E-96	T	26-03-2025	IPR023397	S-adenosyl-L-methionine-dependent methyltransferase, MraW, recognition domain superfamily	GO:0008168(InterPro)	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	MobiDBLite	mobidb-lite	consensus disorder prediction	280	299	-	T	26-03-2025	-	-	-	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	MobiDBLite	mobidb-lite	consensus disorder prediction	289	299	-	T	26-03-2025	-	-	-	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	PIRSF	PIRSF004486	MraW	1	299	5.2E-95	T	26-03-2025	IPR002903	Ribosomal RNA small subunit methyltransferase H	GO:0008168(InterPro)	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	Hamap	MF_01007	Ribosomal RNA small subunit methyltransferase H [rsmH].	5	299	33.942924	T	26-03-2025	IPR002903	Ribosomal RNA small subunit methyltransferase H	GO:0008168(InterPro)	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	Pfam	PF01795	MraW methylase family	4	298	3.3E-87	T	26-03-2025	IPR002903	Ribosomal RNA small subunit methyltransferase H	GO:0008168(InterPro)	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	SUPERFAMILY	SSF53335	S-adenosyl-L-methionine-dependent methyltransferases	4	298	1.08E-36	T	26-03-2025	IPR029063	S-adenosyl-L-methionine-dependent methyltransferase superfamily	-	-
+ERZ1049444_103_72	ccdc757c6d0745312d1ce607af0a243c	299	NCBIfam	TIGR00006	16S rRNA (cytosine(1402)-N(4))-methyltransferase RsmH	3	298	1.5E-86	T	26-03-2025	IPR002903	Ribosomal RNA small subunit methyltransferase H	GO:0008168(InterPro)	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	CDD	cd00093	HTH_XRE	4	61	4.09988E-16	T	26-03-2025	IPR001387	Cro/C1-type helix-turn-helix domain	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	SMART	SM00530	mbf_short4	6	61	2.4E-14	T	26-03-2025	IPR001387	Cro/C1-type helix-turn-helix domain	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	SUPERFAMILY	SSF47413	lambda repressor-like DNA-binding domains	1	64	2.95E-17	T	26-03-2025	IPR010982	Lambda repressor-like, DNA-binding domain superfamily	GO:0003677(InterPro)	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	Pfam	PF01381	Helix-turn-helix	7	61	9.7E-10	T	26-03-2025	IPR001387	Cro/C1-type helix-turn-helix domain	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	Gene3D	G3DSA:1.10.260.40	-	1	65	9.3E-18	T	26-03-2025	IPR010982	Lambda repressor-like, DNA-binding domain superfamily	GO:0003677(InterPro)	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	ProSiteProfiles	PS50943	Cro/C1-type HTH domain profile.	7	61	15.429382	T	26-03-2025	IPR001387	Cro/C1-type helix-turn-helix domain	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	Gene3D	G3DSA:2.60.120.10	Jelly Rolls	87	182	2.0E-15	T	26-03-2025	IPR014710	RmlC-like jelly roll fold	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	SUPERFAMILY	SSF51182	RmlC-like cupins	59	180	5.94E-23	T	26-03-2025	IPR011051	RmlC-like cupin domain superfamily	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	Pfam	PF07883	Cupin domain	106	173	5.6E-11	T	26-03-2025	IPR013096	Cupin 2, conserved barrel	-	-
+ERZ1049444_29_81	edaa2cb58f30d9aec7b76e0af2613b01	191	CDD	cd02209	cupin_XRE_C	86	176	1.80718E-29	T	26-03-2025	-	-	-	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	Gene3D	G3DSA:3.40.50.2000	Glycogen Phosphorylase B;	180	359	2.0E-104	T	26-03-2025	-	-	-	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	Pfam	PF13439	Glycosyltransferase Family 4	15	183	5.9E-24	T	26-03-2025	IPR028098	Glycosyltransferase subfamily 4-like, N-terminal domain	-	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	NCBIfam	TIGR03999	N-acetyl-alpha-D-glucosaminyl L-malate synthase BshA	6	376	4.8E-156	T	26-03-2025	IPR023881	N-acetyl-alpha-D-glucosaminyl L-malate synthase BshA	GO:0016757(InterPro)|GO:0071793(InterPro)	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	Gene3D	G3DSA:3.40.50.2000	Glycogen Phosphorylase B;	13	364	2.0E-104	T	26-03-2025	-	-	-	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	Pfam	PF00534	Glycosyl transferases group 1	201	352	1.9E-35	T	26-03-2025	IPR001296	Glycosyl transferase, family 1	GO:0016757(InterPro)	-
+ERZ1049444_391_8	322dfece52a5deca7656e65a946c83bc	382	SUPERFAMILY	SSF53756	UDP-Glycosyltransferase/glycogen phosphorylase	11	376	1.02E-80	T	26-03-2025	-	-	-	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	NCBIfam	TIGR01036	dihydroorotate dehydrogenase (quinone)	10	348	7.5E-110	T	26-03-2025	IPR005719	Dihydroorotate dehydrogenase, class 2	GO:0004152(InterPro)|GO:0006207(InterPro)|GO:0016020(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	ProSitePatterns	PS00912	Dihydroorotate dehydrogenase signature 2.	284	304	-	T	26-03-2025	IPR001295	Dihydroorotate dehydrogenase, conserved site	GO:0006207(InterPro)|GO:0016627(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	Gene3D	G3DSA:3.20.20.70	Aldolase class I	5	351	3.4E-127	T	26-03-2025	IPR013785	Aldolase-type TIM barrel	-	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	PIRSF	PIRSF000164	DHO_oxidase	12	349	1.8E-97	T	26-03-2025	IPR012135	Dihydroorotate dehydrogenase, class 1/ 2	GO:0004152(InterPro)|GO:0006222(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	CDD	cd04738	DHOD_2_like	10	328	1.73434E-158	T	26-03-2025	IPR005719	Dihydroorotate dehydrogenase, class 2	GO:0004152(InterPro)|GO:0006207(InterPro)|GO:0016020(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	Pfam	PF01180	Dihydroorotate dehydrogenase	44	332	3.4E-75	T	26-03-2025	IPR005720	Dihydroorotate dehydrogenase, catalytic	GO:0005737(InterPro)|GO:0016627(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	NCBIfam	NF003652	quinone-dependent dihydroorotate dehydrogenase	11	340	2.3E-103	T	26-03-2025	-	-	-	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	SUPERFAMILY	SSF51395	FMN-linked oxidoreductases	12	346	3.36E-96	T	26-03-2025	-	-	-	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	ProSitePatterns	PS00911	Dihydroorotate dehydrogenase signature 1.	79	98	-	T	26-03-2025	IPR001295	Dihydroorotate dehydrogenase, conserved site	GO:0006207(InterPro)|GO:0016627(InterPro)	-
+ERZ1049444_51_71	5c246bdb7772d98c5560393e9df9b2f2	352	NCBIfam	NF003645	quinone-dependent dihydroorotate dehydrogenase	2	351	6.0E-134	T	26-03-2025	-	-	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	1	209	3.95E-45	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	Gene3D	G3DSA:1.10.8.60	-	144	211	5.4E-25	T	26-03-2025	-	-	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	CDD	cd18138	HLD_clamp_pol_III_delta	141	205	6.22961E-25	T	26-03-2025	-	-	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	Pfam	PF06144	DNA polymerase III, delta subunit	20	131	2.4E-11	T	26-03-2025	IPR010372	DNA polymerase III delta, N-terminal	GO:0003677(InterPro)|GO:0003887(InterPro)|GO:0006260(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	Gene3D	G3DSA:3.40.50.300	-	1	136	1.2E-41	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	NCBIfam	TIGR01128	DNA polymerase III subunit delta	19	332	7.4E-71	T	26-03-2025	IPR005790	DNA polymerase III, delta subunit	GO:0003677(InterPro)|GO:0006260(InterPro)	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	Gene3D	G3DSA:1.20.272.10	-	214	341	2.2E-28	T	26-03-2025	-	-	-	-
+ERZ1049444_108_33	9706be40303f5886835a142300bb7260	349	SUPERFAMILY	SSF48019	post-AAA+ oligomerization domain-like	212	337	6.97E-20	T	26-03-2025	IPR008921	DNA polymerase III, clamp loader complex, gamma/delta/delta subunit, C-terminal	GO:0003677(InterPro)|GO:0006260(InterPro)	-
+ERZ1049444_187_48	22b806e2a79f3b7aa85be1029e4da8b5	366	Coils	Coil	Coil	186	206	-	T	26-03-2025	-	-	-	-
+ERZ1049444_187_48	22b806e2a79f3b7aa85be1029e4da8b5	366	Coils	Coil	Coil	231	258	-	T	26-03-2025	-	-	-	-
+ERZ1049444_187_48	22b806e2a79f3b7aa85be1029e4da8b5	366	Coils	Coil	Coil	134	154	-	T	26-03-2025	-	-	-	-
+ERZ1049444_187_48	22b806e2a79f3b7aa85be1029e4da8b5	366	Coils	Coil	Coil	105	125	-	T	26-03-2025	-	-	-	-
+ERZ1049444_187_48	22b806e2a79f3b7aa85be1029e4da8b5	366	Coils	Coil	Coil	23	43	-	T	26-03-2025	-	-	-	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	Gene3D	G3DSA:3.40.1280.10	-	7	182	1.4E-47	T	26-03-2025	IPR029026	tRNA (guanine-N1-)-methyltransferase, N-terminal	-	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	NCBIfam	TIGR00050	TrmJ/YjtD family RNA methyltransferase	11	242	8.3E-47	T	26-03-2025	IPR004384	RNA methyltransferase TrmJ/LasT	GO:0006396(InterPro)|GO:0008173(InterPro)	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	Pfam	PF00588	SpoU rRNA Methylase family	9	159	2.0E-17	T	26-03-2025	IPR001537	tRNA/rRNA methyltransferase, SpoU type	GO:0003723(InterPro)|GO:0006396(InterPro)|GO:0008173(InterPro)	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	SUPERFAMILY	SSF75217	alpha/beta knot	5	180	2.75E-30	T	26-03-2025	IPR029028	Alpha/beta knot methyltransferases	-	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	CDD	cd18093	SpoU-like_TrmJ	8	161	2.80773E-69	T	26-03-2025	-	-	-	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	Gene3D	G3DSA:1.10.8.590	-	183	240	2.7E-15	T	26-03-2025	-	-	-	-
+ERZ1049444_206_24	200c1650a6dff72dc8b8d1c41df0be43	248	PIRSF	PIRSF004808	LasT	3	248	8.1E-75	T	26-03-2025	IPR004384	RNA methyltransferase TrmJ/LasT	GO:0006396(InterPro)|GO:0008173(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	CDD	cd07958	Anticodon_Ia_Leu_BEm	615	733	4.79147E-45	T	26-03-2025	-	-	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Gene3D	G3DSA:3.40.50.620	HUPs	353	577	5.8E-70	T	26-03-2025	IPR014729	Rossmann-like alpha/beta/alpha sandwich fold	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	CDD	cd00812	LeuRS_core	34	615	1.74527E-129	T	26-03-2025	-	-	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	ProSitePatterns	PS00178	Aminoacyl-transfer RNA synthetases class-I signature.	42	53	-	T	26-03-2025	IPR001412	Aminoacyl-tRNA synthetase, class I, conserved site	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	NCBIfam	TIGR00396	bacterial-type leucine--tRNA ligase	5	816	0.0	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Pfam	PF13603	Leucyl-tRNA synthetase, editing domain	222	403	1.6E-75	T	26-03-2025	IPR025709	Leucyl-tRNA synthetase, editing domain	GO:0002161(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	525	547	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	153	169	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	215	234	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	487	505	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	558	568	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	127	144	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	PRINTS	PR00985	Leucyl-tRNA synthetase signature	185	198	7.9E-52	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Gene3D	G3DSA:3.10.20.590	-	755	818	6.5E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Gene3D	G3DSA:1.10.730.10	-	578	754	6.6E-63	T	26-03-2025	-	-	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Pfam	PF08264	Anticodon-binding domain of tRNA ligase	658	780	3.3E-15	T	26-03-2025	IPR013155	Methionyl/Valyl/Leucyl/Isoleucyl-tRNA synthetase, anticodon-binding	GO:0004812(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Hamap	MF_00049_B	Leucine--tRNA ligase [leuS].	4	816	23.619606	T	26-03-2025	IPR002302	Leucine-tRNA ligase	GO:0000166(InterPro)|GO:0004823(InterPro)|GO:0005524(InterPro)|GO:0006429(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	SUPERFAMILY	SSF47323	Anticodon-binding domain of a subclass of class I aminoacyl-tRNA synthetases	620	816	4.86E-35	T	26-03-2025	IPR009080	Aminoacyl-tRNA synthetase, class Ia, anticodon-binding	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	SUPERFAMILY	SSF52374	Nucleotidylyl transferase	5	624	7.3E-154	T	26-03-2025	-	-	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	SUPERFAMILY	SSF50677	ValRS/IleRS/LeuRS editing domain	226	415	2.51E-56	T	26-03-2025	IPR009008	Valyl/Leucyl/Isoleucyl-tRNA synthetase, editing domain	GO:0002161(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Gene3D	G3DSA:3.40.50.620	HUPs	32	237	2.7E-82	T	26-03-2025	IPR014729	Rossmann-like alpha/beta/alpha sandwich fold	-	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Pfam	PF00133	tRNA synthetases class I (I, L, M and V)	417	615	8.9E-21	T	26-03-2025	IPR002300	Aminoacyl-tRNA synthetase, class Ia	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_108_31	06e359b9a237e3c7e7cc9671f7064044	818	Pfam	PF09334	tRNA synthetases class I (M)	39	171	4.2E-16	T	26-03-2025	IPR015413	Methionyl/Leucyl tRNA synthetase	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Hamap	MF_00118_B	Elongation factor Tu [tuf].	1	394	59.781227	T	26-03-2025	IPR004541	Translation elongation factor EFTu/EF1A, bacterial/organelle	GO:0003746(InterPro)|GO:0005525(InterPro)|GO:0006414(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	NCBIfam	NF000766	elongation factor Tu	1	394	4.3E-220	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Pfam	PF03144	Elongation factor Tu domain 2	225	294	6.6E-16	T	26-03-2025	IPR004161	Translation elongation factor EFTu-like, domain 2	GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	ProSitePatterns	PS00301	Translational (tr)-type guanine nucleotide-binding (G) domain signature.	51	66	-	T	26-03-2025	IPR031157	Tr-type G domain, conserved site	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	NCBIfam	NF009372	elongation factor Tu	1	394	7.9E-222	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	CDD	cd03707	EFTU_III	300	389	8.32057E-62	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	CDD	cd03697	EFTU_II	211	297	5.81734E-51	T	26-03-2025	IPR033720	Elongation factor Tu, domain 2	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Pfam	PF00009	Elongation factor Tu GTP binding domain	10	195	1.7E-60	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Pfam	PF03143	Elongation factor Tu C-terminal domain	298	392	5.0E-36	T	26-03-2025	IPR004160	Translation elongation factor EFTu/EF1A, C-terminal	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	CDD	cd01884	EF_Tu	11	203	5.18674E-137	T	26-03-2025	IPR041709	Elongation factor Tu (EF-Tu), GTP-binding domain	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Gene3D	G3DSA:2.40.30.10	Translation factors	338	393	5.4E-27	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Gene3D	G3DSA:2.40.30.10	Translation factors	207	334	4.4E-56	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	NCBIfam	TIGR00485	elongation factor Tu	1	394	3.4E-220	T	26-03-2025	IPR004541	Translation elongation factor EFTu/EF1A, bacterial/organelle	GO:0003746(InterPro)|GO:0005525(InterPro)|GO:0006414(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	PRINTS	PR00315	GTP-binding elongation factor signature	14	27	2.7E-23	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	PRINTS	PR00315	GTP-binding elongation factor signature	58	66	2.7E-23	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	PRINTS	PR00315	GTP-binding elongation factor signature	94	105	2.7E-23	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	PRINTS	PR00315	GTP-binding elongation factor signature	131	140	2.7E-23	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	PRINTS	PR00315	GTP-binding elongation factor signature	78	88	2.7E-23	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	Gene3D	G3DSA:3.40.50.300	-	1	203	1.1E-73	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	SUPERFAMILY	SSF50465	EF-Tu/eEF-1alpha/eIF2-gamma C-terminal domain	298	393	4.89E-36	T	26-03-2025	IPR009001	Translation elongation factor EF1A/initiation factor IF2gamma, C-terminal	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	NCBIfam	NF009373	elongation factor Tu	1	393	4.7E-220	T	26-03-2025	-	-	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	ProSiteProfiles	PS51722	Translational (tr)-type guanine nucleotide-binding (G) domain profile.	10	204	57.383827	T	26-03-2025	IPR000795	Translational (tr)-type GTP-binding domain	GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	NCBIfam	TIGR00231	small GTP-binding protein domain	13	145	9.3E-13	T	26-03-2025	IPR005225	Small GTP-binding domain	GO:0005525(InterPro)	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	9	226	4.05E-60	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_22_74	317987d12b97265b2528a074e0518a89	394	SUPERFAMILY	SSF50447	Translation proteins	206	301	1.46E-30	T	26-03-2025	IPR009000	Translation protein, beta-barrel domain superfamily	-	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	CDD	cd02440	AdoMet_MTases	78	148	8.61412E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	Pfam	PF02527	rRNA small subunit methyltransferase G	30	205	1.6E-49	T	26-03-2025	IPR003682	rRNA small subunit methyltransferase G	GO:0005737(InterPro)|GO:0006364(InterPro)|GO:0008649(InterPro)	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	PIRSF	PIRSF003078	GidB	7	213	2.0E-50	T	26-03-2025	IPR003682	rRNA small subunit methyltransferase G	GO:0005737(InterPro)|GO:0006364(InterPro)|GO:0008649(InterPro)	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	NCBIfam	TIGR00138	16S rRNA (guanine(527)-N(7))-methyltransferase RsmG	35	210	1.0E-45	T	26-03-2025	IPR003682	rRNA small subunit methyltransferase G	GO:0005737(InterPro)|GO:0006364(InterPro)|GO:0008649(InterPro)	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	Gene3D	G3DSA:3.40.50.150	Vaccinia Virus protein VP39	2	216	4.1E-60	T	26-03-2025	IPR029063	S-adenosyl-L-methionine-dependent methyltransferase superfamily	-	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	Hamap	MF_00074	Ribosomal RNA small subunit methyltransferase G [rsmG].	21	207	25.323656	T	26-03-2025	IPR003682	rRNA small subunit methyltransferase G	GO:0005737(InterPro)|GO:0006364(InterPro)|GO:0008649(InterPro)	-
+ERZ1049444_272_5	3353fbd0ce02ed3ec2279d2ce7142faf	216	SUPERFAMILY	SSF53335	S-adenosyl-L-methionine-dependent methyltransferases	12	210	4.06E-33	T	26-03-2025	IPR029063	S-adenosyl-L-methionine-dependent methyltransferase superfamily	-	-
+ERZ1049444_213_24	5c6b6b0c71c9ce9944e7119cbf0ae2f1	179	Pfam	PF04238	Protein of unknown function (DUF420)	45	173	3.1E-41	T	26-03-2025	IPR007352	Protein of unknown function DUF420	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	Gene3D	G3DSA:1.10.10.10	-	3	87	9.4E-24	T	26-03-2025	IPR036388	Winged helix-like DNA-binding domain superfamily	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	Gene3D	G3DSA:3.40.190.290	-	88	299	2.1E-65	T	26-03-2025	-	-	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	CDD	cd08422	PBP2_CrgA_like	92	295	7.25088E-83	T	26-03-2025	-	-	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	Coils	Coil	Coil	66	89	-	T	26-03-2025	-	-	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	Pfam	PF00126	Bacterial regulatory helix-turn-helix protein, lysR family	6	63	1.4E-16	T	26-03-2025	IPR000847	Transcription regulator HTH, LysR	GO:0003700(InterPro)|GO:0006355(InterPro)	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	SUPERFAMILY	SSF46785	"Winged helix" DNA-binding domain	4	111	9.33E-23	T	26-03-2025	IPR036390	Winged helix DNA-binding domain superfamily	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	SUPERFAMILY	SSF53850	Periplasmic binding protein-like II	90	301	1.71E-46	T	26-03-2025	-	-	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	Pfam	PF03466	LysR substrate binding domain	89	299	2.6E-39	T	26-03-2025	IPR005119	LysR, substrate-binding	-	-
+ERZ1049444_326_45	b99e332e7dccd998c6901d911f897670	305	ProSiteProfiles	PS50931	LysR-type HTH domain profile.	1	59	23.975857	T	26-03-2025	IPR000847	Transcription regulator HTH, LysR	GO:0003700(InterPro)|GO:0006355(InterPro)	-
+ERZ1049444_347_29	bdaa30b6eb91f1a9c8c25fb7938bf222	297	ProSiteProfiles	PS50972	Pterin-binding domain profile.	21	265	33.594181	T	26-03-2025	IPR000489	Pterin-binding domain	GO:0042558(InterPro)	-
+ERZ1049444_347_29	bdaa30b6eb91f1a9c8c25fb7938bf222	297	SUPERFAMILY	SSF51717	Dihydropteroate synthetase-like	21	280	4.45E-79	T	26-03-2025	IPR011005	Dihydropteroate synthase-like superfamily	-	-
+ERZ1049444_347_29	bdaa30b6eb91f1a9c8c25fb7938bf222	297	NCBIfam	NF005719	methyltetrahydrofolate:corrinoid/iron-sulfur protein methyltransferase	21	283	7.0E-105	T	26-03-2025	-	-	-	-
+ERZ1049444_347_29	bdaa30b6eb91f1a9c8c25fb7938bf222	297	Pfam	PF00809	Pterin binding enzyme	25	247	1.1E-25	T	26-03-2025	IPR000489	Pterin-binding domain	GO:0042558(InterPro)	-
+ERZ1049444_347_29	bdaa30b6eb91f1a9c8c25fb7938bf222	297	Gene3D	G3DSA:3.20.20.20	-	11	284	1.2E-79	T	26-03-2025	IPR011005	Dihydropteroate synthase-like superfamily	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Pfam	PF02775	Thiamine pyrophosphate enzyme, C-terminal TPP binding domain	395	544	1.6E-50	T	26-03-2025	IPR011766	Thiamine pyrophosphate enzyme, TPP-binding	GO:0003824(InterPro)|GO:0030976(InterPro)	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	SUPERFAMILY	SSF52518	Thiamin diphosphate-binding fold (THDP-binding)	369	570	3.23E-68	T	26-03-2025	IPR029061	Thiamin diphosphate-binding fold	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	SUPERFAMILY	SSF52467	DHS-like NAD/FAD-binding domain	190	361	3.1E-60	T	26-03-2025	IPR029035	DHS-like NAD/FAD-binding domain superfamily	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Gene3D	G3DSA:3.40.50.1220	-	196	363	4.9E-123	T	26-03-2025	-	-	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Gene3D	G3DSA:3.40.50.970	-	1	180	2.0E-63	T	26-03-2025	-	-	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	NCBIfam	TIGR00118	biosynthetic-type acetolactate synthase large subunit	4	567	1.7E-249	T	26-03-2025	IPR012846	Acetolactate synthase, large subunit, biosynthetic	GO:0000287(InterPro)|GO:0003984(InterPro)|GO:0009082(InterPro)|GO:0030976(InterPro)|GO:0050660(InterPro)	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	NCBIfam	NF005058	acetolactate synthase 3 large subunit	1	573	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Pfam	PF00205	Thiamine pyrophosphate enzyme, central domain	196	330	4.0E-42	T	26-03-2025	IPR012000	Thiamine pyrophosphate enzyme, central domain	GO:0000287(InterPro)|GO:0030976(InterPro)	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Pfam	PF02776	Thiamine pyrophosphate enzyme, N-terminal TPP binding domain	5	119	2.5E-39	T	26-03-2025	IPR012001	Thiamine pyrophosphate enzyme, N-terminal TPP-binding domain	GO:0030976(InterPro)	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	Gene3D	G3DSA:3.40.50.970	-	364	543	4.9E-123	T	26-03-2025	-	-	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	SUPERFAMILY	SSF52518	Thiamin diphosphate-binding fold (THDP-binding)	2	182	2.86E-63	T	26-03-2025	IPR029061	Thiamin diphosphate-binding fold	-	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	CDD	cd02015	TPP_AHAS	373	558	7.74623E-107	T	26-03-2025	IPR039368	Acetolactate synthase large subunit, TPP binding domain	GO:0030976(InterPro)	-
+ERZ1049444_53_114	0bae19a80de551ed7307fe1b1f09b54e	573	CDD	cd07035	TPP_PYR_POX_like	8	163	1.01115E-73	T	26-03-2025	-	-	-	-
+ERZ1049444_9_79	664407b385e9d8ae76b66340c1d25aa0	103	SUPERFAMILY	SSF51182	RmlC-like cupins	2	102	2.13E-17	T	26-03-2025	IPR011051	RmlC-like cupin domain superfamily	-	-
+ERZ1049444_9_79	664407b385e9d8ae76b66340c1d25aa0	103	CDD	cd06981	cupin_reut_a1446	1	103	5.0758E-59	T	26-03-2025	-	-	-	-
+ERZ1049444_9_79	664407b385e9d8ae76b66340c1d25aa0	103	Pfam	PF07883	Cupin domain	36	101	3.5E-5	T	26-03-2025	IPR013096	Cupin 2, conserved barrel	-	-
+ERZ1049444_9_79	664407b385e9d8ae76b66340c1d25aa0	103	Gene3D	G3DSA:2.60.120.10	Jelly Rolls	14	103	1.7E-36	T	26-03-2025	IPR014710	RmlC-like jelly roll fold	-	-
+ERZ1049444_120_26	57cfe02b3ec890d7ee5f32f5cef37e3c	144	Gene3D	G3DSA:3.50.80.10	-	1	144	2.0E-55	T	26-03-2025	IPR023509	D-aminoacyl-tRNA deacylase-like superfamily	-	-
+ERZ1049444_120_26	57cfe02b3ec890d7ee5f32f5cef37e3c	144	NCBIfam	TIGR00256	D-aminoacyl-tRNA deacylase	1	144	6.4E-57	T	26-03-2025	IPR003732	D-aminoacyl-tRNA deacylase DTD	GO:0002161(InterPro)|GO:0005737(InterPro)|GO:0051499(InterPro)	-
+ERZ1049444_120_26	57cfe02b3ec890d7ee5f32f5cef37e3c	144	Pfam	PF02580	D-Tyr-tRNA(Tyr) deacylase	2	143	6.1E-52	T	26-03-2025	IPR003732	D-aminoacyl-tRNA deacylase DTD	GO:0002161(InterPro)|GO:0005737(InterPro)|GO:0051499(InterPro)	-
+ERZ1049444_120_26	57cfe02b3ec890d7ee5f32f5cef37e3c	144	Hamap	MF_00518	D-aminoacyl-tRNA deacylase [dtd].	1	144	33.924854	T	26-03-2025	IPR003732	D-aminoacyl-tRNA deacylase DTD	GO:0002161(InterPro)|GO:0005737(InterPro)|GO:0051499(InterPro)	-
+ERZ1049444_120_26	57cfe02b3ec890d7ee5f32f5cef37e3c	144	SUPERFAMILY	SSF69500	DTD-like	1	143	4.05E-55	T	26-03-2025	IPR023509	D-aminoacyl-tRNA deacylase-like superfamily	-	-
+ERZ1049444_176_7	b7164c2e818d7fc6f8768ec3a958ba37	118	Pfam	PF04663	Phenol hydroxylase conserved region	14	78	2.1E-26	T	26-03-2025	IPR006756	Phenol hydroxylase	GO:0018662(InterPro)	-
+ERZ1049444_176_7	b7164c2e818d7fc6f8768ec3a958ba37	118	Gene3D	G3DSA:3.10.20.560	Phenol hydroxylase	16	117	4.3E-37	T	26-03-2025	IPR043010	Phenol hydroxylase domain superfamily	-	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	SUPERFAMILY	SSF51445	(Trans)glycosidases	346	591	4.95E-14	T	26-03-2025	IPR017853	Glycoside hydrolase superfamily	-	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	Gene3D	G3DSA:3.20.20.70	Aldolase class I	288	705	1.2E-180	T	26-03-2025	IPR013785	Aldolase-type TIM barrel	-	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	Pfam	PF14509	Glycosyl-hydrolase 97 C-terminal, oligomerisation	601	702	4.9E-28	T	26-03-2025	IPR029483	Glycosyl-hydrolase 97, C-terminal oligomerisation domain	-	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	Gene3D	G3DSA:2.70.98.10	-	21	284	1.2E-89	T	26-03-2025	IPR014718	Glycoside hydrolase-type carbohydrate-binding	GO:0030246(InterPro)	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	Pfam	PF14508	Glycosyl-hydrolase 97 N-terminal	24	291	1.8E-74	T	26-03-2025	IPR029486	Glycosyl-hydrolase 97, N-terminal domain	-	-
+ERZ1049444_16_50	8bc4db8d7f792b620a1821aeeb782727	705	Pfam	PF10566	Glycoside hydrolase 97	296	598	1.0E-99	T	26-03-2025	IPR019563	Glycosyl-hydrolase 97, catalytic domain	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	103	136	11.475901	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	532	565	120.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	69	102	0.0093	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	631	664	72.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	597	630	4.5E-6	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	205	238	0.0046	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	498	531	0.0045	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	103	136	5.3E-5	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	239	272	0.34	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	273	306	3.1E-5	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	137	170	1.2	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	171	204	0.0051	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	35	68	210.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SMART	SM00028	tpr_5	307	340	3.6E-4	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	212	287	1.7E-13	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	288	397	8.6E-17	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	571	674	8.4E-21	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	498	531	9.2044	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	476	565	3.3E-9	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	138	211	1.2E-13	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	171	204	8.2309	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF00515	Tetratricopeptide repeat	598	629	4.7E-4	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	597	630	10.8859	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF13432	Tetratricopeptide repeat	277	338	6.8	T	26-03-2025	-	-	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF13432	Tetratricopeptide repeat	76	136	0.048	T	26-03-2025	-	-	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Coils	Coil	Coil	180	200	-	T	26-03-2025	-	-	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	205	238	9.7059	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50293	TPR repeat region circular profile.	103	134	8.687919	T	26-03-2025	-	-	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50293	TPR repeat region circular profile.	597	629	8.654233	T	26-03-2025	-	-	-	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Gene3D	G3DSA:1.25.40.10	Tetratricopeptide repeat domain	34	137	3.7E-22	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	69	102	9.6764	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	ProSiteProfiles	PS50005	TPR repeat profile.	273	306	10.3254	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF13181	Tetratricopeptide repeat	206	238	32.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF13181	Tetratricopeptide repeat	241	272	680.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	Pfam	PF13181	Tetratricopeptide repeat	172	201	250.0	T	26-03-2025	IPR019734	Tetratricopeptide repeat	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SUPERFAMILY	SSF48452	TPR-like	38	347	3.49E-41	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_14_124	25e0acfe2559fa5d933d603b659b011c	675	SUPERFAMILY	SSF48452	TPR-like	497	661	5.78E-26	T	26-03-2025	IPR011990	Tetratricopeptide-like helical domain superfamily	GO:0005515(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	Pfam	PF00725	3-hydroxyacyl-CoA dehydrogenase, C-terminal domain	187	283	5.2E-27	T	26-03-2025	IPR006108	3-hydroxyacyl-CoA dehydrogenase, C-terminal	GO:0006631(InterPro)|GO:0016491(InterPro)|GO:0016616(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	1	186	4.41E-56	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	SUPERFAMILY	SSF48179	6-phosphogluconate dehydrogenase C-terminal domain-like	186	288	6.72E-28	T	26-03-2025	IPR008927	6-phosphogluconate dehydrogenase-like, C-terminal domain superfamily	-	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	PRINTS	PR00077	NAD-dependent glycerol-3-phosphate dehydrogenase signature	8	25	4.5E-5	T	26-03-2025	IPR006168	Glycerol-3-phosphate dehydrogenase, NAD-dependent	GO:0006072(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	PRINTS	PR00077	NAD-dependent glycerol-3-phosphate dehydrogenase signature	68	95	4.5E-5	T	26-03-2025	IPR006168	Glycerol-3-phosphate dehydrogenase, NAD-dependent	GO:0006072(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	Pfam	PF02737	3-hydroxyacyl-CoA dehydrogenase, NAD binding domain	5	185	6.8E-58	T	26-03-2025	IPR006176	3-hydroxyacyl-CoA dehydrogenase, NAD binding	GO:0006631(InterPro)|GO:0070403(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	Gene3D	G3DSA:1.10.1040.10	-	190	294	5.2E-31	T	26-03-2025	IPR013328	6-phosphogluconate dehydrogenase, domain 2	-	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	PIRSF	PIRSF000105	HCDH	1	296	6.4E-86	T	26-03-2025	IPR022694	3-hydroxyacyl-CoA dehydrogenase	GO:0006631(InterPro)|GO:0016616(InterPro)|GO:0070403(InterPro)	-
+ERZ1049444_121_25	ce42f8d06f74d8e8290c8425ce980616	296	Gene3D	G3DSA:3.40.50.720	-	1	189	3.5E-67	T	26-03-2025	-	-	-	-
+ERZ1049444_192_4	b4e587ae2392de9d9c80b91600797f96	328	Gene3D	G3DSA:3.40.1210.10	-	10	306	4.4E-57	T	26-03-2025	IPR036523	SurE-like phosphatase/nucleotidase superfamily	GO:0016787(InterPro)	-
+ERZ1049444_192_4	b4e587ae2392de9d9c80b91600797f96	328	SUPERFAMILY	SSF64167	SurE-like	24	297	4.71E-42	T	26-03-2025	IPR036523	SurE-like phosphatase/nucleotidase superfamily	GO:0016787(InterPro)	-
+ERZ1049444_192_4	b4e587ae2392de9d9c80b91600797f96	328	Pfam	PF01975	Survival protein SurE	25	240	6.6E-40	T	26-03-2025	IPR002828	Survival protein SurE-like phosphatase/nucleotidase	GO:0016787(InterPro)	-
+ERZ1049444_100_30	075f7008fdb1dd3b52c5d1ba9199463d	405	Gene3D	G3DSA:1.20.1250.20	MFS general substrate transporter like domains	16	391	3.4E-20	T	26-03-2025	IPR036259	MFS transporter superfamily	-	-
+ERZ1049444_100_30	075f7008fdb1dd3b52c5d1ba9199463d	405	Pfam	PF07690	Major Facilitator Superfamily	25	356	5.6E-11	T	26-03-2025	IPR011701	Major facilitator superfamily	GO:0022857(InterPro)|GO:0055085(InterPro)	-
+ERZ1049444_100_30	075f7008fdb1dd3b52c5d1ba9199463d	405	SUPERFAMILY	SSF103473	MFS general substrate transporter	17	397	6.15E-31	T	26-03-2025	IPR036259	MFS transporter superfamily	-	-
+ERZ1049444_100_30	075f7008fdb1dd3b52c5d1ba9199463d	405	CDD	cd06174	MFS	32	388	6.14411E-7	T	26-03-2025	-	-	-	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	PIRSF	PIRSF000521	Transaminase_4ab_Lys_Orn	122	159	39.0	T	26-03-2025	IPR005814	Aminotransferase class-III	GO:0008483(InterPro)|GO:0030170(InterPro)	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	PIRSF	PIRSF000521	Transaminase_4ab_Lys_Orn	8	132	1.3E-11	T	26-03-2025	IPR005814	Aminotransferase class-III	GO:0008483(InterPro)|GO:0030170(InterPro)	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	PIRSF	PIRSF000521	Transaminase_4ab_Lys_Orn	170	394	3.8E-28	T	26-03-2025	IPR005814	Aminotransferase class-III	GO:0008483(InterPro)|GO:0030170(InterPro)	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	Gene3D	G3DSA:3.40.640.10	-	58	303	6.3E-119	T	26-03-2025	IPR015421	Pyridoxal phosphate-dependent transferase, major domain	-	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	Gene3D	G3DSA:3.90.1150.10	Aspartate Aminotransferase, domain 1	27	383	6.3E-119	T	26-03-2025	IPR015422	Pyridoxal phosphate-dependent transferase, small domain	-	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	Pfam	PF00202	Aminotransferase class-III	24	393	2.6E-100	T	26-03-2025	IPR005814	Aminotransferase class-III	GO:0008483(InterPro)|GO:0030170(InterPro)	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	ProSitePatterns	PS00600	Aminotransferases class-III pyridoxal-phosphate attachment site.	218	255	-	T	26-03-2025	IPR049704	Aminotransferases class-III pyridoxal-phosphate attachment site	-	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	SUPERFAMILY	SSF53383	PLP-dependent transferases	22	393	3.8E-114	T	26-03-2025	IPR015424	Pyridoxal phosphate-dependent transferase	-	-
+ERZ1049444_52_25	a3f06859050a74af73498f30f92edabe	395	CDD	cd00610	OAT_like	19	393	1.34246E-147	T	26-03-2025	IPR005814	Aminotransferase class-III	GO:0008483(InterPro)|GO:0030170(InterPro)	-
+ERZ1049444_16_16	68e121c97697c457686eb90cd071f976	289	ProSiteProfiles	PS51257	Prokaryotic membrane lipoprotein lipid attachment site profile.	1	16	5.0	T	26-03-2025	-	-	-	-
+ERZ1049444_16_16	68e121c97697c457686eb90cd071f976	289	Pfam	PF04784	Protein of unknown function, DUF547	123	228	5.5E-24	T	26-03-2025	IPR006869	Domain of unknown function DUF547	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Pfam	PF01274	Malate synthase, TIM barrel domain	329	569	2.2E-59	T	26-03-2025	IPR001465	Malate synthase, TIM barrel domain	GO:0004474(InterPro)|GO:0006097(InterPro)	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Pfam	PF20658	Malate synthase G, alpha-beta insertion domain	157	227	1.9E-18	T	26-03-2025	IPR048357	Malate synthase G, alpha-beta insertion domain	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	NCBIfam	TIGR01345	malate synthase G	4	711	0.0	T	26-03-2025	IPR006253	Malate synthase G	GO:0004474(InterPro)|GO:0006097(InterPro)	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Pfam	PF20659	Malate synthase, C-terminal	583	673	2.4E-19	T	26-03-2025	IPR048355	Malate synthase, C-terminal domain	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Pfam	PF20656	Malate synthase, N-terminal domain	17	71	3.4E-8	T	26-03-2025	IPR048356	Malate synthase, N-terminal domain	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Hamap	MF_00641	Malate synthase G [glcB].	1	714	373.506653	T	26-03-2025	IPR006253	Malate synthase G	GO:0004474(InterPro)|GO:0006097(InterPro)	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Gene3D	G3DSA:3.20.20.360	Malate synthase, domain 3	1	161	1.8E-57	T	26-03-2025	IPR046363	Malate synthase, N-terminal and TIM-barrel domains	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Gene3D	G3DSA:3.20.20.360	Malate synthase, domain 3	230	576	9.9E-175	T	26-03-2025	IPR046363	Malate synthase, N-terminal and TIM-barrel domains	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	SUPERFAMILY	SSF51645	Malate synthase G	3	711	2.35E-284	T	26-03-2025	IPR011076	Malate synthase superfamily	GO:0003824(InterPro)	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	NCBIfam	NF002825	malate synthase G	1	712	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_290_24	02844cadfb0570b05bfabc624cf70b3d	714	Gene3D	G3DSA:1.20.1220.12	Malate synthase, domain III	577	713	8.2E-75	T	26-03-2025	IPR044856	Malate synthase, C-terminal superfamily	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	Gene3D	G3DSA:1.10.166.10	-	1	70	1.1E-29	T	26-03-2025	IPR037133	Tetrahydrodipicolinate-N-succinyltransferase, N-terminal domain superfamily	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	NCBIfam	TIGR00965	2,3,4,5-tetrahydropyridine-2,6-dicarboxylate N-succinyltransferase	4	273	6.0E-144	T	26-03-2025	IPR005664	Tetrahydrodipicolinate N-succinyltransferase, transferase hexapeptide repeat family	GO:0008666(InterPro)|GO:0009089(InterPro)	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	Hamap	MF_00811	2,3,4,5-tetrahydropyridine-2,6-dicarboxylate N-succinyltransferase [dapD].	1	272	57.152676	T	26-03-2025	IPR005664	Tetrahydrodipicolinate N-succinyltransferase, transferase hexapeptide repeat family	GO:0008666(InterPro)|GO:0009089(InterPro)	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	Gene3D	G3DSA:2.160.10.10	Hexapeptide repeat proteins	87	256	3.4E-62	T	26-03-2025	-	-	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	CDD	cd03350	LbH_THP_succinylT	102	239	8.05973E-68	T	26-03-2025	-	-	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	Pfam	PF14602	Hexapeptide repeat of succinyl-transferase	175	209	2.4E-10	T	26-03-2025	IPR001451	Hexapeptide repeat	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	SUPERFAMILY	SSF51161	Trimeric LpxA-like enzymes	2	256	3.6E-76	T	26-03-2025	IPR011004	Trimeric LpxA-like superfamily	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	Pfam	PF14805	Tetrahydrodipicolinate N-succinyltransferase N-terminal	4	69	1.3E-25	T	26-03-2025	IPR023180	Tetrahydrodipicolinate-N-succinyltransferase, chain A, domain 1	-	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	ProSitePatterns	PS00101	Hexapeptide-repeat containing-transferases signature.	134	162	-	T	26-03-2025	IPR018357	Hexapeptide transferase, conserved site	GO:0016740(InterPro)	-
+ERZ1049444_363_5	7e6501f3be0f5d560fc80d8ec3e4407e	273	NCBIfam	NF008808	2,3,4,5-tetrahydropyridine-2,6-dicarboxylate N-succinyltransferase	30	271	1.6E-113	T	26-03-2025	-	-	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Gene3D	G3DSA:3.30.420.10	-	9	201	2.8E-66	T	26-03-2025	IPR036397	Ribonuclease H superfamily	GO:0003676(InterPro)	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Gene3D	G3DSA:1.20.1280.70	Exonuclease ExoI, domain 3	358	420	2.3E-19	T	26-03-2025	-	-	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	ProSiteProfiles	PS51784	Exonuclease I (ExoI) SH3-like domain profile.	202	355	38.476604	T	26-03-2025	IPR034747	Exonuclease I, SH3-like domain	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Gene3D	G3DSA:3.30.1520.20	Exonuclease ExoI, domain 2	214	352	3.2E-41	T	26-03-2025	IPR038649	Exonuclease I, SH3-like domain superfamily	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	ProSiteProfiles	PS51785	Exonuclease I (ExoI) C-terminal domain profile.	358	480	33.483013	T	26-03-2025	IPR034748	Exonuclease I, C-terminal alpha-helical domain	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Pfam	PF00929	Exonuclease	12	193	4.1E-18	T	26-03-2025	IPR013520	Exonuclease, RNase T/DNA polymerase III	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	CDD	cd06138	ExoI_N	12	195	4.11089E-107	T	26-03-2025	-	-	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	NCBIfam	NF008746	exodeoxyribonuclease I	6	480	3.8E-180	T	26-03-2025	-	-	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	SUPERFAMILY	SSF53098	Ribonuclease H-like	10	479	2.4E-115	T	26-03-2025	IPR012337	Ribonuclease H-like superfamily	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Gene3D	G3DSA:1.10.287.1240	-	421	480	2.3E-10	T	26-03-2025	-	-	-	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	PIRSF	PIRSF000977	Exodeoxyribonuclease_I	3	482	7.7E-184	T	26-03-2025	IPR023607	Exodeoxyribonuclease I	GO:0004529(InterPro)	-
+ERZ1049444_217_31	41f17296f085f4c57d95446882f85fbb	482	Pfam	PF08411	Exonuclease C-terminal	212	477	2.9E-75	T	26-03-2025	IPR013620	Exodeoxyribonuclease I, C-terminal	GO:0006281(InterPro)|GO:0008310(InterPro)	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	Pfam	PF01262	Alanine dehydrogenase/PNT, C-terminal domain	143	373	2.9E-60	T	26-03-2025	IPR007698	Alanine dehydrogenase/pyridine nucleotide transhydrogenase, NAD(H)-binding domain	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	Gene3D	G3DSA:3.40.50.720	-	139	323	1.4E-131	T	26-03-2025	-	-	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	NCBIfam	TIGR00561	Re/Si-specific NAD(P)(+) transhydrogenase subunit alpha	2	522	6.7E-192	T	26-03-2025	IPR026255	NAD(P) transhydrogenase, alpha subunit	GO:1902600(InterPro)	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	Pfam	PF05222	Alanine dehydrogenase/PNT, N-terminal domain	6	139	5.7E-42	T	26-03-2025	IPR007886	Alanine dehydrogenase/pyridine nucleotide transhydrogenase, N-terminal	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	SUPERFAMILY	SSF52283	Formate/glycerate dehydrogenase catalytic domain-like	1	170	1.11E-51	T	26-03-2025	-	-	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	Gene3D	G3DSA:3.40.50.720	-	6	361	1.4E-131	T	26-03-2025	-	-	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	NCBIfam	NF006942	Re/Si-specific NAD(P)(+) transhydrogenase subunit alpha	1	523	7.8E-232	T	26-03-2025	-	-	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	139	322	3.11E-34	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	SMART	SM01002	AlaDh_PNT_C_2	148	316	3.1E-72	T	26-03-2025	IPR007698	Alanine dehydrogenase/pyridine nucleotide transhydrogenase, NAD(H)-binding domain	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	CDD	cd05304	Rubrum_tdh	1	369	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	SMART	SM01003	AlaDh_PNT_N_2	4	139	5.9E-63	T	26-03-2025	IPR007886	Alanine dehydrogenase/pyridine nucleotide transhydrogenase, N-terminal	-	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	PIRSF	PIRSF000203	NADP_transhydrogenase_alpha	1	522	4.6E-215	T	26-03-2025	IPR026255	NAD(P) transhydrogenase, alpha subunit	GO:1902600(InterPro)	-
+ERZ1049444_388_27	61a1aed4602d729fccda4b4ecc973592	523	Pfam	PF12769	4TM region of pyridine nucleotide transhydrogenase, mitoch	439	522	2.3E-28	T	26-03-2025	IPR024605	NAD(P) transhydrogenase, alpha subunit, C-terminal	-	-
+ERZ1049444_6_88	3ff39658ff5366f8c9e61232fbc80f56	102	Hamap	MF_00434	Putative pterin-4-alpha-carbinolamine dehydratase.	1	92	20.05669	T	26-03-2025	IPR001533	Pterin 4 alpha carbinolamine dehydratase	GO:0006729(InterPro)|GO:0008124(InterPro)	-
+ERZ1049444_6_88	3ff39658ff5366f8c9e61232fbc80f56	102	Gene3D	G3DSA:3.30.1360.20	Transcriptional coactivator/pterin dehydratase	1	94	1.2E-29	T	26-03-2025	IPR036428	Pterin 4 alpha carbinolamine dehydratase superfamily	GO:0006729(InterPro)|GO:0008124(InterPro)	-
+ERZ1049444_6_88	3ff39658ff5366f8c9e61232fbc80f56	102	SUPERFAMILY	SSF55248	PCD-like	1	93	5.36E-29	T	26-03-2025	IPR036428	Pterin 4 alpha carbinolamine dehydratase superfamily	GO:0006729(InterPro)|GO:0008124(InterPro)	-
+ERZ1049444_6_88	3ff39658ff5366f8c9e61232fbc80f56	102	NCBIfam	NF002017	4a-hydroxytetrahydrobiopterin dehydratase	1	92	1.8E-19	T	26-03-2025	-	-	-	-
+ERZ1049444_6_88	3ff39658ff5366f8c9e61232fbc80f56	102	Pfam	PF01329	Pterin 4 alpha carbinolamine dehydratase	3	91	1.6E-25	T	26-03-2025	IPR001533	Pterin 4 alpha carbinolamine dehydratase	GO:0006729(InterPro)|GO:0008124(InterPro)	-
+ERZ1049444_27_48	ee7542ad986dc27ea9322f90ffce6f85	391	Coils	Coil	Coil	104	124	-	T	26-03-2025	-	-	-	-
+ERZ1049444_27_48	ee7542ad986dc27ea9322f90ffce6f85	391	Pfam	PF05762	VWA domain containing CoxE-like protein	186	283	2.8E-6	T	26-03-2025	IPR008912	Uncharacterised protein family CoxE-like	-	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	ProSiteProfiles	PS50893	ATP-binding cassette, ABC transporter-type domain profile.	31	275	30.43224	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	SMART	SM00382	AAA_5	55	252	1.7E-11	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	CDD	cd03262	ABC_HisP_GlnQ	31	251	3.31245E-119	T	26-03-2025	-	-	-	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	Pfam	PF00005	ABC transporter	47	204	2.2E-27	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	ProSitePatterns	PS00211	ABC transporters family signature.	176	190	-	T	26-03-2025	IPR017871	ABC transporter-like, conserved site	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	Gene3D	G3DSA:3.40.50.300	-	27	280	1.0E-70	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	30	274	1.18E-70	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_56_28	f5c00fdf49004927e2f195c648027cb9	280	PIRSF	PIRSF039085	ABC_ATPase_HisP	27	280	2.0E-113	T	26-03-2025	IPR030679	ABC-type amino acid transport system, ATPase component, HisP-type	GO:0003333(InterPro)|GO:0015424(InterPro)	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Pfam	PF06429	Flagellar basal body rod FlgEFG protein C-terminal	884	928	5.3E-13	T	26-03-2025	IPR010930	Flagellar basal-body/hook protein, C-terminal domain	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Pfam	PF22692	Flagellar hook protein FlgE/F/G D1 domain	83	146	2.3E-7	T	26-03-2025	IPR053967	Flagellar hook protein FlgE/F/G-like, D1 domain	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	NCBIfam	TIGR03506	flagellar hook-basal body complex protein	655	911	1.5E-38	T	26-03-2025	IPR020013	Flagellar hook-basal body protein, FlgE/F/G	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	NCBIfam	TIGR03506	flagellar hook-basal body complex protein	1	283	5.3E-47	T	26-03-2025	IPR020013	Flagellar hook-basal body protein, FlgE/F/G	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Pfam	PF00460	Flagella basal body rod protein	3	33	9.9E-5	T	26-03-2025	IPR001444	Flagellar basal body rod protein, N-terminal	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	SUPERFAMILY	SSF117143	Flagellar hook protein flgE	718	888	6.15E-35	T	26-03-2025	IPR037925	Flagellar hook-basal body protein, FlgE/F/G-like	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Gene3D	G3DSA:2.60.98.20	Flagellar hook protein FlgE	157	347	2.5E-19	T	26-03-2025	IPR037058	Flagellar hook protein FlgE superfamily	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Pfam	PF07559	Flagellar basal body protein FlaE D2 domain	729	810	0.018	T	26-03-2025	IPR011491	Flagellar hook protein FlgE, D2 domain	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	Pfam	PF07559	Flagellar basal body protein FlaE D2 domain	183	279	4.8E-12	T	26-03-2025	IPR011491	Flagellar hook protein FlgE, D2 domain	-	-
+ERZ1049444_81_72	5bc9ad7cf2f07a3365b979fc84ab24d9	930	SUPERFAMILY	SSF117143	Flagellar hook protein flgE	79	303	9.94E-35	T	26-03-2025	IPR037925	Flagellar hook-basal body protein, FlgE/F/G-like	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	ProSitePatterns	PS00018	EF-hand calcium-binding domain.	130	142	-	T	26-03-2025	IPR018247	EF-Hand 1, calcium-binding site	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	Pfam	PF13202	EF hand	39	56	17.0	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	Pfam	PF13202	EF hand	124	143	0.055	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	Pfam	PF13202	EF hand	99	116	100.0	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	CDD	cd00051	EFh	97	145	1.39147E-8	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	ProSitePatterns	PS00018	EF-hand calcium-binding domain.	43	55	-	T	26-03-2025	IPR018247	EF-Hand 1, calcium-binding site	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	SMART	SM00054	efh_1	34	62	12.0	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	SMART	SM00054	efh_1	121	149	0.012	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	Gene3D	G3DSA:1.10.238.10	-	36	88	3.3E-9	T	26-03-2025	-	-	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	Gene3D	G3DSA:1.10.238.10	-	89	151	3.4E-13	T	26-03-2025	-	-	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	SUPERFAMILY	SSF47473	EF-hand	33	145	3.42E-20	T	26-03-2025	IPR011992	EF-hand domain pair	-	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	ProSiteProfiles	PS50222	EF-hand calcium-binding domain profile.	39	65	8.23694	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	ProSiteProfiles	PS50222	EF-hand calcium-binding domain profile.	124	152	10.050141	T	26-03-2025	IPR002048	EF-hand domain	GO:0005509(InterPro)	-
+ERZ1049444_7_56	2f7f10779dfb599f10bca110f1e66da3	168	MobiDBLite	mobidb-lite	consensus disorder prediction	128	168	-	T	26-03-2025	-	-	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	CDD	cd04623	CBS_pair_bac_euk	15	124	4.39548E-48	T	26-03-2025	IPR044725	CBS domain-containing protein CBSX3, CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	ProSiteProfiles	PS51371	CBS domain profile.	77	132	12.328268	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	Gene3D	G3DSA:3.10.580.10	-	1	143	2.2E-39	T	26-03-2025	IPR046342	CBS domain superfamily	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	Pfam	PF00571	CBS domain	14	62	1.7E-5	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	Pfam	PF00571	CBS domain	73	126	5.3E-9	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	ProSiteProfiles	PS51371	CBS domain profile.	11	68	9.918091	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	SUPERFAMILY	SSF54631	CBS-domain pair	2	142	4.8E-32	T	26-03-2025	IPR046342	CBS domain superfamily	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	SMART	SM00116	cbs_1	80	127	4.2E-8	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_269_47	e04ea9a1e67a150b1bd912d22dad3700	144	SMART	SM00116	cbs_1	14	62	1.2E-5	T	26-03-2025	IPR000644	CBS domain	-	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Pfam	PF01128	2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase	9	216	1.7E-55	T	26-03-2025	IPR034683	Cytidylyltransferase IspD/TarI	GO:0070567(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	ProSitePatterns	PS01350	2C-methyl-D-erythritol 2,4-cyclodiphosphate synthase signature.	259	274	-	T	26-03-2025	IPR020555	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase, conserved site	GO:0008685(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Hamap	MF_00107	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase [ispF].	225	380	31.310564	T	26-03-2025	IPR003526	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Gene3D	G3DSA:3.90.550.10	Spore Coat Polysaccharide Biosynthesis Protein SpsA; Chain A	1	222	1.7E-58	T	26-03-2025	IPR029044	Nucleotide-diphospho-sugar transferases	-	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Gene3D	G3DSA:3.30.1330.50	-	223	381	4.2E-63	T	26-03-2025	IPR036571	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase superfamily	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	NCBIfam	TIGR00151	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	226	379	2.6E-55	T	26-03-2025	IPR003526	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	SUPERFAMILY	SSF69765	IpsF-like	223	380	1.7E-61	T	26-03-2025	IPR036571	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase superfamily	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	NCBIfam	TIGR00453	2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase	10	217	3.3E-53	T	26-03-2025	IPR001228	2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase	GO:0008299(InterPro)|GO:0050518(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	CDD	cd02516	CDP-ME_synthetase	8	215	6.85286E-60	T	26-03-2025	IPR034683	Cytidylyltransferase IspD/TarI	GO:0070567(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Hamap	MF_01520	Bifunctional enzyme IspD/IspF [ispDF].	6	381	40.772083	T	26-03-2025	IPR026596	Bifunctional enzyme IspD/IspF	-	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	ProSitePatterns	PS01295	4-diphosphocytidyl-2C-methyl-D-erythritol synthase signature.	99	106	-	T	26-03-2025	IPR018294	4-diphosphocytidyl-2C-methyl-D-erythritol synthase, conserved site	GO:0003824(InterPro)|GO:0008299(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	NCBIfam	NF006899	bifunctional 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase/2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	6	379	4.9E-123	T	26-03-2025	-	-	-	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	SUPERFAMILY	SSF53448	Nucleotide-diphospho-sugar transferases	8	219	2.07E-48	T	26-03-2025	IPR029044	Nucleotide-diphospho-sugar transferases	-	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Hamap	MF_00108	2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase [ispD].	7	219	35.759804	T	26-03-2025	IPR001228	2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase	GO:0008299(InterPro)|GO:0050518(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	Pfam	PF02542	YgbB family	225	378	1.1E-57	T	26-03-2025	IPR003526	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_31_93	de3014d9e9af939f82a27a2029ed7709	381	CDD	cd00554	MECDP_synthase	226	378	1.53635E-79	T	26-03-2025	IPR003526	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase	GO:0008685(InterPro)|GO:0016114(InterPro)	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	CDD	cd05797	Ribosomal_L10	2	157	3.45402E-56	T	26-03-2025	IPR047865	Large ribosomal subunit protein uL10, bacterial type	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	Pfam	PF00466	Ribosomal protein L10	1	98	1.6E-22	T	26-03-2025	IPR001790	Large ribosomal subunit protein uL10	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	Gene3D	G3DSA:6.10.250.290	-	130	170	3.2E-8	T	26-03-2025	-	-	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	Hamap	MF_00362	Large ribosomal subunit protein uL10 [rplJ].	1	158	24.07658	T	26-03-2025	IPR022973	Large ribosomal subunit protein uL10, bacterial	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	SUPERFAMILY	SSF160369	Ribosomal protein L10-like	1	168	2.48E-48	T	26-03-2025	IPR043141	Large ribosomal subunit protein uL10-like domain superfamily	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	ProSitePatterns	PS01109	Ribosomal protein L10 signature.	6	40	-	T	26-03-2025	IPR002363	Large ribosomal subunit protein uL10, conserved site, bacteria	GO:0003735(InterPro)|GO:0006412(InterPro)|GO:0015934(InterPro)	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	Gene3D	G3DSA:3.30.70.1730	-	1	129	3.4E-36	T	26-03-2025	IPR043141	Large ribosomal subunit protein uL10-like domain superfamily	-	-
+ERZ1049444_154_75	80577e2d5c8ab6487f72a5ab311f16f7	172	NCBIfam	NF000955	50S ribosomal protein L10	5	170	6.8E-48	T	26-03-2025	-	-	-	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	ProSitePatterns	PS00737	Thiolases signature 2.	329	345	-	T	26-03-2025	IPR020613	Thiolase, conserved site	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	Pfam	PF00108	Thiolase, N-terminal domain	5	253	1.3E-48	T	26-03-2025	IPR020616	Thiolase, N-terminal	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	Gene3D	G3DSA:3.40.47.10	-	5	266	1.1E-125	T	26-03-2025	IPR016039	Thiolase-like	GO:0016746(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	Pfam	PF02803	Thiolase, C-terminal domain	261	382	5.7E-39	T	26-03-2025	IPR020617	Thiolase, C-terminal	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	Gene3D	G3DSA:3.40.47.10	-	136	375	1.1E-125	T	26-03-2025	IPR016039	Thiolase-like	GO:0016746(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	NCBIfam	NF005865	acetyl-CoA C-acetyltransferase	1	383	3.2E-205	T	26-03-2025	-	-	-	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	NCBIfam	TIGR01930	acetyl-CoA C-acyltransferase	6	381	6.6E-113	T	26-03-2025	IPR002155	Thiolase	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	CDD	cd00751	thiolase	5	382	4.532E-177	T	26-03-2025	IPR002155	Thiolase	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	PIRSF	PIRSF000429	Ac-CoA_Ac_transf	1	383	1.3E-110	T	26-03-2025	IPR002155	Thiolase	GO:0016747(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	SUPERFAMILY	SSF53901	Thiolase-like	261	382	3.1E-42	T	26-03-2025	IPR016039	Thiolase-like	GO:0016746(InterPro)	-
+ERZ1049444_268_11	34936f4c01e1713e62a2e875fb401128	383	SUPERFAMILY	SSF53901	Thiolase-like	3	258	8.52E-62	T	26-03-2025	IPR016039	Thiolase-like	GO:0016746(InterPro)	-
+ERZ1049444_231_38	640a4c620a492f1677deccf9e37c5ead	1179	SUPERFAMILY	SSF53474	alpha/beta-Hydrolases	88	253	4.48E-16	T	26-03-2025	IPR029058	Alpha/Beta hydrolase fold	-	-
+ERZ1049444_231_38	640a4c620a492f1677deccf9e37c5ead	1179	Gene3D	G3DSA:2.60.40.10	Immunoglobulins	321	404	6.2E-5	T	26-03-2025	IPR013783	Immunoglobulin-like fold	-	-
+ERZ1049444_231_38	640a4c620a492f1677deccf9e37c5ead	1179	Gene3D	G3DSA:3.40.50.1820	alpha/beta hydrolase	57	274	9.0E-18	T	26-03-2025	IPR029058	Alpha/Beta hydrolase fold	-	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	CDD	cd02022	DPCK	13	190	1.28623E-59	T	26-03-2025	-	-	-	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	Pfam	PF01121	Dephospho-CoA kinase	13	188	4.8E-37	T	26-03-2025	IPR001977	Dephospho-CoA kinase	GO:0004140(InterPro)|GO:0005524(InterPro)|GO:0015937(InterPro)	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	10	197	1.4E-26	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	NCBIfam	TIGR00152	dephospho-CoA kinase	13	191	3.5E-29	T	26-03-2025	IPR001977	Dephospho-CoA kinase	GO:0004140(InterPro)|GO:0005524(InterPro)|GO:0015937(InterPro)	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	Gene3D	G3DSA:3.40.50.300	-	11	204	2.7E-53	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	Hamap	MF_00376	Dephospho-CoA kinase [coaE].	10	206	21.601904	T	26-03-2025	IPR001977	Dephospho-CoA kinase	GO:0004140(InterPro)|GO:0005524(InterPro)|GO:0015937(InterPro)	-
+ERZ1049444_156_60	8095c5881039ebf659014298a6f21456	206	ProSiteProfiles	PS51219	Dephospho-CoA kinase (DPCK) domain profile.	12	206	25.514193	T	26-03-2025	IPR001977	Dephospho-CoA kinase	GO:0004140(InterPro)|GO:0005524(InterPro)|GO:0015937(InterPro)	-
+ERZ1049444_128_70	0c2275b474f6c87979c8100c996579fd	143	CDD	cd15904	TSPO_MBR	6	140	2.35438E-26	T	26-03-2025	IPR004307	TspO/MBR-related protein	GO:0016020(InterPro)	-
+ERZ1049444_128_70	0c2275b474f6c87979c8100c996579fd	143	Pfam	PF03073	TspO/MBR family	9	140	1.1E-22	T	26-03-2025	IPR004307	TspO/MBR-related protein	GO:0016020(InterPro)	-
+ERZ1049444_128_70	0c2275b474f6c87979c8100c996579fd	143	PIRSF	PIRSF005859	PBR	1	143	5.7E-25	T	26-03-2025	IPR004307	TspO/MBR-related protein	GO:0016020(InterPro)	-
+ERZ1049444_128_70	0c2275b474f6c87979c8100c996579fd	143	Gene3D	G3DSA:1.20.1260.100	TspO/MBR protein	3	143	4.9E-27	T	26-03-2025	IPR038330	TspO/MBR-related superfamily	-	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	Gene3D	G3DSA:3.10.50.40	-	102	210	7.0E-39	T	26-03-2025	IPR046357	Peptidyl-prolyl cis-trans isomerase domain superfamily	GO:0003755(InterPro)	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	Pfam	PF01346	Domain amino terminal to FKBP-type peptidyl-prolyl isomerase	13	111	2.8E-17	T	26-03-2025	IPR000774	Peptidyl-prolyl cis-trans isomerase, FKBP-type, N-terminal	GO:0006457(InterPro)	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	Pfam	PF00254	FKBP-type peptidyl-prolyl cis-trans isomerase	120	206	3.2E-25	T	26-03-2025	IPR001179	FKBP-type peptidyl-prolyl cis-trans isomerase domain	GO:0003755(InterPro)	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	SUPERFAMILY	SSF54534	FKBP-like	12	209	1.12E-54	T	26-03-2025	-	-	-	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	Gene3D	G3DSA:1.10.287.460	-	5	101	1.8E-17	T	26-03-2025	IPR036944	Peptidyl-prolyl cis-trans isomerase, FKBP-type, N-terminal domain superfamily	GO:0006457(InterPro)	-
+ERZ1049444_243_45	265e47db1730811e6e9597d8591dcf75	210	ProSiteProfiles	PS50059	FKBP-type peptidyl-prolyl cis-trans isomerase domain profile.	123	209	25.9485	T	26-03-2025	IPR001179	FKBP-type peptidyl-prolyl cis-trans isomerase domain	GO:0003755(InterPro)	-
+ERZ1049444_235_11	9de162802a77186d064366efd69bead3	479	SUPERFAMILY	SSF52833	Thioredoxin-like	333	478	4.38E-8	T	26-03-2025	IPR036249	Thioredoxin-like superfamily	-	-
+ERZ1049444_235_11	9de162802a77186d064366efd69bead3	479	ProSiteProfiles	PS51257	Prokaryotic membrane lipoprotein lipid attachment site profile.	1	23	6.0	T	26-03-2025	-	-	-	-
+ERZ1049444_235_11	9de162802a77186d064366efd69bead3	479	Gene3D	G3DSA:3.40.30.10	Glutaredoxin	336	471	9.9E-11	T	26-03-2025	-	-	-	-
+ERZ1049444_111_21	c1f2ce4c3d2dc8c89de0d72f0a245c11	382	Gene3D	G3DSA:1.25.40.290	ARM repeat domains	149	260	2.0E-27	T	26-03-2025	-	-	-	-
+ERZ1049444_111_21	c1f2ce4c3d2dc8c89de0d72f0a245c11	382	SUPERFAMILY	SSF48371	ARM repeat	41	260	3.29E-36	T	26-03-2025	IPR016024	Armadillo-type fold	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	CDD	cd05299	CtBP_dh	25	324	1.49231E-126	T	26-03-2025	IPR043322	C-terminal binding protein	GO:0003714(InterPro)|GO:0016616(InterPro)|GO:0051287(InterPro)	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	SUPERFAMILY	SSF52283	Formate/glycerate dehydrogenase catalytic domain-like	28	146	4.91E-27	T	26-03-2025	-	-	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	Gene3D	G3DSA:3.40.50.720	-	32	324	8.9E-96	T	26-03-2025	-	-	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	Pfam	PF00389	D-isomer specific 2-hydroxyacid dehydrogenase, catalytic domain	27	329	1.3E-18	T	26-03-2025	IPR006139	D-isomer specific 2-hydroxyacid dehydrogenase, catalytic domain	GO:0016616(InterPro)|GO:0051287(InterPro)	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	Gene3D	G3DSA:3.40.50.720	-	111	298	8.9E-96	T	26-03-2025	-	-	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	ProSitePatterns	PS00671	D-isomer specific 2-hydroxyacid dehydrogenases signature 3.	236	252	-	T	26-03-2025	IPR029753	D-isomer specific 2-hydroxyacid dehydrogenase, NAD-binding domain conserved site	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	113	298	3.25E-52	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_386_22	6fdb52bb3c78e4b4d6673e964071b0e4	352	Pfam	PF02826	D-isomer specific 2-hydroxyacid dehydrogenase, NAD binding domain	119	297	1.5E-52	T	26-03-2025	IPR006140	D-isomer specific 2-hydroxyacid dehydrogenase, NAD-binding domain	GO:0051287(InterPro)	-
+ERZ1049444_93_28	b42f2804d0960f6e6902e0c5c0fdcc29	295	Pfam	PF13616	PPIC-type PPIASE domain	137	226	1.8E-16	T	26-03-2025	-	-	-	-
+ERZ1049444_93_28	b42f2804d0960f6e6902e0c5c0fdcc29	295	Gene3D	G3DSA:3.10.50.40	-	130	247	2.3E-30	T	26-03-2025	IPR046357	Peptidyl-prolyl cis-trans isomerase domain superfamily	GO:0003755(InterPro)	-
+ERZ1049444_93_28	b42f2804d0960f6e6902e0c5c0fdcc29	295	ProSiteProfiles	PS50198	PpiC-type peptidyl-prolyl cis-trans isomerase family profile.	135	224	26.188255	T	26-03-2025	IPR000297	Peptidyl-prolyl cis-trans isomerase, PpiC-type	GO:0003755(InterPro)	-
+ERZ1049444_93_28	b42f2804d0960f6e6902e0c5c0fdcc29	295	SUPERFAMILY	SSF109998	Triger factor/SurA peptide-binding domain-like	31	164	4.32E-13	T	26-03-2025	IPR027304	Trigger factor/SurA domain superfamily	-	-
+ERZ1049444_93_28	b42f2804d0960f6e6902e0c5c0fdcc29	295	SUPERFAMILY	SSF54534	FKBP-like	136	224	2.86E-28	T	26-03-2025	-	-	-	-
+ERZ1049444_111_30	44e67209342ca73059f934d33f697ca1	292	ProSiteProfiles	PS51318	Twin arginine translocation (Tat) signal profile.	1	44	7.77205	T	26-03-2025	IPR006311	Twin-arginine translocation pathway, signal sequence	-	-
+ERZ1049444_111_30	44e67209342ca73059f934d33f697ca1	292	Pfam	PF01738	Dienelactone hydrolase family	62	290	2.6E-36	T	26-03-2025	IPR002925	Dienelactone hydrolase	GO:0016787(InterPro)	-
+ERZ1049444_111_30	44e67209342ca73059f934d33f697ca1	292	SUPERFAMILY	SSF53474	alpha/beta-Hydrolases	50	291	1.3E-33	T	26-03-2025	IPR029058	Alpha/Beta hydrolase fold	-	-
+ERZ1049444_111_30	44e67209342ca73059f934d33f697ca1	292	Gene3D	G3DSA:3.40.50.1820	alpha/beta hydrolase	50	290	6.4E-46	T	26-03-2025	IPR029058	Alpha/Beta hydrolase fold	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	Pfam	PF00288	GHMP kinases N terminal domain	64	147	1.5E-13	T	26-03-2025	IPR006204	GHMP kinase N-terminal domain	GO:0005524(InterPro)	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	Hamap	MF_00384	Homoserine kinase [thrB].	4	306	24.676224	T	26-03-2025	IPR000870	Homoserine kinase	GO:0004413(InterPro)|GO:0005524(InterPro)|GO:0006566(InterPro)	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PIRSF	PIRSF000676	Homoser_kin	1	308	2.4E-71	T	26-03-2025	IPR000870	Homoserine kinase	GO:0004413(InterPro)|GO:0005524(InterPro)|GO:0006566(InterPro)	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	SUPERFAMILY	SSF55060	GHMP Kinase, C-terminal domain	168	282	4.32E-22	T	26-03-2025	IPR036554	GHMP kinase, C-terminal domain superfamily	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	Gene3D	G3DSA:3.30.70.890	-	167	297	3.9E-30	T	26-03-2025	IPR036554	GHMP kinase, C-terminal domain superfamily	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	SUPERFAMILY	SSF54211	Ribosomal protein S5 domain 2-like	3	162	4.63E-29	T	26-03-2025	IPR020568	Ribosomal protein uS5 domain 2-type superfamily	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	Pfam	PF08544	GHMP kinases C terminal	210	270	1.7E-4	T	26-03-2025	IPR013750	GHMP kinase, C-terminal domain	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	NCBIfam	NF002288	homoserine kinase	5	304	2.8E-103	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PRINTS	PR00958	Homoserine kinase signature	172	189	1.7E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PRINTS	PR00958	Homoserine kinase signature	11	26	1.7E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PRINTS	PR00958	Homoserine kinase signature	94	109	1.7E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PRINTS	PR00958	Homoserine kinase signature	134	147	1.7E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	PRINTS	PR00958	Homoserine kinase signature	251	266	1.7E-24	T	26-03-2025	-	-	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	Gene3D	G3DSA:3.30.230.10	-	1	166	7.5E-48	T	26-03-2025	IPR014721	Small ribosomal subunit protein uS5 domain 2-type fold, subgroup	-	-
+ERZ1049444_68_85	c31b8bb6b7a44a968a390258cdfdd3a1	309	NCBIfam	TIGR00191	homoserine kinase	5	291	1.2E-63	T	26-03-2025	IPR000870	Homoserine kinase	GO:0004413(InterPro)|GO:0005524(InterPro)|GO:0006566(InterPro)	-
+ERZ1049444_83_38	099fdaaa04b06dfa16f04dc92a8d5d44	455	MobiDBLite	mobidb-lite	consensus disorder prediction	326	358	-	T	26-03-2025	-	-	-	-
+ERZ1049444_83_38	099fdaaa04b06dfa16f04dc92a8d5d44	455	Coils	Coil	Coil	304	331	-	T	26-03-2025	-	-	-	-
+ERZ1049444_179_10	2411cdf39fa8f3570139f24a35bfc6a6	392	Gene3D	G3DSA:2.60.120.620	q2cbj1_9rhob like domain	79	329	4.0E-28	T	26-03-2025	-	-	-	-
+ERZ1049444_179_10	2411cdf39fa8f3570139f24a35bfc6a6	392	SUPERFAMILY	SSF51197	Clavaminate synthase-like	81	345	3.48E-40	T	26-03-2025	-	-	-	-
+ERZ1049444_179_10	2411cdf39fa8f3570139f24a35bfc6a6	392	Pfam	PF05721	Phytanoyl-CoA dioxygenase (PhyH)	81	283	5.9E-21	T	26-03-2025	IPR008775	Phytanoyl-CoA dioxygenase-like	-	-
+ERZ1049444_47_123	dac8fc4f9cb59af6b9537221ad3ab459	75	Gene3D	G3DSA:3.10.20.30	-	2	75	1.5E-16	T	26-03-2025	IPR012675	Beta-grasp domain superfamily	-	-
+ERZ1049444_47_123	dac8fc4f9cb59af6b9537221ad3ab459	75	Pfam	PF02597	ThiS family	5	75	2.1E-9	T	26-03-2025	IPR003749	Sulfur carrier ThiS/MoaD-like	-	-
+ERZ1049444_47_123	dac8fc4f9cb59af6b9537221ad3ab459	75	CDD	cd00754	Ubl_MoaD	3	75	1.01125E-20	T	26-03-2025	-	-	-	-
+ERZ1049444_47_123	dac8fc4f9cb59af6b9537221ad3ab459	75	SUPERFAMILY	SSF54285	MoaD/ThiS	3	75	2.62E-13	T	26-03-2025	IPR016155	Molybdopterin synthase/thiamin biosynthesis sulphur carrier, beta-grasp	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	NCBIfam	TIGR01745	aspartate-semialdehyde dehydrogenase	2	368	7.8E-186	T	26-03-2025	IPR011534	Aspartate-semialdehyde dehydrogenase, gamma-type	GO:0004073(InterPro)|GO:0009086(InterPro)|GO:0009088(InterPro)|GO:0009089(InterPro)|GO:0009097(InterPro)|GO:0050661(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	CDD	cd02314	VcASADH1_like_N	2	134	4.32741E-91	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	Hamap	MF_02121	Aspartate-semialdehyde dehydrogenase [asd].	1	369	32.14196	T	26-03-2025	IPR012080	Aspartate-semialdehyde dehydrogenase	GO:0004073(InterPro)|GO:0009086(InterPro)|GO:0009088(InterPro)|GO:0009089(InterPro)|GO:0050661(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	SMART	SM00859	Semialdhyde_dh_3	3	122	2.0E-27	T	26-03-2025	IPR000534	Semialdehyde dehydrogenase, NAD-binding	GO:0016620(InterPro)|GO:0051287(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	Pfam	PF01118	Semialdehyde dehydrogenase, NAD binding domain	3	122	5.2E-21	T	26-03-2025	IPR000534	Semialdehyde dehydrogenase, NAD-binding	GO:0016620(InterPro)|GO:0051287(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	Gene3D	G3DSA:3.30.360.10	Dihydrodipicolinate Reductase; domain 2	136	353	1.4E-146	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	1	147	4.48E-53	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	NCBIfam	NF005144	aspartate-semialdehyde dehydrogenase	1	369	1.1E-191	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	PIRSF	PIRSF000148	ASA_dh	1	371	8.8E-70	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	Gene3D	G3DSA:3.40.50.720	-	4	358	1.4E-146	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	CDD	cd23938	ASADH_C_bac_like	135	353	5.84119E-149	T	26-03-2025	-	-	-	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	ProSitePatterns	PS01103	Aspartate-semialdehyde dehydrogenase signature.	263	277	-	T	26-03-2025	IPR000319	Aspartate-semialdehyde dehydrogenase, conserved site	GO:0004073(InterPro)|GO:0006520(InterPro)|GO:0050661(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	Pfam	PF02774	Semialdehyde dehydrogenase, dimerisation domain	144	355	9.9E-43	T	26-03-2025	IPR012280	Semialdehyde dehydrogenase, dimerisation domain	GO:0008652(InterPro)|GO:0016620(InterPro)|GO:0046983(InterPro)	-
+ERZ1049444_130_45	5bbb09e7a1da8a7d04f4233ab6ddd7a1	371	SUPERFAMILY	SSF55347	Glyceraldehyde-3-phosphate dehydrogenase-like, C-terminal domain	134	356	2.56E-74	T	26-03-2025	-	-	-	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	Pfam	PF02556	Preprotein translocase subunit SecB	13	151	4.5E-54	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	NCBIfam	TIGR00809	protein-export chaperone SecB	14	147	6.4E-48	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	Gene3D	G3DSA:3.10.420.10	-	1	167	1.5E-58	T	26-03-2025	IPR035958	SecB-like superfamily	-	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	NCBIfam	NF004393	protein-export chaperone SecB	2	163	7.1E-64	T	26-03-2025	-	-	-	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	SUPERFAMILY	SSF54611	SecB-like	6	148	1.29E-52	T	26-03-2025	IPR035958	SecB-like superfamily	-	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	Hamap	MF_00821	Protein-export protein SecB [secB].	1	152	33.706951	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	PRINTS	PR01594	Bacterial protein-transport SecB chaperone protein signature	104	126	1.3E-37	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	PRINTS	PR01594	Bacterial protein-transport SecB chaperone protein signature	80	100	1.3E-37	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	PRINTS	PR01594	Bacterial protein-transport SecB chaperone protein signature	130	148	1.3E-37	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_27_12	d9916e5a11a7ee9569a26b5dca09c552	170	PRINTS	PR01594	Bacterial protein-transport SecB chaperone protein signature	20	37	1.3E-37	T	26-03-2025	IPR003708	Bacterial protein export chaperone SecB	GO:0015031(InterPro)|GO:0051082(InterPro)|GO:0051262(InterPro)	-
+ERZ1049444_102_37	d7e7839f5ab033e7a4d5c9ecdecc7bef	366	Gene3D	G3DSA:3.90.550.10	Spore Coat Polysaccharide Biosynthesis Protein SpsA; Chain A	22	278	4.6E-37	T	26-03-2025	IPR029044	Nucleotide-diphospho-sugar transferases	-	-
+ERZ1049444_102_37	d7e7839f5ab033e7a4d5c9ecdecc7bef	366	Pfam	PF00535	Glycosyl transferase family 2	38	201	4.0E-22	T	26-03-2025	IPR001173	Glycosyltransferase 2-like	-	-
+ERZ1049444_102_37	d7e7839f5ab033e7a4d5c9ecdecc7bef	366	SUPERFAMILY	SSF53448	Nucleotide-diphospho-sugar transferases	33	315	6.75E-42	T	26-03-2025	IPR029044	Nucleotide-diphospho-sugar transferases	-	-
+ERZ1049444_237_21	b2569db0f071f09695c4e6dfac06acd4	150	MobiDBLite	mobidb-lite	consensus disorder prediction	123	132	-	T	26-03-2025	-	-	-	-
+ERZ1049444_237_21	b2569db0f071f09695c4e6dfac06acd4	150	MobiDBLite	mobidb-lite	consensus disorder prediction	133	144	-	T	26-03-2025	-	-	-	-
+ERZ1049444_237_21	b2569db0f071f09695c4e6dfac06acd4	150	MobiDBLite	mobidb-lite	consensus disorder prediction	103	150	-	T	26-03-2025	-	-	-	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	CDD	cd08513	PBP2_thermophilic_Hb8_like	30	547	6.22408E-172	T	26-03-2025	-	-	-	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	PIRSF	PIRSF002741	MppA	1	565	1.2E-59	T	26-03-2025	IPR030678	Peptide/nickel binding protein, MppA-type	GO:0043190(InterPro)|GO:0055085(InterPro)	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	Gene3D	G3DSA:3.40.190.10	-	11	273	6.9E-48	T	26-03-2025	-	-	-	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	Pfam	PF00496	Bacterial extracellular solute-binding proteins, family 5 Middle	83	470	1.9E-61	T	26-03-2025	IPR000914	Solute-binding protein family 5 domain	-	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	Gene3D	G3DSA:3.10.105.10	-	298	531	4.0E-44	T	26-03-2025	-	-	-	-
+ERZ1049444_152_17	ea023d7f8d7e1541512df96d2daa99f3	566	SUPERFAMILY	SSF53850	Periplasmic binding protein-like II	26	562	2.9E-102	T	26-03-2025	-	-	-	-
+ERZ1049444_259_15	f9c6c4b80324fb226bf956300c33da2a	440	CDD	cd04489	ExoVII_LU_OBF	33	123	1.68824E-15	T	26-03-2025	IPR025824	OB-fold nucleic acid binding domain	GO:0003676(InterPro)	-
+ERZ1049444_259_15	f9c6c4b80324fb226bf956300c33da2a	440	Pfam	PF02601	Exonuclease VII, large subunit	145	434	1.3E-49	T	26-03-2025	IPR020579	Exonuclease VII, large subunit, C-terminal	GO:0008855(InterPro)	-
+ERZ1049444_259_15	f9c6c4b80324fb226bf956300c33da2a	440	Pfam	PF13742	OB-fold nucleic acid binding domain	14	120	3.1E-11	T	26-03-2025	IPR025824	OB-fold nucleic acid binding domain	GO:0003676(InterPro)	-
+ERZ1049444_259_15	f9c6c4b80324fb226bf956300c33da2a	440	NCBIfam	TIGR00237	exodeoxyribonuclease VII large subunit	15	438	1.3E-75	T	26-03-2025	IPR003753	Exonuclease VII, large subunit	GO:0006308(InterPro)|GO:0008855(InterPro)|GO:0009318(InterPro)	-
+ERZ1049444_77_77	4bc83a13b7d8d443d6c946febafb7ce5	292	SUPERFAMILY	SSF103481	Multidrug resistance efflux transporter EmrE	38	140	2.35E-12	T	26-03-2025	-	-	-	-
+ERZ1049444_77_77	4bc83a13b7d8d443d6c946febafb7ce5	292	Pfam	PF00892	EamA-like transporter family	152	288	7.9E-8	T	26-03-2025	IPR000620	EamA domain	GO:0016020(InterPro)	-
+ERZ1049444_77_77	4bc83a13b7d8d443d6c946febafb7ce5	292	Pfam	PF00892	EamA-like transporter family	7	137	6.5E-13	T	26-03-2025	IPR000620	EamA domain	GO:0016020(InterPro)	-
+ERZ1049444_77_77	4bc83a13b7d8d443d6c946febafb7ce5	292	SUPERFAMILY	SSF103481	Multidrug resistance efflux transporter EmrE	212	291	8.89E-8	T	26-03-2025	-	-	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	CDD	cd00140	beta_clamp	1	365	2.77526E-157	T	26-03-2025	IPR001001	DNA polymerase III, beta sliding clamp	GO:0003677(InterPro)|GO:0006260(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	Pfam	PF00712	DNA polymerase III beta subunit, N-terminal domain	1	118	1.5E-34	T	26-03-2025	IPR022634	DNA polymerase III, beta sliding clamp, N-terminal	GO:0003677(InterPro)|GO:0003887(InterPro)|GO:0006260(InterPro)|GO:0008408(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	SUPERFAMILY	SSF55979	DNA clamp	1	116	9.03E-27	T	26-03-2025	IPR046938	DNA clamp superfamily	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	SUPERFAMILY	SSF55979	DNA clamp	246	366	1.79E-36	T	26-03-2025	IPR046938	DNA clamp superfamily	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	Pfam	PF02768	DNA polymerase III beta subunit, C-terminal domain	246	364	3.4E-34	T	26-03-2025	IPR022635	DNA polymerase III, beta sliding clamp, C-terminal	GO:0003677(InterPro)|GO:0003887(InterPro)|GO:0006260(InterPro)|GO:0008408(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	Pfam	PF02767	DNA polymerase III beta subunit, central domain	129	243	4.0E-30	T	26-03-2025	IPR022637	DNA polymerase III, beta sliding clamp, central	GO:0003887(InterPro)|GO:0006260(InterPro)|GO:0008408(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	SUPERFAMILY	SSF55979	DNA clamp	128	244	1.21E-27	T	26-03-2025	IPR046938	DNA clamp superfamily	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	Gene3D	G3DSA:3.70.10.10	-	137	364	1.0E-122	T	26-03-2025	-	-	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	Gene3D	G3DSA:3.10.150.10	DNA Polymerase III, subunit A, domain 2	1	242	1.0E-122	T	26-03-2025	-	-	-	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	NCBIfam	TIGR00663	DNA polymerase III subunit beta	1	366	8.9E-101	T	26-03-2025	IPR001001	DNA polymerase III, beta sliding clamp	GO:0003677(InterPro)|GO:0006260(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	SMART	SM00480	pol35	17	362	5.6E-136	T	26-03-2025	IPR001001	DNA polymerase III, beta sliding clamp	GO:0003677(InterPro)|GO:0006260(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_105_69	07adec11e2b654031b811dca3b1e0e4f	366	PIRSF	PIRSF000804	DNA_pol_III_b	1	366	2.2E-119	T	26-03-2025	IPR001001	DNA polymerase III, beta sliding clamp	GO:0003677(InterPro)|GO:0006260(InterPro)|GO:0009360(InterPro)	-
+ERZ1049444_172_17	d54219902fb4c9a8637705025050728d	226	SUPERFAMILY	SSF52141	Uracil-DNA glycosylase-like	10	132	9.29E-5	T	26-03-2025	IPR036895	Uracil-DNA glycosylase-like domain superfamily	-	-
+ERZ1049444_172_17	d54219902fb4c9a8637705025050728d	226	Gene3D	G3DSA:3.40.470.10	-	4	209	1.2E-24	T	26-03-2025	IPR036895	Uracil-DNA glycosylase-like domain superfamily	-	-
+ERZ1049444_165_8	3b21ae8f6cb58dc5db9d88d290df3966	317	Pfam	PF02423	Ornithine cyclodeaminase/mu-crystallin family	3	314	1.3E-57	T	26-03-2025	IPR003462	Ornithine cyclodeaminase/mu-crystallin	-	-
+ERZ1049444_165_8	3b21ae8f6cb58dc5db9d88d290df3966	317	Gene3D	G3DSA:3.30.1780.10	ornithine cyclodeaminase, domain 1	4	312	1.3E-98	T	26-03-2025	IPR023401	Ornithine cyclodeaminase, N-terminal	-	-
+ERZ1049444_165_8	3b21ae8f6cb58dc5db9d88d290df3966	317	PIRSF	PIRSF001439	CryM	1	317	4.7E-80	T	26-03-2025	IPR003462	Ornithine cyclodeaminase/mu-crystallin	-	-
+ERZ1049444_165_8	3b21ae8f6cb58dc5db9d88d290df3966	317	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	1	312	9.77E-88	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_165_8	3b21ae8f6cb58dc5db9d88d290df3966	317	Gene3D	G3DSA:3.40.50.720	-	124	296	1.3E-98	T	26-03-2025	-	-	-	-
+ERZ1049444_89_66	a326376d09683f145658ebfb691328b9	286	NCBIfam	TIGR00765	YihY family inner membrane protein	11	265	1.5E-19	T	26-03-2025	IPR017039	Virulence factor BrkB	-	-
+ERZ1049444_89_66	a326376d09683f145658ebfb691328b9	286	PIRSF	PIRSF035875	RNase_BN	1	281	1.3E-60	T	26-03-2025	IPR017039	Virulence factor BrkB	-	-
+ERZ1049444_89_66	a326376d09683f145658ebfb691328b9	286	Pfam	PF03631	Virulence factor BrkB	18	267	2.2E-41	T	26-03-2025	IPR017039	Virulence factor BrkB	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	Pfam	PF17863	AAA lid domain	246	310	3.1E-17	T	26-03-2025	IPR041628	ChlI/MoxR, AAA lid domain	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	PIRSF	PIRSF002849	MoxR	1	318	9.7E-127	T	26-03-2025	-	-	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	CDD	cd00009	AAA	18	172	1.32066E-6	T	26-03-2025	-	-	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	Pfam	PF07726	ATPase family associated with various cellular activities (AAA)	36	166	1.6E-60	T	26-03-2025	IPR011703	ATPase, AAA-3	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	Gene3D	G3DSA:1.10.8.80	-	200	314	2.0E-34	T	26-03-2025	-	-	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	8	291	6.69E-43	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_100_78	5e3603e5e02c89a070c4400edb6ad51a	318	Gene3D	G3DSA:3.40.50.300	-	17	183	4.3E-47	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_166_57	3618db15f9957a6c64bee682b2c0c616	251	Pfam	PF00596	Class II Aldolase and Adducin N-terminal domain	30	204	1.9E-32	T	26-03-2025	IPR001303	Class II aldolase/adducin N-terminal	-	-
+ERZ1049444_166_57	3618db15f9957a6c64bee682b2c0c616	251	Gene3D	G3DSA:3.40.225.10	-	8	246	2.4E-52	T	26-03-2025	IPR036409	Class II aldolase/adducin N-terminal domain superfamily	-	-
+ERZ1049444_166_57	3618db15f9957a6c64bee682b2c0c616	251	SUPERFAMILY	SSF53639	AraD/HMP-PK domain-like	21	221	1.24E-44	T	26-03-2025	IPR036409	Class II aldolase/adducin N-terminal domain superfamily	-	-
+ERZ1049444_166_57	3618db15f9957a6c64bee682b2c0c616	251	SMART	SM01007	Aldolase_II_2	25	205	2.0E-36	T	26-03-2025	IPR001303	Class II aldolase/adducin N-terminal	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	CDD	cd03221	ABCF_EF-3	320	515	6.56434E-52	T	26-03-2025	-	-	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	ProSitePatterns	PS00211	ABC transporters family signature.	159	173	-	T	26-03-2025	IPR017871	ABC transporter-like, conserved site	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Gene3D	G3DSA:3.40.50.300	-	3	281	3.7E-65	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Pfam	PF16326	ABC transporter C-terminal domain	564	630	1.0E-8	T	26-03-2025	IPR032524	ABC transporter Uup, C-terminal	GO:0003677(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Gene3D	G3DSA:1.10.287.380	-	554	632	1.6E-12	T	26-03-2025	IPR037118	Valyl-tRNA synthetase, tRNA-binding arm superfamily	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	ProSiteProfiles	PS50893	ATP-binding cassette, ABC transporter-type domain profile.	320	539	15.959858	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Pfam	PF12848	ABC transporter	226	299	3.4E-6	T	26-03-2025	IPR032781	ABC-transporter extension domain	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	CDD	cd03221	ABCF_EF-3	4	232	1.96204E-51	T	26-03-2025	-	-	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Gene3D	G3DSA:3.40.50.300	-	282	553	2.7E-58	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Pfam	PF00005	ABC transporter	20	187	1.4E-19	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	4	234	1.64E-47	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	ProSiteProfiles	PS50893	ATP-binding cassette, ABC transporter-type domain profile.	4	255	17.727222	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	SMART	SM00382	AAA_5	344	515	8.4E-5	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	SMART	SM00382	AAA_5	28	232	5.3E-11	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	313	525	8.38E-46	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Pfam	PF00005	ABC transporter	335	470	6.4E-18	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Coils	Coil	Coil	529	556	-	T	26-03-2025	-	-	-	-
+ERZ1049444_99_12	f0819e4ca80e737942ed44f8f1939ac9	632	Coils	Coil	Coil	573	593	-	T	26-03-2025	-	-	-	-
+ERZ1049444_333_30	df42975c8d359557c32760824740d1ac	152	MobiDBLite	mobidb-lite	consensus disorder prediction	30	40	-	T	26-03-2025	-	-	-	-
+ERZ1049444_333_30	df42975c8d359557c32760824740d1ac	152	MobiDBLite	mobidb-lite	consensus disorder prediction	1	29	-	T	26-03-2025	-	-	-	-
+ERZ1049444_333_30	df42975c8d359557c32760824740d1ac	152	MobiDBLite	mobidb-lite	consensus disorder prediction	1	46	-	T	26-03-2025	-	-	-	-
+ERZ1049444_333_30	df42975c8d359557c32760824740d1ac	152	MobiDBLite	mobidb-lite	consensus disorder prediction	86	138	-	T	26-03-2025	-	-	-	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	CDD	cd03230	ABC_DR_subfamily_A	6	211	1.51357E-81	T	26-03-2025	-	-	-	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	ProSitePatterns	PS00211	ABC transporters family signature.	137	151	-	T	26-03-2025	IPR017871	ABC transporter-like, conserved site	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	5	225	1.11E-66	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	SMART	SM00382	AAA_5	30	289	1.2E-17	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	Gene3D	G3DSA:3.40.50.300	-	1	234	1.1E-69	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	Pfam	PF00005	ABC transporter	22	165	1.8E-32	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_5_193	d00248f9290c3b4a07a930168d5b4fdd	311	ProSiteProfiles	PS50893	ATP-binding cassette, ABC transporter-type domain profile.	6	235	24.409863	T	26-03-2025	IPR003439	ABC transporter-like, ATP-binding domain	GO:0005524(InterPro)|GO:0016887(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Hamap	MF_00936	DNA topoisomerase 4 subunit A [parC].	8	747	33.671734	T	26-03-2025	IPR005742	DNA topoisomerase IV, subunit A, Gram-negative	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)|GO:0005694(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	NCBIfam	NF004044	DNA topoisomerase (ATP-hydrolyzing)	17	745	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	NCBIfam	TIGR01062	DNA topoisomerase IV subunit A	12	745	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	SUPERFAMILY	SSF56719	Type II DNA topoisomerase	35	487	5.49E-153	T	26-03-2025	IPR013760	DNA topoisomerase, type IIA-like domain superfamily	GO:0003918(InterPro)|GO:0005524(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Gene3D	G3DSA:3.30.1360.40	-	242	335	1.5E-187	T	26-03-2025	-	-	-	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Gene3D	G3DSA:1.10.268.10	Topoisomerase, domain 3	373	458	1.5E-187	T	26-03-2025	IPR013757	DNA topoisomerase, type IIA, alpha-helical domain superfamily	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Pfam	PF00521	DNA gyrase/topoisomerase IV, subunit A	36	473	9.9E-136	T	26-03-2025	IPR002205	DNA topoisomerase, type IIA, domain A	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Pfam	PF03989	DNA gyrase C-terminal domain, beta-propeller	602	627	1000.0	T	26-03-2025	IPR006691	DNA gyrase/topoisomerase IV, subunit A, C-terminal repeat	GO:0003677(InterPro)|GO:0003916(InterPro)|GO:0005524(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Pfam	PF03989	DNA gyrase C-terminal domain, beta-propeller	651	699	0.36	T	26-03-2025	IPR006691	DNA gyrase/topoisomerase IV, subunit A, C-terminal repeat	GO:0003677(InterPro)|GO:0003916(InterPro)|GO:0005524(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Gene3D	G3DSA:3.90.199.10	Topoisomerase II, domain 5	36	485	1.5E-187	T	26-03-2025	IPR013758	DNA topoisomerase, type IIA, domain A, alpha-beta	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)|GO:0006259(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	SMART	SM00434	topIV4	15	465	7.5E-223	T	26-03-2025	IPR002205	DNA topoisomerase, type IIA, domain A	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	Gene3D	G3DSA:2.120.10.90	-	504	749	2.2E-48	T	26-03-2025	IPR035516	DNA gyrase/topoisomerase IV, subunit A, C-terminal	-	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	CDD	cd00187	TOP4c	35	475	0.0	T	26-03-2025	IPR002205	DNA topoisomerase, type IIA, domain A	GO:0003677(InterPro)|GO:0003918(InterPro)|GO:0005524(InterPro)|GO:0006265(InterPro)	-
+ERZ1049444_58_103	17b087f4c8e8f5460642266b3af3cebe	750	SUPERFAMILY	SSF101904	GyrA/ParC C-terminal domain-like	501	747	1.07E-51	T	26-03-2025	IPR035516	DNA gyrase/topoisomerase IV, subunit A, C-terminal	-	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	CDD	cd11033	CYP142-like	56	435	5.44524E-176	T	26-03-2025	-	-	-	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	356	371	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	378	387	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	387	398	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	187	202	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	311	322	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	124	135	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	PRINTS	PR00359	B-class P450 signature	328	355	7.5E-27	T	26-03-2025	IPR002397	Cytochrome P450, B-class	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	Gene3D	G3DSA:1.10.630.10	Cytochrome P450	27	437	3.4E-103	T	26-03-2025	IPR036396	Cytochrome P450 superfamily	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	Pfam	PF00067	Cytochrome P450	246	411	3.1E-18	T	26-03-2025	IPR001128	Cytochrome P450	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	ProSitePatterns	PS00086	Cytochrome P450 cysteine heme-iron ligand signature.	380	389	-	T	26-03-2025	IPR017972	Cytochrome P450, conserved site	GO:0005506(InterPro)|GO:0016705(InterPro)	-
+ERZ1049444_326_7	430482320f030e8eb0fb95f149e3c7cd	438	SUPERFAMILY	SSF48264	Cytochrome P450	52	432	2.1E-82	T	26-03-2025	IPR036396	Cytochrome P450 superfamily	GO:0004497(InterPro)|GO:0005506(InterPro)|GO:0016705(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	Gene3D	G3DSA:2.40.30.10	Translation factors	8	118	5.0E-31	T	26-03-2025	-	-	-	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	Gene3D	G3DSA:3.40.50.80	-	122	279	3.0E-47	T	26-03-2025	IPR039261	Ferredoxin-NADP reductase (FNR), nucleotide-binding domain	-	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	ProSiteProfiles	PS51384	Ferredoxin reductase-type FAD binding domain profile.	17	124	11.214505	T	26-03-2025	IPR017927	FAD-binding domain, ferredoxin reductase-type	GO:0016491(InterPro)	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	SUPERFAMILY	SSF52343	Ferredoxin reductase-like, C-terminal NADP-linked domain	125	280	5.37E-29	T	26-03-2025	IPR039261	Ferredoxin-NADP reductase (FNR), nucleotide-binding domain	-	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	SUPERFAMILY	SSF63380	Riboflavin synthase domain-like	23	121	4.48E-19	T	26-03-2025	IPR017938	Riboflavin synthase-like beta-barrel	-	-
+ERZ1049444_10_23	ed4d6e43b92a830d3a4eca553969ddac	282	CDD	cd06195	FNR1	24	279	1.21089E-99	T	26-03-2025	IPR033892	Ferredoxin--NADP reductase, bacteria	GO:0004324(InterPro)	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	SUPERFAMILY	SSF51556	Metallo-dependent hydrolases	75	385	8.93E-96	T	26-03-2025	IPR032466	Metal-dependent hydrolase	-	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	Gene3D	G3DSA:2.30.40.10	Urease, subunit C, domain 1	22	419	9.7E-127	T	26-03-2025	IPR011059	Metal-dependent hydrolase, composite domain superfamily	GO:0016810(InterPro)	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	Pfam	PF01979	Amidohydrolase family	71	421	4.7E-47	T	26-03-2025	IPR006680	Amidohydrolase-related	GO:0016787(InterPro)	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	Gene3D	G3DSA:3.20.20.140	-	77	384	9.7E-127	T	26-03-2025	-	-	-	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	CDD	cd01299	Met_dep_hydrolase_A	66	409	2.4002E-108	T	26-03-2025	-	-	-	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	SUPERFAMILY	SSF51338	Composite domain of metallo-dependent hydrolases	366	423	1.25E-19	T	26-03-2025	IPR011059	Metal-dependent hydrolase, composite domain superfamily	GO:0016810(InterPro)	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	SUPERFAMILY	SSF51338	Composite domain of metallo-dependent hydrolases	18	83	5.28E-8	T	26-03-2025	IPR011059	Metal-dependent hydrolase, composite domain superfamily	GO:0016810(InterPro)	-
+ERZ1049444_163_11	2fb8efefddf33e6e887105ab6e445faf	424	MobiDBLite	mobidb-lite	consensus disorder prediction	156	175	-	T	26-03-2025	-	-	-	-
+ERZ1049444_123_26	d549ac0385e9ee429ef85bd1fe300cbc	152	Pfam	PF00034	Cytochrome c	29	140	1.2	T	26-03-2025	IPR009056	Cytochrome c-like domain	GO:0009055(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_123_26	d549ac0385e9ee429ef85bd1fe300cbc	152	SUPERFAMILY	SSF46626	Cytochrome c	25	142	6.15E-32	T	26-03-2025	IPR036909	Cytochrome c-like domain superfamily	GO:0009055(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_123_26	d549ac0385e9ee429ef85bd1fe300cbc	152	Gene3D	G3DSA:1.10.760.10	-	23	152	1.8E-40	T	26-03-2025	IPR036909	Cytochrome c-like domain superfamily	GO:0009055(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_123_26	d549ac0385e9ee429ef85bd1fe300cbc	152	ProSiteProfiles	PS51007	Cytochrome c family profile.	26	142	11.937473	T	26-03-2025	IPR009056	Cytochrome c-like domain	GO:0009055(InterPro)|GO:0020037(InterPro)	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Gene3D	G3DSA:3.30.505.50	-	143	190	3.8E-18	T	26-03-2025	IPR038416	Sigma 54 modulation/S30EA ribosomal protein, C-terminal domain superfamily	-	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	NCBIfam	TIGR00741	ribosome hibernation-promoting factor, HPF/YfiA family	1	98	7.5E-15	T	26-03-2025	IPR003489	Ribosome hibernation promoting factor/RaiA	GO:0044238(InterPro)	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Hamap	MF_00839	Ribosome hibernation promoting factor [hpf].	1	189	20.751759	T	26-03-2025	IPR034694	Ribosome hibernation promoting factor, long/plastid	-	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	CDD	cd00552	RaiA	2	93	1.65124E-20	T	26-03-2025	IPR003489	Ribosome hibernation promoting factor/RaiA	GO:0044238(InterPro)	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Pfam	PF16321	Sigma 54 modulation/S30EA ribosomal protein C terminus	132	184	6.5E-15	T	26-03-2025	IPR032528	Sigma 54 modulation/S30EA ribosomal protein, C-terminal	-	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Pfam	PF02482	Sigma 54 modulation protein / S30EA ribosomal protein	4	95	7.1E-15	T	26-03-2025	IPR003489	Ribosome hibernation promoting factor/RaiA	GO:0044238(InterPro)	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Coils	Coil	Coil	80	100	-	T	26-03-2025	-	-	-	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	SUPERFAMILY	SSF69754	Ribosome binding protein Y (YfiA homologue)	1	103	2.35E-24	T	26-03-2025	IPR036567	Ribosome hibernation promotion factor-like	-	-
+ERZ1049444_234_5	0e1507896ffbe93be9f442e2581f7900	192	Gene3D	G3DSA:3.30.160.100	-	1	103	3.3E-21	T	26-03-2025	IPR036567	Ribosome hibernation promotion factor-like	-	-
+ERZ1049444_26_118	d964fafb8f349f28f211350f76df6812	207	Pfam	PF08889	WbqC-like protein family	7	156	3.3E-28	T	26-03-2025	IPR014985	WbqC-like protein family	-	-
+ERZ1049444_26_118	d964fafb8f349f28f211350f76df6812	207	Pfam	PF08889	WbqC-like protein family	163	197	0.022	T	26-03-2025	IPR014985	WbqC-like protein family	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	SUPERFAMILY	SSF53187	Zn-dependent exopeptidases	9	393	5.69E-83	T	26-03-2025	-	-	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	Gene3D	G3DSA:3.40.630.10	Zn peptidases	16	378	1.5E-127	T	26-03-2025	-	-	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	Gene3D	G3DSA:3.30.70.360	-	181	295	1.5E-127	T	26-03-2025	-	-	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	Pfam	PF01546	Peptidase family M20/M25/M40	72	386	1.3E-36	T	26-03-2025	IPR002933	Peptidase M20	GO:0016787(InterPro)	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	SUPERFAMILY	SSF55031	Bacterial exopeptidase dimerisation domain	181	299	1.57E-27	T	26-03-2025	IPR036264	Bacterial exopeptidase dimerisation domain	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	Pfam	PF07687	Peptidase dimerisation domain	184	276	4.4E-6	T	26-03-2025	IPR011650	Peptidase M20, dimerisation domain	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	CDD	cd05666	M20_Acy1-like	14	391	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	PIRSF	PIRSF005962	Amidohydrol_AmhX	3	396	7.4E-118	T	26-03-2025	IPR017439	Amidohydrolase	GO:0016787(InterPro)	-
+ERZ1049444_8_34	d91957125c003696df6922c508e78a05	402	NCBIfam	TIGR01891	amidohydrolase	14	380	7.2E-96	T	26-03-2025	IPR017439	Amidohydrolase	GO:0016787(InterPro)	-
+ERZ1049444_56_35	3241a02a4e6154b16c6077e66b647030	106	NCBIfam	TIGR03889	nitrile hydratase accessory protein	9	81	2.7E-23	T	26-03-2025	IPR023808	Nitrile hydratase accessory protein, putative	-	-
+ERZ1049444_56_35	3241a02a4e6154b16c6077e66b647030	106	Gene3D	G3DSA:1.10.472.20	Nitrile hydratase, beta subunit	1	103	1.0E-18	T	26-03-2025	IPR042262	Nitrile hydratase beta subunit, N-terminal	-	-
+ERZ1049444_56_35	3241a02a4e6154b16c6077e66b647030	106	Pfam	PF21006	Nitrile hydratase beta subunit, N-terminal	3	83	0.016	T	26-03-2025	IPR049054	Nitrile hydratase beta subunit-like, N-terminal domain	-	-
+ERZ1049444_56_35	3241a02a4e6154b16c6077e66b647030	106	SUPERFAMILY	SSF50090	Electron transport accessory proteins	3	104	2.35E-17	T	26-03-2025	IPR008990	Electron transport accessory-like domain superfamily	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	CDD	cd19961	EcYidC-like_peri	98	367	3.29542E-52	T	26-03-2025	IPR028053	Membrane insertase YidC, N-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	NCBIfam	NF002356	membrane protein insertase YidC	1	637	3.0E-207	T	26-03-2025	-	-	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	MobiDBLite	mobidb-lite	consensus disorder prediction	609	638	-	T	26-03-2025	-	-	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	PRINTS	PR00701	60kDa inner membrane protein signature	105	126	2.8E-10	T	26-03-2025	IPR001708	Membrane insertase YidC/ALB3/OXA1/COX18	GO:0016020(InterPro)|GO:0032977(InterPro)	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	PRINTS	PR00701	60kDa inner membrane protein signature	284	299	2.8E-10	T	26-03-2025	IPR001708	Membrane insertase YidC/ALB3/OXA1/COX18	GO:0016020(InterPro)|GO:0032977(InterPro)	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	PRINTS	PR00701	60kDa inner membrane protein signature	460	483	2.8E-10	T	26-03-2025	IPR001708	Membrane insertase YidC/ALB3/OXA1/COX18	GO:0016020(InterPro)|GO:0032977(InterPro)	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	NCBIfam	TIGR03593	membrane protein insertase, YidC/Oxa1 family, N-terminal domain	2	374	2.3E-25	T	26-03-2025	IPR028053	Membrane insertase YidC, N-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	Hamap	MF_01810	Membrane protein insertase YidC [yidC].	3	598	15.17201	T	26-03-2025	IPR019998	Membrane insertase YidC	GO:0016020(InterPro)|GO:0032977(InterPro)	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	Pfam	PF14849	YidC periplasmic domain	102	376	7.3E-23	T	26-03-2025	IPR028053	Membrane insertase YidC, N-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	Coils	Coil	Coil	50	75	-	T	26-03-2025	-	-	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	Pfam	PF02096	60Kd inner membrane protein	397	595	3.3E-46	T	26-03-2025	IPR028055	Membrane insertase YidC/Oxa/ALB, C-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	NCBIfam	TIGR03592	membrane protein insertase YidC	396	594	1.3E-49	T	26-03-2025	IPR028055	Membrane insertase YidC/Oxa/ALB, C-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	CDD	cd20070	5TM_YidC_Alb3	398	595	3.29869E-63	T	26-03-2025	IPR047196	Membrane insertase YidC/ALB, C-terminal	-	-
+ERZ1049444_299_2	03a1c709b874e08d4c4664d89655420e	638	Gene3D	G3DSA:2.70.98.90	-	95	368	8.1E-40	T	26-03-2025	IPR038221	YidC, periplasmic domain superfamily	-	-
+ERZ1049444_40_60	bd4420a8e164b2062e0943465abaa6c5	312	CDD	cd03510	Rhizobitoxine-FADS-like	31	276	3.96543E-59	T	26-03-2025	-	-	-	-
+ERZ1049444_40_60	bd4420a8e164b2062e0943465abaa6c5	312	Pfam	PF00487	Fatty acid desaturase	49	283	2.2E-35	T	26-03-2025	IPR005804	Fatty acid desaturase domain	GO:0006629(InterPro)	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	SUPERFAMILY	SSF56112	Protein kinase-like (PK-like)	94	437	1.5E-45	T	26-03-2025	IPR011009	Protein kinase-like domain superfamily	-	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	NCBIfam	NF003404	ubiquinone biosynthesis regulatory protein kinase UbiB	4	514	2.7E-221	T	26-03-2025	-	-	-	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	Coils	Coil	Coil	432	452	-	T	26-03-2025	-	-	-	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	CDD	cd13972	UbiB	92	343	8.76121E-120	T	26-03-2025	IPR045308	UbiB domain, bacteria	GO:0006744(InterPro)	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	Pfam	PF03109	ABC1 atypical kinase-like domain	92	343	1.2E-71	T	26-03-2025	IPR004147	ABC1 atypical kinase-like domain	-	-
+ERZ1049444_45_112	a8ce3f5d58309694e018a3da809e824d	553	NCBIfam	TIGR01982	2-polyprenylphenol 6-hydroxylase	6	443	1.6E-165	T	26-03-2025	IPR010232	Probable protein kinase UbiB	GO:0006744(InterPro)	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	10	34	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	119	136	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	208	236	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	79	107	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	317	340	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	243	269	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	PRINTS	PR01874	DNA repair protein radA signature	169	193	3.2E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	SUPERFAMILY	SSF54211	Ribosomal protein S5 domain 2-like	250	451	7.59E-36	T	26-03-2025	IPR020568	Ribosomal protein uS5 domain 2-type superfamily	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	CDD	cd01121	RadA_SMS_N	8	272	5.76376E-157	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Hamap	MF_01498	DNA repair protein RadA [radA].	21	452	42.175591	T	26-03-2025	IPR004504	DNA repair protein RadA	GO:0003684(InterPro)|GO:0005524(InterPro)|GO:0006281(InterPro)	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	SMART	SM00382	AAA_5	87	239	1.2E-10	T	26-03-2025	IPR003593	AAA+ ATPase domain	GO:0016887(InterPro)	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	66	282	7.83E-50	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Gene3D	G3DSA:3.40.50.300	-	58	270	5.0E-44	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Pfam	PF13541	Subunit ChlI of Mg-chelatase	339	423	1.1E-6	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	NCBIfam	TIGR00416	DNA repair protein RadA	1	447	1.5E-174	T	26-03-2025	IPR004504	DNA repair protein RadA	GO:0003684(InterPro)|GO:0005524(InterPro)|GO:0006281(InterPro)	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Gene3D	G3DSA:3.30.230.10	-	286	452	8.2E-23	T	26-03-2025	IPR014721	Small ribosomal subunit protein uS5 domain 2-type fold, subgroup	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	ProSiteProfiles	PS50162	RecA family profile 1.	66	213	35.515808	T	26-03-2025	IPR020588	DNA recombination and repair protein RecA-like, ATP-binding domain	GO:0003677(InterPro)|GO:0005524(InterPro)|GO:0006281(InterPro)|GO:0140664(InterPro)	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Pfam	PF13481	AAA domain	68	217	2.7E-12	T	26-03-2025	-	-	-	-
+ERZ1049444_1_138	7a85359c184ced2188957bb72d32a329	452	Pfam	PF18073	Rubredoxin metal binding domain	8	35	2.4E-8	T	26-03-2025	IPR041166	LapB, rubredoxin metal binding domain	-	-
+ERZ1049444_323_19	5b2040c77ebe050a714d17dbaf0808c9	632	Gene3D	G3DSA:3.60.20.10	Glutamine Phosphoribosylpyrophosphate, subunit 1, domain 1	9	380	1.9E-51	T	26-03-2025	IPR029055	Nucleophile aminohydrolases, N-terminal	-	-
+ERZ1049444_323_19	5b2040c77ebe050a714d17dbaf0808c9	632	SUPERFAMILY	SSF53271	PRTase-like	320	530	5.27E-19	T	26-03-2025	IPR029057	Phosphoribosyltransferase-like	-	-
+ERZ1049444_323_19	5b2040c77ebe050a714d17dbaf0808c9	632	CDD	cd06223	PRTases_typeI	454	489	0.00100064	T	26-03-2025	IPR000836	Phosphoribosyltransferase domain	-	-
+ERZ1049444_323_19	5b2040c77ebe050a714d17dbaf0808c9	632	SUPERFAMILY	SSF56235	N-terminal nucleophile aminohydrolases (Ntn hydrolases)	82	310	1.03E-38	T	26-03-2025	IPR029055	Nucleophile aminohydrolases, N-terminal	-	-
+ERZ1049444_323_19	5b2040c77ebe050a714d17dbaf0808c9	632	ProSiteProfiles	PS51278	Glutamine amidotransferase type 2 domain profile.	9	303	25.937355	T	26-03-2025	IPR017932	Glutamine amidotransferase type 2 domain	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	Coils	Coil	Coil	345	365	-	T	26-03-2025	-	-	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	NCBIfam	NF001540	(E)-4-hydroxy-3-methylbut-2-enyl-diphosphate synthase	2	357	7.0E-156	T	26-03-2025	-	-	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	Gene3D	G3DSA:3.30.413.10	Sulfite Reductase Hemoprotein, domain 1	262	361	2.1E-27	T	26-03-2025	IPR045854	Nitrite and sulphite reductase 4Fe-4S domain-like superfamily	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	Pfam	PF04551	GcpE protein	13	353	1.4E-144	T	26-03-2025	IPR004588	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase, bacterial-type	GO:0016114(InterPro)|GO:0046429(InterPro)	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	SUPERFAMILY	SSF56014	Nitrite and sulphite reductase 4Fe-4S domain-like	265	350	2.43E-13	T	26-03-2025	IPR045854	Nitrite and sulphite reductase 4Fe-4S domain-like superfamily	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	PIRSF	PIRSF004640	IspG	1	363	1.9E-149	T	26-03-2025	IPR016425	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase, bacterial	GO:0005506(InterPro)|GO:0008299(InterPro)|GO:0046429(InterPro)	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	Hamap	MF_00159	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase (ferredoxin) [ispG].	7	357	35.405796	T	26-03-2025	IPR004588	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase, bacterial-type	GO:0016114(InterPro)|GO:0046429(InterPro)	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	NCBIfam	TIGR00612	(E)-4-hydroxy-3-methylbut-2-enyl-diphosphate synthase	9	352	6.7E-128	T	26-03-2025	IPR004588	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase, bacterial-type	GO:0016114(InterPro)|GO:0046429(InterPro)	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	Gene3D	G3DSA:3.20.20.20	-	1	261	1.3E-107	T	26-03-2025	IPR011005	Dihydropteroate synthase-like superfamily	-	-
+ERZ1049444_404_23	55d64c00bad6865e24d0c11bdb8c9a24	376	SUPERFAMILY	SSF51717	Dihydropteroate synthetase-like	16	208	1.1E-10	T	26-03-2025	IPR011005	Dihydropteroate synthase-like superfamily	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	NCBIfam	TIGR00634	DNA repair protein RecN	1	550	1.4E-128	T	26-03-2025	IPR004604	DNA recombination/repair protein RecN	GO:0005524(InterPro)|GO:0006281(InterPro)|GO:0006310(InterPro)	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	Gene3D	G3DSA:3.40.50.300	-	1	250	8.5E-53	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	Gene3D	G3DSA:3.40.50.300	-	263	550	1.0E-64	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	SUPERFAMILY	SSF52540	P-loop containing nucleoside triphosphate hydrolases	1	507	2.78E-52	T	26-03-2025	IPR027417	P-loop containing nucleoside triphosphate hydrolase	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	CDD	cd03241	ABC_RecN	405	534	4.02244E-51	T	26-03-2025	-	-	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	Pfam	PF02463	RecF/RecN/SMC N terminal domain	2	507	2.7E-13	T	26-03-2025	IPR003395	RecF/RecN/SMC, N-terminal	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	Coils	Coil	Coil	324	355	-	T	26-03-2025	-	-	-	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	PIRSF	PIRSF003128	RecN	1	550	7.8E-150	T	26-03-2025	IPR004604	DNA recombination/repair protein RecN	GO:0005524(InterPro)|GO:0006281(InterPro)|GO:0006310(InterPro)	-
+ERZ1049444_119_32	2a278f27ca76f490b35325f36dee9ddc	550	Coils	Coil	Coil	148	182	-	T	26-03-2025	-	-	-	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	Gene3D	G3DSA:3.20.20.140	-	1	344	4.4E-127	T	26-03-2025	-	-	-	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	SUPERFAMILY	SSF51556	Metallo-dependent hydrolases	1	343	1.82E-146	T	26-03-2025	IPR032466	Metal-dependent hydrolase	-	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	Hamap	MF_00219	Dihydroorotase [pyrC].	2	344	46.764446	T	26-03-2025	IPR004721	Dihydroorotase homodimeric type	GO:0004151(InterPro)|GO:0019856(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	ProSitePatterns	PS00482	Dihydroorotase signature 1.	11	19	-	T	26-03-2025	IPR002195	Dihydroorotase, conserved site	GO:0016812(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	ProSitePatterns	PS00483	Dihydroorotase signature 2.	246	257	-	T	26-03-2025	IPR002195	Dihydroorotase, conserved site	GO:0016812(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	PIRSF	PIRSF001237	Dihydroorotase	1	344	7.8E-141	T	26-03-2025	IPR004721	Dihydroorotase homodimeric type	GO:0004151(InterPro)|GO:0019856(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	NCBIfam	TIGR00856	dihydroorotase, homodimeric type	3	343	1.8E-136	T	26-03-2025	IPR004721	Dihydroorotase homodimeric type	GO:0004151(InterPro)|GO:0019856(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	CDD	cd01294	DHOase	4	341	0.0	T	26-03-2025	IPR004721	Dihydroorotase homodimeric type	GO:0004151(InterPro)|GO:0019856(InterPro)	-
+ERZ1049444_9_65	7bf7cbed0aa2ea40e697347487b5d434	344	Pfam	PF01979	Amidohydrolase family	11	259	8.9E-10	T	26-03-2025	IPR006680	Amidohydrolase-related	GO:0016787(InterPro)	-
+ERZ1049444_344_12	f9a6e2c22a2df69980f47da0a3708e75	163	NCBIfam	NF033205	IPExxxVDY family protein	4	162	2.6E-36	T	26-03-2025	IPR047690	Uncharacterised protein family IPExxxVDY	-	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	NCBIfam	TIGR00087	5'/3'-nucleotidase SurE	1	231	7.4E-56	T	26-03-2025	IPR002828	Survival protein SurE-like phosphatase/nucleotidase	GO:0016787(InterPro)	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	NCBIfam	NF001489	5'/3'-nucleotidase SurE	1	245	1.4E-100	T	26-03-2025	-	-	-	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	Hamap	MF_00060	5'/3'-nucleotidase SurE [surE].	1	246	36.139004	T	26-03-2025	IPR030048	Survival protein SurE	GO:0008252(InterPro)	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	Gene3D	G3DSA:3.40.1210.10	-	1	247	1.8E-78	T	26-03-2025	IPR036523	SurE-like phosphatase/nucleotidase superfamily	GO:0016787(InterPro)	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	Pfam	PF01975	Survival protein SurE	4	179	6.6E-57	T	26-03-2025	IPR002828	Survival protein SurE-like phosphatase/nucleotidase	GO:0016787(InterPro)	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	SUPERFAMILY	SSF64167	SurE-like	1	245	5.23E-80	T	26-03-2025	IPR036523	SurE-like phosphatase/nucleotidase superfamily	GO:0016787(InterPro)	-
+ERZ1049444_53_64	a5a9f13583dab2e666e06f4665485fe6	247	NCBIfam	NF001490	5'/3'-nucleotidase SurE	1	244	3.6E-78	T	26-03-2025	-	-	-	-
+ERZ1049444_8_218	f98e47380bbcd9e94a315287aa6e75eb	183	Pfam	PF00156	Phosphoribosyl transferase domain	21	168	9.4E-20	T	26-03-2025	IPR000836	Phosphoribosyltransferase domain	-	-
+ERZ1049444_8_218	f98e47380bbcd9e94a315287aa6e75eb	183	NCBIfam	NF006605	hypoxanthine-guanine phosphoribosyltransferase	4	182	4.8E-68	T	26-03-2025	-	-	-	-
+ERZ1049444_8_218	f98e47380bbcd9e94a315287aa6e75eb	183	SUPERFAMILY	SSF53271	PRTase-like	13	181	5.51E-49	T	26-03-2025	IPR029057	Phosphoribosyltransferase-like	-	-
+ERZ1049444_8_218	f98e47380bbcd9e94a315287aa6e75eb	183	Gene3D	G3DSA:3.40.50.2020	-	1	182	1.0E-54	T	26-03-2025	IPR029057	Phosphoribosyltransferase-like	-	-
+ERZ1049444_8_218	f98e47380bbcd9e94a315287aa6e75eb	183	CDD	cd06223	PRTases_typeI	28	151	2.52125E-22	T	26-03-2025	IPR000836	Phosphoribosyltransferase domain	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	Gene3D	G3DSA:3.50.50.60	-	3	171	3.6E-22	T	26-03-2025	IPR036188	FAD/NAD(P)-binding domain superfamily	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	Gene3D	G3DSA:3.30.9.10	-	88	146	3.6E-22	T	26-03-2025	-	-	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	Gene3D	G3DSA:3.30.9.10	-	201	286	6.2E-25	T	26-03-2025	-	-	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	Gene3D	G3DSA:3.50.50.60	-	179	327	6.2E-25	T	26-03-2025	IPR036188	FAD/NAD(P)-binding domain superfamily	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	SUPERFAMILY	SSF51905	FAD/NAD(P)-binding domain	1	335	2.2E-19	T	26-03-2025	IPR036188	FAD/NAD(P)-binding domain superfamily	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	SUPERFAMILY	SSF54373	FAD-linked reductases, C-terminal domain	204	284	7.32E-13	T	26-03-2025	-	-	-	-
+ERZ1049444_133_21	02b18c2a43d03948a5e88fe7e86f5409	344	Pfam	PF01266	FAD dependent oxidoreductase	3	326	5.6E-33	T	26-03-2025	IPR006076	FAD dependent oxidoreductase	-	-
+ERZ1049444_24_33	72b430e95039d295fd860c25f4f8fcf9	104	Pfam	PF07746	Aromatic-ring-opening dioxygenase LigAB, LigA subunit	7	82	5.9E-11	T	26-03-2025	IPR011986	Extradiol ring-cleavage dioxygenase LigAB, LigA subunit	-	-
+ERZ1049444_24_33	72b430e95039d295fd860c25f4f8fcf9	104	SUPERFAMILY	SSF48076	LigA subunit of an aromatic-ring-opening dioxygenase LigAB	6	82	3.66E-11	T	26-03-2025	IPR036622	Dioxygenase LigAB, LigA subunit superfamily	-	-
+ERZ1049444_24_33	72b430e95039d295fd860c25f4f8fcf9	104	Gene3D	G3DSA:1.10.700.10	Dioxygenase LigAB, LigA subunit	1	99	1.3E-19	T	26-03-2025	IPR036622	Dioxygenase LigAB, LigA subunit superfamily	-	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	ProSitePatterns	PS00202	Rubredoxin signature.	38	48	-	T	26-03-2025	IPR018527	Rubredoxin, iron-binding site	GO:0046872(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	Pfam	PF00301	Rubredoxin	8	54	8.4E-20	T	26-03-2025	IPR024935	Rubredoxin domain	GO:0005506(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	PRINTS	PR00163	Rubredoxin signature	8	24	3.3E-10	T	26-03-2025	IPR024935	Rubredoxin domain	GO:0005506(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	PRINTS	PR00163	Rubredoxin signature	38	54	3.3E-10	T	26-03-2025	IPR024935	Rubredoxin domain	GO:0005506(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	CDD	cd00730	rubredoxin	8	54	3.84423E-20	T	26-03-2025	IPR024935	Rubredoxin domain	GO:0005506(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	PIRSF	PIRSF000071	Rubredoxin	5	59	5.0E-24	T	26-03-2025	IPR024922	Rubredoxin	GO:0005506(InterPro)|GO:0009055(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	SUPERFAMILY	SSF57802	Rubredoxin-like	6	58	2.52E-22	T	26-03-2025	-	-	-	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	ProSiteProfiles	PS50903	Rubredoxin-like domain profile.	6	57	13.179906	T	26-03-2025	IPR024934	Rubredoxin-like domain	GO:0005506(InterPro)	-
+ERZ1049444_97_61	dfa8ae037db4e128ab5dedfe13feea87	59	Gene3D	G3DSA:2.20.28.10	-	1	59	6.6E-25	T	26-03-2025	-	-	-	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PIRSF	PIRSF006615	Zn_crbxpep_Taq	1	498	1.5E-184	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	Gene3D	G3DSA:1.10.1370.30	-	1	498	4.1E-202	T	26-03-2025	-	-	-	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	330	349	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	444	462	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	289	305	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	242	261	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	144	164	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	399	420	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	225	241	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	262	281	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	PRINTS	PR00998	Carboxypeptidase Taq (M32) metallopeptidase signature	376	393	3.7E-64	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	Pfam	PF02074	Carboxypeptidase Taq (M32) metallopeptidase	7	492	3.1E-174	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	ProSiteProfiles	PS52034	Peptidase family M32 domain profile.	1	493	169.939682	T	26-03-2025	IPR001333	Peptidase M32, carboxypeptidase Taq	GO:0004181(InterPro)|GO:0006508(InterPro)	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	SUPERFAMILY	SSF55486	Metalloproteases ("zincins"), catalytic domain	1	490	1.47E-115	T	26-03-2025	-	-	-	-
+ERZ1049444_186_52	fde9997a1d33eab1200da8a873ae1d84	498	CDD	cd06460	M32_Taq	10	491	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Pfam	PF00378	Enoyl-CoA hydratase/isomerase	40	202	4.0E-15	T	26-03-2025	IPR001753	Enoyl-CoA hydratase/isomerase	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Pfam	PF02737	3-hydroxyacyl-CoA dehydrogenase, NAD binding domain	327	505	6.8E-57	T	26-03-2025	IPR006176	3-hydroxyacyl-CoA dehydrogenase, NAD binding	GO:0006631(InterPro)|GO:0070403(InterPro)	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	SUPERFAMILY	SSF52096	ClpP/crotonase	3	317	2.9E-51	T	26-03-2025	IPR029045	ClpP/crotonase-like domain superfamily	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	CDD	cd06558	crotonase-like	10	213	7.21095E-36	T	26-03-2025	-	-	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Gene3D	G3DSA:1.10.1040.50	-	511	725	5.1E-55	T	26-03-2025	-	-	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Gene3D	G3DSA:3.40.50.720	-	325	507	1.4E-64	T	26-03-2025	-	-	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	SUPERFAMILY	SSF48179	6-phosphogluconate dehydrogenase C-terminal domain-like	633	721	4.51E-21	T	26-03-2025	IPR008927	6-phosphogluconate dehydrogenase-like, C-terminal domain superfamily	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Gene3D	G3DSA:3.90.226.10	-	1	324	4.6E-75	T	26-03-2025	-	-	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	SUPERFAMILY	SSF51735	NAD(P)-binding Rossmann-fold domains	323	506	2.37E-55	T	26-03-2025	IPR036291	NAD(P)-binding domain superfamily	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	SUPERFAMILY	SSF48179	6-phosphogluconate dehydrogenase C-terminal domain-like	509	617	7.31E-21	T	26-03-2025	IPR008927	6-phosphogluconate dehydrogenase-like, C-terminal domain superfamily	-	-
+ERZ1049444_51_81	25856a7a56591fd1dcfdc565b3d93a6d	731	Pfam	PF00725	3-hydroxyacyl-CoA dehydrogenase, C-terminal domain	509	604	1.0E-14	T	26-03-2025	IPR006108	3-hydroxyacyl-CoA dehydrogenase, C-terminal	GO:0006631(InterPro)|GO:0016491(InterPro)|GO:0016616(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	MobiDBLite	mobidb-lite	consensus disorder prediction	1	22	-	T	26-03-2025	-	-	-	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Pfam	PF02770	Acyl-CoA dehydrogenase, middle domain	134	223	7.2E-8	T	26-03-2025	IPR006091	Acyl-CoA oxidase/dehydrogenase, middle domain	GO:0016627(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Gene3D	G3DSA:2.40.110.10	-	132	233	1.3E-16	T	26-03-2025	IPR046373	Acyl-CoA oxidase/dehydrogenase, middle domain superfamily	GO:0016627(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Gene3D	G3DSA:1.10.540.10	-	9	129	1.2E-20	T	26-03-2025	IPR037069	Acyl-CoA dehydrogenase/oxidase, N-terminal domain superfamily	GO:0016627(InterPro)|GO:0050660(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	SUPERFAMILY	SSF56645	Acyl-CoA dehydrogenase NM domain-like	10	233	1.24E-38	T	26-03-2025	IPR009100	Acyl-CoA dehydrogenase/oxidase, N-terminal and middle domain superfamily	GO:0016627(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Gene3D	G3DSA:1.20.140.10	-	238	371	1.6E-37	T	26-03-2025	-	-	-	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Pfam	PF02771	Acyl-CoA dehydrogenase, N-terminal domain	15	127	1.5E-16	T	26-03-2025	IPR013786	Acyl-CoA dehydrogenase/oxidase, N-terminal	GO:0016627(InterPro)|GO:0050660(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	Pfam	PF00441	Acyl-CoA dehydrogenase, C-terminal domain	240	367	4.0E-28	T	26-03-2025	IPR009075	Acyl-CoA dehydrogenase/oxidase, C-terminal	GO:0016627(InterPro)	-
+ERZ1049444_36_57	daf3a6e04a367395644fc33d4f54bb07	371	SUPERFAMILY	SSF47203	Acyl-CoA dehydrogenase C-terminal domain-like	239	368	8.22E-39	T	26-03-2025	IPR036250	Acyl-CoA dehydrogenase-like, C-terminal	GO:0016627(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	CDD	cd22231	RHH_NikR_HicB-like	10	52	1.89436E-4	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	NCBIfam	TIGR00979	class II fumarate hydratase	73	530	5.2E-231	T	26-03-2025	IPR005677	Fumarate hydratase, class II	GO:0004333(InterPro)|GO:0006106(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Pfam	PF10415	Fumarase C C-terminus	477	529	7.7E-22	T	26-03-2025	IPR018951	Fumarase C, C-terminal	GO:0006099(InterPro)|GO:0016829(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Hamap	MF_00743	Fumarate hydratase class II [fumC].	73	531	89.477592	T	26-03-2025	IPR005677	Fumarate hydratase, class II	GO:0004333(InterPro)|GO:0006106(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	NCBIfam	NF008909	aspartate ammonia-lyase	73	532	7.4E-163	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Gene3D	G3DSA:1.10.275.10	-	74	207	3.3E-62	T	26-03-2025	IPR024083	Fumarase/histidase, N-terminal	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	CDD	cd01362	Fumarase_classII	74	528	0.0	T	26-03-2025	IPR005677	Fumarate hydratase, class II	GO:0004333(InterPro)|GO:0006106(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	ProSitePatterns	PS00163	Fumarate lyases signature.	386	395	-	T	26-03-2025	IPR020557	Fumarate lyase, conserved site	GO:0003824(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00149	Fumarate lyase superfamily signature	249	267	2.9E-33	T	26-03-2025	IPR000362	Fumarate lyase family	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00149	Fumarate lyase superfamily signature	203	221	2.9E-33	T	26-03-2025	IPR000362	Fumarate lyase family	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00149	Fumarate lyase superfamily signature	386	402	2.9E-33	T	26-03-2025	IPR000362	Fumarate lyase family	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00149	Fumarate lyase superfamily signature	340	367	2.9E-33	T	26-03-2025	IPR000362	Fumarate lyase family	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	SUPERFAMILY	SSF48557	L-aspartase-like	73	528	3.3E-156	T	26-03-2025	IPR008948	L-Aspartase-like	GO:0003824(InterPro)	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Gene3D	G3DSA:1.10.40.30	-	475	534	9.9E-29	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	MobiDBLite	mobidb-lite	consensus disorder prediction	59	68	-	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	MobiDBLite	mobidb-lite	consensus disorder prediction	48	68	-	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00145	Argininosuccinate lyase family signature	202	224	2.4E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00145	Argininosuccinate lyase family signature	244	264	2.4E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	PRINTS	PR00145	Argininosuccinate lyase family signature	386	402	2.4E-5	T	26-03-2025	-	-	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Pfam	PF00206	Lyase	81	411	7.1E-110	T	26-03-2025	IPR022761	Fumarate lyase, N-terminal	-	-
+ERZ1049444_186_49	c353d3eda2ebcdfcd54bf8af73b8a460	534	Gene3D	G3DSA:1.20.200.10	Fumarase/aspartase (Central domain)	208	474	6.8E-101	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Pfam	PF00472	RF-1 domain	215	323	7.3E-40	T	26-03-2025	IPR000352	Peptide chain release factor class I	GO:0003747(InterPro)|GO:0006415(InterPro)	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Coils	Coil	Coil	77	97	-	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	NCBIfam	TIGR00019	peptide chain release factor 1	1	359	1.0E-162	T	26-03-2025	IPR004373	Peptide chain release factor 1	GO:0006415(InterPro)|GO:0016149(InterPro)	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Coils	Coil	Coil	2	29	-	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Hamap	MF_00093	Peptide chain release factor 1 [prfA].	5	359	40.577816	T	26-03-2025	IPR004373	Peptide chain release factor 1	GO:0006415(InterPro)|GO:0016149(InterPro)	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	SMART	SM00937	PCRF_a_2	66	180	5.5E-63	T	26-03-2025	IPR005139	Peptide chain release factor	GO:0006415(InterPro)	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	SUPERFAMILY	SSF75620	Release factor	12	355	3.01E-131	T	26-03-2025	IPR045853	Peptide chain release factor class I superfamily	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	NCBIfam	NF001859	peptide chain release factor 1	9	355	1.5E-157	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Gene3D	G3DSA:3.30.160.20	-	211	307	4.1E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Gene3D	G3DSA:3.30.70.1660	-	115	344	4.1E-89	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Gene3D	G3DSA:6.10.140.1950	-	1	108	7.2E-31	T	26-03-2025	-	-	-	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	ProSitePatterns	PS00745	Prokaryotic-type class I peptide chain release factors signature.	230	246	-	T	26-03-2025	IPR000352	Peptide chain release factor class I	GO:0003747(InterPro)|GO:0006415(InterPro)	-
+ERZ1049444_214_13	03a08c5af3151b2fee0db4bc1dc1ee8c	363	Pfam	PF03462	PCRF domain	12	205	4.2E-71	T	26-03-2025	IPR005139	Peptide chain release factor	GO:0006415(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	NCBIfam	TIGR00594	DNA polymerase III subunit alpha	256	1318	0.0	T	26-03-2025	IPR004805	Error-prone DNA polymerase/DNA polymerase III subunit alpha DnaE/PolC	GO:0006260(InterPro)|GO:0008408(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Gene3D	G3DSA:3.20.20.140	-	220	536	2.8E-80	T	26-03-2025	-	-	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	ProSiteProfiles	PS50935	Single-strand binding (SSB) domain profile.	1277	1365	9.193292	T	26-03-2025	IPR000424	Primosome PriB/single-strand DNA-binding	GO:0003697(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Gene3D	G3DSA:3.30.420.10	-	1	195	3.4E-35	T	26-03-2025	IPR036397	Ribonuclease H superfamily	GO:0003676(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	NCBIfam	NF004226	DNA polymerase III subunit alpha	254	1441	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF02811	PHP domain	258	435	5.1E-34	T	26-03-2025	IPR004013	PHP domain	GO:0003824(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	CDD	cd04485	DnaE_OBF	1282	1371	1.82237E-17	T	26-03-2025	-	-	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	CDD	cd06127	DEDDh	3	181	5.6227E-30	T	26-03-2025	-	-	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Gene3D	G3DSA:1.10.10.1600	Bacterial DNA polymerase III alpha subunit, thumb domain	704	794	2.9E-18	T	26-03-2025	IPR041931	Bacterial DNA polymerase III alpha subunit, thumb domain	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Gene3D	G3DSA:1.10.150.870	-	971	1159	3.0E-16	T	26-03-2025	-	-	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	SUPERFAMILY	SSF53098	Ribonuclease H-like	2	608	5.14E-52	T	26-03-2025	IPR012337	Ribonuclease H-like superfamily	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF14579	Helix-hairpin-helix motif	1083	1170	1.1E-18	T	26-03-2025	IPR029460	DNA polymerase, helix-hairpin-helix motif	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF07733	Bacterial DNA polymerase III alpha NTPase domain	572	843	1.3E-87	T	26-03-2025	IPR011708	Bacterial DNA polymerase III, alpha subunit, NTPase domain	GO:0006260(InterPro)|GO:0008408(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF00929	Exonuclease	4	182	4.8E-8	T	26-03-2025	IPR013520	Exonuclease, RNase T/DNA polymerase III	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF01336	OB-fold nucleic acid binding domain	1282	1348	0.0037	T	26-03-2025	IPR004365	OB-fold nucleic acid binding domain, AA-tRNA synthetase-type	GO:0003676(InterPro)	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	Pfam	PF17657	Bacterial DNA polymerase III alpha subunit finger domain	846	1009	8.2E-54	T	26-03-2025	IPR040982	DNA polymerase III alpha subunit finger domain	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	SMART	SM00481	npolultra	257	333	9.6E-10	T	26-03-2025	IPR003141	Polymerase/histidinol phosphatase, N-terminal	-	-
+ERZ1049444_126_25	881038a904cdf837a0c2b89aae4ecf82	1450	SMART	SM00479	exoiiiendus	1	192	3.0E-11	T	26-03-2025	IPR013520	Exonuclease, RNase T/DNA polymerase III	-	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	Gene3D	G3DSA:3.10.20.70	-	10	118	2.0E-10	T	26-03-2025	IPR036651	Glutamine synthetase, N-terminal domain superfamily	GO:0004356(InterPro)|GO:0006542(InterPro)	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	Gene3D	G3DSA:3.30.590.10	Glutamine synthetase/guanido kinase, catalytic domain	121	453	1.4E-92	T	26-03-2025	-	-	-	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	SUPERFAMILY	SSF55931	Glutamine synthetase/guanido kinase	120	452	5.59E-106	T	26-03-2025	IPR014746	Glutamine synthetase/guanido kinase, catalytic domain	GO:0003824(InterPro)	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	SUPERFAMILY	SSF54368	Glutamine synthetase, N-terminal domain	12	116	3.4E-19	T	26-03-2025	IPR036651	Glutamine synthetase, N-terminal domain superfamily	GO:0004356(InterPro)|GO:0006542(InterPro)	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	ProSiteProfiles	PS51987	Glutamine synthetase (GS) catalytic domain profile.	121	455	65.979156	T	26-03-2025	IPR008146	Glutamine synthetase, catalytic domain	GO:0004356(InterPro)	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	SMART	SM01230	Gln_synt_C_2	118	374	2.6E-106	T	26-03-2025	IPR008146	Glutamine synthetase, catalytic domain	GO:0004356(InterPro)	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	ProSitePatterns	PS00181	Glutamine synthetase putative ATP-binding region signature.	254	269	-	T	26-03-2025	IPR027303	Glutamine synthetase, glycine-rich site	-	-
+ERZ1049444_265_34	b3b9af7b8a0f63d712fce5ec0bf400f1	455	Pfam	PF00120	Glutamine synthetase, catalytic domain	120	449	5.3E-97	T	26-03-2025	IPR008146	Glutamine synthetase, catalytic domain	GO:0004356(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Coils	Coil	Coil	866	886	-	T	26-03-2025	-	-	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	SUPERFAMILY	SSF47323	Anticodon-binding domain of a subclass of class I aminoacyl-tRNA synthetases	611	777	2.24E-29	T	26-03-2025	IPR009080	Aminoacyl-tRNA synthetase, class Ia, anticodon-binding	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Gene3D	G3DSA:1.10.730.10	-	600	772	7.4E-32	T	26-03-2025	-	-	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	PRINTS	PR00986	Valyl-tRNA synthetase signature	478	499	3.2E-27	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	PRINTS	PR00986	Valyl-tRNA synthetase signature	370	383	3.2E-27	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	PRINTS	PR00986	Valyl-tRNA synthetase signature	511	529	3.2E-27	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	PRINTS	PR00986	Valyl-tRNA synthetase signature	255	272	3.2E-27	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	PRINTS	PR00986	Valyl-tRNA synthetase signature	60	71	3.2E-27	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Pfam	PF08264	Anticodon-binding domain of tRNA ligase	640	775	4.3E-22	T	26-03-2025	IPR013155	Methionyl/Valyl/Leucyl/Isoleucyl-tRNA synthetase, anticodon-binding	GO:0004812(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	CDD	cd07962	Anticodon_Ia_Val	598	726	1.08749E-37	T	26-03-2025	IPR033705	Valyl tRNA synthetase, anticodon-binding domain	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	SUPERFAMILY	SSF52374	Nucleotidylyl transferase	26	609	1.95E-124	T	26-03-2025	-	-	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Gene3D	G3DSA:1.10.287.380	-	821	890	6.6E-15	T	26-03-2025	IPR037118	Valyl-tRNA synthetase, tRNA-binding arm superfamily	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	CDD	cd00817	ValRS_core	58	598	4.09807E-172	T	26-03-2025	-	-	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Pfam	PF00133	tRNA synthetases class I (I, L, M and V)	39	597	7.4E-121	T	26-03-2025	IPR002300	Aminoacyl-tRNA synthetase, class Ia	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Gene3D	G3DSA:3.40.50.620	HUPs	29	234	5.1E-57	T	26-03-2025	IPR014729	Rossmann-like alpha/beta/alpha sandwich fold	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	SUPERFAMILY	SSF50677	ValRS/IleRS/LeuRS editing domain	215	365	1.31E-52	T	26-03-2025	IPR009008	Valyl/Leucyl/Isoleucyl-tRNA synthetase, editing domain	GO:0002161(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Hamap	MF_02004	Valine--tRNA ligase [valS].	27	891	13.944016	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	NCBIfam	TIGR00422	valine--tRNA ligase	28	873	1.8E-258	T	26-03-2025	IPR002303	Valine-tRNA ligase	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Pfam	PF10458	Valyl tRNA synthetase tRNA binding arm	826	889	5.5E-9	T	26-03-2025	IPR019499	Valyl-tRNA synthetase, tRNA-binding arm	GO:0000166(InterPro)|GO:0004832(InterPro)|GO:0005524(InterPro)|GO:0005737(InterPro)|GO:0006438(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	ProSitePatterns	PS00178	Aminoacyl-transfer RNA synthetases class-I signature.	67	78	-	T	26-03-2025	IPR001412	Aminoacyl-tRNA synthetase, class I, conserved site	GO:0000166(InterPro)|GO:0004812(InterPro)|GO:0005524(InterPro)|GO:0006418(InterPro)	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	Gene3D	G3DSA:3.40.50.620	HUPs	333	560	9.2E-65	T	26-03-2025	IPR014729	Rossmann-like alpha/beta/alpha sandwich fold	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	NCBIfam	NF004349	valine--tRNA ligase	29	882	0.0	T	26-03-2025	-	-	-	-
+ERZ1049444_6_96	a9b5a34067832f7b7d53169ebedb8fe8	891	SUPERFAMILY	SSF46589	tRNA-binding arm	826	890	5.75E-12	T	26-03-2025	IPR010978	Class I and II aminoacyl-tRNA synthetase, tRNA-binding arm	GO:0000166(InterPro)	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	Hamap	MF_01454	GTPase Obg [obg].	11	335	44.214333	T	26-03-2025	IPR014100	GTP-binding protein Obg/CgtA	GO:0000287(InterPro)|GO:0003924(InterPro)|GO:0005525(InterPro)	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	ProSiteProfiles	PS51710	OBG-type guanine nucleotide-binding (G) domain profile.	169	335	65.108086	T	26-03-2025	IPR031167	OBG-type guanine nucleotide-binding (G) domain	GO:0005525(InterPro)	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	MobiDBLite	mobidb-lite	consensus disorder prediction	42	52	-	T	26-03-2025	-	-	-	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	MobiDBLite	mobidb-lite	consensus disorder prediction	24	53	-	T	26-03-2025	-	-	-	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	MobiDBLite	mobidb-lite	consensus disorder prediction	75	97	-	T	26-03-2025	-	-	-	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	CDD	cd01898	Obg	169	334	3.18553E-83	T	26-03-2025	IPR031167	OBG-type guanine nucleotide-binding (G) domain	GO:0005525(InterPro)	-
+ERZ1049444_32_113	5a0c380ec4c4b9b29cec214bbb2fc9fa	339	ProSiteProfiles	PS51883	Obg domain profile.	10	168	75.667015	T	26-03-2025	IPR006169	GTP1/OBG domain	-	-

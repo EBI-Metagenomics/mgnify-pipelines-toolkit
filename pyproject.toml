@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.0.4"
+version = "1.0.5"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -73,6 +73,11 @@ combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combine
 generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
 summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
 antismash_gff_builder = "mgnify_pipelines_toolkit.analysis.assembly.antismash_gff_builder:main"
+summarise_sanntis_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_sanntis_bgcs:main"
+summarise_antismash_bgcs = "mgnify_pipelines_toolkit.analysis.assembly.summarise_antismash_bgcs:main"
+gff_toolkit = "mgnify_pipelines_toolkit.analysis.assembly.gff_toolkit:main"
+process_dbcan_clusters = "mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_clusters:main"
+process_dbcan_cazys = "mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_cazys:main"
 # genomes #
 genomes_extract_bacterial_rrnas_as_tsv = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_bacterial_rrnas_as_tsv:main"
 genomes_extract_rrnas_as_fasta = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_rrnas_as_fasta:main"

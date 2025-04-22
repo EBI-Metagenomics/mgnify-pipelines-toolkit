@@ -29,24 +29,27 @@ from mgnify_pipelines_toolkit.analysis.assembly.gff_file_utils import (
 )
 
 
-def main(
-    gff,
-    ipr_file,
-    eggnog_file,
-    sanntis_file,
-    crispr_file,
-    amr_file,
-    antismash_file,
-    gecco_file,
-    dbcan_file,
-    dbcan_cazys_file,
-    defense_finder_file,
-    pseudofinder_file,
-    rfam_file,
-    trnascan_file,
-    outfile,
-    pseudogene_report_file,
-):
+def main():
+
+    (
+        gff,
+        ipr_file,
+        eggnog_file,
+        sanntis_file,
+        crispr_file,
+        amr_file,
+        antismash_file,
+        gecco_file,
+        dbcan_file,
+        dbcan_cazys_file,
+        defense_finder_file,
+        pseudofinder_file,
+        rfam_file,
+        trnascan_file,
+        outfile,
+        pseudogene_report_file,
+    ) = parse_args()
+
     # load annotations and add them to existing CDS
     # here header contains leading GFF lines starting with "#",
     # main_gff_extended is a dictionary that contains GFF lines with added in additional annotations
@@ -163,12 +166,8 @@ def parse_args():
         "--pseudogene-report", help="Pseudogene report filename", required=False
     )
 
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    args = parse_args()
-    main(
+    args = parser.parse_args()
+    return (
         args.gff_input,
         args.ips,
         args.eggnog,
@@ -186,3 +185,7 @@ if __name__ == "__main__":
         args.outfile,
         args.pseudogene_report,
     )
+
+
+if __name__ == "__main__":
+    main()

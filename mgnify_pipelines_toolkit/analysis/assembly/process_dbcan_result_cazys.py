@@ -24,7 +24,16 @@ import re
 logging.basicConfig(level=logging.INFO)
 
 
-def main(hmm_file, overview_file, genome_gff, outfile, dbcan_version):
+def main():
+
+    args = parse_args()
+    hmm_file, overview_file, genome_gff, outfile, dbcan_ver = (
+        args.hmm_file,
+        args.overview_file,
+        args.genome_gff,
+        args.outfile,
+        args.dbcan_ver,
+    )
 
     hmm_path = Path(hmm_file)
     overview_path = Path(overview_file)
@@ -38,7 +47,7 @@ def main(hmm_file, overview_file, genome_gff, outfile, dbcan_version):
     substrates = load_substrates(hmm_path)
     genome_gff_lines = load_gff(genome_gff)
 
-    print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_lines)
+    print_gff(overview_file, outfile, dbcan_ver, substrates, genome_gff_lines)
 
 
 def load_gff(gff):
@@ -205,7 +214,4 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(
-        args.hmm_file, args.overview_file, args.genome_gff, args.outfile, args.dbcan_ver
-    )
+    main()

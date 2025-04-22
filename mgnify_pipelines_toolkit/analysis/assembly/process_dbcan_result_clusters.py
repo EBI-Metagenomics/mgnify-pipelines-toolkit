@@ -22,7 +22,15 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 
 
-def main(standard_file, substrate_file, outfile, dbcan_version):
+def main():
+
+    args = parse_args()
+    standard_file, substrate_file, outfile, dbcan_ver = (
+        args.standard_file,
+        args.substrate_file,
+        args.outfile,
+        args.dbcan_ver,
+    )
     standard_path = Path(standard_file)
     substrate_path = Path(substrate_file)
 
@@ -36,7 +44,7 @@ def main(standard_file, substrate_file, outfile, dbcan_version):
 
     substrates = load_substrates(substrate_path)
     cgc_locations = load_cgcs(standard_path)
-    print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations)
+    print_gff(standard_path, outfile, dbcan_ver, substrates, cgc_locations)
 
 
 def load_cgcs(standard_path):
@@ -158,5 +166,4 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args.standard_file, args.substrate_file, args.outfile, args.dbcan_ver)
+    main()

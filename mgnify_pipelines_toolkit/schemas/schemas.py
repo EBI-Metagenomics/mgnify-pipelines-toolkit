@@ -213,17 +213,21 @@ class GOSummarySchema(BaseSummarySchema):
         coerce = True
 
 
-class SanntisSummaryRecord(BaseModel):
-    """Model of a row in the Sanntis summary file."""
+class SanntisBaseRecord(BaseModel):
+    """Model describing common columns in the Sanntis summary files."""
 
-    nearest_MIBiG: str = Field(
+    nearest_mibig: str = Field(
         ...,
+        # use alias because the column name triggers linter
+        alias="nearest_MIBiG",
         description="The accession ID of the closest matching biosynthetic gene cluster (BGC) in the MIBiG database",
         examples=["BGC0000073"],
         pattern=r"BGC\d{7}",
     )
-    nearest_MIBiG_class: str = Field(
+    nearest_mibig_class: str = Field(
         ...,
+        # use alias because the column name triggers linter
+        alias="nearest_MIBiG_class",
         description="The biosynthetic class of the nearest MIBiG BGC",
         examples=["Polyketide"],
     )
@@ -231,6 +235,11 @@ class SanntisSummaryRecord(BaseModel):
         ...,
         description="A brief summary of the biosynthetic process or type of metabolite associated with the nearest MIBiG cluster",
     )
+
+
+class SanntisSummaryRecord(SanntisBaseRecord):
+    """Model of a row in the Sanntis assembly-level summary file."""
+
     count: int = Field(
         ..., ge=0, description="Number of times the MIBiG entry is observed"
     )
@@ -325,9 +334,9 @@ class KEGGModulesSummaryRecord(BaseModel):
 
 
 class SanntisSummarySchema(BaseSummarySchema):
-    nearest_MIBiG: Series[str]
+    nearest_mibig: Series[str]
 
-    @pa.check("nearest_MIBiG")
+    @pa.check("nearest_mibig")
     def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
         return self.is_unique(series)
 
@@ -423,11 +432,15 @@ class SourmashStudySummarySchema(BaseStudySummarySchema):
 
 
 class SanntisStudySummarySchema(BaseStudySummarySchema):
-    nearest_MIBiG: Series[str]
+    nearest_mibig: Series[str]
 
-    @pa.check("nearest_MIBiG")
+    @pa.check("nearest_mibig")
     def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
         return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(SanntisBaseRecord)
+        coerce = True
 
 
 class KOStudySummarySchema(BaseStudySummarySchema):

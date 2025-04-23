@@ -1,9 +1,0 @@
-count	label	description
-160	resorcinol	Resorcinol
-383	arylpolyene,resorcinol	Aryl polyene,Resorcinol
-40	terpene	Terpene
-92	arylpolyene	Aryl polyene
-295	NRPS-like	NRPS-like fragment
-388	T1PKS	Type I PKS (Polyketide synthase)
-298	NRPS	Non-ribosomal peptide synthetase
-247	redox-cofactor	Redox-cofactors such as PQQ (NC_021985:1458906-1494876)

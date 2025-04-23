@@ -1,0 +1,9 @@
+completeness	module_accession	pathway_name	pathway_class	matching_ko	missing_ko
+52.1	M00539	Cumate degradation, p-cumate => 2-oxopent-4-enoate + 2-methylpropanoate	Pathway modules; Xenobiotics biodegradation; Aromatics degradation	K10619,K10620,K10621,K10622,K10623,K16303,K16304,K18227
+51.5	M00851	Carbapenem resistance	Signature modules; Gene set; Drug resistance	K18768
+36.5	M00370	Glucosinolate biosynthesis, tryptophan => glucobrassicin	Pathway modules; Biosynthesis of other secondary metabolites; Biosynthesis of phytochemical compounds	K11812,K11818,K11819,K11820,K11821
+37.7	M00137	Flavanone biosynthesis, phenylalanine => naringenin	Pathway modules; Biosynthesis of other secondary metabolites; Biosynthesis of phytochemical compounds	K00487,K00660,K01904,K10775	K01859
+98.0	M00881	Lipoic acid biosynthesis, plants and bacteria, octanoyl-ACP => dihydrolipoyl-E2/H	Pathway modules; Metabolism of cofactors and vitamins; Cofactor and vitamin metabolism	K03644,K03801
+39.2	M00057	Glycosaminoglycan biosynthesis, linkage tetrasaccharide	Pathway modules; Glycan metabolism; Glycosaminoglycan metabolism	K00733,K00734,K10158	K00771
+82.1	M00543	Biphenyl degradation, biphenyl => 2-oxopent-4-enoate + benzoate	Pathway modules; Xenobiotics biodegradation; Aromatics degradation	K00462,K08689,K08690,K10222,K15750,K18087,K18088
+39.5	M00045	Histidine degradation, histidine => N-formiminoglutamate => glutamate	Pathway modules; Amino acid metabolism; Histidine metabolism	K01468,K01479,K01712,K01745

@@ -1,0 +1,11 @@
+module_accession	pathway_name	pathway_class	ERZ1049444	ERZ1049445
+M00109	C21-Steroid hormone biosynthesis, progesterone => cortisol/cortisone	Pathway modules; Lipid metabolism; Sterol biosynthesis	50.3	55.7
+M00114	Ascorbate biosynthesis, plants, fructose-6P => ascorbate	Pathway modules; Carbohydrate metabolism; Other carbohydrate metabolism	90.0	83.3
+M00153	Cytochrome bd ubiquinol oxidase	Pathway modules; Energy metabolism; ATP synthesis	19.0	72.7
+M00564	Helicobacter pylori pathogenicity signature, cagA pathogenicity island	Signature modules; Gene set; Pathogenicity	70.3	0.0
+M00796	dTDP-D-mycaminose biosynthesis	Pathway modules; Biosynthesis of terpenoids and polyketides; Polyketide sugar unit biosynthesis	21.2	74.9
+M00800	dTDP-L-megosamine biosynthesis	Pathway modules; Biosynthesis of terpenoids and polyketides; Polyketide sugar unit biosynthesis	0.0	96.5
+M00836	Coenzyme F430 biosynthesis, sirohydrochlorin => coenzyme F430	Pathway modules; Metabolism of cofactors and vitamins; Cofactor and vitamin metabolism	3.8	11.6
+M00844	Arginine biosynthesis, ornithine => arginine	Pathway modules; Amino acid metabolism; Arginine and proline metabolism	0.0	93.9
+M00846	Siroheme biosynthesis, glutamyl-tRNA => siroheme	Pathway modules; Metabolism of cofactors and vitamins; Cofactor and vitamin metabolism	6.5	34.4
+M00987	Assimilatory sulfate reduction, plants, sulfate => H2S	Pathway modules; Energy metabolism; Sulfur metabolism	2.1	0.0

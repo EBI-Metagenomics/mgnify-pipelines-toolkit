@@ -31,6 +31,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     SanntisSummarySchema,
     SourmashSummarySchema,
     PFAMSummarySchema,
+    KEGGModulesSummarySchema,
     GOStudySummarySchema,
     InterProStudySummarySchema,
     TaxonomyStudySummarySchema,
@@ -38,6 +39,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     SanntisStudySummarySchema,
     SourmashStudySummarySchema,
     PFAMStudySummarySchema,
+    KEGGModulesStudySummarySchema,
     validate_dataframe,
 )
 
@@ -80,7 +82,13 @@ PFAM_COLUMN_NAMES = {
     "description": "description",
 }
 
-# this mapping allows using for cycle later to process all summary types in one way
+KEGG_MODULES_COLUMN_NAMES = {
+    "module_accession": "module_accession",
+    "pathway_name": "pathway_name",
+    "pathway_class": "pathway_class",
+}
+
+# this mapping allows using 'for' cycle later to process all summary types in one way
 SUMMARY_TYPES_MAP = {
     "go": {
         "folder": "functional-annotation/go",
@@ -123,6 +131,12 @@ SUMMARY_TYPES_MAP = {
         "column_names": PFAM_COLUMN_NAMES,
         "schema": PFAMSummarySchema,
         "study_schema": PFAMStudySummarySchema,
+    },
+    "kegg_modules": {
+        "folder": "pathways-and-systems/kegg",
+        "column_names": KEGG_MODULES_COLUMN_NAMES,
+        "schema": KEGGModulesSummarySchema,
+        "study_schema": KEGGModulesStudySummarySchema,
     },
 }
 
@@ -204,7 +218,9 @@ def generate_functional_summary(
     file_dict: dict[str, Path],
     column_names: dict[str, str],
     output_prefix: str,
-    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"],
+    label: Literal[
+        "go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"
+    ],
 ) -> None:
     """
     Generate a combined study-level functional annotation summary from multiple input
@@ -213,7 +229,8 @@ def generate_functional_summary(
     :param file_dict: Dictionary mapping assembly accession to its summary file path.
     :param column_names: Dictionary mapping original column names to standard column names.
     :param output_prefix: Prefix for the output summary file.
-    :param label: Label for the functional annotation type (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"]).
+    :param label: Label for the functional annotation type
+    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"]).
 
     Example of GO summary input file:
     go	term	category	count
@@ -248,10 +265,19 @@ def generate_functional_summary(
     457	PF00265	Thymidine kinase
     368	PF01852	START domain
     397	PF13756	Stimulus-sensing domain
+
+    Example of KEGG modules summary input file:
+    module_accession	completeness	pathway_name	pathway_class	matching_ko	missing_ko
+    M00986	100.0	Sulfur reduction, sulfur => sulfide	Pathway modules; Energy metabolism; Sulfur metabolism	K18367
+    M00163	83.33	Photosystem I	Pathway modules; Energy metabolism; Photosynthesis	K02689,K02690,K02691,K02692,K02694	K02693
+    M00615	50.0	Nitrate assimilation	Signature modules; Module set; Metabolic capacity	K02575	M00531
     """
     check_files_exist(list(file_dict.values()))
 
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
+
+    original_col_names = list(column_names.keys())
+    renamed_col_names = list(column_names.values())
 
     merged_df = None
     for assembly_acc, filepath in file_dict.items():
@@ -264,14 +290,18 @@ def generate_functional_summary(
         schema = SUMMARY_TYPES_MAP[label]["schema"]
         validate_dataframe(df, schema, str(filepath))
 
-        df = df.rename(columns={**column_names, "count": assembly_acc})
+        # Only keep required columns describing entries + "count" or "completeness"
+        value_column = "completeness" if label == "kegg_modules" else "count"
+        keep_columns = original_col_names + [value_column]
+        df = df[keep_columns].copy()
+
+        # Rename columns: merge columns are renamed according to column_names dict, "count"/"completeness" -> assembly acc
+        df.rename(columns={**column_names, value_column: assembly_acc}, inplace=True)
 
         if merged_df is None:
             merged_df = df
         else:
-            merged_df = pd.merge(
-                merged_df, df, on=list(column_names.values()), how="outer"
-            )
+            merged_df = pd.merge(merged_df, df, on=renamed_col_names, how="outer")
 
     if merged_df is None:
         logging.warning(
@@ -279,16 +309,15 @@ def generate_functional_summary(
         )
         return
 
-    # Fill NaNs with 0 and make sure counts are integers
-    count_columns = [
-        col for col in merged_df.columns if col not in column_names.values()
-    ]
-    merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
+    # Fill NaNs with 0, convert completeness percentages to float, and counts to integers
+    value_columns = [col for col in merged_df.columns if col not in renamed_col_names]
+    if label == "kegg_modules":
+        merged_df[value_columns] = merged_df[value_columns].fillna(0.0).astype(float)
+    else:
+        merged_df[value_columns] = merged_df[value_columns].fillna(0).astype(int)
 
-    # Reorder columns: merge_keys first, then sorted assembly accessions
-    cols = list(column_names.values()) + [
-        col for col in merged_df.columns if col not in column_names.values()
-    ]
+    # Reorder columns: merge keys first, then sorted assembly accessions
+    cols = renamed_col_names + sorted(value_columns)
     merged_df = merged_df[cols]
 
     merged_df.to_csv(output_file_name, sep="\t", index=False)
@@ -296,18 +325,18 @@ def generate_functional_summary(
 
 @cli.command(
     "summarise",
-    options_metavar="-r <assemblies> -a <study_dir> -p <output_prefix>",
+    options_metavar="-a <assemblies> -s <study_dir> -p <output_prefix>",
     short_help="Generate study-level analysis summaries.",
 )
 @click.option(
-    "-r",
+    "-a",
     "--assemblies",
     required=True,
     help="CSV file containing successful analyses generated by the pipeline",
     type=click.Path(exists=True, path_type=Path, dir_okay=False),
 )
 @click.option(
-    "-a",
+    "-s",
     "--study_dir",
     required=True,
     help="Input directory to where all the individual analyses subdirectories for summarising",
@@ -357,9 +386,6 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
         folder = SUMMARY_TYPES_MAP[summary_type]["folder"]
         column_names = SUMMARY_TYPES_MAP[summary_type]["column_names"]
         summary_file_name = "{{acc}}_{}_summary.tsv.gz".format(summary_type)
-        # TODO remove this once the script is tested
-        if summary_type in ["sanntis", "sourmash", "ko", "pfam"]:
-            summary_file_name = "{{acc}}_{}_summary.tsv".format(summary_type)
         generate_functional_summary(
             get_file_paths(folder, summary_file_name),
             column_names,
@@ -376,7 +402,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     short_help="Merge multiple study-level analysis summaries.",
 )
 @click.option(
-    "-a",
+    "-s",
     "--study_dir",
     required=True,
     help="Input directory to where all the individual analyses subdirectories for merging",
@@ -459,7 +485,9 @@ def merge_functional_summaries(
     summary_files: list[str],
     merge_keys: list[str],
     output_prefix: str,
-    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"],
+    label: Literal[
+        "go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"
+    ],
 ) -> None:
     """
     Merge multiple functional study-level summary files into a single study-level summary.
@@ -468,7 +496,8 @@ def merge_functional_summaries(
                         annotation terms and counts for an individual analysis.
     :param merge_keys: List of column names to merge on (e.g. term ID, description).
     :param output_prefix: Prefix for the generated output file.
-    :param label: Label describing the functional annotation type (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam"]).
+    :param label: Label describing the functional annotation type
+    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"]).
 
     Example of GO summary input:
     GO	description	category	ERZ1049444	ERZ1049446
@@ -499,6 +528,11 @@ def merge_functional_summaries(
     description	PFAM	ERZ1049440	ERZ1049443
     HTH-like domain	PF24718	468	1
     Malate:quinone oxidoreductase (Mqo)	PF06039	490	21
+
+    Example of KEGG modules summary input:
+    module_accession	pathway_name	pathway_class	ERZ1049440	ERZ1049443
+    M00109	C21-Steroid hormone biosynthesis, progesterone => cortisol/cortisone	Pathway modules; Lipid metabolism; Sterol biosynthesis	38.9	0.0
+    M00153	Cytochrome bd ubiquinol oxidase	Pathway modules; Energy metabolism; ATP synthesis	44.7	84.4
     """
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
@@ -518,13 +552,20 @@ def merge_functional_summaries(
             validate_dataframe(df, validation_schema, filepath)
             merged_df = pd.merge(merged_df, df, on=merge_keys, how="outer")
 
-        # Fill NaNs with 0 and make sure count columns are integers
-        count_columns = [col for col in merged_df.columns if col not in merge_keys]
+        # Identify non-key columns (i.e. values)
+        value_columns = [col for col in merged_df.columns if col not in merge_keys]
 
-        # Reorder columns: merge_keys first, then sorted count columns
-        sorted_columns = merge_keys + sorted(count_columns)
+        # Fill NaNs and set dtype accordingly
+        if label == "kegg_modules":
+            merged_df[value_columns] = (
+                merged_df[value_columns].fillna(0.0).astype(float)
+            )
+        else:
+            merged_df[value_columns] = merged_df[value_columns].fillna(0).astype(int)
+
+        # Reorder columns
+        sorted_columns = merge_keys + sorted(value_columns)
         merged_df = merged_df[sorted_columns]
-        merged_df[count_columns] = merged_df[count_columns].fillna(0).astype(int)
 
     merged_df.to_csv(output_file_name, sep="\t", index=False)
 

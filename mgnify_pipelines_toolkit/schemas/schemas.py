@@ -298,6 +298,32 @@ class PFAMSummaryRecord(BaseModel):
     )
 
 
+class KEGGModulesSummaryRecord(BaseModel):
+    """Model of a row in the KEGG Modules summary file."""
+
+    module_accession: str = Field(
+        ...,
+        description="KEGG Module identifier representing a specific metabolic pathway or module.",
+        examples=["M00123", "M00234"],
+        pattern=r"M\d{5}",
+    )
+    completeness: float = Field(
+        ...,
+        ge=0,
+        description="Completeness score of the KEGG Module, indicating the extent to which the module is present in the metagenome.",
+    )
+    pathway_name: str = Field(
+        ...,
+        description="Name of the metabolic pathway associated with the KEGG Module.",
+        examples=["Sulfur reduction, sulfur => sulfide"],
+    )
+    pathway_class: str = Field(
+        ...,
+        description="Biosynthetic class or category associated with the KEGG Module, semi colon separated.",
+        examples=["Pathway modules; Energy metabolism; Photosynthesis"],
+    )
+
+
 class SanntisSummarySchema(BaseSummarySchema):
     nearest_MIBiG: Series[str]
 
@@ -343,6 +369,18 @@ class PFAMSummarySchema(BaseSummarySchema):
 
     class Config:
         dtype = PydanticModel(PFAMSummaryRecord)
+        coerce = True
+
+
+class KEGGModulesSummarySchema(BaseSummarySchema):
+    module_accession: Series[str]
+
+    @pa.check("module_accession")
+    def module_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(KEGGModulesSummaryRecord)
         coerce = True
 
 
@@ -405,6 +443,14 @@ class PFAMStudySummarySchema(BaseStudySummarySchema):
 
     @pa.check("PFAM")
     def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class KEGGModulesStudySummarySchema(BaseStudySummarySchema):
+    module_accession: Series[str]
+
+    @pa.check("module_accession")
+    def module_ids_unique(self, series: Series[str]) -> Series[bool]:
         return self.is_unique(series)
 
 

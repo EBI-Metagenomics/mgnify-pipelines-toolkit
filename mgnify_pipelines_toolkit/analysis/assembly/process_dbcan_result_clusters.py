@@ -49,7 +49,7 @@ def main():
 
 def load_cgcs(standard_path):
     cgc_locations = dict()
-    with fileinput.hook_compressed(standard_path, "rt") as file_in:
+    with fileinput.hook_compressed(standard_path, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if not line.startswith("CGC#"):
                 cgc, _, contig, _, start, end, _, _ = line.strip().split("\t")
@@ -72,7 +72,7 @@ def print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations):
     with open(outfile, "w") as file_out:
         file_out.write("##gff-version 3\n")
         cgcs_printed = list()
-        with fileinput.hook_compressed(standard_path, "rt") as file_in:
+        with fileinput.hook_compressed(standard_path, "r", encoding="utf-8") as file_in:
             for line in file_in:
                 if not line.startswith("CGC#"):
                     cgc, gene_type, contig, prot_id, start, end, strand, protein_fam = (
@@ -107,7 +107,7 @@ def print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations):
 
 def load_substrates(substrate_path):
     substrates = dict()
-    with fileinput.hook_compressed(substrate_path, "rt") as file_in:
+    with fileinput.hook_compressed(substrate_path, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if not line.startswith("#"):
                 parts = line.strip().split("\t")

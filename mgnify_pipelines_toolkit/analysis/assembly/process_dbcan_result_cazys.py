@@ -52,7 +52,7 @@ def main():
 
 def load_gff(gff):
     genome_gff_lines = dict()
-    with fileinput.hook_compressed(gff, "rt") as gff:
+    with fileinput.hook_compressed(gff, "r", encoding="utf-8") as gff:
         for line in gff:
             if line.startswith("##FASTA"):
                 return genome_gff_lines
@@ -81,7 +81,7 @@ def load_gff(gff):
 def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_lines):
     with open(outfile, "w") as file_out:
         file_out.write("##gff-version 3\n")
-        with fileinput.hook_compressed(overview_file, "rt") as file_in:
+        with fileinput.hook_compressed(overview_file, "r", encoding="utf-8") as file_in:
             for line in file_in:
                 if line.startswith("MGYG") or line.startswith("ERZ"):
                     (
@@ -151,7 +151,7 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
 
 def load_substrates(hmm_path):
     substrates = dict()
-    with fileinput.hook_compressed(hmm_path, "rt") as file_in:
+    with fileinput.hook_compressed(hmm_path, "r", encoding="utf-8") as file_in:
         header = next(file_in)
         header_fields = header.strip().split("\t")
         substrate_idx = header_fields.index("Substrate")

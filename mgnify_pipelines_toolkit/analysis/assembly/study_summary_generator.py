@@ -30,7 +30,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     InterProSummarySchema,
     KOSummarySchema,
     SanntisSummarySchema,
-    SourmashSummarySchema,
+    AntismashSummarySchema,
     PFAMSummarySchema,
     KEGGModulesSummarySchema,
     GOStudySummarySchema,
@@ -38,7 +38,7 @@ from mgnify_pipelines_toolkit.schemas.schemas import (
     TaxonomyStudySummarySchema,
     KOStudySummarySchema,
     SanntisStudySummarySchema,
-    SourmashStudySummarySchema,
+    AntismashStudySummarySchema,
     PFAMStudySummarySchema,
     KEGGModulesStudySummarySchema,
     validate_dataframe,
@@ -68,7 +68,7 @@ SANNTIS_COLUMN_NAMES = {
     "description": "description",
 }
 
-SOURMASH_COLUMN_NAMES = {
+ANTISMASH_COLUMN_NAMES = {
     "label": "label",
     "description": "description",
 }
@@ -121,11 +121,11 @@ SUMMARY_TYPES_MAP = {
         "schema": SanntisSummarySchema,
         "study_schema": SanntisStudySummarySchema,
     },
-    "sourmash": {
-        "folder": "pathways-and-systems/sourmash",
-        "column_names": SOURMASH_COLUMN_NAMES,
-        "schema": SourmashSummarySchema,
-        "study_schema": SourmashStudySummarySchema,
+    "antismash": {
+        "folder": "pathways-and-systems/antismash",
+        "column_names": ANTISMASH_COLUMN_NAMES,
+        "schema": AntismashSummarySchema,
+        "study_schema": AntismashStudySummarySchema,
     },
     "pfam": {
         "folder": "functional-annotation/pfam",
@@ -221,7 +221,7 @@ def generate_functional_summary(
     column_names: dict[str, str],
     output_prefix: str,
     label: Literal[
-        "go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"
+        "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
     ],
 ) -> None:
     """
@@ -232,7 +232,7 @@ def generate_functional_summary(
     :param column_names: Dictionary mapping original column names to standard column names.
     :param output_prefix: Prefix for the output summary file.
     :param label: Label for the functional annotation type
-    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"]).
+    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
 
     Example of GO summary input file:
     go	term	category	count
@@ -256,7 +256,7 @@ def generate_functional_summary(
     BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	3
     BGC0001327	NRP Polyketide	Nonribosomal Peptide Polyketide	2
 
-    Example of Sourmash summary input file:
+    Example of Antismash summary input file:
     label	description	count
     terpene	Terpene	16
     betalactone	Beta-lactone containing protease inhibitor	8
@@ -488,7 +488,7 @@ def merge_functional_summaries(
     merge_keys: list[str],
     output_prefix: str,
     label: Literal[
-        "go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"
+        "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
     ],
 ) -> None:
     """
@@ -499,7 +499,7 @@ def merge_functional_summaries(
     :param merge_keys: List of column names to merge on (e.g. term ID, description).
     :param output_prefix: Prefix for the generated output file.
     :param label: Label describing the functional annotation type
-    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "sourmash", "pfam", "kegg_modules"]).
+    (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
 
     Example of GO summary input:
     GO	description	category	ERZ1049444	ERZ1049446
@@ -521,7 +521,7 @@ def merge_functional_summaries(
     BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide	230	185
     BGC0001432	NRP Polyketide	Nonribosomal Peptide Polyketide	0	8
 
-    Example of Sourmash summary input:
+    Example of Antismash summary input:
     label	description	ERZ1049440	ERZ1049443
     NRPS	Non-ribosomal peptide synthetase	368	0
     arylpolyene	Aryl polyene	149	447

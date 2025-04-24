@@ -245,12 +245,12 @@ class SanntisSummaryRecord(SanntisBaseRecord):
     )
 
 
-class SourmashSummaryRecord(BaseModel):
-    """Model of a row in the Sourmash summary file."""
+class AntismashSummaryRecord(BaseModel):
+    """Model of a row in the Antismash summary file."""
 
     label: str = Field(
         ...,
-        description="Biosynthetic class or label assigned by Sourmash based on sequence similarity to known biosynthetic gene clusters.",
+        description="Biosynthetic class or label assigned by Antismash based on sequence similarity to known biosynthetic gene clusters.",
         examples=["RiPP-like", "T1PKS", "terpene"],
     )
     description: str = Field(
@@ -345,7 +345,7 @@ class SanntisSummarySchema(BaseSummarySchema):
         coerce = True
 
 
-class SourmashSummarySchema(BaseSummarySchema):
+class AntismashSummarySchema(BaseSummarySchema):
     label: Series[str]
 
     @pa.check("label")
@@ -353,7 +353,7 @@ class SourmashSummarySchema(BaseSummarySchema):
         return self.is_unique(series)
 
     class Config:
-        dtype = PydanticModel(SourmashSummaryRecord)
+        dtype = PydanticModel(AntismashSummaryRecord)
         coerce = True
 
 
@@ -423,7 +423,7 @@ class InterProStudySummarySchema(BaseStudySummarySchema):
         return self.is_unique(series)
 
 
-class SourmashStudySummarySchema(BaseStudySummarySchema):
+class AntismashStudySummarySchema(BaseStudySummarySchema):
     label: Series[str]
 
     @pa.check("label")

@@ -22,7 +22,7 @@
       md5sum: 314ec298af0a15fbc764b731a120e54d
     - path: "test_sanntis_summary.tsv"
       md5sum: 0c700abc1b2ea9930339332e4ab8bac0
-    - path: "test_sourmash_summary.tsv"
+    - path: "test_antismash_summary.tsv"
       md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
       md5sum: 6260f20e4237d81c00d9787e02653734
@@ -51,7 +51,7 @@
       md5sum: 0132c105324d369daccfa54042651fd3
     - path: "test_sanntis_summary.tsv"
       md5sum: 049ac8d5993c34000cd9dc1e4dbe65c5
-    - path: "test_sourmash_summary.tsv"
+    - path: "test_antismash_summary.tsv"
       md5sum: 7b231682fccb3685b9795dae7d54c3b3
     - path: "test_taxonomy_summary.tsv"
       md5sum: ff1a1a359bad0f23dd90a6fa71c38d75
@@ -79,7 +79,7 @@
       md5sum: 314ec298af0a15fbc764b731a120e54d
     - path: "test_sanntis_summary.tsv"
       md5sum: 0c700abc1b2ea9930339332e4ab8bac0
-    - path: "test_sourmash_summary.tsv"
+    - path: "test_antismash_summary.tsv"
       md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
       md5sum: c8d5afd57dd58bc9e9f78c1f9c88c6a5
@@ -107,7 +107,7 @@
       md5sum: 8919ac386fcd4967a98eb6f37848290f
     - path: "test_sanntis_summary.tsv"
       md5sum: 4d32f2448b32483e1c489bbab2b07433
-    - path: "test_sourmash_summary.tsv"
+    - path: "test_antismash_summary.tsv"
       md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_summary.tsv"
       md5sum: 59484d7492be580e531df86d4b96ddcb
@@ -174,7 +174,7 @@
       md5sum: 8919ac386fcd4967a98eb6f37848290f
     - path: "test_sanntis_summary.tsv"
       md5sum: 4d32f2448b32483e1c489bbab2b07433
-    - path: "test_sourmash_summary.tsv"
+    - path: "test_antismash_summary.tsv"
       md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_summary.tsv"
       md5sum: 59484d7492be580e531df86d4b96ddcb
@@ -306,14 +306,14 @@
     contains:
       - "failure_case      1  {'count': 131, 'nearest_MIBiG': 'BGC0000866',"
 
-- name: assembly_study_summary_generator summarise_invalid_sourmash_summary # duplicated "label" value
+- name: assembly_study_summary_generator summarise_invalid_antismash_summary # duplicated "label" value
   tags:
     - assembly_study_summary_generator
   command: >
     assembly_study_summary_generator
     summarise
     --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
-    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sourmash.csv
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_antismash.csv
     -p test
   exit_code: 1
   stderr:

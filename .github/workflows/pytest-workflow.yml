@@ -22,8 +22,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: pip install -e .[tests]
-      - name: Dry run pytest collection
-        run: pytest --collect-only -vv
+      - name: Trace imports during test discovery
+        run: python -X importtime -m pytest --collect-only tests/unit | tee import_trace.log
       - uses: pavelzw/pytest-action@v2
         with:
           emoji: false

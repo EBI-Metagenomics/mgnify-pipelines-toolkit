@@ -257,7 +257,7 @@ def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List
 @cli.command(
     "summarise",
     options_metavar="-r <runs> -a <analyses_dir> -p <output_prefix>",
-    short_help="Generate study-level analysis summaries.",
+    short_help="Generate study-level summaries of amplicon analysis results.",
 )
 @click.option(
     "-r",
@@ -327,7 +327,7 @@ def summarise_analyses(
 @cli.command(
     "merge",
     options_metavar="-a <analyses_dir> -p <output_prefix>",
-    short_help="Merge multiple study-level analysis summaries.",
+    short_help="Merge multiple study-level summaries of amplicon analysis.",
 )
 @click.option(
     "-a",

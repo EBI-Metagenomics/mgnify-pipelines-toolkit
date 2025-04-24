@@ -326,7 +326,7 @@ def generate_functional_summary(
 @cli.command(
     "summarise",
     options_metavar="-a <assemblies> -s <study_dir> -p <output_prefix>",
-    short_help="Generate study-level analysis summaries.",
+    short_help="Generate study-level summaries for assembly analysis results.",
 )
 @click.option(
     "-a",
@@ -346,7 +346,7 @@ def generate_functional_summary(
     "-p",
     "--output_prefix",
     required=True,
-    help="Prefix to summary files",
+    help="Prefix for generated summary files",
     type=str,
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
@@ -399,7 +399,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
 @cli.command(
     "merge",
     options_metavar="-a <study_dir> -p <output_prefix>",
-    short_help="Merge multiple study-level analysis summaries.",
+    short_help="Merge multiple study-level summaries of assembly analysis.",
 )
 @click.option(
     "-s",
@@ -412,7 +412,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     "-p",
     "--output_prefix",
     required=True,
-    help="Prefix to merged summary summary_files",
+    help="Prefix for generated merged summary files",
     type=str,
 )
 def merge_summaries(study_dir: str, output_prefix: str) -> None:

@@ -401,12 +401,10 @@ def retrieve_regions(
         region_counter = defaultdict(int)
 
         regions_to_remove = []
-
         for model, value in multiregion_matches.items():
             marker_gene = determine_marker_gene(determine_domain(model))
             for region in value:
                 region_counter[f"{marker_gene}.{region}"] += 1
-
         for region, count in region_counter.items():
             if count < MIN_SEQ_COUNT:
                 regions_to_remove.append(region)
@@ -421,6 +419,8 @@ def retrieve_regions(
         for model, value in multiregion_matches.items():
             new_value = []
             for region in value:
+                if region == "":
+                    continue
                 marker_gene = determine_marker_gene(determine_domain(model))
                 full_region = f"{marker_gene}.{region}"
                 if full_region not in regions_to_remove:
@@ -463,6 +463,9 @@ def retrieve_regions(
             for key, value in temp_seq_counter.items():
                 seq_per_variable_region_count.setdefault(key, 0)
                 seq_per_variable_region_count[key] += value
+        else:
+            logging.info("No output will be produced - the run is ambiguous.")
+            continue
 
     json_outfile = "{}.json".format(outfile_prefix)
     tsv_outfile = "{}.tsv".format(outfile_prefix)

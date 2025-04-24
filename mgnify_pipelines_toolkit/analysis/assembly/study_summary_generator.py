@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import click
+from functools import reduce
 import glob
 import logging
 from pathlib import Path
@@ -169,7 +170,7 @@ def check_files_exist(file_list: list[Path]) -> None:
     :param file_list: List of file paths to check.
     :raises FileNotFoundError: If any file does not exist.
     """
-    missing_files = [str(path) for path in file_list if not path.exists()]
+    missing_files = [str(path) for path in file_list if not path.is_file()]
     if missing_files:
         raise FileNotFoundError(
             f"The following required files are missing: {', '.join(missing_files)}"
@@ -210,7 +211,8 @@ def generate_taxonomy_summary(
         result.columns = [assembly_acc]
         tax_dfs.append(result)
 
-    summary_df = pd.concat(tax_dfs, axis=1).fillna(0).astype(int).sort_index()
+    summary_df = pd.concat(tax_dfs, axis=1)
+    summary_df = summary_df.fillna(0).astype(int).sort_index()
     summary_df.to_csv(output_file_name, sep="\t", index_label="taxonomy")
 
 
@@ -278,48 +280,46 @@ def generate_functional_summary(
 
     original_col_names = list(column_names.keys())
     renamed_col_names = list(column_names.values())
+    value_col_name = "completeness" if label == "kegg_modules" else "count"
 
-    merged_df = None
+    dfs = []
     for assembly_acc, filepath in file_dict.items():
         try:
             df = pd.read_csv(filepath, sep="\t")
         except pd.errors.EmptyDataError:
-            logging.warning(f"File {filepath} is empty. Skipping.")
+            logging.warning(f"File {filepath.resolve()} is empty. Skipping.")
             continue
 
         schema = SUMMARY_TYPES_MAP[label]["schema"]
         validate_dataframe(df, schema, str(filepath))
 
-        # Only keep required columns describing entries + "count" or "completeness"
-        value_column = "completeness" if label == "kegg_modules" else "count"
-        keep_columns = original_col_names + [value_column]
-        df = df[keep_columns].copy()
+        # Extract only relevant columns
+        df = df[original_col_names + [value_col_name]].copy()
 
-        # Rename columns: merge columns are renamed according to column_names dict, "count"/"completeness" -> assembly acc
-        df.rename(columns={**column_names, value_column: assembly_acc}, inplace=True)
+        # Rename columns: metadata columns are renamed according to column_names dict, "count"/"completeness" -> assembly acc
+        df.rename(columns={**column_names, value_col_name: assembly_acc}, inplace=True)
+        dfs.append(df)
 
-        if merged_df is None:
-            merged_df = df
-        else:
-            merged_df = pd.merge(merged_df, df, on=renamed_col_names, how="outer")
-
-    if merged_df is None:
+    if not dfs:
         logging.warning(
             f"No valid files with functional annotation summary were found. Skipping creation of {output_file_name}."
         )
         return
 
-    # Fill NaNs with 0, convert completeness percentages to float, and counts to integers
+    # Merge all dataframes on the renamed metadata columns
+    merged_df = reduce(
+        lambda left, right: pd.merge(left, right, on=renamed_col_names, how="outer"),
+        dfs,
+    )
+
+    # Fill missing values appropriately, convert completeness percentages to float, counts to integers
     value_columns = [col for col in merged_df.columns if col not in renamed_col_names]
-    if label == "kegg_modules":
-        merged_df[value_columns] = merged_df[value_columns].fillna(0.0).astype(float)
-    else:
-        merged_df[value_columns] = merged_df[value_columns].fillna(0).astype(int)
+    fill_value = 0.0 if label == "kegg_modules" else 0
+    dtype = float if label == "kegg_modules" else int
+    merged_df[value_columns] = merged_df[value_columns].fillna(fill_value).astype(dtype)
 
     # Reorder columns: merge keys first, then sorted assembly accessions
-    cols = renamed_col_names + sorted(value_columns)
-    merged_df = merged_df[cols]
-
+    merged_df = merged_df[renamed_col_names + sorted(value_columns)]
     merged_df.to_csv(output_file_name, sep="\t", index=False)
 
 
@@ -351,7 +351,7 @@ def generate_functional_summary(
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
     """
-    Generate study-level summaries for successfuly proccessed assemblies.
+    Generate study-level summaries for successfully proccessed assemblies.
 
     :param assemblies: Path to a file listing completed assembly accessions and their status.
     :param study_dir: Path to the directory containing analysis results for each assembly.
@@ -364,6 +364,10 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     logging.info("Assembly list was read successfully.")
 
     def get_file_paths(subdir: str, filename_template: str) -> dict[str, Path]:
+        """
+        Construct file paths for each assembly given a subdirectory and filename template.
+        Template must contain {acc} as a placeholder.
+        """
         return {
             acc: study_dir / acc / subdir / filename_template.format(acc=acc)
             for acc in assembly_list
@@ -379,16 +383,13 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
         f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}",
     )
 
-    for summary_type in SUMMARY_TYPES_MAP:
+    for summary_type, config in SUMMARY_TYPES_MAP.items():
         logging.info(
             f"Generating study-level {summary_type.capitalize()} summary from file <accession>_{summary_type}_summary.tsv.gz"
         )
-        folder = SUMMARY_TYPES_MAP[summary_type]["folder"]
-        column_names = SUMMARY_TYPES_MAP[summary_type]["column_names"]
-        summary_file_name = "{{acc}}_{}_summary.tsv.gz".format(summary_type)
         generate_functional_summary(
-            get_file_paths(folder, summary_file_name),
-            column_names,
+            get_file_paths(config["folder"], f"{{acc}}_{summary_type}_summary.tsv.gz"),
+            config["column_names"],
             output_prefix,
             summary_type,
         )
@@ -432,9 +433,9 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
         get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}"
     )
 
-    for summary_type in SUMMARY_TYPES_MAP:
+    for summary_type, config in SUMMARY_TYPES_MAP.items():
         logging.info(f"Parsing summary files for {summary_type.capitalize()}.")
-        column_names = SUMMARY_TYPES_MAP[summary_type]["column_names"]
+        column_names = config["column_names"]
         merge_functional_summaries(
             get_file_paths(summary_type),
             list(column_names.values()),
@@ -468,7 +469,8 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
         df = pd.read_csv(file, sep="\t", index_col=0)
         validate_dataframe(df, TaxonomyStudySummarySchema, file)
         summary_dfs.append(df)
-    merged_df = pd.concat(summary_dfs, axis=1).fillna(0).astype(int)
+    merged_df = pd.concat(summary_dfs, axis=1)
+    merged_df = merged_df.fillna(0).astype(int)
 
     # Reorder columns: taxonomy first, then sorted assembly accessions
     merged_df = merged_df[sorted(merged_df.columns)]
@@ -543,29 +545,30 @@ def merge_functional_summaries(
         return
 
     validation_schema = SUMMARY_TYPES_MAP[label]["study_schema"]
-    merged_df = pd.read_csv(summary_files[0], sep="\t")
-    validate_dataframe(merged_df, validation_schema, summary_files[0])
 
-    if len(summary_files) > 1:
-        for filepath in summary_files[1:]:
-            df = pd.read_csv(filepath, sep="\t")
-            validate_dataframe(df, validation_schema, filepath)
-            merged_df = pd.merge(merged_df, df, on=merge_keys, how="outer")
+    dfs = []
+    for filepath in summary_files:
+        df = pd.read_csv(filepath, sep="\t")
+        validate_dataframe(df, validation_schema, filepath)
+        dfs.append(df)
 
-        # Identify non-key columns (i.e. values)
-        value_columns = [col for col in merged_df.columns if col not in merge_keys]
+    if len(dfs) == 1:
+        merged_df = dfs[0]
+    else:
+        merged_df = reduce(
+            lambda left, right: pd.merge(left, right, on=merge_keys, how="outer"), dfs
+        )
 
-        # Fill NaNs and set dtype accordingly
-        if label == "kegg_modules":
-            merged_df[value_columns] = (
-                merged_df[value_columns].fillna(0.0).astype(float)
-            )
-        else:
-            merged_df[value_columns] = merged_df[value_columns].fillna(0).astype(int)
+    # Identify non-key columns (i.e. counts)
+    value_columns = [col for col in merged_df.columns if col not in merge_keys]
 
-        # Reorder columns
-        sorted_columns = merge_keys + sorted(value_columns)
-        merged_df = merged_df[sorted_columns]
+    # Fill NaNs and set dtype accordingly
+    fill_value = 0.0 if label == "kegg_modules" else 0
+    dtype = float if label == "kegg_modules" else int
+    merged_df[value_columns] = merged_df[value_columns].fillna(fill_value).astype(dtype)
+
+    # Reorder columns
+    merged_df = merged_df[merge_keys + sorted(value_columns)]
 
     merged_df.to_csv(output_file_name, sep="\t", index=False)
 

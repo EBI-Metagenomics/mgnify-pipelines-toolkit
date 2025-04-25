@@ -351,7 +351,7 @@ def generate_functional_summary(
 )
 def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
     """
-    Generate study-level summaries for successfully proccessed assemblies.
+    Generate study-level summaries for successfully processed assemblies.
 
     :param assemblies: Path to a file listing completed assembly accessions and their status.
     :param study_dir: Path to the directory containing analysis results for each assembly.

@@ -2,9 +2,9 @@
 name = "mgnify_pipelines_toolkit"
 version = "1.0.4"
 readme = "README.md"
-license = {text = "Apache Software License 2.0"}
+license = { text = "Apache Software License 2.0" }
 authors = [
-  { name = "MGnify team", email = "metagenomics-help@ebi.ac.uk" },
+    { name = "MGnify team", email = "metagenomics-help@ebi.ac.uk" },
 ]
 keywords = ["bioinformatics", "pipelines", "metagenomics"]
 description = "Collection of scripts and tools for MGnify pipelines"
@@ -33,14 +33,14 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["mgnify_pipelines_toolkit",
-            "mgnify_pipelines_toolkit.analysis",
-            "mgnify_pipelines_toolkit.constants",
-            "mgnify_pipelines_toolkit.utils",
-            "mgnify_pipelines_toolkit.schemas",
-            "mgnify_pipelines_toolkit.analysis.shared",
-            "mgnify_pipelines_toolkit.analysis.amplicon",
-            "mgnify_pipelines_toolkit.analysis.assembly",
-            "mgnify_pipelines_toolkit.analysis.genomes"
+    "mgnify_pipelines_toolkit.analysis",
+    "mgnify_pipelines_toolkit.constants",
+    "mgnify_pipelines_toolkit.utils",
+    "mgnify_pipelines_toolkit.schemas",
+    "mgnify_pipelines_toolkit.analysis.shared",
+    "mgnify_pipelines_toolkit.analysis.amplicon",
+    "mgnify_pipelines_toolkit.analysis.assembly",
+    "mgnify_pipelines_toolkit.analysis.genomes"
 ]
 
 [project.scripts]
@@ -90,6 +90,7 @@ tests = [
     "pytest>=8.3.5,<9",
     "pytest-md>=0.2.0",
     "pytest-workflow==2.1.0",
+    "pyfakefs==5.8.0",
 ]
 
 dev = [

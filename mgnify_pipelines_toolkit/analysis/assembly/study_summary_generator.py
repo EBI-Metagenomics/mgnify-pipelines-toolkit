@@ -145,14 +145,14 @@ SUMMARY_TYPES_MAP = {
 # containing of following columns:
 TAXONOMY_COLUMN_NAMES = [
     "Count",
-    "superkingdom",
-    "kingdom",
-    "phylum",
-    "class",
-    "order",
-    "family",
-    "genus",
-    "species",
+    "Superkingdom",
+    "Kingdom",
+    "Phylum",
+    "Class",
+    "Order",
+    "Family",
+    "Genus",
+    "Species",
 ]
 
 OUTPUT_SUFFIX = "summary.tsv"

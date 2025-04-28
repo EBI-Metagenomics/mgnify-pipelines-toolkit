@@ -506,7 +506,11 @@ class TaxRank(RootModel):
     def rank_structure_validity_check(cls, taxrank: str) -> bool:
         taxrank_list = taxrank.split("__")
         rank = taxrank_list[0]
-        if rank != "" and rank != "Unclassified" and rank not in cls.valid_tax_ranks:
+        if (
+            rank != ""
+            and rank.capitalize() != "Unclassified"
+            and rank not in cls.valid_tax_ranks
+        ):
             raise ValueError(f"Invalid taxonomy rank {rank}.")
 
         return taxrank

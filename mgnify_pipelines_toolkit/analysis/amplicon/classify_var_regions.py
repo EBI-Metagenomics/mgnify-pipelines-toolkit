@@ -427,6 +427,8 @@ def retrieve_regions(
                     new_value.append(region)
             if not new_value:
                 models_to_remove.append(model)
+            if len(new_value) < MIN_SEQ_COUNT:
+                models_to_remove.append(model)
             multiregion_matches[model] = new_value
 
         [multiregion_matches.pop(model) for model in models_to_remove]

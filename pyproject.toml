@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.0.9"
+version = "1.1.1"
 readme = "README.md"
 license = {text = "Apache Software License 2.0"}
 authors = [
@@ -72,8 +72,6 @@ add_rhea_chebi_annotation = "mgnify_pipelines_toolkit.analysis.assembly.add_rhea
 combined_gene_caller_merge = "mgnify_pipelines_toolkit.analysis.assembly.combined_gene_caller_merge:main"
 generate_gaf = "mgnify_pipelines_toolkit.analysis.assembly.generate_gaf:main"
 summarise_goslims = "mgnify_pipelines_toolkit.analysis.assembly.summarise_goslims:main"
-dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.assembly.dwc_summary_generator:main"
-# utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 

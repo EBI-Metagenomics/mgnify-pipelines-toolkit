@@ -234,41 +234,42 @@ def generate_functional_summary(
     :param label: Label for the functional annotation type
     (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
 
-    Example of GO summary input file:
+    In the input files, column orders may vary, but the following columns are expected:
+    GO summary input file:
     go	term	category	count
     GO:0016020	membrane	cellular_component	30626
     GO:0005524	ATP binding	molecular_function	30524
 
-    Example of InterPro summary input file:
-    count	interpro_accession	description
-    16503	IPR036291	NAD(P)-binding domain superfamily
-    14694	IPR019734	Tetratricopeptide repeat
+    InterPro summary input file:
+    interpro_accession	description	count
+    IPR036291	NAD(P)-binding domain superfamily	16503
+    IPR019734	Tetratricopeptide repeat	14694
 
-    Example of KEGG summary input file:
-    count   ko      description
-    562     K01552  energy-coupling factor transport system ATP-binding protein [EC:7.-.-.-]
-    537     K18889  ATP-binding cassette, subfamily B, multidrug efflux pump
-    517     K15497  molybdate/tungstate transport system ATP-binding protein [EC:7.3.2.5 7.3.2.6]
+    KEGG summary input file:
+    ko      description	count
+    K01552  energy-coupling factor transport system ATP-binding protein [EC:7.-.-.-]	562
+    K18889  ATP-binding cassette, subfamily B, multidrug efflux pump	537
+    K15497  molybdate/tungstate transport system ATP-binding protein [EC:7.3.2.5 7.3.2.6]	517
 
-    Example of Sanntis summary input file:
+    Sanntis summary input file:
     nearest_mibig	nearest_mibig_class	description	count
     BGC0000787	Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)	1
     BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	3
     BGC0001327	NRP Polyketide	Nonribosomal Peptide Polyketide	2
 
-    Example of Antismash summary input file:
+    Antismash summary input file:
     label	description	count
     terpene	Terpene	16
     betalactone	Beta-lactone containing protease inhibitor	8
     T1PKS	Type I PKS (Polyketide synthase)	3
 
-    Example of PFAM summary input file:
-    count	pfam	description
-    457	PF00265	Thymidine kinase
-    368	PF01852	START domain
-    397	PF13756	Stimulus-sensing domain
+    PFAM summary input file:
+    pfam	description	count
+    PF00265	Thymidine kinase	457
+    PF01852	START domain	368
+    PF13756	Stimulus-sensing domain	397
 
-    Example of KEGG modules summary input file:
+    KEGG modules summary input file:
     module_accession	completeness	pathway_name	pathway_class	matching_ko	missing_ko
     M00986	100.0	Sulfur reduction, sulfur => sulfide	Pathway modules; Energy metabolism; Sulfur metabolism	K18367
     M00163	83.33	Photosystem I	Pathway modules; Energy metabolism; Photosynthesis	K02689,K02690,K02691,K02692,K02694	K02693
@@ -501,7 +502,8 @@ def merge_functional_summaries(
     :param label: Label describing the functional annotation type
     (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
 
-    Example of GO summary input:
+    In the input files, column orders may vary, but the following columns are expected:
+    GO summary input:
     GO	description	category	ERZ1049444	ERZ1049446
     GO:0016020	membrane	cellular_component	30626	673
     GO:0005524	ATP binding	molecular_function	30524	2873
@@ -511,27 +513,27 @@ def merge_functional_summaries(
     IPR036291	NAD(P)-binding domain superfamily	16503	13450
     IPR019734	Tetratricopeptide repeat	14694	11021
 
-    Example of KEGG summary input:
+    KEGG summary input:
     GO	description	category	ERZ1049440	ERZ1049443
     GO:0003677	DNA binding	molecular_function	6125	16417
     GO:0055085	transmembrane transport	biological_process	144	13926
 
-    Example of Sanntis summary input:
+    Sanntis summary input:
     nearest_mibig	nearest_mibig_class	description	ERZ1049440	ERZ1049443
     BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide	230	185
     BGC0001432	NRP Polyketide	Nonribosomal Peptide Polyketide	0	8
 
-    Example of Antismash summary input:
+    Antismash summary input:
     label	description	ERZ1049440	ERZ1049443
     NRPS	Non-ribosomal peptide synthetase	368	0
     arylpolyene	Aryl polyene	149	447
 
-    Example of PFAM summary input:
-    description	PFAM	ERZ1049440	ERZ1049443
-    HTH-like domain	PF24718	468	1
-    Malate:quinone oxidoreductase (Mqo)	PF06039	490	21
+    PFAM summary input:
+    PFAM	description	ERZ1049440	ERZ1049443
+    PF24718	HTH-like domain	468	1
+    PF06039	Malate:quinone oxidoreductase (Mqo)	490	21
 
-    Example of KEGG modules summary input:
+    KEGG modules summary input:
     module_accession	pathway_name	pathway_class	ERZ1049440	ERZ1049443
     M00109	C21-Steroid hormone biosynthesis, progesterone => cortisol/cortisone	Pathway modules; Lipid metabolism; Sterol biosynthesis	38.9	0.0
     M00153	Cytochrome bd ubiquinol oxidase	Pathway modules; Energy metabolism; ATP synthesis	44.7	84.4

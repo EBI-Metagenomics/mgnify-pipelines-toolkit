@@ -700,8 +700,8 @@ def sanntis_modules_summary_tsv_rows_per_accession() -> Dict:
     The TSV string includes the following columns:
 
     - **count**: The number of occurrences.
-    - **nearest_MIBiG**: The nearest MIBiG identifier.
-    - **nearest_MIBiG_class**: The class of the nearest MIBiG entry.
+    - **nearest_mibig**: The nearest MIBiG identifier.
+    - **nearest_mibig_class**: The class of the nearest MIBiG entry.
     - **description**: A brief description of the BGC.
 
     The data includes several BGC entries with their respective details.
@@ -710,7 +710,7 @@ def sanntis_modules_summary_tsv_rows_per_accession() -> Dict:
     :rtype: str
     """
     rows_per_accession = {}
-    header = ["count", "nearest_MIBiG", "nearest_MIBiG_class", "description"]
+    header = ["count", "nearest_mibig", "nearest_mibig_class", "description"]
     rows_per_accession["ERZ1049440"] = [
         header,
         [
@@ -1255,7 +1255,7 @@ def test_assembly_study_summary_generator_correct_summarise(
         "/test_ko_summary.tsv": "9a0e4ebc8d3c096738ab9be5658fbc0d",
         "/test_kegg_modules_summary.tsv": "c66966de0c38f74ed83919c9fe0dd1b4",
         "/test_pfam_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
-        "/test_sanntis_summary.tsv": "0c700abc1b2ea9930339332e4ab8bac0",
+        "/test_sanntis_summary.tsv": "97b79aee421aaee39bf6409333218e03",
         "/test_antismash_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
         "/test_taxonomy_summary.tsv": "6260f20e4237d81c00d9787e02653734",
     }

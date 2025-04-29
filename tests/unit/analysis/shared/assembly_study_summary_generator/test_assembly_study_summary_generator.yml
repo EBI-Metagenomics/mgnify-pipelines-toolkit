@@ -21,7 +21,7 @@
     - path: "test_pfam_summary.tsv"
       md5sum: 314ec298af0a15fbc764b731a120e54d
     - path: "test_sanntis_summary.tsv"
-      md5sum: 0c700abc1b2ea9930339332e4ab8bac0
+      md5sum: 97b79aee421aaee39bf6409333218e03
     - path: "test_antismash_summary.tsv"
       md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
@@ -50,7 +50,7 @@
     - path: "test_pfam_summary.tsv"
       md5sum: 0132c105324d369daccfa54042651fd3
     - path: "test_sanntis_summary.tsv"
-      md5sum: 049ac8d5993c34000cd9dc1e4dbe65c5
+      md5sum: 1516d41522a470f58df6eb3adfa79123
     - path: "test_antismash_summary.tsv"
       md5sum: 7b231682fccb3685b9795dae7d54c3b3
     - path: "test_taxonomy_summary.tsv"
@@ -78,7 +78,7 @@
     - path: "test_pfam_summary.tsv"
       md5sum: 314ec298af0a15fbc764b731a120e54d
     - path: "test_sanntis_summary.tsv"
-      md5sum: 0c700abc1b2ea9930339332e4ab8bac0
+      md5sum: 97b79aee421aaee39bf6409333218e03
     - path: "test_antismash_summary.tsv"
       md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_summary.tsv"
@@ -106,7 +106,7 @@
     - path: "test_pfam_summary.tsv"
       md5sum: 8919ac386fcd4967a98eb6f37848290f
     - path: "test_sanntis_summary.tsv"
-      md5sum: 4d32f2448b32483e1c489bbab2b07433
+      md5sum: 48134ffbbbc141e28b3bd63ccb11d50e
     - path: "test_antismash_summary.tsv"
       md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_summary.tsv"
@@ -173,7 +173,7 @@
     - path: "test_pfam_summary.tsv"
       md5sum: 8919ac386fcd4967a98eb6f37848290f
     - path: "test_sanntis_summary.tsv"
-      md5sum: 4d32f2448b32483e1c489bbab2b07433
+      md5sum: 48134ffbbbc141e28b3bd63ccb11d50e
     - path: "test_antismash_summary.tsv"
       md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_summary.tsv"
@@ -304,7 +304,7 @@
   exit_code: 1
   stderr:
     contains:
-      - "failure_case      1  {'count': 131, 'nearest_MIBiG': 'BGC0000866',"
+      - "failure_case      1  {'count': 131, 'nearest_mibig': 'BGC0000866',"
 
 - name: assembly_study_summary_generator summarise_invalid_antismash_summary # duplicated "label" value
   tags:

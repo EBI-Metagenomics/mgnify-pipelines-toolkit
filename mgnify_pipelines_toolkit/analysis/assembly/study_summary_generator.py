@@ -63,8 +63,8 @@ INTERPRO_COLUMN_NAMES = {
 }
 
 SANNTIS_COLUMN_NAMES = {
-    "nearest_MIBiG": "nearest_MIBiG",
-    "nearest_MIBiG_class": "nearest_MIBiG_class",
+    "nearest_mibig": "nearest_mibig",
+    "nearest_mibig_class": "nearest_mibig_class",
     "description": "description",
 }
 
@@ -251,7 +251,7 @@ def generate_functional_summary(
     517     K15497  molybdate/tungstate transport system ATP-binding protein [EC:7.3.2.5 7.3.2.6]
 
     Example of Sanntis summary input file:
-    nearest_MIBiG	nearest_MIBiG_class	description	count
+    nearest_mibig	nearest_mibig_class	description	count
     BGC0000787	Saccharide	Carbohydrate-based natural products (e.g., aminoglycoside antibiotics)	1
     BGC0000248	Polyketide	Built from iterative condensation of acetate units derived from acetyl-CoA	3
     BGC0001327	NRP Polyketide	Nonribosomal Peptide Polyketide	2
@@ -517,7 +517,7 @@ def merge_functional_summaries(
     GO:0055085	transmembrane transport	biological_process	144	13926
 
     Example of Sanntis summary input:
-    nearest_MIBiG	nearest_MIBiG_class	description	ERZ1049440	ERZ1049443
+    nearest_mibig	nearest_mibig_class	description	ERZ1049440	ERZ1049443
     BGC0001356	RiPP	Ribosomally synthesised and Post-translationally modified Peptide	230	185
     BGC0001432	NRP Polyketide	Nonribosomal Peptide Polyketide	0	8
 

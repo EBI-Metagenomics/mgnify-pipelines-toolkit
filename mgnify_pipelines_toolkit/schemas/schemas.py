@@ -218,16 +218,12 @@ class SanntisBaseRecord(BaseModel):
 
     nearest_mibig: str = Field(
         ...,
-        # use alias because the column name triggers linter
-        alias="nearest_MIBiG",
         description="The accession ID of the closest matching biosynthetic gene cluster (BGC) in the MIBiG database",
         examples=["BGC0000073"],
         pattern=r"BGC\d{7}",
     )
     nearest_mibig_class: str = Field(
         ...,
-        # use alias because the column name triggers linter
-        alias="nearest_MIBiG_class",
         description="The biosynthetic class of the nearest MIBiG BGC",
         examples=["Polyketide"],
     )

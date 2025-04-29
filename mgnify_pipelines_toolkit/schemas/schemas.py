@@ -213,8 +213,8 @@ class GOSummarySchema(BaseSummarySchema):
         coerce = True
 
 
-class SanntisBaseRecord(BaseModel):
-    """Model describing common columns in the Sanntis summary files."""
+class SanntisSummaryRecord(BaseModel):
+    """Model of a row in the Sanntis assembly-level summary file."""
 
     nearest_mibig: str = Field(
         ...,
@@ -231,10 +231,6 @@ class SanntisBaseRecord(BaseModel):
         ...,
         description="A brief summary of the biosynthetic process or type of metabolite associated with the nearest MIBiG cluster",
     )
-
-
-class SanntisSummaryRecord(SanntisBaseRecord):
-    """Model of a row in the Sanntis assembly-level summary file."""
 
     count: int = Field(
         ..., ge=0, description="Number of times the MIBiG entry is observed"
@@ -433,10 +429,6 @@ class SanntisStudySummarySchema(BaseStudySummarySchema):
     @pa.check("nearest_mibig")
     def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
         return self.is_unique(series)
-
-    class Config:
-        dtype = PydanticModel(SanntisBaseRecord)
-        coerce = True
 
 
 class KOStudySummarySchema(BaseStudySummarySchema):

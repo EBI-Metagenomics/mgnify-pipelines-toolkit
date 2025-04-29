@@ -199,7 +199,7 @@ def generate_taxonomy_summary(
         df = pd.read_csv(path, sep="\t", names=TAXONOMY_COLUMN_NAMES).fillna("")
 
         # Note: schema validation will fail if the taxonomy file is empty
-        validate_dataframe(df, TaxonSchema, str(path))
+        df = validate_dataframe(df, TaxonSchema, str(path))
 
         # Combine all taxonomic ranks in the classification into a single string
         df["full_taxon"] = (
@@ -291,7 +291,7 @@ def generate_functional_summary(
             continue
 
         schema = SUMMARY_TYPES_MAP[label]["schema"]
-        validate_dataframe(df, schema, str(filepath))
+        df = validate_dataframe(df, schema, str(filepath))
 
         # Extract only relevant columns
         df = df[original_col_names + [value_col_name]].copy()
@@ -467,7 +467,7 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
     summary_dfs = []
     for file in summary_files:
         df = pd.read_csv(file, sep="\t", index_col=0)
-        validate_dataframe(df, TaxonomyStudySummarySchema, file)
+        df = validate_dataframe(df, TaxonomyStudySummarySchema, file)
         summary_dfs.append(df)
     merged_df = pd.concat(summary_dfs, axis=1)
     merged_df = merged_df.fillna(0).astype(int)
@@ -549,7 +549,7 @@ def merge_functional_summaries(
     dfs = []
     for filepath in summary_files:
         df = pd.read_csv(filepath, sep="\t")
-        validate_dataframe(df, validation_schema, filepath)
+        df = validate_dataframe(df, validation_schema, filepath)
         dfs.append(df)
 
     if len(dfs) == 1:

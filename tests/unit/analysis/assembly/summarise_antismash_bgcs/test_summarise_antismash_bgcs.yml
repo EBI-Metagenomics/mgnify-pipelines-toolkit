@@ -5,6 +5,6 @@
   files:
     - path: "summary_antismash.tsv"
       contains:
-        - "classid\tdescription\tcount"
+        - "label\tdescription\tcount"
         - "terpene\tTerpene\t16"
         - "transAT-PKS,NRPS\tTrans-AT PKS,Non-ribosomal peptide synthetase\t1"

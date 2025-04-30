@@ -155,7 +155,7 @@ def parse_args():
     description = (
         "antiSMASH output summary generator. "
         "Script takes regions from GFF and counts its appearance in annotation. "
-        "Output columns contain classID, descriptions and count. "
+        "Output columns contain label, descriptions and count. "
         f"Descriptions were taken from pre-parsed glossary provided on antiSMASH website. "
         f"Current script supports antiSMASH results for version {ANTISMASH_VERSION} and older."
     )

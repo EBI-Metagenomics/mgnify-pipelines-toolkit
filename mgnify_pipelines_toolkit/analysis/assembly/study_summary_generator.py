@@ -134,7 +134,7 @@ SUMMARY_TYPES_MAP = {
         "study_schema": PFAMStudySummarySchema,
     },
     "kegg_modules": {
-        "folder": "pathways-and-systems/kegg_modules",
+        "folder": "pathways-and-systems/kegg-modules",
         "column_names": KEGG_MODULES_COLUMN_NAMES,
         "schema": KEGGModulesSummarySchema,
         "study_schema": KEGGModulesStudySummarySchema,

@@ -1,0 +1,363 @@
+- name: assembly_study_summary_generator correct_summarise
+  tags:
+    - assembly_study_summary_generator
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input.csv
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: 3783ef924b0f7d598888334025de1834
+    - path: "test_goslim_summary.tsv"
+      md5sum: 0c23dcda7a38197680cab263ca90292f
+    - path: "test_interpro_summary.tsv"
+      md5sum: ccdb11f77c1631ec3dad99226e791cbb
+    - path: "test_ko_summary.tsv"
+      md5sum: 9a0e4ebc8d3c096738ab9be5658fbc0d
+    - path: "test_kegg_modules_summary.tsv"
+      md5sum: c66966de0c38f74ed83919c9fe0dd1b4
+    - path: "test_pfam_summary.tsv"
+      md5sum: 314ec298af0a15fbc764b731a120e54d
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 97b79aee421aaee39bf6409333218e03
+    - path: "test_antismash_summary.tsv"
+      md5sum: c3105b172ab8c795bb0593e1dc5abe98
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: 6260f20e4237d81c00d9787e02653734
+
+- name: assembly_study_summary_generator summarise_singleton
+  tags:
+    - assembly_study_summary_generator
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_singleton.csv
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: 171e1981d6dff62859e530ac77027942
+    - path: "test_goslim_summary.tsv"
+      md5sum: 526b5d4442eeca094b27bdacea8b2465
+    - path: "test_interpro_summary.tsv"
+      md5sum: 74052714ef73f76649d9396b7fd9532e
+    - path: "test_ko_summary.tsv"
+      md5sum: bf40ea416ded1c424e5daced25ca3fdb
+    - path: "test_kegg_modules_summary.tsv"
+      md5sum: b3f852096badfb994fca111975ed56b7
+    - path: "test_pfam_summary.tsv"
+      md5sum: 0132c105324d369daccfa54042651fd3
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 1516d41522a470f58df6eb3adfa79123
+    - path: "test_antismash_summary.tsv"
+      md5sum: 7b231682fccb3685b9795dae7d54c3b3
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: ff1a1a359bad0f23dd90a6fa71c38d75
+
+- name: assembly_study_summary_generator correct_merge
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    merge
+    --study_dir tests/fixtures/study_summary_inputs/assembly/merge/normal
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: 3783ef924b0f7d598888334025de1834
+    - path: "test_goslim_summary.tsv"
+      md5sum: 3783ef924b0f7d598888334025de1834
+    - path: "test_interpro_summary.tsv"
+      md5sum: 04713e331bfbfdfa9a04c7c88dcc1004
+    - path: "test_ko_summary.tsv"
+      md5sum: 9a0e4ebc8d3c096738ab9be5658fbc0d
+    - path: "test_kegg_modules_summary.tsv"
+      md5sum: f23d0b1fec3279f3df460fd9c04ea0d2
+    - path: "test_pfam_summary.tsv"
+      md5sum: 314ec298af0a15fbc764b731a120e54d
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 97b79aee421aaee39bf6409333218e03
+    - path: "test_antismash_summary.tsv"
+      md5sum: c3105b172ab8c795bb0593e1dc5abe98
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: c8d5afd57dd58bc9e9f78c1f9c88c6a5
+
+- name: assembly_study_summary_generator merge_singleton
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    merge
+    --study_dir tests/fixtures/study_summary_inputs/assembly/merge/only_1_chunk
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_goslim_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_interpro_summary.tsv"
+      md5sum: 1d7bcc504c4a762c6fd080852c31c208
+    - path: "test_ko_summary.tsv"
+      md5sum: c910e023cc6747909b4a06dcbadb360f
+    - path: "test_kegg_modules_summary.tsv"
+      md5sum: 55674f2da392b0a0b383b4fa49df3cca
+    - path: "test_pfam_summary.tsv"
+      md5sum: 8919ac386fcd4967a98eb6f37848290f
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 48134ffbbbc141e28b3bd63ccb11d50e
+    - path: "test_antismash_summary.tsv"
+      md5sum: becd41d1b3920fa2a47214dd5a37270d
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: 59484d7492be580e531df86d4b96ddcb
+
+- name: assembly_study_summary_generator summarise_no_tax_file
+  tags:
+    - assembly_study_summary_generator
+  command:  >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_no_tax_file.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "The following required files are missing: tests/fixtures/study_summary_inputs/assembly/summarise/ERZ1049449/taxonomy/ERZ1049449.krona.txt"
+
+- name: assembly_study_summary_generator summarise_no_func_file
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_no_func_file.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "The following required files are missing: tests/fixtures/study_summary_inputs/assembly/summarise/ERZ1049450/functional-annotation/interpro/ERZ1049450_interpro_summary.tsv"
+
+- name: assembly_study_summary_generator merge_no_tax_summary
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    merge
+    --study_dir tests/fixtures/study_summary_inputs/assembly/merge/no_tax_summary
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "The required taxonomic classification summary files are missing. Exiting."
+
+- name: assembly_study_summary_generator merge_no_func_summary
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    merge
+    --study_dir tests/fixtures/study_summary_inputs/assembly/merge/no_func_summary
+    -p test
+  files:
+    - path: "test_go_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_goslim_summary.tsv"
+      md5sum: af45e45eb3808b84ccf81c871fa30a70
+    - path: "test_ko_summary.tsv"
+      md5sum: c910e023cc6747909b4a06dcbadb360f
+    - path: "test_kegg_modules_summary.tsv"
+      md5sum: 55674f2da392b0a0b383b4fa49df3cca
+    - path: "test_pfam_summary.tsv"
+      md5sum: 8919ac386fcd4967a98eb6f37848290f
+    - path: "test_sanntis_summary.tsv"
+      md5sum: 48134ffbbbc141e28b3bd63ccb11d50e
+    - path: "test_antismash_summary.tsv"
+      md5sum: becd41d1b3920fa2a47214dd5a37270d
+    - path: "test_taxonomy_summary.tsv"
+      md5sum: 59484d7492be580e531df86d4b96ddcb
+
+- name: assembly_study_summary_generator summarise_invalid_input_csv # invalid status in input csv, ERP instead of ERZ
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "{'status': 'sucess'}"
+      - "{'assembly': 'ERP1049445'}"
+
+- name: assembly_study_summary_generator summarise_invalid_input_csv2 # duplicate in input.csv
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid2.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "Column 'assembly' failed element-wise validator number 0: <Check accessions_unique> failure cases: ERZ1049443"
+
+- name: assembly_study_summary_generator summarise_invalid_go_summary # one column is missing
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_go.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "failure_case      0  {'go': 'GO:0003824', 'term': 'catalytic activi...1"
+
+- name: assembly_study_summary_generator summarise_invalid_go_summary2 # GO0055085 instead of GO:0055085
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_go2.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "failure_case0      2  {'go': 'GO0055085'}"
+
+- name: assembly_study_summary_generator summarise_invalid_go_summary3 # duplicated GO in summary file
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_go3.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "Column 'go' failed element-wise validator number 0: <Check go_ids_unique> failure cases: GO:0003674"
+
+- name: assembly_study_summary_generator summarise_invalid_interpro_summary # one column is missing
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_interpro.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "failure_case      0  {'count': 3241, 'interpro_accession': 'IPR0274...1"
+
+- name: assembly_study_summary_generator summarise_invalid_interpro_summary2 # IPRRR036291 instead of IPR036291
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_interpro2.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "{'interpro_accession': 'IPRRR036291'}"
+
+- name: assembly_study_summary_generator summarise_invalid_interpro_summary3 # duplicated IPR id in summary file
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_interpro3.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "Column 'interpro_accession' failed element-wise validator number 0: <Check interpro_ids_unique> failure cases: IPR036188"
+
+- name: assembly_study_summary_generator summarise_invalid_sanntis_summary # missing column
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_sanntis.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "failure_case      1  {'count': 131, 'nearest_mibig': 'BGC0000866',"
+
+- name: assembly_study_summary_generator summarise_invalid_antismash_summary # duplicated "label" value
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_antismash.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "Column 'label' failed element-wise validator"
+
+- name: assembly_study_summary_generator summarise_invalid_ko_summary # missing column
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_ko.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "column 'ko' not in dataframe. Columns in dataframe: ['count', 'kodescription']"
+
+- name: assembly_study_summary_generator summarise_invalid_pfam_summary # id fails pattern validation, PFF13558 instead of PF13558
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_pfam.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "'pfam': 'PFF13558'}"
+
+- name: assembly_study_summary_generator summarise_invalid_modules_summary # fgd instead of % in completeness column
+  tags:
+    - assembly_study_summary_generator
+  command: >
+    assembly_study_summary_generator
+    summarise
+    --study_dir tests/fixtures/study_summary_inputs/assembly/summarise
+    --assemblies tests/fixtures/study_summary_inputs/assembly/summarise/input_invalid_modules.csv
+    -p test
+  exit_code: 1
+  stderr:
+    contains:
+      - "{'completeness': 'fgd'}"

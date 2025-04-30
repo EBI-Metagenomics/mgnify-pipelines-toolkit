@@ -155,7 +155,7 @@ def parse_args():
     description = (
         "antiSMASH output summary generator. "
         "Script takes regions from GFF and counts its appearance in annotation. "
-        "Output columns contain classID, descriptions and count. "
+        "Output columns contain label, descriptions and count. "
         f"Descriptions were taken from pre-parsed glossary provided on antiSMASH website. "
         f"Current script supports antiSMASH results for version {ANTISMASH_VERSION} and older."
     )
@@ -202,15 +202,15 @@ def main():
         df = pd.DataFrame(dict_list)
         df = df[df["product"].notna()]
         df_grouped = (
-            df.groupby(["product"]).size().reset_index(name="Count")
-        ).sort_values(by="Count", ascending=False)
+            df.groupby(["product"]).size().reset_index(name="count")
+        ).sort_values(by="count", ascending=False)
 
         df_grouped = df_grouped.rename(
             columns={
                 "product": "label",
             }
         )
-        df_grouped["Description"] = df_grouped["label"].apply(
+        df_grouped["description"] = df_grouped["label"].apply(
             lambda x: ",".join(
                 [
                     DESCRIPTIONS.get(cls.strip().lower(), cls.strip())
@@ -218,11 +218,7 @@ def main():
                 ]
             )
         )
-        df_grouped = df_grouped[["label", "Description", "Count"]]
-        df_grouped = df_grouped.rename(columns={
-            "Description": "description",
-            "Count": "count"
-        })
+        df_grouped = df_grouped[["label", "description", "count"]]
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 
 

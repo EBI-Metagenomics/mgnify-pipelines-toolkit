@@ -93,7 +93,6 @@ tests = [
     "pytest>=8.3.5,<9",
     "pytest-md>=0.2.0",
     "pytest-workflow==2.1.0",
-    "pyfakefs==5.8.0",
 ]
 
 dev = [

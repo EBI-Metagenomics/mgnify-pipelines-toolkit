@@ -5,5 +5,6 @@
   files:
     - path: "summary_sanntis.tsv"
       contains:
+        - "nearest_mibig\tnearest_mibig_class\tdescription\tcount"
         - "BGC0000427\tNRP\tNonribosomal Peptide\t1"
         - "BGC0000470\tRiPP\tRibosomally synthesised and Post-translationally modified Peptide\t1"

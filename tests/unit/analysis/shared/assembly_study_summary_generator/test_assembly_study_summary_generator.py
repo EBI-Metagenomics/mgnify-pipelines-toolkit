@@ -1139,7 +1139,7 @@ def create_results_dirs(fs: Any, accession: str) -> None:
     fs.create_dir(f"/{accession}/functional-annotation/kegg")
     fs.create_dir(f"/{accession}/functional-annotation/pfam")
     fs.create_dir(f"/{accession}/pathways-and-systems/antismash")
-    fs.create_dir(f"/{accession}/pathways-and-systems/kegg")
+    fs.create_dir(f"/{accession}/pathways-and-systems/kegg-modules")
     fs.create_dir(f"/{accession}/pathways-and-systems/sanntis")
     fs.create_dir(f"/{accession}/taxonomy")
 
@@ -1222,7 +1222,7 @@ def test_assembly_study_summary_generator_correct_summarise(
             antismash_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/pathways-and-systems/kegg/{accession}_kegg_modules_summary.tsv.gz",
+            f"/{accession}/pathways-and-systems/kegg-modules/{accession}_kegg_modules_summary.tsv.gz",
             kegg_modules_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(

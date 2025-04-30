@@ -202,15 +202,15 @@ def main():
         df = pd.DataFrame(dict_list)
         df = df[df["product"].notna()]
         df_grouped = (
-            df.groupby(["product"]).size().reset_index(name="Count")
-        ).sort_values(by="Count", ascending=False)
+            df.groupby(["product"]).size().reset_index(name="count")
+        ).sort_values(by="count", ascending=False)
 
         df_grouped = df_grouped.rename(
             columns={
-                "product": "ClassID",
+                "product": "classid",
             }
         )
-        df_grouped["Description"] = df_grouped["ClassID"].apply(
+        df_grouped["description"] = df_grouped["classid"].apply(
             lambda x: ",".join(
                 [
                     DESCRIPTIONS.get(cls.strip().lower(), cls.strip())
@@ -218,7 +218,7 @@ def main():
                 ]
             )
         )
-        df_grouped = df_grouped[["ClassID", "Description", "Count"]]
+        df_grouped = df_grouped[["classid", "description", "count"]]
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 
 

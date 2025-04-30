@@ -178,7 +178,9 @@ def check_files_exist(file_list: list[Path]) -> None:
 
 
 def generate_taxonomy_summary(
-    file_dict: dict[str, Path], output_file_name: str
+    file_dict: dict[str, Path],
+    output_file_name: str,
+    outdir: Path = None,
 ) -> None:
     """
     Generate a combined study-level taxonomic classification summary from multiple input
@@ -186,6 +188,7 @@ def generate_taxonomy_summary(
 
     :param file_dict: Dictionary mapping assembly accession to its taxonomy file.
     :param output_file_name: Output path for the output summary file.
+    :param outdir: Optional output directory for the results.
 
     Example of the taxonomy file:
     23651	sk__Bacteria
@@ -213,7 +216,12 @@ def generate_taxonomy_summary(
 
     summary_df = pd.concat(tax_dfs, axis=1)
     summary_df = summary_df.fillna(0).astype(int).sort_index()
-    summary_df.to_csv(output_file_name, sep="\t", index_label="taxonomy")
+
+    outfile = output_file_name
+    if outdir:
+        outfile = outdir / output_file_name
+
+    summary_df.to_csv(outfile, sep="\t", index_label="taxonomy")
 
 
 def generate_functional_summary(
@@ -223,6 +231,7 @@ def generate_functional_summary(
     label: Literal[
         "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
     ],
+    outdir: Path = None,
 ) -> None:
     """
     Generate a combined study-level functional annotation summary from multiple input
@@ -233,6 +242,7 @@ def generate_functional_summary(
     :param output_prefix: Prefix for the output summary file.
     :param label: Label for the functional annotation type
     (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
+    :param outdir: Optional output directory for the results.
 
     In the input files, column orders may vary, but the following columns are expected:
     GO summary input file:
@@ -321,7 +331,12 @@ def generate_functional_summary(
 
     # Reorder columns: merge keys first, then sorted assembly accessions
     merged_df = merged_df[renamed_col_names + sorted(value_columns)]
-    merged_df.to_csv(output_file_name, sep="\t", index=False)
+
+    outfile = output_file_name
+    if outdir:
+        outfile = outdir / output_file_name
+
+    merged_df.to_csv(outfile, sep="\t", index=False)
 
 
 @cli.command(
@@ -350,7 +365,16 @@ def generate_functional_summary(
     help="Prefix for generated summary files",
     type=str,
 )
-def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) -> None:
+@click.option(
+    "-o",
+    "--outdir",
+    required=False,
+    help="Directory for the output files, by default it will use the current working directory.",
+    type=click.Path(exists=True, path_type=Path, file_okay=False),
+)
+def summarise_analyses(
+    assemblies: Path, study_dir: Path, output_prefix: str, outdir: Path
+) -> None:
     """
     Generate study-level summaries for successfully proccessed assemblies.
 
@@ -382,6 +406,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
     generate_taxonomy_summary(
         get_file_paths("taxonomy", "{acc}.krona.txt.gz"),
         f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}",
+        outdir=outdir,
     )
 
     for summary_type, config in SUMMARY_TYPES_MAP.items():
@@ -393,6 +418,7 @@ def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str) ->
             config["column_names"],
             output_prefix,
             summary_type,
+            outdir=outdir,
         )
     logging.info("Assembly-level summaries were generated successfully.")
     logging.info("Done.")

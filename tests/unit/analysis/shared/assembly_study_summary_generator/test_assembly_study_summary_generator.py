@@ -1127,21 +1127,32 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
     return rows_per_accession
 
 
-def create_results_dirs(fs: Any, accession: str) -> None:
+def create_results_dirs(tmpdir: Any, accession: str) -> None:
     """
     Create the necessary directory structure for the results.
 
-    :param fs: The fake filesystem instance.
+    :param tmpdir: pytest tmpdir fixture
     :param accession: The accession ID for which to create directories.
     """
-    fs.create_dir(f"/{accession}/functional-annotation/go")
-    fs.create_dir(f"/{accession}/functional-annotation/interpro")
-    fs.create_dir(f"/{accession}/functional-annotation/kegg")
-    fs.create_dir(f"/{accession}/functional-annotation/pfam")
-    fs.create_dir(f"/{accession}/pathways-and-systems/antismash")
-    fs.create_dir(f"/{accession}/pathways-and-systems/kegg-modules")
-    fs.create_dir(f"/{accession}/pathways-and-systems/sanntis")
-    fs.create_dir(f"/{accession}/taxonomy")
+    accession_tmp = tmpdir / accession
+    accession_tmp.mkdir()
+
+    functional_annotations = accession_tmp / "functional-annotation"
+    functional_annotations.mkdir()
+
+    (functional_annotations / "go").mkdir()
+    (functional_annotations / "interpro").mkdir()
+    (functional_annotations / "kegg").mkdir()
+    (functional_annotations / "pfam").mkdir()
+
+    pathways_and_systems = accession_tmp / "pathways-and-systems"
+    pathways_and_systems.mkdir()
+
+    (pathways_and_systems / "antismash").mkdir()
+    (pathways_and_systems / "kegg-modules").mkdir()
+    (pathways_and_systems / "sanntis").mkdir()
+
+    (accession_tmp / "taxonomy").mkdir()
 
 
 def write_gzipped_tsv(file_path: str, rows: List[List[Any]]) -> None:
@@ -1171,7 +1182,7 @@ def calculate_md5(file_path: str) -> str:
 
 
 def test_assembly_study_summary_generator_correct_summarise(
-    fs: Any,
+    tmpdir: Any,
     go_summary_tsv_rows_per_accession: Dict,
     interpro_summary_tsv_rows_per_accession: Dict,
     ko_summary_summary_tsv_rows_per_accession: Dict,
@@ -1192,72 +1203,80 @@ def test_assembly_study_summary_generator_correct_summarise(
     ]
 
     for accession in accessions:
-        create_results_dirs(fs, accession)
+        create_results_dirs(tmpdir, accession)
         # functional-annotation #
         write_gzipped_tsv(
-            f"/{accession}/functional-annotation/go/{accession}_go_summary.tsv.gz",
+            f"{tmpdir}/{accession}/functional-annotation/go/{accession}_go_summary.tsv.gz",
             go_summary_tsv_rows_per_accession[accession],
         )
         # We are reusing the GO results for GO slim, the structure of the results is the same
         write_gzipped_tsv(
-            f"/{accession}/functional-annotation/go/{accession}_goslim_summary.tsv.gz",
+            f"{tmpdir}/{accession}/functional-annotation/go/{accession}_goslim_summary.tsv.gz",
             go_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/functional-annotation/interpro/{accession}_interpro_summary.tsv.gz",
+            f"{tmpdir}/{accession}/functional-annotation/interpro/{accession}_interpro_summary.tsv.gz",
             interpro_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/functional-annotation/kegg/{accession}_ko_summary.tsv.gz",
+            f"{tmpdir}/{accession}/functional-annotation/kegg/{accession}_ko_summary.tsv.gz",
             ko_summary_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/functional-annotation/pfam/{accession}_pfam_summary.tsv.gz",
+            f"{tmpdir}/{accession}/functional-annotation/pfam/{accession}_pfam_summary.tsv.gz",
             pfam_summary_summary_tsv_rows_per_accession[accession],
         )
 
         # pathways-and-systems #
         write_gzipped_tsv(
-            f"/{accession}/pathways-and-systems/antismash/{accession}_antismash_summary.tsv.gz",
+            f"{tmpdir}/{accession}/pathways-and-systems/antismash/{accession}_antismash_summary.tsv.gz",
             antismash_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/pathways-and-systems/kegg-modules/{accession}_kegg_modules_summary.tsv.gz",
+            f"/{tmpdir}/{accession}/pathways-and-systems/kegg-modules/{accession}_kegg_modules_summary.tsv.gz",
             kegg_modules_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/pathways-and-systems/sanntis/{accession}_sanntis_summary.tsv.gz",
+            f"{tmpdir}/{accession}/pathways-and-systems/sanntis/{accession}_sanntis_summary.tsv.gz",
             sanntis_modules_summary_tsv_rows_per_accession[accession],
         )
         write_gzipped_tsv(
-            f"/{accession}/taxonomy/{accession}.krona.txt.gz",
+            f"{tmpdir}/{accession}/taxonomy/{accession}.krona.txt.gz",
             taxonomy_tsv_rows_per_accession[accession],
         )
 
-    input_csv = "/input.csv"
-    fs.create_file(
-        input_csv,
-        contents="\n".join(f"{accession},success" for accession in accessions),
-    )
+    input_csv = tmpdir / "input.csv"
+
+    with open(input_csv, "w") as input_fh:
+        input_fh.write("\n".join(f"{accession},success" for accession in accessions))
 
     runner = CliRunner()
     result = runner.invoke(
         summarise_analyses,
-        ["--assemblies", input_csv, "--study_dir", "/", "-p", "test"],
+        [
+            "--assemblies",
+            input_csv,
+            "--study_dir",
+            tmpdir,
+            "-p",
+            "test",
+            "--outdir",
+            tmpdir,
+        ],
     )
     assert result.exit_code == 0
 
     # Verify that the output files exist and have the expected MD5 checksums
     expected_files_md5 = {
-        "/test_go_summary.tsv": "3783ef924b0f7d598888334025de1834",
-        "/test_goslim_summary.tsv": "3783ef924b0f7d598888334025de1834",
-        "/test_interpro_summary.tsv": "ccdb11f77c1631ec3dad99226e791cbb",
-        "/test_ko_summary.tsv": "9a0e4ebc8d3c096738ab9be5658fbc0d",
-        "/test_kegg_modules_summary.tsv": "c66966de0c38f74ed83919c9fe0dd1b4",
-        "/test_pfam_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
-        "/test_sanntis_summary.tsv": "97b79aee421aaee39bf6409333218e03",
-        "/test_antismash_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
-        "/test_taxonomy_summary.tsv": "6260f20e4237d81c00d9787e02653734",
+        f"{tmpdir}/test_go_summary.tsv": "3783ef924b0f7d598888334025de1834",
+        f"{tmpdir}/test_goslim_summary.tsv": "3783ef924b0f7d598888334025de1834",
+        f"{tmpdir}/test_interpro_summary.tsv": "ccdb11f77c1631ec3dad99226e791cbb",
+        f"{tmpdir}/test_ko_summary.tsv": "9a0e4ebc8d3c096738ab9be5658fbc0d",
+        f"{tmpdir}/test_kegg_modules_summary.tsv": "c66966de0c38f74ed83919c9fe0dd1b4",
+        f"{tmpdir}/test_pfam_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
+        f"{tmpdir}/test_sanntis_summary.tsv": "97b79aee421aaee39bf6409333218e03",
+        f"{tmpdir}/test_antismash_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
+        f"{tmpdir}/test_taxonomy_summary.tsv": "6260f20e4237d81c00d9787e02653734",
     }
 
     for file_path, expected_md5 in expected_files_md5.items():

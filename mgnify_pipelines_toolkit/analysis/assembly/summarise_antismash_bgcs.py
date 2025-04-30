@@ -207,10 +207,10 @@ def main():
 
         df_grouped = df_grouped.rename(
             columns={
-                "product": "classid",
+                "product": "label",
             }
         )
-        df_grouped["description"] = df_grouped["classid"].apply(
+        df_grouped["description"] = df_grouped["label"].apply(
             lambda x: ",".join(
                 [
                     DESCRIPTIONS.get(cls.strip().lower(), cls.strip())
@@ -218,7 +218,7 @@ def main():
                 ]
             )
         )
-        df_grouped = df_grouped[["classid", "description", "count"]]
+        df_grouped = df_grouped[["label", "description", "count"]]
         df_grouped.to_csv(output_filename, sep="\t", index=False)
 
 

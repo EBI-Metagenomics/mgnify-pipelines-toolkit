@@ -17,27 +17,39 @@
 
 import argparse
 
-from gff_annotation_utils import get_ncrnas, get_trnas, load_annotations, load_crispr
-from gff_file_utils import write_results_to_file, print_pseudogene_report
+from mgnify_pipelines_toolkit.analysis.assembly.gff_annotation_utils import (
+    get_ncrnas,
+    get_trnas,
+    load_annotations,
+    load_crispr,
+)
+from mgnify_pipelines_toolkit.analysis.assembly.gff_file_utils import (
+    write_results_to_file,
+    print_pseudogene_report,
+)
 
 
-def main(
-    gff,
-    ipr_file,
-    eggnog_file,
-    sanntis_file,
-    crispr_file,
-    amr_file,
-    antismash_file,
-    gecco_file,
-    dbcan_file,
-    defense_finder_file,
-    pseudofinder_file,
-    rfam_file,
-    trnascan_file,
-    outfile,
-    pseudogene_report_file,
-):
+def main():
+
+    (
+        gff,
+        ipr_file,
+        eggnog_file,
+        sanntis_file,
+        crispr_file,
+        amr_file,
+        antismash_file,
+        gecco_file,
+        dbcan_file,
+        dbcan_cazys_file,
+        defense_finder_file,
+        pseudofinder_file,
+        rfam_file,
+        trnascan_file,
+        outfile,
+        pseudogene_report_file,
+    ) = parse_args()
+
     # load annotations and add them to existing CDS
     # here header contains leading GFF lines starting with "#",
     # main_gff_extended is a dictionary that contains GFF lines with added in additional annotations
@@ -53,6 +65,7 @@ def main(
         antismash_file,
         gecco_file,
         dbcan_file,
+        dbcan_cazys_file,
         defense_finder_file,
         pseudofinder_file,
     )
@@ -66,7 +79,9 @@ def main(
     if crispr_file:
         crispr_annotations = load_crispr(crispr_file)
 
-    write_results_to_file(outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations)
+    write_results_to_file(
+        outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations
+    )
     if pseudogene_report_file:
         print_pseudogene_report(pseudogene_report_dict, pseudogene_report_file)
 
@@ -74,7 +89,7 @@ def main(
 def parse_args():
     parser = argparse.ArgumentParser(
         description="The script extends a user-provided base GFF annotation file by incorporating "
-                    "information extracted from the user-provided outputs of supplementary annotation tools.",
+        "information extracted from the user-provided outputs of supplementary annotation tools.",
     )
     parser.add_argument(
         "-g",
@@ -124,7 +139,12 @@ def parse_args():
     )
     parser.add_argument(
         "--dbcan",
-        help="The GFF file produced by dbCAN post-processing script",
+        help="The GFF file produced by dbCAN post-processing script that uses cluster annotations",
+        required=False,
+    )
+    parser.add_argument(
+        "--dbcan-cazys",
+        help="The GFF file produced by dbCAN-CAZYs post-processing script",
         required=False,
     )
     parser.add_argument(
@@ -146,12 +166,8 @@ def parse_args():
         "--pseudogene-report", help="Pseudogene report filename", required=False
     )
 
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
-    args = parse_args()
-    main(
+    args = parser.parse_args()
+    return (
         args.gff_input,
         args.ips,
         args.eggnog,
@@ -161,10 +177,15 @@ if __name__ == '__main__':
         args.antismash,
         args.gecco,
         args.dbcan,
+        args.dbcan_cazys,
         args.defense_finder,
         args.pseudofinder,
         args.rfam,
         args.trnascan,
         args.outfile,
         args.pseudogene_report,
-         )
+    )
+
+
+if __name__ == "__main__":
+    main()

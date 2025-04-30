@@ -1,0 +1,6 @@
+##gff-version 3
+MGYG000500002_1	SanntiSv0.9.3.1	CLUSTER	573971	588437	.	.	.	ID=MGYG000500002_1_sanntis_1;nearest_MiBIG=BGC0000913;nearest_MiBIG_class=Other;nearest_MiBIG_diceDistance=0.479;score=0.650;partial=00
+MGYG000500002_1	SanntiSv0.9.3.1	CLUSTER	844348	849611	.	.	.	ID=MGYG000500002_1_sanntis_2;nearest_MiBIG=BGC0002031;nearest_MiBIG_class=Alkaloid;nearest_MiBIG_diceDistance=0.514;score=0.450;partial=00
+MGYG000500002_2	SanntiSv0.9.3.1	CLUSTER	538	26645	.	.	.	ID=MGYG000500002_2_sanntis_1;nearest_MiBIG=BGC0000943;nearest_MiBIG_class=Other;nearest_MiBIG_diceDistance=0.718;score=0.660;partial=10
+MGYG000500002_2	SanntiSv0.9.3.1	CLUSTER	365314	388384	.	.	.	ID=MGYG000500002_2_sanntis_2;nearest_MiBIG=BGC0000265;nearest_MiBIG_class=Polyketide;nearest_MiBIG_diceDistance=0.726;score=0.440;partial=00
+MGYG000500002_3	SanntiSv0.9.3.1	CLUSTER	52476	79632	.	.	.	ID=MGYG000500002_3_sanntis_1;nearest_MiBIG=BGC0000308;nearest_MiBIG_class=NRP;nearest_MiBIG_diceDistance=0.474;score=0.820;partial=00

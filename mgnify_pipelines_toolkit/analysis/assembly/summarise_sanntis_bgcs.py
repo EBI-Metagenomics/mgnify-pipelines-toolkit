@@ -110,6 +110,10 @@ def main():
         df_merged = df_merged[
             ["nearest_mibig", "nearest_mibig_class", "description", "count"]
         ]
+        df_merged = df_merged.rename(columns={
+            "Description": "description",
+            "Count": "count"
+        })
         df_merged.to_csv(output_filename, sep="\t", index=False)
 
 

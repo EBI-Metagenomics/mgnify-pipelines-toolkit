@@ -17,10 +17,11 @@ import logging
 import re
 
 from enum import Enum
-from typing import ClassVar, Optional, Type
+from typing import ClassVar, Optional, Type, Literal
 
 import pandas as pd
 import pandera as pa
+from pandera.typing import Series
 from pandera.typing.common import DataFrameBase
 
 from pydantic import (
@@ -110,6 +111,354 @@ class AmpliconPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
+class CompletedAnalysisRecord(BaseModel):
+    """Class defining a Pydantic model for a single "row" of an successfully analysed assemblies file."""
+
+    assembly: str = Field(
+        ...,
+        description="Assembly accession",
+        examples=["ERZ789012"],
+        pattern=r"ERZ\d{6,}",
+    )
+    status: Literal["success"] = Field(
+        ...,
+        description="Pipeline output for whether this assembly's analysis succeeded or not",
+    )
+
+
+class CompletedAnalysisSchema(pa.DataFrameModel):
+    """Class modelling a Pandera dataframe schema that uses the CompletedAnalysisSchema class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    assembly: Series[str]
+
+    @pa.check("assembly")
+    def accessions_unique(self, series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(CompletedAnalysisRecord)
+        coerce = True
+
+
+class InterProSummaryRecord(BaseModel):
+    """Model of a row in the InterPro summary file."""
+
+    count: int = Field(
+        ..., ge=0, description="Number of hits for the InterPro accession"
+    )
+    interpro_accession: str = Field(
+        ...,
+        description="InterPro accession ID",
+        examples=["IPR123456"],
+        pattern=r"IPR\d{6}",
+    )
+    description: str = Field(..., description="Description of the InterPro domain")
+
+
+class GOSummaryRecord(BaseModel):
+    """Model of a row in the GO summary file."""
+
+    go: str = Field(
+        ...,
+        description="GO term identifier",
+        examples=["GO:1234567"],
+        pattern=r"GO:\d{7}",
+    )
+    term: str = Field(..., description="GO term name")
+    category: str = Field(
+        ...,
+        description="GO category",
+        examples=["biological_process", "molecular_function", "cellular_component"],
+    )
+    count: int = Field(..., ge=0, description="Number of times the GO term is observed")
+
+
+class BaseSummarySchema(pa.DataFrameModel):
+    """Base schema for summary files."""
+
+    @staticmethod
+    def is_unique(series: Series[str]) -> Series[bool]:
+        return ~series.duplicated()
+
+
+class InterProSummarySchema(BaseSummarySchema):
+    """Schema for InterPro summary file validation."""
+
+    interpro_accession: Series[str]
+
+    @pa.check("interpro_accession")
+    def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(InterProSummaryRecord)
+        coerce = True
+
+
+class GOSummarySchema(BaseSummarySchema):
+    """Schema for GO or GOslim summary file validation."""
+
+    go: Series[str]
+
+    @pa.check("go")
+    def go_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(GOSummaryRecord)
+        coerce = True
+
+
+class SanntisSummaryRecord(BaseModel):
+    """Model of a row in the Sanntis assembly-level summary file."""
+
+    nearest_mibig: str = Field(
+        ...,
+        description="The accession ID of the closest matching biosynthetic gene cluster (BGC) in the MIBiG database",
+        examples=["BGC0000073"],
+        pattern=r"BGC\d{7}",
+    )
+    nearest_mibig_class: str = Field(
+        ...,
+        description="The biosynthetic class of the nearest MIBiG BGC",
+        examples=["Polyketide"],
+    )
+    description: str = Field(
+        ...,
+        description="A brief summary of the biosynthetic process or type of metabolite associated with the nearest MIBiG cluster",
+    )
+
+    count: int = Field(
+        ..., ge=0, description="Number of times the MIBiG entry is observed"
+    )
+
+
+class AntismashSummaryRecord(BaseModel):
+    """Model of a row in the Antismash summary file."""
+
+    label: str = Field(
+        ...,
+        description="Biosynthetic class or label assigned by Antismash based on sequence similarity to known biosynthetic gene clusters.",
+        examples=["RiPP-like", "T1PKS", "terpene"],
+    )
+    description: str = Field(
+        ...,
+        description="Brief explanation of the biosynthetic class, often indicating compound type or functional characteristics.",
+        examples=["Type I PKS (Polyketide synthase)", "Redox-cofactors such as PQQ"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of BGCs (biosynthetic gene clusters) in the dataset assigned to this label.",
+    )
+
+
+class KOSummaryRecord(BaseModel):
+    """Model of a row in the KEGG summary file."""
+
+    ko: str = Field(
+        ...,
+        description="KEGG Orthology (KO) identifier representing a functional gene or pathway component.",
+        examples=["K07547", "K04874", "K19946"],
+        pattern=r"K\d{5,}",
+    )
+    description: str = Field(
+        ...,
+        description="Name or function of the KO, sometimes including EC numbers and protein families.",
+        examples=["optineurin", "MFS transporter, POT/PTR family"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of times this KO identifier is observed in the dataset.",
+    )
+
+
+class PFAMSummaryRecord(BaseModel):
+    """Model of a row in the PFAM summary file."""
+
+    pfam: str = Field(
+        ...,
+        description="PFAM accession identifier representing a protein domain or family.",
+        examples=["PF00265", "PF01956", "PF00673"],
+        pattern=r"PF\d{5}",
+    )
+    description: str = Field(
+        ...,
+        description="Description of the protein domain or family associated with the PFAM ID.",
+        examples=["Thymidine kinase", "Integral membrane protein EMC3/TMCO1-like"],
+    )
+    count: int = Field(
+        ...,
+        ge=0,
+        description="Number of times the PFAM domain is observed in the dataset.",
+    )
+
+
+class KEGGModulesSummaryRecord(BaseModel):
+    """Model of a row in the KEGG Modules summary file."""
+
+    module_accession: str = Field(
+        ...,
+        description="KEGG Module identifier representing a specific metabolic pathway or module.",
+        examples=["M00123", "M00234"],
+        pattern=r"M\d{5}",
+    )
+    completeness: float = Field(
+        ...,
+        ge=0,
+        description="Completeness score of the KEGG Module, indicating the extent to which the module is present in the metagenome.",
+    )
+    pathway_name: str = Field(
+        ...,
+        description="Name of the metabolic pathway associated with the KEGG Module.",
+        examples=["Sulfur reduction, sulfur => sulfide"],
+    )
+    pathway_class: str = Field(
+        ...,
+        description="Biosynthetic class or category associated with the KEGG Module, semi colon separated.",
+        examples=["Pathway modules; Energy metabolism; Photosynthesis"],
+    )
+
+
+class SanntisSummarySchema(BaseSummarySchema):
+    nearest_mibig: Series[str]
+
+    @pa.check("nearest_mibig")
+    def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(SanntisSummaryRecord)
+        coerce = True
+
+
+class AntismashSummarySchema(BaseSummarySchema):
+    label: Series[str]
+
+    @pa.check("label")
+    def class_names_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(AntismashSummaryRecord)
+        coerce = True
+
+
+class KOSummarySchema(BaseSummarySchema):
+    ko: Series[str]
+
+    @pa.check("ko")
+    def ko_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(KOSummaryRecord)
+        coerce = True
+
+
+class PFAMSummarySchema(BaseSummarySchema):
+    pfam: Series[str]
+
+    @pa.check("pfam")
+    def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(PFAMSummaryRecord)
+        coerce = True
+
+
+class KEGGModulesSummarySchema(BaseSummarySchema):
+    module_accession: Series[str]
+
+    @pa.check("module_accession")
+    def module_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+    class Config:
+        dtype = PydanticModel(KEGGModulesSummaryRecord)
+        coerce = True
+
+
+class BaseStudySummarySchema(BaseSummarySchema):
+    """Base schema for study summary files with ERZ* columns and count checks."""
+
+    @pa.check(regex=r"^ERZ\d+")
+    def count_columns_are_non_negative(self, s: Series[int]) -> Series[bool]:
+        return s >= 0
+
+    class Config:
+        strict = False  # allow extra ERZ* columns not declared above
+
+
+class GOStudySummarySchema(BaseStudySummarySchema):
+    GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$")
+    description: Series[str]
+    category: Series[str]
+
+    @pa.check("GO")
+    def go_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class InterProStudySummarySchema(BaseStudySummarySchema):
+    IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$")
+    description: Series[str]
+
+    @pa.check("IPR")
+    def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class AntismashStudySummarySchema(BaseStudySummarySchema):
+    label: Series[str]
+
+    @pa.check("label")
+    def class_names_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class SanntisStudySummarySchema(BaseStudySummarySchema):
+    nearest_mibig: Series[str]
+
+    @pa.check("nearest_mibig")
+    def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class KOStudySummarySchema(BaseStudySummarySchema):
+    KO: Series[str]
+
+    @pa.check("KO")
+    def ko_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class PFAMStudySummarySchema(BaseStudySummarySchema):
+    PFAM: Series[str]
+
+    @pa.check("PFAM")
+    def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class KEGGModulesStudySummarySchema(BaseStudySummarySchema):
+    module_accession: Series[str]
+
+    @pa.check("module_accession")
+    def module_ids_unique(self, series: Series[str]) -> Series[bool]:
+        return self.is_unique(series)
+
+
+class TaxonomyStudySummarySchema(BaseStudySummarySchema):
+    pass
+
+
 class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
     Uses the AmpliconNonINSDCSPassedRunsRecord as a dtype to achieve this.
@@ -145,7 +494,11 @@ class TaxRank(RootModel):
     def rank_structure_validity_check(cls, taxrank: str) -> bool:
         taxrank_list = taxrank.split("__")
         rank = taxrank_list[0]
-        if rank != "" and rank != "Unclassified" and rank not in cls.valid_tax_ranks:
+        if (
+            rank != ""
+            and rank.capitalize() != "Unclassified"
+            and rank not in cls.valid_tax_ranks
+        ):
             raise ValueError(f"Invalid taxonomy rank {rank}.")
 
         return taxrank

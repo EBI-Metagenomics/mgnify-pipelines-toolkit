@@ -75,38 +75,40 @@ def main():
                 entry_dict[key] = value
             dict_list.append(entry_dict)
 
-            # Convert to DataFrame
+        # Convert to DataFrame
         df = pd.DataFrame(dict_list)
         df = df.rename(
             columns={
-                "nearest_MiBIG": "nearest_MIBiG",
-                "nearest_MiBIG_class": "nearest_MIBiG_class",
+                "nearest_MiBIG": "nearest_mibig",
+                "nearest_MiBIG_class": "nearest_mibig_class",
             }
         )
         df_grouped = (
-            df.groupby(["nearest_MIBiG", "nearest_MIBiG_class"])
+            df.groupby(["nearest_mibig", "nearest_mibig_class"])
             .size()
-            .reset_index(name="Count")
+            .reset_index(name="count")
         )
-        df_grouped = df_grouped.sort_values(by="Count", ascending=False)
+        df_grouped = df_grouped.sort_values(by="count", ascending=False)
 
         df_desc = pd.DataFrame(
-            list(DESCRIPTIONS.items()), columns=["MIBiG_class", "Description"]
+            list(DESCRIPTIONS.items()), columns=["mibig_class", "description"]
         )
-        df_desc = df_desc.set_index("MIBiG_class")
+        df_desc = df_desc.set_index("mibig_class")
         df_merged = df_grouped.merge(
-            df_desc, left_on="nearest_MIBiG_class", right_index=True, how="left"
+            df_desc, left_on="nearest_mibig_class", right_index=True, how="left"
         )
-        df_merged["Description"] = df_merged.apply(
-            lambda row: row["nearest_MIBiG_class"].replace(
-                "NRP", df_desc.loc["NRP"]["Description"]
-            )
-            if pd.isna(row["Description"]) and "NRP" in row["nearest_MIBiG_class"]
-            else row["Description"],
+        df_merged["description"] = df_merged.apply(
+            lambda row: (
+                row["nearest_mibig_class"].replace(
+                    "NRP", df_desc.loc["NRP"]["description"]
+                )
+                if pd.isna(row["description"]) and "NRP" in row["nearest_mibig_class"]
+                else row["description"]
+            ),
             axis=1,
         )
         df_merged = df_merged[
-            ["nearest_MIBiG", "nearest_MIBiG_class", "Description", "Count"]
+            ["nearest_mibig", "nearest_mibig_class", "description", "count"]
         ]
         df_merged = df_merged.rename(columns={
             "Description": "description",

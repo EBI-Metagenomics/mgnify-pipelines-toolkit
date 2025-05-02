@@ -1,0 +1,11 @@
+label	description	ERZ1049444	ERZ1049445
+NRPS	Non-ribosomal peptide synthetase	444	298
+NRPS-like	NRPS-like fragment	0	295
+NRPS-like,T1PKS	NRPS-like fragment,Type I PKS (Polyketide synthase)	456	0
+T1PKS	Type I PKS (Polyketide synthase)	0	388
+arylpolyene	Aryl polyene	19	92
+arylpolyene,resorcinol	Aryl polyene,Resorcinol	306	383
+betalactone	Beta-lactone containing protease inhibitor	19	0
+redox-cofactor	Redox-cofactors such as PQQ (NC_021985:1458906-1494876)	297	247
+resorcinol	Resorcinol	35	160
+terpene	Terpene	417	40

@@ -117,6 +117,7 @@ SUMMARY_TYPES_MAP = {
     },
     "sanntis": {
         "folder": "pathways-and-systems/sanntis",
+        "allow_missing": True,
         "column_names": SANNTIS_COLUMN_NAMES,
         "schema": SanntisSummarySchema,
         "study_schema": SanntisStudySummarySchema,
@@ -232,6 +233,7 @@ def generate_functional_summary(
         "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
     ],
     outdir: Path = None,
+    allow_missing: bool = False,
 ) -> None:
     """
     Generate a combined study-level functional annotation summary from multiple input
@@ -243,6 +245,7 @@ def generate_functional_summary(
     :param label: Label for the functional annotation type
     (expected one of ["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"]).
     :param outdir: Optional output directory for the results.
+    :param allow_missing: Whether to allow the summary files to be missing (e.g. because the pipeline doesn't emit them if acceptably empty).
 
     In the input files, column orders may vary, but the following columns are expected:
     GO summary input file:
@@ -285,7 +288,17 @@ def generate_functional_summary(
     M00163	83.33	Photosystem I	Pathway modules; Energy metabolism; Photosynthesis	K02689,K02690,K02691,K02692,K02694	K02693
     M00615	50.0	Nitrate assimilation	Signature modules; Module set; Metabolic capacity	K02575	M00531
     """
-    check_files_exist(list(file_dict.values()))
+    try:
+        check_files_exist(list(file_dict.values()))
+    except FileNotFoundError as e:
+        if allow_missing:
+            logging.warning(
+                f"One of the expected files is missing, but this is allowed for {label}."
+            )
+            logging.warning(e)
+            return
+        else:
+            raise e
 
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
@@ -419,6 +432,7 @@ def summarise_analyses(
             output_prefix,
             summary_type,
             outdir=outdir,
+            allow_missing=config.get("allow_missing", False),
         )
     logging.info("Assembly-level summaries were generated successfully.")
     logging.info("Done.")

@@ -1,0 +1,15 @@
+- name: test_process_dbcan_result_cazys test_wrong_args
+  tags:
+    - test_process_dbcan_result_cazys
+  exit_code: 2
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_cazys --chromosome X
+  stderr:
+    contains:
+      - "process_dbcan_result_cazys.py: error: the following arguments are required: -hmm, -ov, -g, -o, -v"
+- name: test_process_dbcan_result_cazys test_correct_args
+  tags:
+    - test_process_dbcan_result_cazys
+  command: python -m mgnify_pipelines_toolkit.analysis.assembly.process_dbcan_result_cazys -g tests/fixtures/process_dbcan/input_cgc.gff -ov tests/fixtures/process_dbcan/overview.tsv -hmm tests/fixtures/process_dbcan/dbCANsub_hmm_results.tsv -v 4.6 -o test_dbcan_cazys.gff
+  files:
+    - path: "test_dbcan_cazys.gff"
+      md5sum: 00b2c1d3f1024163099086d70ff12d50

@@ -84,14 +84,13 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
         with fileinput.hook_compressed(overview_file, "r", encoding="utf-8") as file_in:
             for line in file_in:
                 if line.startswith("MGYG") or line.startswith("ERZ"):
-                    (
-                        transcript,
-                        ec_number_raw,
-                        dbcan_hmmer,
-                        dbcan_sub_ecami,
-                        diamond,
-                        num_of_tools,
-                    ) = line.strip().split("\t")
+                    line = line.strip()
+                    temp_list = line.split("\t")
+                    transcript = temp_list[0]
+                    ec_number_raw = temp_list[1]
+                    num_of_tools = temp_list[5]
+                    recc_subfamily = temp_list[6]
+
                     # EC is reported as 2.4.99.-:5 with :5 meaning 5 proteins in the subfamily have EC 2.4.99.-
 
                     ec_number = ""
@@ -101,16 +100,6 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                             ec_number += ec.split(":")[0] + "|"
 
                     ec_number = ec_number.strip("|")
-
-                    # Dbcan recommends to use subfamily preference as dbcan_hmmer > dbcan_sub_ecami > diamond
-                    # diamond is messier, so we don't report it here
-                    if dbcan_hmmer != "-":
-                        # the field dbcan_hmmer reports match positions in parentheses, clear them out first:
-                        subfamily = dbcan_hmmer.split("(")[0]
-                    elif dbcan_sub_ecami != "-":
-                        subfamily = dbcan_sub_ecami
-                    else:
-                        continue
                     cleaned_substrates = ",".join(
                         sorted(
                             {
@@ -122,8 +111,11 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         )
                     )
                     # Assemble information to add to the 9th column
+                    if recc_subfamily == "-":
+                        continue
+
                     col9_parts = [
-                        f"protein_family={subfamily}",
+                        f"protein_family={recc_subfamily}",
                         f"substrate_dbcan-sub={cleaned_substrates}",
                     ]
 
@@ -155,8 +147,8 @@ def load_substrates(hmm_path):
         header = next(file_in)
         header_fields = header.strip().split("\t")
         substrate_idx = header_fields.index("Substrate")
-        gene_idx = header_fields.index("Gene ID")
-        evalue_idx = header_fields.index("E Value")
+        gene_idx = header_fields.index("Target Name")
+        evalue_idx = header_fields.index("i-Evalue")
         for line in file_in:
             fields = line.strip().split("\t")
             if float(fields[evalue_idx]) < 1e-15:  # evalue is the default from dbcan

@@ -297,8 +297,7 @@ def generate_functional_summary(
             )
             logging.warning(e)
             return
-        else:
-            raise e
+        raise
 
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 

@@ -1285,3 +1285,84 @@ def test_assembly_study_summary_generator_correct_summarise(
         assert (
             actual_md5 == expected_md5
         ), f"MD5 checksum mismatch for {file_path}. Expected: {expected_md5}, Actual: {actual_md5}"
+
+
+def test_assembly_study_summary_generator_no_sanntis(
+    tmpdir: Any,
+    go_summary_tsv_rows_per_accession: Dict,
+    interpro_summary_tsv_rows_per_accession: Dict,
+    ko_summary_summary_tsv_rows_per_accession: Dict,
+    pfam_summary_summary_tsv_rows_per_accession: Dict,
+    antismash_summary_tsv_rows_per_accession: Dict,
+    kegg_modules_summary_tsv_rows_per_accession: Dict,
+    taxonomy_tsv_rows_per_accession: Dict,
+) -> None:
+    """
+    Summarize a correct set of results, but where Sanntis results are (allowed to be) missing.
+    """
+    accessions = [
+        "ERZ1049440",
+        "ERZ1049443",
+        "ERZ1049444",
+        "ERZ1049445",
+    ]
+
+    for accession in accessions:
+        create_results_dirs(tmpdir, accession)
+        # functional-annotation #
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/functional-annotation/go/{accession}_go_summary.tsv.gz",
+            go_summary_tsv_rows_per_accession[accession],
+        )
+        # We are reusing the GO results for GO slim, the structure of the results is the same
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/functional-annotation/go/{accession}_goslim_summary.tsv.gz",
+            go_summary_tsv_rows_per_accession[accession],
+        )
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/functional-annotation/interpro/{accession}_interpro_summary.tsv.gz",
+            interpro_summary_tsv_rows_per_accession[accession],
+        )
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/functional-annotation/kegg/{accession}_ko_summary.tsv.gz",
+            ko_summary_summary_tsv_rows_per_accession[accession],
+        )
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/functional-annotation/pfam/{accession}_pfam_summary.tsv.gz",
+            pfam_summary_summary_tsv_rows_per_accession[accession],
+        )
+
+        # pathways-and-systems #
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/pathways-and-systems/antismash/{accession}_antismash_summary.tsv.gz",
+            antismash_summary_tsv_rows_per_accession[accession],
+        )
+        write_gzipped_tsv(
+            f"/{tmpdir}/{accession}/pathways-and-systems/kegg-modules/{accession}_kegg_modules_summary.tsv.gz",
+            kegg_modules_summary_tsv_rows_per_accession[accession],
+        )
+        write_gzipped_tsv(
+            f"{tmpdir}/{accession}/taxonomy/{accession}.krona.txt.gz",
+            taxonomy_tsv_rows_per_accession[accession],
+        )
+
+    input_csv = tmpdir / "input.csv"
+
+    with open(input_csv, "w") as input_fh:
+        input_fh.write("\n".join(f"{accession},success" for accession in accessions))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        summarise_analyses,
+        [
+            "--assemblies",
+            input_csv,
+            "--study_dir",
+            tmpdir,
+            "-p",
+            "test",
+            "--outdir",
+            tmpdir,
+        ],
+    )
+    assert result.exit_code == 0

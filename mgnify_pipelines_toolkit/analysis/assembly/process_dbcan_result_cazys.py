@@ -83,70 +83,63 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
         file_out.write("##gff-version 3\n")
         with fileinput.hook_compressed(overview_file, "r", encoding="utf-8") as file_in:
             for line in file_in:
-                if line.startswith("MGYG") or line.startswith("ERZ"):
-                    (
-                        transcript,
-                        ec_number_raw,
-                        dbcan_hmmer,
-                        dbcan_sub_ecami,
-                        diamond,
-                        num_of_tools,
-                    ) = line.strip().split("\t")
-                    # EC is reported as 2.4.99.-:5 with :5 meaning 5 proteins in the subfamily have EC 2.4.99.-
 
-                    ec_number = ""
-                    ec_list = ec_number_raw.split("|")
-                    for ec in ec_list:
-                        if ec != "-":
-                            ec_number += ec.split(":")[0] + "|"
+                if not line.startswith("MGYG") and not line.startswith("ERZ"):
+                    continue
 
-                    ec_number = ec_number.strip("|")
+                line = line.strip()
+                temp_list = line.split("\t")
+                transcript = temp_list[0]
+                ec_number_raw = temp_list[1]
+                num_of_tools = temp_list[5]
+                recc_subfamily = temp_list[6]
 
-                    # Dbcan recommends to use subfamily preference as dbcan_hmmer > dbcan_sub_ecami > diamond
-                    # diamond is messier, so we don't report it here
-                    if dbcan_hmmer != "-":
-                        # the field dbcan_hmmer reports match positions in parentheses, clear them out first:
-                        subfamily = dbcan_hmmer.split("(")[0]
-                    elif dbcan_sub_ecami != "-":
-                        subfamily = dbcan_sub_ecami
-                    else:
-                        continue
-                    cleaned_substrates = ",".join(
-                        sorted(
-                            {
-                                subsrate.strip()
-                                for subsrate in substrates.get(transcript, "N/A").split(
-                                    ","
-                                )
-                            }
-                        )
+                # EC is reported as 2.4.99.-:5 with :5 meaning 5 proteins in the subfamily have EC 2.4.99.-
+
+                ec_number = ""
+                ec_list = ec_number_raw.split("|")
+                for ec in ec_list:
+                    if ec != "-":
+                        ec_number += ec.split(":")[0] + "|"
+
+                ec_number = ec_number.strip("|")
+                cleaned_substrates = ",".join(
+                    sorted(
+                        {
+                            subsrate.strip()
+                            for subsrate in substrates.get(transcript, "N/A").split(",")
+                        }
                     )
-                    # Assemble information to add to the 9th column
-                    col9_parts = [
-                        f"protein_family={subfamily}",
-                        f"substrate_dbcan-sub={cleaned_substrates}",
-                    ]
+                )
+                # Assemble information to add to the 9th column
+                if recc_subfamily == "-":
+                    continue
 
-                    if ec_number:
-                        col9_parts.append(f"eC_number={ec_number}")
+                col9_parts = [
+                    f"protein_family={recc_subfamily}",
+                    f"substrate_dbcan-sub={cleaned_substrates}",
+                ]
 
-                    col9_parts.append(f"num_tools={num_of_tools}")
-                    col9_text = ";".join(col9_parts)
+                if ec_number:
+                    col9_parts.append(f"eC_number={ec_number}")
 
-                    for gff_line in genome_gff_lines[transcript]:
-                        fields = gff_line.strip().split("\t")
-                        # Replace the tool
-                        fields[1] = f"dbCAN:{dbcan_version}"
-                        # Replace the feature
-                        fields[2] = "CAZyme"
-                        # Replace the confidence value
-                        fields[5] = "."
-                        # Keep only the ID in the 9th column
-                        attributes = fields[8].split(";")[0]
-                        # Add dbcan information to the 9th column
-                        attributes = f"{attributes};{col9_text};"
-                        fields[8] = attributes
-                        file_out.write("\t".join(fields) + "\n")
+                col9_parts.append(f"num_tools={num_of_tools}")
+                col9_text = ";".join(col9_parts)
+
+                for gff_line in genome_gff_lines[transcript]:
+                    fields = gff_line.strip().split("\t")
+                    # Replace the tool
+                    fields[1] = f"dbCAN:{dbcan_version}"
+                    # Replace the feature
+                    fields[2] = "CAZyme"
+                    # Replace the confidence value
+                    fields[5] = "."
+                    # Keep only the ID in the 9th column
+                    attributes = fields[8].split(";")[0]
+                    # Add dbcan information to the 9th column
+                    attributes = f"{attributes};{col9_text};"
+                    fields[8] = attributes
+                    file_out.write("\t".join(fields) + "\n")
 
 
 def load_substrates(hmm_path):
@@ -155,8 +148,8 @@ def load_substrates(hmm_path):
         header = next(file_in)
         header_fields = header.strip().split("\t")
         substrate_idx = header_fields.index("Substrate")
-        gene_idx = header_fields.index("Gene ID")
-        evalue_idx = header_fields.index("E Value")
+        gene_idx = header_fields.index("Target Name")
+        evalue_idx = header_fields.index("i-Evalue")
         for line in file_in:
             fields = line.strip().split("\t")
             if float(fields[evalue_idx]) < 1e-15:  # evalue is the default from dbcan

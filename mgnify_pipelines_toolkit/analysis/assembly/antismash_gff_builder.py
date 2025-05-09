@@ -22,7 +22,6 @@ import pandas as pd
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i", "--input", required=True, type=str, help="Input JSON from antiSMASH"
@@ -64,7 +63,6 @@ def main():
         region_name = None
 
         for feature in record["features"]:
-
             if feature["type"] == "region":
                 # Annotate region features
                 region_name = (
@@ -129,35 +127,38 @@ def main():
             cds_by_protocluster = record["modules"][
                 "antismash.detection.hmm_detection"
             ]["rule_results"]["cds_by_protocluster"]
-            if len(cds_by_protocluster) > 0:
-                for feature in cds_by_protocluster[0][1]:
-                    if "cds_name" in feature.keys():
-                        locus_tag = feature["cds_name"]
-                        as_clusters = ",".join(
-                            list(feature["definition_domains"].keys())
+
+            if not len(cds_by_protocluster):
+                continue
+
+            for feature in cds_by_protocluster[0][1]:
+                if "cds_name" in feature.keys():
+                    locus_tag = feature["cds_name"]
+                    as_clusters = ",".join(list(feature["definition_domains"].keys()))
+                    if locus_tag in attributes_dict.keys():
+                        attributes_dict[locus_tag].update(
+                            {"as_gene_clusters": as_clusters}
                         )
-                        if locus_tag in attributes_dict.keys():
-                            attributes_dict[locus_tag].update(
-                                {"as_gene_clusters": as_clusters}
-                            )
 
         if "antismash.detection.genefunctions" in record["modules"].keys():
-            for tool in record["modules"]["antismash.detection.genefunctions"]["tools"]:
-                if tool["tool"] == "smcogs":
-                    for locus_tag in tool["best_hits"]:
-                        hit_id = tool["best_hits"][locus_tag]["hit_id"].split(":")[0]
-                        hit_desc = (
-                            tool["best_hits"][locus_tag]["hit_id"]
-                            .split(":")[1]
-                            .replace(" ", "_")
-                        )
-                        score = tool["best_hits"][locus_tag]["bitscore"]
-                        e_value = tool["best_hits"][locus_tag]["evalue"]
+            gene_function_tools = record["modules"][
+                "antismash.detection.genefunctions"
+            ]["tools"]
+            for tool, tool_data in gene_function_tools.items():
+                if tool != "smcogs":
+                    continue
 
-                        smcog_note = f"smCOG:{hit_id}:{hit_desc.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
-                        if locus_tag in attributes_dict.keys():
-                            attributes_dict[locus_tag].update({"as_notes": smcog_note})
-                        break
+                for locus_tag in tool_data["best_hits"]:
+                    smcog_id = tool_data["best_hits"][locus_tag]["reference_id"]
+                    smcog_description = tool_data["best_hits"][locus_tag]["description"]
+
+                    score = tool_data["best_hits"][locus_tag]["bitscore"]
+                    e_value = tool_data["best_hits"][locus_tag]["evalue"]
+
+                    smcog_note = f"smCOG:{smcog_id}:{smcog_description.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
+                    if locus_tag in attributes_dict.keys():
+                        attributes_dict[locus_tag].update({"as_notes": smcog_note})
+                    break
 
     attributes = [
         ";".join(f"{k}={v}" for k, v in attrib_data.items() if v)

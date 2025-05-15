@@ -12,7 +12,7 @@
   command: antismash_gff_builder -i tests/fixtures/misc/test_antismash.json -o test.gff --cds_tag ID
   files:
     - path: "test.gff"
-      md5sum: 381a0c0d7e221f8817d84f36153444c4
+      md5sum: cd0975378d7832bfa0b39bfd9f5f5bdb
 - name: antismash_gff_builder test_correct_args_wrong_cds_tag
   tags:
     - antismash_gff_builder

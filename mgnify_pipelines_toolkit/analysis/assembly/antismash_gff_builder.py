@@ -158,7 +158,6 @@ def main():
                     smcog_note = f"smCOG:{smcog_id}:{smcog_description.replace(' ', '_')}(Score:{score}%3BE-value:{e_value})"
                     if locus_tag in attributes_dict.keys():
                         attributes_dict[locus_tag].update({"as_notes": smcog_note})
-                    break
 
     attributes = [
         ";".join(f"{k}={v}" for k, v in attrib_data.items() if v)

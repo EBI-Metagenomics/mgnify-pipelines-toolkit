@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.1.2"
+version = "1.2.0"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -8,7 +8,7 @@ authors = [
 ]
 keywords = ["bioinformatics", "pipelines", "metagenomics"]
 description = "Collection of scripts and tools for MGnify pipelines"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
@@ -89,7 +89,7 @@ fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
 [project.optional-dependencies]
-tests = [
+test = [
     "pytest>=8.3.5,<9",
     "pytest-md>=0.2.0",
     "pytest-workflow==2.1.0",

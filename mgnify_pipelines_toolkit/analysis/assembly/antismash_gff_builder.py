@@ -143,9 +143,7 @@ def main():
             gene_function_tools = record["modules"][
                 "antismash.detection.genefunctions"
             ]["tools"]
-            for tool, tool_data in gene_function_tools.items():
-                if tool != "smcogs":
-                    continue
+            if tool_data := gene_function_tools.get("smcogs"):
 
                 for locus_tag in tool_data["best_hits"]:
                     smcog_id = tool_data["best_hits"][locus_tag]["reference_id"]

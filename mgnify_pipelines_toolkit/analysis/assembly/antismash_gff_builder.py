@@ -134,7 +134,7 @@ def main():
             for feature in cds_by_protocluster[0][1]:
                 if locus_tag := feature.get("cds_name"):
                     as_clusters = ",".join(list(feature["definition_domains"].keys()))
-                    if locus_tag in attributes_dict.keys():
+                    if locus_tag in attributes_dict:
                         attributes_dict[locus_tag].update(
                             {"as_gene_clusters": as_clusters}
                         )

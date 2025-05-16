@@ -91,6 +91,7 @@ get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 [project.optional-dependencies]
 test = [
     "pytest>=8.3.5,<9",
+    "pytest-md>=0.2.0",
     "pytest-workflow==2.1.0",
 ]
 

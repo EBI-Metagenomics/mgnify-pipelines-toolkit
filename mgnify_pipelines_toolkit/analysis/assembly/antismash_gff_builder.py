@@ -128,7 +128,7 @@ def main():
                 "antismash.detection.hmm_detection"
             ]["rule_results"]["cds_by_protocluster"]
 
-            if not len(cds_by_protocluster):
+            if not cds_by_protocluster:
                 continue
 
             for feature in cds_by_protocluster[0][1]:

@@ -88,7 +88,7 @@ genomes_extract_trnas = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_t
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
-[dependency-groups]
+[optional-dependencies]
 test = [
     "pytest>=8.3.5,<9",
     "pytest-workflow==2.1.0",

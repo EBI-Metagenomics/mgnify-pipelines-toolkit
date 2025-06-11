@@ -35,6 +35,7 @@ from pandera.engines.pandas_engine import PydanticModel
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
     SHORT_TAX_RANKS,
     SHORT_PR2_TAX_RANKS,
+    SHORT_MOTUS_TAX_RANKS,
 )
 
 
@@ -616,12 +617,12 @@ class MotusTaxRank(RootModel):
     Essentially is just a special string with validation of the structure:
     `${rank}__${taxon}`
     Where `${rank}` is one of the allowed short ranks defined by the imported
-    `SHORT_TAX_RANKS` and `SHORT_PR2_TAX_RANKS` variables.
+    `SHORT_MOTUS_TAX_RANKS` variables.
     And `${taxon}` is the actual taxon for that rank (this isn't validated).
     It will also validate if the whole string is the permitted "unassigned" or "unclassified".
     """
 
-    valid_tax_ranks: ClassVar = SHORT_TAX_RANKS + SHORT_PR2_TAX_RANKS
+    valid_tax_ranks: ClassVar = SHORT_MOTUS_TAX_RANKS
 
     root: str = Field(
         unique=True,
@@ -645,7 +646,7 @@ class MotusTaxRank(RootModel):
 
 class MotusTaxon(BaseModel):
     """Class for modelling an entire MotusTaxon or mOTUs taxonomic assignment.
-    All of the ranks are optional, to model for the taxon being "Unclassified".
+    All of the ranks are optional, to model for the taxon being "Unclassified" or "Unassigned".
     """
 
     Kingdom: Optional[MotusTaxRank] = None

@@ -584,6 +584,7 @@ class RawReadsStatusTypes(str, Enum):
     no_results = "no_results"
     missing_results = "missing_results"
 
+
 class RawReadsReadsTypes(str, Enum):
     """Class that models the two allowed values for reporting whether the run had reads.
     """
@@ -593,7 +594,7 @@ class RawReadsReadsTypes(str, Enum):
 
 
 class RawReadsQcTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had reads 
+    """Class that models the two allowed values for reporting whether the run had reads
     following QC.
     """
 
@@ -602,7 +603,7 @@ class RawReadsQcTypes(str, Enum):
 
 
 class RawReadsDecontamTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had reads 
+    """Class that models the two allowed values for reporting whether the run had reads
     following QC and decontamination.
     """
 
@@ -611,7 +612,7 @@ class RawReadsDecontamTypes(str, Enum):
 
 
 class RawReadsMotusTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had mOTUs 
+    """Class that models the two allowed values for reporting whether the run had mOTUs
     taxonomic profile results.
     """
 
@@ -620,7 +621,7 @@ class RawReadsMotusTypes(str, Enum):
 
 
 class RawReadsSilvaSsuTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had SILVA-SSU 
+    """Class that models the two allowed values for reporting whether the run had SILVA-SSU
     taxonomic profile results.
     """
 
@@ -629,7 +630,7 @@ class RawReadsSilvaSsuTypes(str, Enum):
 
 
 class RawReadsSilvaLsuTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had SILVA-LSU 
+    """Class that models the two allowed values for reporting whether the run had SILVA-LSU
     taxonomic profile results.
     """
 
@@ -638,7 +639,7 @@ class RawReadsSilvaLsuTypes(str, Enum):
 
 
 class RawReadsPfamTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had Pfam 
+    """Class that models the two allowed values for reporting whether the run had Pfam
     functional profile results.
     """
 

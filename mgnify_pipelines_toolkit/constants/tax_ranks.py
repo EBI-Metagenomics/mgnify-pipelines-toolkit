@@ -35,7 +35,7 @@ _PR2_TAX_RANKS = [
     "Genus",
     "Species",
 ]
-MOTUS_TAX_RANKS = [
+_MOTUS_TAX_RANKS = [
     'Kingdom',
     'Phylum',
     'Class',

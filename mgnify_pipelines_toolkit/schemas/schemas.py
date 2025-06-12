@@ -589,7 +589,7 @@ class RawReadsReadsTypes(str, Enum):
     """Class that models the two allowed values for reporting whether the run had reads.
     """
 
-    reads_yes = "reads_no"
+    reads_yes = "reads_yes"
     reads_no = "reads_no"
 
 
@@ -598,7 +598,7 @@ class RawReadsQcTypes(str, Enum):
     following QC.
     """
 
-    qc_yes = "qc_no"
+    qc_yes = "qc_yes"
     qc_no = "qc_no"
 
 
@@ -643,7 +643,7 @@ class RawReadsPfamTypes(str, Enum):
     functional profile results.
     """
 
-    pfam_yes = "pfam_yess"
+    pfam_yes = "pfam_yes"
     pfam_no = "pfam_no"
 
 

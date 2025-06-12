@@ -34,8 +34,8 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
     _MOTUS_TAX_RANKS,
 )
 from mgnify_pipelines_toolkit.schemas.schemas import (
-    RawReadsPassedRunsRecord,
-    RawReadsNonINSDCSPassedRunsRecord,
+    RawReadsPassedRunsSchema,
+    RawReadsNonINSDCPassedRunsSchema,
     TaxonSchema,
     MotusTaxonSchema,
     FunctionProfileSchema,
@@ -88,7 +88,7 @@ def get_file(
         )
         if not analysis_file.exists():
             logging.error(
-                f"DB path exists but file doesn't - exiting. Path: {tax_file}"
+                f"DB path exists but file doesn't - exiting. Path: {analysis_file}"
             )
             exit(1)
 
@@ -98,7 +98,7 @@ def get_file(
         ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
             # so need to skip those. Should probably fix that at some point
             logging.debug(
-                f"File {tax_file} exists but is empty, so will be skipping it."
+                f"File {analysis_file} exists but is empty, so will be skipping it."
             )
             analysis_file = None
 
@@ -109,7 +109,7 @@ def parse_one_file(
     run_acc: str, tax_file: Path
 ) -> pd.DataFrame:
     return
-    
+
 
 def parse_one_tax_file(
     run_acc: str, tax_file: Path, db_label: str
@@ -127,11 +127,11 @@ def parse_one_tax_file(
     :rtype: pd.DataFrame
     """
 
-    tax_ranks = _MOTUS_TAX_RANKS if db_label=='mOTUs' else _SILVA_TAX_RANKS
+    tax_ranks = _MOTUS_TAX_RANKS if db_label == 'mOTUs' else _SILVA_TAX_RANKS
     res_df = pd.read_csv(tax_file, sep="\t", names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
-    validate_dataframe(res_df, MotusTaxonSchema if db_label=='mOTUs' else TaxonSchema, str(tax_file))
+    validate_dataframe(res_df, MotusTaxonSchema if db_label == 'mOTUs' else TaxonSchema, str(tax_file))
 
     res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
         lambda x: ";".join(x).strip(";"), axis=1
@@ -160,10 +160,10 @@ def parse_one_func_file(
     """
 
     res_df = pd.read_csv(
-        func_file, sep="\t", 
-        names=["Function accession", "Count", "Coverage Depth", 
+        func_file, sep="\t",
+        names=["Function accession", "Count", "Coverage Depth",
                "Coverage Breadth"],
-        skiprows=1,  
+        skiprows=1,
     ).set_index('Function accession')
     res_df = res_df.fillna(0)
     res_df["Count"] = res_df["Count"].astype(int)
@@ -274,7 +274,7 @@ def summarise_analyses(
 ) -> None:
     """Function that will take a file of pipeline-successful run accessions
     that should be used for the generation of the relevant db-specific
-    study-level summary files. 
+    study-level summary files.
     \f
 
     :param runs: Path to a qc_passed_runs file from the pipeline execution.

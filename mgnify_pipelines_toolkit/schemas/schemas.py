@@ -575,7 +575,7 @@ class PR2TaxonSchema(pa.DataFrameModel):
 
 
 class RawReadsStatusTypes(str, Enum):
-    """Class that models the four allowed statuses for successful amplicon analysis runs.
+    """Class that models the four allowed statuses for successful raw reads analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
 
@@ -682,7 +682,7 @@ class RawReadsNonINSDCSPassedRunsRecord(BaseModel):
 
 # This is the schema for the whole DF
 class RawReadsPassedRunsSchema(pa.DataFrameModel):
-    """Class modelling a Pandera dataframe schema that uses the AmpliconPassedRunsRecord class as dtype.
+    """Class modelling a Pandera dataframe schema that uses the RawReadsPassedRunsRecord class as dtype.
     This is what actually validates the generated dataframe when read by pandas.read_csv.
     """
 

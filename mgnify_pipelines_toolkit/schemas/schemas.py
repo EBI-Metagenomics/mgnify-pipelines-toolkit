@@ -574,21 +574,92 @@ class PR2TaxonSchema(pa.DataFrameModel):
         coerce = True
 
 
-class RawReadsResultTypes(str, Enum):
-    """Class that models the two allowed statuses for successful amplicon analysis runs.
+class RawReadsStatusTypes(str, Enum):
+    """Class that models the four allowed statuses for successful amplicon analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
 
     all_results = "all_results"
+    no_reads = "no_reads"
+    no_results = "no_results"
+    missing_results = "missing_results"
+
+class RawReadsReadsTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had reads.
+    """
+
+    reads_yes = "reads_no"
+    reads_no = "reads_no"
+
+
+class RawReadsQcTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had reads 
+    following QC.
+    """
+
+    qc_yes = "qc_no"
+    qc_no = "qc_no"
+
+
+class RawReadsDecontamTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had reads 
+    following QC and decontamination.
+    """
+
+    decontam_yes = "decontam_yes"
+    decontam_no = "decontam_no"
+
+
+class RawReadsMotusTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had mOTUs 
+    taxonomic profile results.
+    """
+
+    motus_yes = "motus_yes"
+    motus_no = "motus_no"
+
+
+class RawReadsSilvaSsuTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had SILVA-SSU 
+    taxonomic profile results.
+    """
+
+    silva_ssu_yes = "silva-ssu_yes"
+    silva_ssu_no = "silva-ssu_no"
+
+
+class RawReadsSilvaLsuTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had SILVA-LSU 
+    taxonomic profile results.
+    """
+
+    silva_lsu_yes = "silva-lsu_yes"
+    silva_lsu_no = "silva-lsu_no"
+
+
+class RawReadsPfamTypes(str, Enum):
+    """Class that models the two allowed values for reporting whether the run had Pfam 
+    functional profile results.
+    """
+
+    pfam_yes = "pfam_yess"
+    pfam_no = "pfam_no"
 
 
 class RawReadsPassedRunsRecord(BaseModel):
     """Class defining a Pydantic model for a single "row" of an amplicon passed runs file.
-    Uses the previous two classes.
+    Uses the previous nine classes.
     """
 
     run: INSDCRunAccession
-    status: RawReadsResultTypes
+    status: RawReadsStatusTypes
+    reads: RawReadsReadsTypes
+    qc: RawReadsQcTypes
+    decontam: RawReadsDecontamTypes
+    motus: RawReadsMotusTypes
+    silva_ssu: RawReadsSilvaSsuTypes
+    silva_lsu: RawReadsSilvaLsuTypes
+    pfam: RawReadsPfamTypes
 
 
 class RawReadsNonINSDCSPassedRunsRecord(BaseModel):
@@ -598,7 +669,14 @@ class RawReadsNonINSDCSPassedRunsRecord(BaseModel):
     """
 
     run: str
-    status: RawReadsResultTypes
+    status: RawReadsStatusTypes
+    reads: RawReadsReadsTypes
+    qc: RawReadsQcTypes
+    decontam: RawReadsDecontamTypes
+    motus: RawReadsMotusTypes
+    silva_ssu: RawReadsSilvaSsuTypes
+    silva_lsu: RawReadsSilvaLsuTypes
+    pfam: RawReadsPfamTypes
 
 
 # This is the schema for the whole DF

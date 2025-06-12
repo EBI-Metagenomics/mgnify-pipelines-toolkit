@@ -104,10 +104,12 @@ def get_file(
 
     return analysis_file
 
+
 def parse_one_file(
     run_acc: str, tax_file: Path
 ) -> pd.DataFrame:
     return
+    
 
 def parse_one_tax_file(
     run_acc: str, tax_file: Path, db_label: str

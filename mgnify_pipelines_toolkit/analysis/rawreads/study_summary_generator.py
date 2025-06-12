@@ -288,7 +288,7 @@ def summarise_analyses(
     """
     runs_df = pd.read_csv(runs, names=["run", "status", "read",
                                        "qc", "decontam", "motus",
-                                       "silva-ssu", "silva-lsu", "pfam"])
+                                       "silva_ssu", "silva_lsu", "pfam"])
 
     if not non_insdc:
         RawReadsPassedRunsSchema(

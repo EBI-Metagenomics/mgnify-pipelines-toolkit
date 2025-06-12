@@ -35,7 +35,7 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 )
 from mgnify_pipelines_toolkit.schemas.schemas import (
     RawReadsPassedRunsRecord,
-    RawReadsNonINSDCSPassedRunsRecord
+    RawReadsNonINSDCSPassedRunsRecord,
     TaxonSchema,
     MotusTaxonSchema,
     FunctionProfileSchema,

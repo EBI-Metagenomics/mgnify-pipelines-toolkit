@@ -614,6 +614,18 @@ class RawReadsPassedRunsSchema(pa.DataFrameModel):
         coerce = True
 
 
+class RawReadsNonINSDCPassedRunsSchema(pa.DataFrameModel):
+    """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
+    Uses the RawReadsNonINSDCSPassedRunsRecord as a dtype to achieve this.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(RawReadsNonINSDCSPassedRunsRecord)
+        coerce = True
+
+
 class MotusTaxRank(RootModel):
     """Class for modelling a single Taxonomic Rank in mOTUs output.
     Essentially is just a special string with validation of the structure:

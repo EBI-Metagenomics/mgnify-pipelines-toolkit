@@ -573,6 +573,7 @@ class PR2TaxonSchema(pa.DataFrameModel):
         dtype = PydanticModel(PR2TaxonRecord)
         coerce = True
 
+
 class RawReadsResultTypes(str, Enum):
     """Class that models the two allowed statuses for successful amplicon analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
@@ -612,6 +613,7 @@ class RawReadsPassedRunsSchema(pa.DataFrameModel):
         dtype = PydanticModel(RawReadsPassedRunsRecord)
         coerce = True
 
+
 class MotusTaxRank(RootModel):
     """Class for modelling a single Taxonomic Rank in mOTUs output.
     Essentially is just a special string with validation of the structure:
@@ -644,6 +646,7 @@ class MotusTaxRank(RootModel):
 
         return taxrank
 
+
 class MotusTaxon(BaseModel):
     """Class for modelling an entire MotusTaxon or mOTUs taxonomic assignment.
     All of the ranks are optional, to model for the taxon being "Unclassified" or "Unassigned".
@@ -657,6 +660,7 @@ class MotusTaxon(BaseModel):
     Genus: Optional[MotusTaxRank] = None
     Species: Optional[MotusTaxRank] = None
 
+
 class MotusTaxonRecord(MotusTaxon):
     """Class for modelling a single taxon record in a mOTUs taxonomy file.
     It inherits the MotusTaxon class, and simply adds a Count field, modelling the read counts
@@ -664,6 +668,7 @@ class MotusTaxonRecord(MotusTaxon):
     """
 
     Count: int
+
 
 class MotusTaxonSchema(pa.DataFrameModel):
     """Class modelling a Pandera dataframe schema that uses the MotusTaxonRecord class as dtype.
@@ -675,6 +680,7 @@ class MotusTaxonSchema(pa.DataFrameModel):
 
         dtype = PydanticModel(MotusTaxonRecord)
         coerce = True
+
 
 class FunctionProfileRecord(BaseModel):
     """Class for modelling a single taxon record in a functional profile file.
@@ -689,6 +695,7 @@ class FunctionProfileRecord(BaseModel):
     class Config:
         validate_by_name = True
 
+
 class FunctionProfileSchema(pa.DataFrameModel):
     """Class modelling a Pandera dataframe schema that uses the FunctionProfileRecord class as dtype.
     This is what actually validates the generated dataframe when read by pandas.read_csv.
@@ -699,6 +706,7 @@ class FunctionProfileSchema(pa.DataFrameModel):
 
         dtype = PydanticModel(FunctionProfileRecord)
         coerce = True
+
 
 def validate_dataframe(
     df: pd.DataFrame, schema: Type[pa.DataFrameModel], df_metadata: str

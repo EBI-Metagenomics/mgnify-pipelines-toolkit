@@ -233,10 +233,7 @@ def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List
         summary_path = Path(summary)
         summary_filename = summary_path.stem
 
-        temp_lst = summary_filename.split("_")
-        summary_db_label = temp_lst[
-            1
-        ]
+        summary_db_label = summary_filename.split("_")[1]
 
         summaries_dict[summary_db_label].append(summary_path)
 

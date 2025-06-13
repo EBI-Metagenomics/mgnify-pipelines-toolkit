@@ -164,11 +164,13 @@ def parse_one_func_file(
         names=["Function accession", "Count", "Coverage Depth",
                "Coverage Breadth"],
         skiprows=1,
+        dtype={
+            "Count": int,
+            "Coverage Depth": float,
+            "Coverage Breadth": float
+        }
     ).set_index('Function accession')
     res_df = res_df.fillna(0)
-    res_df["Count"] = res_df["Count"].astype(int)
-    float_cols = ["Coverage Depth", "Coverage Breadth"]
-    res_df[float_cols] = res_df[float_cols].astype(float)
 
     validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 

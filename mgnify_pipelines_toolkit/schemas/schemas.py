@@ -648,7 +648,7 @@ class RawReadsPfamTypes(str, Enum):
 
 
 class RawReadsPassedRunsRecord(BaseModel):
-    """Class defining a Pydantic model for a single "row" of an amplicon passed runs file.
+    """Class defining a Pydantic model for a single "row" of a raw-reads pipeline passed runs file.
     Uses the previous nine classes.
     """
 

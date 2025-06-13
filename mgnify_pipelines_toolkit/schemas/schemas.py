@@ -663,21 +663,13 @@ class RawReadsPassedRunsRecord(BaseModel):
     pfam: RawReadsPfamTypes
 
 
-class RawReadsNonINSDCSPassedRunsRecord(BaseModel):
+class RawReadsNonINSDCSPassedRunsRecord(RawReadsPassedRunsRecord):
     """Class modeling a very similar model as the preceding one, but with no INSDC-validation.
     This is achieved by replacing the type of the runs with just a simple string so no validation
     happens.
     """
 
     run: str
-    status: RawReadsStatusTypes
-    reads: RawReadsReadsTypes
-    qc: RawReadsQcTypes
-    decontam: RawReadsDecontamTypes
-    motus: RawReadsMotusTypes
-    silva_ssu: RawReadsSilvaSsuTypes
-    silva_lsu: RawReadsSilvaLsuTypes
-    pfam: RawReadsPfamTypes
 
 
 # This is the schema for the whole DF

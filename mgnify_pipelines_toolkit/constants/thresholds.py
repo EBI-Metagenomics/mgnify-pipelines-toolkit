@@ -14,9 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# used by fetch_mcp in analysis.amplicon
-MCP_MAX_LINE_COUNT = 300_000
-
 # used by classify_var_regions in analysis.amplicon
 MIN_OVERLAP = 0.95
 MIN_SEQ_COUNT = 5000
@@ -25,7 +22,6 @@ MAX_INTERNAL_PRIMER_PROPORTION = 0.2
 
 # used by library_strategy_checker in analysis.shared
 MIN_AMPLICON_STRATEGY_CHECK = 0.30
-
 
 # used by markergene_study_summary in analysis.shared
 MAJORITY_MARKER_PROPORTION = 0.45

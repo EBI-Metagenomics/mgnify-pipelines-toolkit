@@ -585,68 +585,6 @@ class RawReadsStatusTypes(str, Enum):
     missing_results = "missing_results"
 
 
-class RawReadsReadsTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had reads.
-    """
-
-    reads_yes = "reads_yes"
-    reads_no = "reads_no"
-
-
-class RawReadsQcTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had reads
-    following QC.
-    """
-
-    qc_yes = "qc_yes"
-    qc_no = "qc_no"
-
-
-class RawReadsDecontamTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had reads
-    following QC and decontamination.
-    """
-
-    decontam_yes = "decontam_yes"
-    decontam_no = "decontam_no"
-
-
-class RawReadsMotusTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had mOTUs
-    taxonomic profile results.
-    """
-
-    motus_yes = "motus_yes"
-    motus_no = "motus_no"
-
-
-class RawReadsSilvaSsuTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had SILVA-SSU
-    taxonomic profile results.
-    """
-
-    silva_ssu_yes = "silva-ssu_yes"
-    silva_ssu_no = "silva-ssu_no"
-
-
-class RawReadsSilvaLsuTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had SILVA-LSU
-    taxonomic profile results.
-    """
-
-    silva_lsu_yes = "silva-lsu_yes"
-    silva_lsu_no = "silva-lsu_no"
-
-
-class RawReadsPfamTypes(str, Enum):
-    """Class that models the two allowed values for reporting whether the run had Pfam
-    functional profile results.
-    """
-
-    pfam_yes = "pfam_yes"
-    pfam_no = "pfam_no"
-
-
 class RawReadsPassedRunsRecord(BaseModel):
     """Class defining a Pydantic model for a single "row" of a raw-reads pipeline passed runs file.
     Uses the previous nine classes.
@@ -654,13 +592,6 @@ class RawReadsPassedRunsRecord(BaseModel):
 
     run: INSDCRunAccession
     status: RawReadsStatusTypes
-    reads: RawReadsReadsTypes
-    qc: RawReadsQcTypes
-    decontam: RawReadsDecontamTypes
-    motus: RawReadsMotusTypes
-    silva_ssu: RawReadsSilvaSsuTypes
-    silva_lsu: RawReadsSilvaLsuTypes
-    pfam: RawReadsPfamTypes
 
 
 class RawReadsNonINSDCSPassedRunsRecord(RawReadsPassedRunsRecord):

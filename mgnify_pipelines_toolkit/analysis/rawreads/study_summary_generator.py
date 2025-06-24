@@ -285,9 +285,7 @@ def summarise_analyses(
     :param output_prefix: Prefix to be added to the generated summary file.
     :type output_prefix: str
     """
-    runs_df = pd.read_csv(runs, names=["run", "status", "reads",
-                                       "qc", "decontam", "motus",
-                                       "silva_ssu", "silva_lsu", "pfam"])
+    runs_df = pd.read_csv(runs, names=["run", "status"])
 
     if not non_insdc:
         RawReadsPassedRunsSchema(

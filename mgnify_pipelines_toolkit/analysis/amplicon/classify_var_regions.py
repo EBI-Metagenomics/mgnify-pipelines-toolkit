@@ -90,7 +90,7 @@ def check_primer_position(raw_sequence_coords, regions):
 
     """
     result_flag = False
-    margin = 3  # allowed margin of error
+    margin = 10  # allowed margin of error
     for coord in raw_sequence_coords:
         for region in regions.values():
             if coord in range(region[0] + margin, region[1] - margin):
@@ -432,14 +432,12 @@ def retrieve_regions(
             multiregion_matches[model] = new_value
 
         [multiregion_matches.pop(model) for model in models_to_remove]
-        print(multiregion_matches)
 
         run_status = "one"
         run_result = dict()
         total_useful_sequences = 0.0
         temp_seq_counter = dict()
         for model, model_regions in multiregion_matches.items():
-            print(model)
             result = normalise_results(model_regions)
             if result is None:
                 run_status = "ambiguous"

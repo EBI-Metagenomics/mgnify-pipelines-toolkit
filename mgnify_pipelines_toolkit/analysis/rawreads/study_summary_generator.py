@@ -128,7 +128,7 @@ def parse_one_tax_file(
     """
 
     tax_ranks = _MOTUS_TAX_RANKS if db_label == 'mOTUs' else _SILVA_TAX_RANKS
-    res_df = pd.read_csv(tax_file, sep="\t", names=["Count"] + tax_ranks)
+    res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
     validate_dataframe(res_df, MotusTaxonSchema if db_label == 'mOTUs' else TaxonSchema, str(tax_file))

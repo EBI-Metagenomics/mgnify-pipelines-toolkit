@@ -300,23 +300,24 @@ def main():
     if paired_end:
         rev_fr.close()
 
-    ref_db = ""
+    if asv_dict: # if there are matches between taxonomic and ASV annotations
+        ref_db = ""
 
-    if len(taxa_df.columns) == 9:
-        tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
-        ref_db = "silva"
-    elif len(taxa_df.columns) == 10:
-        tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
-        ref_db = "pr2"
+        if len(taxa_df.columns) == 9:
+            tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
+            ref_db = "silva"
+        elif len(taxa_df.columns) == 10:
+            tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
+            ref_db = "pr2"
 
-    with open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
-        for tax_assignment, count in tax_assignment_dict.items():
-            fw.write(f"{count}\t{tax_assignment}\n")
+        with open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
+            for tax_assignment, count in tax_assignment_dict.items():
+                fw.write(f"{count}\t{tax_assignment}\n")
 
-    asv_count_df = generate_asv_count_dict(asv_dict)
-    asv_count_df.to_csv(
-        f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
-    )
+        asv_count_df = generate_asv_count_dict(asv_dict)
+        asv_count_df.to_csv(
+            f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
+        )
 
 
 if __name__ == "__main__":

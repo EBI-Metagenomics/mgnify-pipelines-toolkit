@@ -13,3 +13,7 @@
   files:
     - path: "test_primer_validation.tsv"
       md5sum: 953e749f8d42c4ac89cc84c4afd55731
+    - path: "fwd_primers.fasta"
+      md5sum: d3e8e54f8760c09532deaf1f699bd2e0
+    - path: "rev_primers.fasta"
+      md5sum: 85be59f336f4dd4b0419bfcfd62697fa

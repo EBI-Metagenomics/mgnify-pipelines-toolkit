@@ -22,12 +22,12 @@ import os
 import logging
 import json
 import time
+import numpy as np
 
 from mgnify_pipelines_toolkit.constants.thresholds import (
     MIN_OVERLAP,
     MIN_SEQ_COUNT,
     MAX_ERROR_PROPORTION,
-    MAX_INTERNAL_PRIMER_PROPORTION,
 )
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
     REGIONS_16S_BACTERIA,
@@ -62,8 +62,16 @@ def get_multiregion(raw_sequence_coords, regions):
 
     Returns:
         amplified_region: Amplified variable regions.
+        region_coverages: Coverage of all detected variable regions
 
     """
+
+    region_coverages = defaultdict(float)
+
+    for region, limits in regions.items():
+        overlap = calc_overlap(raw_sequence_coords, limits)
+        region_coverages[region] = overlap
+
     # check if any of the coords are inside the region
     matched_regions = [
         region
@@ -76,7 +84,7 @@ def get_multiregion(raw_sequence_coords, regions):
         amplified_region = matched_regions[0]
     else:
         amplified_region = ""
-    return amplified_region
+    return amplified_region, region_coverages
 
 
 def check_primer_position(raw_sequence_coords, regions):
@@ -90,7 +98,7 @@ def check_primer_position(raw_sequence_coords, regions):
 
     """
     result_flag = False
-    margin = 3  # allowed margin of error
+    margin = 10  # allowed margin of error
     for coord in raw_sequence_coords:
         for region in regions.values():
             if coord in range(region[0] + margin, region[1] - margin):
@@ -342,22 +350,30 @@ def retrieve_regions(
         per_read_info = (
             dict()
         )  # dictionary will contain read names for each variable region
+        all_region_coverages = defaultdict(lambda: defaultdict(list))
         for read in data:
+            # Example structure of `read`
+            # ('ERR14650515.1', 'SSU_rRNA_archaea', 'RF01959', 'hmm', '3', '525', '1', '518', '+', '-', '6', '0.55', '0.6', '363.6', '7.8e-107')
             regions = determine_cm(read[2])
             sequence_counter_total += 1
             limits = list(map(int, read[4:6]))
             domain = determine_domain(read[2])
             marker_gene = determine_marker_gene(domain)
             if not regions == "unsupported":
-                multiregion_matches.setdefault(read[2], []).append(
-                    get_multiregion(limits, regions)
-                )
+                matches, coverages = get_multiregion(limits, regions)
+
+                [
+                    all_region_coverages[domain][region].append(coverage)
+                    for region, coverage in coverages.items()
+                ]
+
+                multiregion_matches.setdefault(read[2], []).append(matches)
                 if check_primer_position(limits, regions):
                     primer_inside_vr += 1
                 sequence_counter_useful += 1
-                per_read_info.setdefault(
-                    marker_gene + "." + get_multiregion(limits, regions), []
-                ).append(read[0])
+                per_read_info.setdefault(marker_gene + "." + matches, []).append(
+                    read[0]
+                )
             else:
                 unsupported_matches += 1
 
@@ -381,18 +397,6 @@ def retrieve_regions(
             logging.info(
                 "Excluded\t{}\t{}\t{}\n".format(
                     tblout_file, "{0:.2f}".format(unsupported_fract), len(data)
-                )
-            )
-            continue
-
-        # filter out runs with too many sequences starting/ending inside variable regions
-        internal_seq_fract = primer_inside_vr / len(data)
-        if internal_seq_fract > MAX_INTERNAL_PRIMER_PROPORTION:
-            failed_run_counter += 1
-            logging.info("No output will be produced - too many internal mappings")
-            logging.info(
-                "Excluded due to high proportion of internal primers:\t{}\t{}\n".format(
-                    tblout_file, "{0:.2f}".format(internal_seq_fract)
                 )
             )
             continue
@@ -432,14 +436,12 @@ def retrieve_regions(
             multiregion_matches[model] = new_value
 
         [multiregion_matches.pop(model) for model in models_to_remove]
-        print(multiregion_matches)
 
         run_status = "one"
         run_result = dict()
         total_useful_sequences = 0.0
         temp_seq_counter = dict()
         for model, model_regions in multiregion_matches.items():
-            print(model)
             result = normalise_results(model_regions)
             if result is None:
                 run_status = "ambiguous"
@@ -468,6 +470,16 @@ def retrieve_regions(
         else:
             logging.info("No output will be produced - the run is ambiguous.")
             continue
+
+    coverage_fw = open(f"{outfile_prefix}_all_coverages.txt", "w")
+
+    for domain, regions in all_region_coverages.items():
+        for region in regions:
+            if len(regions[region]) < MIN_SEQ_COUNT:
+                continue
+            region_coverage = float(np.mean(regions[region]))
+            if region_coverage > 0:
+                coverage_fw.write(f"{domain}:{region}: {region_coverage}\n")
 
     json_outfile = "{}.json".format(outfile_prefix)
     tsv_outfile = "{}.tsv".format(outfile_prefix)

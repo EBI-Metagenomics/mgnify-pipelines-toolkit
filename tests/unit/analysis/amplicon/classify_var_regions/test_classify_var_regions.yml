@@ -15,3 +15,5 @@
       md5sum: aba8ff1cc6df1ce076633dd844b95d28
     - path: "sample.16S.V3-V4.txt"
       md5sum: 26b4cbbafdcfba30abb7ac561be0a40e
+    - path: "sample_all_coverages.txt"
+      md5sum: f81f5f1d60906f94589dd3dcf833da5e

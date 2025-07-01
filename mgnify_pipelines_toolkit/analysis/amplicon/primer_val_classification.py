@@ -19,6 +19,7 @@ from collections import defaultdict
 import re
 
 from Bio import SeqIO
+from Bio.Seq import Seq
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
@@ -49,17 +50,25 @@ def parse_args():
         help="Path to concatenated primers fasta file",
     )
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
+    parser.add_argument(
+        "--se",
+        action=argparse.BooleanOptionalAction,
+        help="Flag for if run is single-end",
+    )
     args = parser.parse_args()
 
     input = args.input
     fasta = args.fasta
     sample = args.sample
+    single_end = args.se
 
-    return input, fasta, sample
+    return input, fasta, sample, single_end
 
 
 def get_amp_region(beg, end, strand, model):
     prev_region = ""
+
+    margin = -10
 
     for region, region_coords in model.items():
 
@@ -68,10 +77,10 @@ def get_amp_region(beg, end, strand, model):
         end_diff = region_beg - end
 
         if strand == STRAND_FWD:
-            if beg_diff > 0 and end_diff > 0:
+            if beg_diff >= margin and end_diff >= margin:
                 return region
         else:
-            if beg_diff > 0 and end_diff > 0:
+            if beg_diff >= margin and end_diff >= margin:
                 return prev_region
 
         prev_region = region
@@ -80,9 +89,13 @@ def get_amp_region(beg, end, strand, model):
 
 
 def main():
-    input, fasta, sample = parse_args()
+
+    input, fasta, sample, single_end = parse_args()
     res_dict = defaultdict(list)
     fasta_dict = SeqIO.to_dict(SeqIO.parse(fasta, "fasta"))
+
+    fwd_primers_fw = open("./fwd_primers.fasta", "w")
+    rev_primers_fw = open("./rev_primers.fasta", "w")
 
     with open(input, "r") as fr:
         for line in fr:
@@ -104,8 +117,12 @@ def main():
             elif rfam == "RF01960":
                 gene = "18S"
                 model = REGIONS_18S
-            else:
-                continue
+            else:  # For cases when it's a std primer but for some reason hasn't matched the model
+                if primer_name == "F_auto" or primer_name == "R_auto":
+                    continue
+                gene = "Unknown"
+                amp_region = "Unknown"
+                model = ""
 
             res_dict["Run"].append(sample)
             res_dict["AssertionEvidence"].append("ECO_0000363")
@@ -113,12 +130,13 @@ def main():
 
             strand = ""
 
-            if "F" in primer_name:
+            if primer_name == "F_auto" or primer_name[-1] == "F":
                 strand = STRAND_FWD
-            elif "R" in primer_name:
+            elif primer_name == "R_auto" or primer_name[-1] == "R":
                 strand = STRAND_REV
 
-            amp_region = get_amp_region(beg, end, strand, model)
+            if model:
+                amp_region = get_amp_region(beg, end, strand, model)
             primer_seq = str(fasta_dict[primer_name].seq)
 
             res_dict["Gene"].append(gene)
@@ -127,8 +145,18 @@ def main():
             res_dict["PrimerStrand"].append(strand)
             res_dict["PrimerSeq"].append(primer_seq)
 
+            if strand == STRAND_FWD:
+                fwd_primers_fw.write(f">{primer_name}\n{primer_seq}\n")
+            elif strand == STRAND_REV:
+                if single_end:
+                    primer_seq = Seq(primer_seq).reverse_complement()
+                rev_primers_fw.write(f">{primer_name}\n{primer_seq}\n")
+
     res_df = pd.DataFrame.from_dict(res_dict)
     res_df.to_csv(f"./{sample}_primer_validation.tsv", sep="\t", index=False)
+
+    fwd_primers_fw.close()
+    rev_primers_fw.close()
 
 
 if __name__ == "__main__":

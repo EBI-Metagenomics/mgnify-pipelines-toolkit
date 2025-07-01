@@ -69,6 +69,22 @@
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_taxranks.csv -p chunk1 --non_insdc
   stderr:
     contains:
-      - "{'Kingdom': 'kkkk__Bacteria'}"
-      - "{'Order': 'oo_Lactobacillales'}"
-      - "{'Genus': 'h__Lactobacillus'}"
+      - "{'Kingdom': 'kkkk__Bacteria',"
+
+- name: rawreads_study_summary_generator test_correct_args_merge
+  tags:
+    - rawreads_study_summary_generator
+  command: rawreads_study_summary_generator merge -a tests/fixtures/study_summary_inputs/rawreads -p merged
+  files:
+    - path: "merged_mOTUs_study_summary.tsv"
+      md5sum: e1bf2aa9f83a26fefcdb207e86a71292
+    - path: "merged_SILVA-SSU_study_summary.tsv"
+      md5sum: 082bffc340fd9212b27832d0d8148fe2
+    - path: "merged_SILVA-LSU_study_summary.tsv"
+      md5sum: a91200fbf670faf61a251e2a6102d10a
+    - path: "merged_Pfam-A_count_study_summary.tsv"
+      md5sum: 84d2f23bada707255b950ea626308c22
+    - path: "merged_Pfam-A_coverage-depth_study_summary.tsv"
+      md5sum: 5d914dd7c370268eaf81f8b9aea423ad
+    - path: "merged_Pfam-A_coverage-breadth_study_summary.tsv"
+      md5sum: 9fa5538072f75f44dc8a432baf276f3f

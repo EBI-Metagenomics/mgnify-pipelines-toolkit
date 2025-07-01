@@ -16,7 +16,7 @@
 import logging
 import re
 
-from enum import Enum
+from enum import StrEnum
 from typing import ClassVar, Optional, Type, Literal
 
 import pandas as pd
@@ -71,7 +71,7 @@ class INSDCRunAccession(RootModel):
         return run
 
 
-class AmpliconResultTypes(str, Enum):
+class AmpliconResultTypes(StrEnum):
     """Class that models the two allowed statuses for successful amplicon analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
@@ -546,7 +546,7 @@ class TaxonRecord(Taxon):
 class PR2TaxonRecord(PR2Taxon):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
-    Count: int
+    count: int = Field(alias="Count")
 
 
 # This is the schema for the whole DF
@@ -574,7 +574,7 @@ class PR2TaxonSchema(pa.DataFrameModel):
         coerce = True
 
 
-class RawReadsStatusTypes(str, Enum):
+class RawReadsStatusTypes(StrEnum):
     """Class that models the four allowed statuses for successful raw reads analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
@@ -681,7 +681,7 @@ class MotusTaxonRecord(MotusTaxon):
     for that particular MotusTaxon record.
     """
 
-    Count: int
+    count: int = Field(alias="Count")
 
 
 class MotusTaxonSchema(pa.DataFrameModel):
@@ -702,9 +702,9 @@ class FunctionProfileRecord(BaseModel):
     for each specific record.
     """
 
-    Count: int
-    coverage_depth: float = Field(alias='Coverage Depth')
-    coverage_breadth: float = Field(alias='Coverage Breadth')
+    count: int = Field(alias="Count")
+    coverage_depth: float = Field(alias="Coverage Depth")
+    coverage_breadth: float = Field(alias="Coverage Breadth")
 
     class Config:
         validate_by_name = True

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import shutil
-from shutil import SameFileError
 
 # Copyright 2024-2025 EMBL - European Bioinformatics Institute
 #
@@ -15,6 +13,9 @@ from shutil import SameFileError
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import shutil
+from shutil import SameFileError
 
 import click
 from collections import defaultdict
@@ -67,46 +68,41 @@ def get_file(
     :rtype: Union[Path, List[Path]]
     """
 
-    analysis_file = None
+    if db_label not in RRAP_TAXDB_LABELS + RRAP_FUNCDB_LABELS:
+        return
 
-    if db_label in RRAP_TAXDB_LABELS + RRAP_FUNCDB_LABELS:
+    if db_label in RRAP_TAXDB_LABELS:
+        db_dir = "taxonomy-summary"
+    else:
+        db_dir = "function-summary"
+    db_path = Path(f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}")
 
-        if db_label in RRAP_TAXDB_LABELS:
-            db_dir = "taxonomy-summary"
-        else:
-            db_dir = "function-summary"
-        db_path = Path(f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}")
+    if not db_path.exists():
+        logging.debug(
+            f"DB {db_path} doesn't exist for {run_acc}. Skipping"
+        )  # or error?
+        return
 
-        if not db_path.exists():
-            logging.debug(
-                f"DB {db_path} doesn't exist for {run_acc}. Skipping"
-            )  # or error?
-            return
-
-        analysis_file = Path(
-            f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt"
+    analysis_file = Path(
+        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt"
+    )
+    if not analysis_file.exists():
+        logging.error(
+            f"DB path exists but file doesn't - exiting. Path: {analysis_file}"
         )
-        if not analysis_file.exists():
-            logging.error(
-                f"DB path exists but file doesn't - exiting. Path: {analysis_file}"
-            )
-            exit(1)
+        exit(1)
 
-        file_size = analysis_file.stat().st_size
-        if (
-            file_size == 0
-        ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
-            # so need to skip those. Should probably fix that at some point
-            logging.debug(
-                f"File {analysis_file} exists but is empty, so will be skipping it."
-            )
-            analysis_file = None
+    file_size = analysis_file.stat().st_size
+    if (
+        file_size == 0
+    ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
+        # so need to skip those. Should probably fix that at some point
+        logging.debug(
+            f"File {analysis_file} exists but is empty, so will be skipping it."
+        )
+        analysis_file = None
 
     return analysis_file
-
-
-def parse_one_file(run_acc: str, tax_file: Path) -> pd.DataFrame:
-    return
 
 
 def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFrame:

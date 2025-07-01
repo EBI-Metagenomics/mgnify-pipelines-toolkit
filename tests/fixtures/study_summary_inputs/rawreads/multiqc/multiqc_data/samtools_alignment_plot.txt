@@ -1,5 +1,0 @@
-Sample	Mapped (with MQ>0)	MQ0	Unmapped
-ERR10889056_short_read_host	4.0	3.0	19877.0
-ERR10889056_short_read_phix	0.0	0.0	19884.0
-ERR10889147_short_read_host	2195.0	1039.0	16766.0
-ERR10889147_short_read_phix	0.0	0.0	20000.0

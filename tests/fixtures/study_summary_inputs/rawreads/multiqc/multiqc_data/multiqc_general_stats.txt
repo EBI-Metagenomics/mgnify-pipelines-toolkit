@@ -1,7 +1,0 @@
-Sample	samtools_stats-error_rate	samtools_stats-non_primary_alignments	samtools_stats-reads_mapped	samtools_stats-reads_mapped_percent	samtools_stats-reads_properly_paired_percent	samtools_stats-reads_MQ0_percent	samtools_stats-raw_total_sequences	samtools_stats-insert_size_average	fastp-pct_duplication	fastp-after_filtering_q30_rate	fastp-after_filtering_q30_bases	fastp-filtering_result_passed_filter_reads	fastp-after_filtering_gc_content	fastp-pct_surviving	fastp-pct_adapter
-ERR10889056									0.0	96.3585	2.363901	0.019884	48.1981	99.42	1.965
-ERR10889056_short_read_host	4.259259	0.0	7e-06	0.0352041842687588	0.0	0.015087507543753773	0.019884	105.0
-ERR10889056_short_read_phix	0.0	0.0	0.0	0.0	0.0	0.0	0.019884	0.0
-ERR10889147									0.0	95.8833	2.3529739999999997	0.02	49.506499999999996	100.0	2.08
-ERR10889147_short_read_host	5.1496390000000005	0.0	0.003234	16.17	12.97	5.195	0.02	533.7
-ERR10889147_short_read_phix	0.0	0.0	0.0	0.0	0.0	0.0	0.02	0.0

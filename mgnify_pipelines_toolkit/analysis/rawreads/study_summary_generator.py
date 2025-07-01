@@ -245,6 +245,7 @@ def generate_db_summary(
             f"{output_prefix}_{db_label}_coverage-depth_study_summary.tsv",
             sep="\t",
             index_label="function",
+            float_format="%.6g",
         )
 
         breadth_df = pd.concat(breadth_df_list, axis=1).fillna(0)
@@ -255,6 +256,7 @@ def generate_db_summary(
             f"{output_prefix}_{db_label}_coverage-breadth_study_summary.tsv",
             sep="\t",
             index_label="function",
+            float_format="%.6g",
         )
 
 
@@ -425,13 +427,14 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                         curr_df = pd.read_csv(summary, sep="\t", index_col=0)
                         res_df = res_df.join(curr_df, how="outer")
                         res_df = res_df.fillna(0)
-                        res_df = res_df.astype(int)
+                        res_df = res_df.astype(int if table_type == "count" else float)
 
                     res_df = res_df.reindex(sorted(res_df.columns), axis=1)
                     res_df.to_csv(
                         merged_summary_name,
                         sep="\t",
                         index_label="function",
+                        float_format="%.6g",
                     )
                 elif len(summaries_) == 1:
                     logging.info(

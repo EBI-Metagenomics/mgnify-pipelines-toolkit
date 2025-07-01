@@ -21,9 +21,9 @@
     - path: "chunk1_Pfam-A_count_study_summary.tsv"
       md5sum: 3d40925c439f17f2a17755afc101c0cb
     - path: "chunk1_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 9b2f390845657926e29cade500d612d3
+      md5sum: c73db3ffd2b2f7286e17491e520ee0cc
     - path: "chunk1_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: c5407f88e6e6776196894d42829a1c3a
+      md5sum: 9314b10294e9b1407575d1916c03ecb1
 
 - name: rawreads_study_summary_generator test_insdc_error
   tags:
@@ -49,9 +49,9 @@
     - path: "chunk2_Pfam-A_count_study_summary.tsv"
       md5sum: 84d2f23bada707255b950ea626308c22
     - path: "chunk2_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 5d914dd7c370268eaf81f8b9aea423ad
+      md5sum: 6ec06f0c501c066ab4bb380e5bbe407d
     - path: "chunk2_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 9fa5538072f75f44dc8a432baf276f3f
+      md5sum: 1b97ceef7194c61add7bee07145e2c41
 
 - name: rawreads_study_summary_generator test_invalid_success_status
   tags:
@@ -85,6 +85,6 @@
     - path: "merged_Pfam-A_count_study_summary.tsv"
       md5sum: 944fb8b3f28dbfb5222ff52e912e6fdd
     - path: "merged_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 53a7337e8fb22aa6ebea8bb1c0c3d10f
+      md5sum: 5554fa9d53f3c1cdf29b69507a17d17a
     - path: "merged_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 0264bef7f107d55ffde75f54477d40eb
+      md5sum: 12802f2543be6087bcd8160753958424

@@ -6,7 +6,8 @@
   stderr:
     contains:
       - "Error: No such option: --chromosome"
-- name: rawreads_study_summary_generator test_summarise_multi_noninsdc
+
+- name: rawreads_study_summary_generator test_summarise_multi_insdc
   tags:
     - rawreads_study_summary_generator
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed.csv -p chunk1
@@ -23,8 +24,51 @@
       md5sum: 9b2f390845657926e29cade500d612d3
     - path: "chunk1_Pfam-A_coverage-breadth_study_summary.tsv"
       md5sum: c5407f88e6e6776196894d42829a1c3a
+
 - name: rawreads_study_summary_generator test_insdc_error
   tags:
     - rawreads_study_summary_generator
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_noninsdc.csv -p chunk2
   exit_code: 1
+  stderr:
+    contains:
+      - "{'run': 'dummy_ERR10889056'}"
+      - "{'run': 'dummy_ERR10889147'}"
+
+- name: rawreads_study_summary_generator test_summarise_multi_noninsdc
+  tags:
+    - rawreads_study_summary_generator
+  command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_noninsdc.csv -p chunk2 --non_insdc
+  files:
+    - path: "chunk2_mOTUs_study_summary.tsv"
+      md5sum: e1bf2aa9f83a26fefcdb207e86a71292
+    - path: "chunk2_SILVA-SSU_study_summary.tsv"
+      md5sum: 082bffc340fd9212b27832d0d8148fe2
+    - path: "chunk2_SILVA-LSU_study_summary.tsv"
+      md5sum: a91200fbf670faf61a251e2a6102d10a
+    - path: "chunk2_Pfam-A_count_study_summary.tsv"
+      md5sum: 84d2f23bada707255b950ea626308c22
+    - path: "chunk2_Pfam-A_coverage-depth_study_summary.tsv"
+      md5sum: 5d914dd7c370268eaf81f8b9aea423ad
+    - path: "chunk2_Pfam-A_coverage-breadth_study_summary.tsv"
+      md5sum: 9fa5538072f75f44dc8a432baf276f3f
+
+- name: rawreads_study_summary_generator test_invalid_success_status
+  tags:
+    - rawreads_study_summary_generator
+  exit_code: 1
+  command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_status.csv -p chunk1 --non_insdc
+  stderr:
+    contains:
+      - "{'status': 'all_resultsssss'}"
+
+- name: rawreads_study_summary_generator test_invalid_taxonomic_ranks
+  tags:
+    - rawreads_study_summary_generator
+  exit_code: 1
+  command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_taxranks.csv -p chunk1 --non_insdc
+  stderr:
+    contains:
+      - "{'Kingdom': 'kkkk__Bacteria'}"
+      - "{'Order': 'oo_Lactobacillales'}"
+      - "{'Genus': 'h__Lactobacillus'}"

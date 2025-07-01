@@ -62,6 +62,7 @@ def get_multiregion(raw_sequence_coords, regions):
 
     Returns:
         amplified_region: Amplified variable regions.
+        region_coverages: Coverage of all detected variable regions
 
     """
 
@@ -351,6 +352,8 @@ def retrieve_regions(
         )  # dictionary will contain read names for each variable region
         all_region_coverages = defaultdict(lambda: defaultdict(list))
         for read in data:
+            # Example structure of `read`
+            # ('ERR14650515.1', 'SSU_rRNA_archaea', 'RF01959', 'hmm', '3', '525', '1', '518', '+', '-', '6', '0.55', '0.6', '363.6', '7.8e-107')
             regions = determine_cm(read[2])
             sequence_counter_total += 1
             limits = list(map(int, read[4:6]))
@@ -397,18 +400,6 @@ def retrieve_regions(
                 )
             )
             continue
-
-        # filter out runs with too many sequences starting/ending inside variable regions
-        # internal_seq_fract = primer_inside_vr / len(data)
-        # if internal_seq_fract > MAX_INTERNAL_PRIMER_PROPORTION:
-        #     failed_run_counter += 1
-        #     logging.info("No output will be produced - too many internal mappings")
-        #     logging.info(
-        #         "Excluded due to high proportion of internal primers:\t{}\t{}\n".format(
-        #             tblout_file, "{0:.2f}".format(internal_seq_fract)
-        #         )
-        #     )
-        #     continue
 
         normalised_matches[run_id] = dict()
         region_counter = defaultdict(int)

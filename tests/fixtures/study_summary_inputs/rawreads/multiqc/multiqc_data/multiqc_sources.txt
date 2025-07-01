@@ -1,0 +1,7 @@
+Module	Section	Sample Name	Source
+Samtools	stats	ERR10889147_short_read_phix	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/2/ERR10889147_short_read_phix_all_summary_stats.txt
+Samtools	stats	ERR10889056_short_read_phix	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/4/ERR10889056_short_read_phix_all_summary_stats.txt
+Samtools	stats	ERR10889147_short_read_host	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/5/ERR10889147_short_read_host_all_summary_stats.txt
+Samtools	stats	ERR10889056_short_read_host	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/6/ERR10889056_short_read_host_all_summary_stats.txt
+fastp	all_sections	ERR10889147	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/1/ERR10889147.fastp.json
+fastp	all_sections	ERR10889056	/hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637/3/ERR10889056.fastp.json

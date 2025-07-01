@@ -72,9 +72,9 @@ def get_file(
     if db_label in RRAP_TAXDB_LABELS + RRAP_FUNCDB_LABELS:
 
         if db_label in RRAP_TAXDB_LABELS:
-            db_dir = 'taxonomy-summary'
+            db_dir = "taxonomy-summary"
         else:
-            db_dir = 'function-summary'
+            db_dir = "function-summary"
         db_path = Path(f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}")
 
         if not db_path.exists():
@@ -105,15 +105,11 @@ def get_file(
     return analysis_file
 
 
-def parse_one_file(
-    run_acc: str, tax_file: Path
-) -> pd.DataFrame:
+def parse_one_file(run_acc: str, tax_file: Path) -> pd.DataFrame:
     return
 
 
-def parse_one_tax_file(
-    run_acc: str, tax_file: Path, db_label: str
-) -> pd.DataFrame:
+def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFrame:
     """Parses a taxonomy file, and returns it as a pandas DataFrame object.
 
     :param run_acc: Run accession of the taxonomy file that will be parsed.
@@ -127,11 +123,13 @@ def parse_one_tax_file(
     :rtype: pd.DataFrame
     """
 
-    tax_ranks = _MOTUS_TAX_RANKS if db_label == 'mOTUs' else _SILVA_TAX_RANKS
+    tax_ranks = _MOTUS_TAX_RANKS if db_label == "mOTUs" else _SILVA_TAX_RANKS
     res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
-    validate_dataframe(res_df, MotusTaxonSchema if db_label == 'mOTUs' else TaxonSchema, str(tax_file))
+    validate_dataframe(
+        res_df, MotusTaxonSchema if db_label == "mOTUs" else TaxonSchema, str(tax_file)
+    )
 
     res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
         lambda x: ";".join(x).strip(";"), axis=1
@@ -144,8 +142,8 @@ def parse_one_tax_file(
 
 
 def parse_one_func_file(
-        run_acc: str, func_file: Path, db_label: str
-) -> pd.DataFrame:
+    run_acc: str, func_file: Path, db_label: str
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Parses a functional profile file, and returns it as a pandas DataFrame object.
 
     :param run_acc: Run accession of the taxonomy file that will be parsed.
@@ -160,28 +158,30 @@ def parse_one_func_file(
     """
 
     res_df = pd.read_csv(
-        func_file, sep="\t",
-        names=["Function accession", "Count", "Coverage Depth",
-               "Coverage Breadth"],
+        func_file,
+        sep="\t",
+        names=["Function accession", "Count", "Coverage Depth", "Coverage Breadth"],
         skiprows=1,
-        dtype={
-            "Count": int,
-            "Coverage Depth": float,
-            "Coverage Breadth": float
-        }
-    ).set_index('Function accession')
+        dtype={"Count": int, "Coverage Depth": float, "Coverage Breadth": float},
+    ).set_index("Function accession")
     res_df = res_df.fillna(0)
 
     validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    final_df = res_df[['Count']]
-    final_df.columns = [run_acc]
+    count_df = res_df[["Count"]]
+    count_df.columns = [run_acc]
 
-    return final_df
+    depth_df = res_df[["Coverage Depth"]]
+    depth_df.columns = [run_acc]
+
+    breadth_df = res_df[["Coverage Breadth"]]
+    breadth_df.columns = [run_acc]
+
+    return count_df, depth_df, breadth_df
 
 
 def generate_db_summary(
-    db_label: str, analysis_dfs: dict[Path], output_prefix: str
+    db_label: str, analysis_dfs: dict[str, Path], output_prefix: str
 ) -> None:
     """Takes paired run accessions taxonomy dataframes in the form of a dictionary,
     and respective db_label, joins them together, and generates a study-wide summary
@@ -197,12 +197,11 @@ def generate_db_summary(
     :type output_prefix: str
     """
 
-    if db_label in RRAP_TAXDB_LABELS + RRAP_FUNCDB_LABELS:
+    if db_label in RRAP_TAXDB_LABELS:
         df_list = []
 
         for run_acc, analysis_df in analysis_dfs.items():
-            parse_file_f = parse_one_tax_file if db_label in RRAP_TAXDB_LABELS else parse_one_func_file
-            res_df = parse_file_f(run_acc, analysis_df, db_label)
+            res_df = parse_one_tax_file(run_acc, analysis_df, db_label)
             df_list.append(res_df)
 
         res_df = pd.concat(df_list, axis=1).fillna(0)
@@ -212,11 +211,54 @@ def generate_db_summary(
         res_df.to_csv(
             f"{output_prefix}_{db_label}_study_summary.tsv",
             sep="\t",
-            index_label="taxonomy" if db_label in RRAP_TAXDB_LABELS else "function",
+            index_label="taxonomy",
+        )
+
+    if db_label in RRAP_FUNCDB_LABELS:
+        count_df_list = []
+        depth_df_list = []
+        breadth_df_list = []
+
+        for run_acc, analysis_df in analysis_dfs.items():
+            count_df, depth_df, breadth_df = parse_one_func_file(
+                run_acc, analysis_df, db_label
+            )
+            count_df_list.append(count_df)
+            depth_df_list.append(depth_df)
+            breadth_df_list.append(breadth_df)
+
+        count_df = pd.concat(count_df_list, axis=1).fillna(0)
+        count_df = count_df.sort_index()
+        count_df = count_df.astype(int)
+
+        count_df.to_csv(
+            f"{output_prefix}_{db_label}_count_study_summary.tsv",
+            sep="\t",
+            index_label="function",
+        )
+
+        depth_df = pd.concat(depth_df_list, axis=1).fillna(0)
+        depth_df = depth_df.sort_index()
+        depth_df = depth_df.astype(float)
+
+        depth_df.to_csv(
+            f"{output_prefix}_{db_label}_coverage-depth_study_summary.tsv",
+            sep="\t",
+            index_label="function",
+        )
+
+        breadth_df = pd.concat(breadth_df_list, axis=1).fillna(0)
+        breadth_df = breadth_df.sort_index()
+        breadth_df = breadth_df.astype(float)
+
+        breadth_df.to_csv(
+            f"{output_prefix}_{db_label}_coverage-breadth_study_summary.tsv",
+            sep="\t",
+            index_label="function",
         )
 
 
-def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[List]:
+def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[str, List]:
     """Matches different summary files of the same database label and analysis
     type into a dictionary to help merge
     the correct summaries.
@@ -298,7 +340,7 @@ def summarise_analyses(
     for db_label in all_db_labels:
 
         analysis_files = {}
-        for run_acc in runs_df['run']:
+        for run_acc in runs_df["run"]:
             analysis_file = get_file(run_acc, analyses_dir, db_label)
 
             if analysis_file:
@@ -344,29 +386,61 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
     summaries_dict = organise_study_summaries(all_study_summaries)
 
     for db_label, summaries in summaries_dict.items():
-        merged_summary_name = f"{output_prefix}_{db_label}_study_summary.tsv"
-        if len(summaries) > 1:
-            res_df = pd.read_csv(summaries[0], sep="\t", index_col=0)
-            for summary in summaries[1:]:
-                curr_df = pd.read_csv(summary, sep="\t", index_col=0)
-                res_df = res_df.join(curr_df, how="outer")
-                res_df = res_df.fillna(0)
-                res_df = res_df.astype(int)
+        if db_label in RRAP_TAXDB_LABELS:
+            merged_summary_name = f"{output_prefix}_{db_label}_study_summary.tsv"
+            if len(summaries) > 1:
+                res_df = pd.read_csv(summaries[0], sep="\t", index_col=0)
+                for summary in summaries[1:]:
+                    curr_df = pd.read_csv(summary, sep="\t", index_col=0)
+                    res_df = res_df.join(curr_df, how="outer")
+                    res_df = res_df.fillna(0)
+                    res_df = res_df.astype(int)
 
-            res_df = res_df.reindex(sorted(res_df.columns), axis=1)
-            res_df.to_csv(
-                merged_summary_name,
-                sep="\t",
-                index_label="taxonomy" if db_label in RRAP_TAXDB_LABELS else "function",
-            )
-        elif len(summaries) == 1:
-            logging.info(
-                f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
-            )
-            try:
-                shutil.copyfile(summaries[0], merged_summary_name)
-            except SameFileError:
-                pass
+                res_df = res_df.reindex(sorted(res_df.columns), axis=1)
+                res_df.to_csv(
+                    merged_summary_name,
+                    sep="\t",
+                    index_label="taxonomy",
+                )
+            elif len(summaries) == 1:
+                logging.info(
+                    f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
+                )
+                try:
+                    shutil.copyfile(summaries[0], merged_summary_name)
+                except SameFileError:
+                    pass
+
+        if db_label in RRAP_FUNCDB_LABELS:
+            for table_type in ["count", "coverage-depth", "coverage-breadth"]:
+                merged_summary_name = (
+                    f"{output_prefix}_{db_label}_{table_type}_study_summary.tsv"
+                )
+                summaries_ = [
+                    v for v in summaries if Path(v).stem.split("_")[2] == table_type
+                ]
+                if len(summaries_) > 1:
+                    res_df = pd.read_csv(summaries_[0], sep="\t", index_col=0)
+                    for summary in summaries_[1:]:
+                        curr_df = pd.read_csv(summary, sep="\t", index_col=0)
+                        res_df = res_df.join(curr_df, how="outer")
+                        res_df = res_df.fillna(0)
+                        res_df = res_df.astype(int)
+
+                    res_df = res_df.reindex(sorted(res_df.columns), axis=1)
+                    res_df.to_csv(
+                        merged_summary_name,
+                        sep="\t",
+                        index_label="function",
+                    )
+                elif len(summaries_) == 1:
+                    logging.info(
+                        f"Only one summary ({summaries_[0]}) so will use that as {merged_summary_name}"
+                    )
+                    try:
+                        shutil.copyfile(summaries_[0], merged_summary_name)
+                    except SameFileError:
+                        pass
 
 
 if __name__ == "__main__":

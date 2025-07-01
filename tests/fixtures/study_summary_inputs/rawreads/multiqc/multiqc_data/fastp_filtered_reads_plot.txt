@@ -1,0 +1,3 @@
+Sample	Passed Filter	Low Quality	Too Many N	Too Short	Too Long
+ERR10889056	19884.0	0.0	0.0	116.0	0.0
+ERR10889147	20000.0	0.0	0.0	0.0	0.0

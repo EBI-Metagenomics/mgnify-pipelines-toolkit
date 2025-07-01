@@ -1,0 +1,6 @@
+[2025-06-12 15:26:48,086] multiqc.config                                     [INFO   ]  Loading config settings from: multiqc_config.yml
+[2025-06-12 15:26:48,128] multiqc.core.version_check                         [WARNING]  MultiQC Version v1.29 now available!
+[2025-06-12 15:26:48,128] multiqc.core.file_search                           [INFO   ]  Search path: /hps/nobackup/rdf/metagenomics/service-team/users/timrozday/rrap_runs/mini1/work/a0/0dcea4da99cbbf47307d54f5253637
+[2025-06-12 15:26:48,555] multiqc.modules.samtools.samtools                  [INFO   ]  Found 4 stats reports
+[2025-06-12 15:26:48,572] multiqc.modules.fastp.fastp                        [INFO   ]  Found 2 reports
+[2025-06-12 15:26:48,629] multiqc.core.write_results                         [INFO   ]  Rendering plots. Export plots to formats png, svg, pdf is requested, so it might take a while. To disable plot export, set `export_plots: false` in config, or remove the `--export-plots` command line flag

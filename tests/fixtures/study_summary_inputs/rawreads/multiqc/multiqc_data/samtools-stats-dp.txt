@@ -1,0 +1,5 @@
+Sample	Total sequences	Mapped &amp; paired	Properly paired	Duplicated	QC Failed	Reads MQ0	Mapped bases (CIGAR)	Bases Trimmed	Duplicated bases	Diff chromosomes	Other orientation	Inward pairs	Outward pairs
+ERR10889056_short_read_host	0.019884	4e-06	0.0	0.0	0.0	3e-06	0.00054	0.0	0.0	1e-06	0.0	0.0	1e-06
+ERR10889056_short_read_phix	0.019884	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+ERR10889147_short_read_host	0.02	0.0032259999999999997	0.002594	0.0	0.0	0.001039	0.324081	0.0	0.0	0.000249	2.2e-05	0.000958	0.000384
+ERR10889147_short_read_phix	0.02	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0

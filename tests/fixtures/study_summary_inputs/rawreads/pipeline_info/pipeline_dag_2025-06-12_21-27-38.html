@@ -1,0 +1,398 @@
+<!--
+  ~ Copyright 2013-2024, Seqera Labs
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+<pre class="mermaid" style="text-align: center;">
+flowchart TB
+    subgraph " "
+    v1["Channel.from"]
+    v15["Channel.fromList"]
+    v21["adapter_fasta"]
+    v22["discard_trimmed_pass"]
+    v23["save_trimmed_fail"]
+    v24["save_merged"]
+    v44["script"]
+    v53["sort_bam"]
+    v71["script"]
+    v80["sort_bam"]
+    v102["script"]
+    v111["bam_format"]
+    v112["filtered_output"]
+    v113["bam_index_extension"]
+    v114["cigar_paf_format"]
+    v115["cigar_bam"]
+    v147["script"]
+    v157["script"]
+    v160["adapter_fasta"]
+    v161["discard_trimmed_pass"]
+    v162["save_trimmed_fail"]
+    v163["save_merged"]
+    v228["script"]
+    v243["script"]
+    v247["Channel.fromPath"]
+    v261["replace_names"]
+    v262["sample_names"]
+    v271["Channel.of"]
+    end
+    subgraph PIPELINE
+    subgraph FETCHDB
+    v11([FETCHUNZIP])
+    v2(( ))
+    end
+    subgraph QC
+    v25([FASTP])
+    v16(( ))
+    v30(( ))
+    end
+    subgraph DECONTAM_SHORTREAD
+    v45([CHUNKFASTX_PHIX])
+    v50([GZIPALL_PHIX])
+    v54([BWAMEM2_ALIGN_PHIX])
+    v61([COMBINEBAM_PHIX])
+    v64([DECONTAMBAM_PHIX])
+    v72([CHUNKFASTX_HOST])
+    v77([GZIPALL_HOST])
+    v81([BWAMEM2_ALIGN_HOST])
+    v88([COMBINEBAM_HOST])
+    v91([DECONTAMBAM_HOST])
+    v47(( ))
+    v60(( ))
+    v63(( ))
+    v69(( ))
+    v74(( ))
+    v87(( ))
+    v90(( ))
+    end
+    subgraph DECONTAM_LONGREAD
+    v103([CHUNKFASTX])
+    v108([GZIPALL])
+    v116([MINIMAP2_ALIGN])
+    v122([COMBINEBAM])
+    v125([DECONTAMBAM])
+    v105(( ))
+    v121(( ))
+    v124(( ))
+    end
+    subgraph MOTUS_KRONA
+    v142([MOTUS_PROFILE])
+    v148([MOTUS2KRONA])
+    v150([KRONA_KTIMPORTTEXT])
+    end
+    subgraph READSMERGE
+    v158([RENAMEPAIREDFASTXHEADERS])
+    v164([FASTP])
+    v173([SEQTK_SEQ])
+    v182(( ))
+    end
+    subgraph RRNA_EXTRACTION
+    v184([INFERNAL_CMSEARCH])
+    v188([COMBINEHMMSEARCHTBL])
+    v189([CMSEARCHTBLOUTDEOVERLAP])
+    v193([EASEL_ESLSFETCH])
+    v196([EXTRACTCOORDS])
+    v187(( ))
+    end
+    subgraph MAPSEQ_OTU_KRONA
+    v213([MAPSEQ])
+    v216([MAPSEQ2BIOM])
+    v220([KRONA_KTIMPORTTEXT])
+    end
+    subgraph PROFILE_HMMSEARCH_PFAM
+    v229([FASTAEMBEDLENGTH])
+    v231([SEQKIT_TRANSLATE])
+    v236([HMMER_HMMSEARCH])
+    v242([COMBINEHMMSEARCHTBL])
+    v244([PARSEHMMSEARCHCOVERAGE])
+    v241(( ))
+    end
+    v263([MULTIQC])
+    v134(( ))
+    v258(( ))
+    v259(( ))
+    v260(( ))
+    end
+    subgraph " "
+    v26[" "]
+    v27[" "]
+    v28[" "]
+    v29[" "]
+    v46[" "]
+    v51[" "]
+    v55[" "]
+    v56[" "]
+    v57[" "]
+    v58[" "]
+    v62[" "]
+    v65[" "]
+    v66[" "]
+    v67[" "]
+    v73[" "]
+    v78[" "]
+    v82[" "]
+    v83[" "]
+    v84[" "]
+    v85[" "]
+    v89[" "]
+    v92[" "]
+    v93[" "]
+    v94[" "]
+    v104[" "]
+    v109[" "]
+    v117[" "]
+    v118[" "]
+    v119[" "]
+    v123[" "]
+    v126[" "]
+    v127[" "]
+    v128[" "]
+    v143[" "]
+    v144[" "]
+    v145[" "]
+    v151[" "]
+    v159[" "]
+    v165[" "]
+    v166[" "]
+    v167[" "]
+    v168["fastp_summary_json"]
+    v169[" "]
+    v197["concat_ssu_lsu_coords"]
+    v217["biom_notaxid_out"]
+    v221["html"]
+    v230[" "]
+    v232[" "]
+    v237[" "]
+    v238[" "]
+    v239[" "]
+    v254[" "]
+    v264[" "]
+    v265[" "]
+    v266[" "]
+    v267[" "]
+    v274["collated_versions"]
+    v277[" "]
+    v280[" "]
+    v283[" "]
+    v286[" "]
+    v290[" "]
+    v294[" "]
+    v297[" "]
+    v305[" "]
+    v308[" "]
+    end
+    v1 --> v2
+    v2 --> v11
+    v11 --> v2
+    v15 --> v16
+    v21 --> v25
+    v22 --> v25
+    v23 --> v25
+    v24 --> v25
+    v16 --> v25
+    v25 --> v29
+    v25 --> v28
+    v25 --> v27
+    v25 --> v26
+    v25 --> v16
+    v25 --> v30
+    v25 --> v134
+    v44 --> v45
+    v16 --> v45
+    v45 --> v46
+    v45 --> v47
+    v47 --> v50
+    v50 --> v51
+    v50 --> v47
+    v53 --> v54
+    v2 --> v54
+    v47 --> v54
+    v54 --> v58
+    v54 --> v57
+    v54 --> v56
+    v54 --> v55
+    v54 --> v30
+    v54 --> v60
+    v60 --> v61
+    v61 --> v62
+    v61 --> v63
+    v63 --> v64
+    v64 --> v67
+    v64 --> v66
+    v64 --> v65
+    v64 --> v30
+    v64 --> v69
+    v64 --> v134
+    v71 --> v72
+    v69 --> v72
+    v72 --> v73
+    v72 --> v74
+    v74 --> v77
+    v77 --> v78
+    v77 --> v74
+    v80 --> v81
+    v2 --> v81
+    v74 --> v81
+    v81 --> v85
+    v81 --> v84
+    v81 --> v83
+    v81 --> v82
+    v81 --> v30
+    v81 --> v87
+    v87 --> v88
+    v88 --> v89
+    v88 --> v90
+    v90 --> v91
+    v91 --> v94
+    v91 --> v93
+    v91 --> v92
+    v91 --> v16
+    v91 --> v30
+    v91 --> v134
+    v102 --> v103
+    v16 --> v103
+    v103 --> v104
+    v103 --> v105
+    v105 --> v108
+    v108 --> v109
+    v108 --> v105
+    v111 --> v116
+    v112 --> v116
+    v113 --> v116
+    v114 --> v116
+    v115 --> v116
+    v2 --> v116
+    v105 --> v116
+    v116 --> v119
+    v116 --> v118
+    v116 --> v117
+    v116 --> v30
+    v116 --> v121
+    v121 --> v122
+    v122 --> v123
+    v122 --> v124
+    v124 --> v125
+    v125 --> v128
+    v125 --> v127
+    v125 --> v126
+    v125 --> v16
+    v125 --> v30
+    v125 --> v134
+    v2 --> v142
+    v16 --> v142
+    v142 --> v148
+    v142 --> v145
+    v142 --> v144
+    v142 --> v143
+    v142 --> v16
+    v142 --> v30
+    v147 --> v148
+    v148 --> v150
+    v148 --> v30
+    v150 --> v151
+    v150 --> v30
+    v157 --> v158
+    v16 --> v158
+    v158 --> v164
+    v158 --> v159
+    v160 --> v164
+    v161 --> v164
+    v162 --> v164
+    v163 --> v164
+    v164 --> v169
+    v164 --> v168
+    v164 --> v167
+    v164 --> v166
+    v164 --> v165
+    v164 --> v16
+    v164 --> v30
+    v16 --> v173
+    v173 --> v229
+    v173 --> v30
+    v173 --> v182
+    v2 --> v184
+    v182 --> v184
+    v184 --> v30
+    v184 --> v187
+    v187 --> v188
+    v188 --> v189
+    v2 --> v189
+    v189 --> v30
+    v189 --> v182
+    v182 --> v193
+    v193 --> v196
+    v193 --> v30
+    v196 --> v197
+    v196 --> v2
+    v196 --> v30
+    v2 --> v213
+    v213 --> v216
+    v213 --> v30
+    v2 --> v216
+    v216 --> v220
+    v216 --> v217
+    v216 --> v16
+    v216 --> v30
+    v220 --> v221
+    v220 --> v30
+    v228 --> v229
+    v229 --> v231
+    v229 --> v230
+    v231 --> v232
+    v231 --> v2
+    v2 --> v236
+    v236 --> v239
+    v236 --> v238
+    v236 --> v237
+    v236 --> v30
+    v236 --> v241
+    v241 --> v242
+    v242 --> v244
+    v243 --> v244
+    v244 --> v16
+    v244 --> v30
+    v247 --> v258
+    v134 --> v254
+    v261 --> v263
+    v262 --> v263
+    v134 --> v263
+    v258 --> v263
+    v259 --> v263
+    v260 --> v263
+    v263 --> v267
+    v263 --> v266
+    v263 --> v265
+    v263 --> v264
+    v271 --> v30
+    v30 --> v274
+    v16 --> v277
+    v16 --> v280
+    v16 --> v283
+    v16 --> v286
+    v16 --> v290
+    v16 --> v294
+    v16 --> v297
+    v16 --> v305
+    v16 --> v308
+
+</pre>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, maxTextSize: Number.MAX_SAFE_INTEGER, maxEdges: Number.MAX_SAFE_INTEGER });
+</script>
+</body>
+</html>

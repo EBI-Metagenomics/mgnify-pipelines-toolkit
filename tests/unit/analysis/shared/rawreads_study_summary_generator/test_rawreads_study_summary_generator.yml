@@ -77,14 +77,14 @@
   command: rawreads_study_summary_generator merge -a tests/fixtures/study_summary_inputs/rawreads -p merged
   files:
     - path: "merged_mOTUs_study_summary.tsv"
-      md5sum: e1bf2aa9f83a26fefcdb207e86a71292
+      md5sum: 0456f1cba22925a3ca32fd5556e9b75b
     - path: "merged_SILVA-SSU_study_summary.tsv"
-      md5sum: 082bffc340fd9212b27832d0d8148fe2
+      md5sum: e793879513db567f4b5a7f3f67ca39e8
     - path: "merged_SILVA-LSU_study_summary.tsv"
-      md5sum: a91200fbf670faf61a251e2a6102d10a
+      md5sum: a2eed30af639dada9f168713e47c8a6d
     - path: "merged_Pfam-A_count_study_summary.tsv"
-      md5sum: 84d2f23bada707255b950ea626308c22
+      md5sum: 944fb8b3f28dbfb5222ff52e912e6fdd
     - path: "merged_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 5d914dd7c370268eaf81f8b9aea423ad
+      md5sum: 53a7337e8fb22aa6ebea8bb1c0c3d10f
     - path: "merged_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 9fa5538072f75f44dc8a432baf276f3f
+      md5sum: 0264bef7f107d55ffde75f54477d40eb

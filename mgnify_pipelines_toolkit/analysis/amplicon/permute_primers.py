@@ -27,7 +27,7 @@ def parse_args():
 
 def permute_seq(seq):
 
-    AMBIGUOUS_BASES_DICT = {
+    ambiguous_bases_dict = {
         "R": ["A", "G"],
         "Y": ["C", "T"],
         "S": ["G", "C"],
@@ -47,7 +47,7 @@ def permute_seq(seq):
         if base in ["A", "C", "T", "G"]:
             seq_template.append(base)
         else:
-            seq_template.append(AMBIGUOUS_BASES_DICT[base])
+            seq_template.append(ambiguous_bases_dict[base])
 
     seq_permutations = []
     for combo in product(*seq_template):

@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.2.3"
+version = "1.2.4"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -58,6 +58,7 @@ make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_coun
 remove_ambiguous_reads = "mgnify_pipelines_toolkit.analysis.amplicon.remove_ambiguous_reads:main"
 rev_comp_se_primers = "mgnify_pipelines_toolkit.analysis.amplicon.rev_comp_se_primers:main"
 mapseq_to_asv_table = "mgnify_pipelines_toolkit.analysis.amplicon.mapseq_to_asv_table:main"
+permute_primers = "mgnify_pipelines_toolkit.analysis.amplicon.permute_primers:main"
 primer_val_classification = "mgnify_pipelines_toolkit.analysis.amplicon.primer_val_classification:main"
 amplicon_study_summary_generator = "mgnify_pipelines_toolkit.analysis.amplicon.study_summary_generator:cli"
 # analysis.assembly #

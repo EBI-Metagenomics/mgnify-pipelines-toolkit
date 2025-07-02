@@ -97,6 +97,8 @@ def main():
     fwd_primers_fw = open("./fwd_primers.fasta", "w")
     rev_primers_fw = open("./rev_primers.fasta", "w")
 
+    matched_primers_list = []
+
     with open(input, "r") as fr:
         for line in fr:
             line = line.strip()
@@ -108,6 +110,10 @@ def main():
             beg = float(line_lst[5])
             end = float(line_lst[6])
 
+            cleaned_primer_name = "_".join(primer_name.split("_")[0:-3])
+            if cleaned_primer_name in matched_primers_list:
+                continue
+
             if rfam == "RF00177":
                 gene = "16S"
                 model = REGIONS_16S_BACTERIA
@@ -118,7 +124,7 @@ def main():
                 gene = "18S"
                 model = REGIONS_18S
             else:  # For cases when it's a std primer but for some reason hasn't matched the model
-                if primer_name == "F_auto" or primer_name == "R_auto":
+                if cleaned_primer_name == "F_auto" or cleaned_primer_name == "R_auto":
                     continue
                 gene = "Unknown"
                 amp_region = "Unknown"
@@ -130,27 +136,32 @@ def main():
 
             strand = ""
 
-            if primer_name == "F_auto" or primer_name[-1] == "F":
+            if primer_name[-1] == "F":
                 strand = STRAND_FWD
-            elif primer_name == "R_auto" or primer_name[-1] == "R":
+            elif primer_name[-1] == "R":
                 strand = STRAND_REV
+            else:
+                print(f"Not sure what strand this is, exiting: {primer_name}")
 
             if model:
                 amp_region = get_amp_region(beg, end, strand, model)
-            primer_seq = str(fasta_dict[primer_name].seq)
+
+            primer_seq = str(fasta_dict[cleaned_primer_name].seq)
 
             res_dict["Gene"].append(gene)
             res_dict["VariableRegion"].append(amp_region)
-            res_dict["PrimerName"].append(primer_name)
+            res_dict["PrimerName"].append(cleaned_primer_name)
             res_dict["PrimerStrand"].append(strand)
             res_dict["PrimerSeq"].append(primer_seq)
 
             if strand == STRAND_FWD:
-                fwd_primers_fw.write(f">{primer_name}\n{primer_seq}\n")
+                fwd_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
             elif strand == STRAND_REV:
                 if single_end:
                     primer_seq = Seq(primer_seq).reverse_complement()
-                rev_primers_fw.write(f">{primer_name}\n{primer_seq}\n")
+                rev_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
+
+            matched_primers_list.append(cleaned_primer_name)
 
     res_df = pd.DataFrame.from_dict(res_dict)
     res_df.to_csv(f"./{sample}_primer_validation.tsv", sep="\t", index=False)

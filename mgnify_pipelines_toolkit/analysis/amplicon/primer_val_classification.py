@@ -110,6 +110,9 @@ def main():
             beg = float(line_lst[5])
             end = float(line_lst[6])
 
+            if "variant" not in primer_name:
+                continue
+
             cleaned_primer_name = "_".join(primer_name.split("_")[0:-3])
             if cleaned_primer_name in matched_primers_list:
                 continue

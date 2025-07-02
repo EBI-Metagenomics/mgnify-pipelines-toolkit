@@ -6,7 +6,7 @@
   stderr:
     contains:
       - "permute_primers: error: the following arguments are required: -i/--input_primers, -p/--prefix"
-- name: primer_val_classification test_correct_args
+- name: permute_primers test_correct_args
   tags:
     - permute_primers
   command: permute_primers -i tests/fixtures/sequences/f_and_r_primers.fasta -p test

@@ -1,0 +1,15 @@
+- name: permute_primers test_wrong_args
+  tags:
+    - permute_primers
+  exit_code: 2
+  command: permute_primers --chromosome X
+  stderr:
+    contains:
+      - "permute_primers: error: the following arguments are required: -i/--input_primers, -p/--prefix"
+- name: primer_val_classification test_correct_args
+  tags:
+    - permute_primers
+  command: permute_primers -i tests/fixtures/sequences/f_and_r_primers.fasta -p test
+  files:
+    - path: "test_permuted_primers.fasta"
+      md5sum: 977107cacb0f47e662c4896973d922b9

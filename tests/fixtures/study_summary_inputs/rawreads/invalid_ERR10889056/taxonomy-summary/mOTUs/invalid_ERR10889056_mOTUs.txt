@@ -1,0 +1,5 @@
+# Count	Taxonomy
+1.0	kkkk__Bacteria	p__Firmicutes	c__Bacilli	oo__Lactobacillales	f__Lactobacillaceae	h__Lactobacillus	s__Lactobacillus gasseri
+2.0	k__Bacteria	p__Actinobacteria	c__Actinobacteria	o__Bifidobacteriales	f__Bifidobacteriaceae	g__Bifidobacterium	s__Bifidobacterium longum [Bifidobacterium longum CAG:69/Bifidobacterium longum]
+1.0	k__Bacteria	p__Bacteroidetes	c__Bacteroidia	o__Bacteroidales	f__Bacteroidaceae	g__Bacteroides	s__Bacteroides thetaiotaomicron
+2.0	unassigned

@@ -9,7 +9,7 @@
 - name: primer_val_classification test_correct_args test_std_inputs
   tags:
     - primer_val_classification
-  command: primer_val_classification -i tests/fixtures/misc/test.cmsearch_matches.tbl.deoverlapped -f test_permutations_permuted_primers.fasta -s test
+  command: primer_val_classification -i tests/fixtures/misc/test.cmsearch_matches.tbl.deoverlapped -f test_permuted_primers.fasta -s test
   files:
     - path: "test_primer_validation.tsv"
       md5sum: 953e749f8d42c4ac89cc84c4afd55731
@@ -20,7 +20,7 @@
 - name: primer_val_classification test_correct_args test_auto_inputs
   tags:
     - primer_val_classification
-  command: primer_val_classification -i tests/fixtures/misc/test_auto.cmsearch_matches.tbl.deoverlapped -f test_permutations_permuted_primers_auto.fasta -s test
+  command: primer_val_classification -i tests/fixtures/misc/test_auto.cmsearch_matches.tbl.deoverlapped -f test_permuted_primers_auto.fasta -s test
   files:
     - path: "test_primer_validation.tsv"
       md5sum: 74735648c88eb593c4efdff570c8b3eb

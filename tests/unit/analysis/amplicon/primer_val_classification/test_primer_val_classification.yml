@@ -6,10 +6,10 @@
   stderr:
     contains:
       - "primer_val_classification: error: the following arguments are required: -i/--input, -f/--fasta, -s/--sample"
-- name: primer_val_classification test_correct_args
+- name: primer_val_classification test_correct_args test_std_inputs
   tags:
     - primer_val_classification
-  command: primer_val_classification -i tests/fixtures/misc/f_and_r_primers_cmsearch.tbl.deoverlapped -f tests/fixtures/sequences/f_and_r_primers.fasta -s test
+  command: primer_val_classification -i tests/fixtures/misc/test.cmsearch_matches.tbl.deoverlapped -f test_permutations_permuted_primers.fasta -s test
   files:
     - path: "test_primer_validation.tsv"
       md5sum: 953e749f8d42c4ac89cc84c4afd55731
@@ -17,3 +17,14 @@
       md5sum: d3e8e54f8760c09532deaf1f699bd2e0
     - path: "rev_primers.fasta"
       md5sum: 85be59f336f4dd4b0419bfcfd62697fa
+- name: primer_val_classification test_correct_args test_auto_inputs
+  tags:
+    - primer_val_classification
+  command: primer_val_classification -i tests/fixtures/misc/test_auto.cmsearch_matches.tbl.deoverlapped -f test_permutations_permuted_primers_auto.fasta -s test
+  files:
+    - path: "test_primer_validation.tsv"
+      md5sum: 74735648c88eb593c4efdff570c8b3eb
+    - path: "fwd_primers.fasta"
+      md5sum: 20b4f1c39097e3bce4e3457f64514a27
+    - path: "rev_primers.fasta"
+      md5sum: 3a5a33751acd45d57ca0d0645677e080

@@ -61,12 +61,13 @@ def make_primer_permutations(primers_dict, prefix):
     with open(f"{prefix}_permuted_primers.fasta", "w") as fw:
         for primer_name, seq in primers_dict.items():
 
+            primer_seq = seq.seq
+            fw.write(f">{primer_name}\n{primer_seq}\n")
+
             if primer_name == "F_auto" or primer_name[-1] == "F":
                 strand = "F"
             elif primer_name == "R_auto" or primer_name[-1] == "R":
                 strand = "R"
-
-            primer_seq = seq.seq
 
             seq_permutations = permute_seq(primer_seq)
 

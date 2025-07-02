@@ -12,4 +12,4 @@
   command: permute_primers -i tests/fixtures/sequences/f_and_r_primers.fasta -p test
   files:
     - path: "test_permuted_primers.fasta"
-      md5sum: 977107cacb0f47e662c4896973d922b9
+      md5sum: 93a17b3453467cf9ee6c92aac7f07a16

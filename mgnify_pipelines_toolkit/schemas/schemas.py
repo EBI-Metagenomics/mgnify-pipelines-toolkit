@@ -16,7 +16,7 @@
 import logging
 import re
 
-from enum import Enum
+from enum import StrEnum
 from typing import ClassVar, Optional, Type, Literal
 
 import pandas as pd
@@ -35,6 +35,7 @@ from pandera.engines.pandas_engine import PydanticModel
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
     SHORT_TAX_RANKS,
     SHORT_PR2_TAX_RANKS,
+    SHORT_MOTUS_TAX_RANKS,
 )
 
 
@@ -70,7 +71,7 @@ class INSDCRunAccession(RootModel):
         return run
 
 
-class AmpliconResultTypes(str, Enum):
+class AmpliconResultTypes(StrEnum):
     """Class that models the two allowed statuses for successful amplicon analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
@@ -545,7 +546,7 @@ class TaxonRecord(Taxon):
 class PR2TaxonRecord(PR2Taxon):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
 
-    Count: int
+    count: int = Field(alias="Count")
 
 
 # This is the schema for the whole DF
@@ -570,6 +571,154 @@ class PR2TaxonSchema(pa.DataFrameModel):
         """Config with dataframe-level data type."""
 
         dtype = PydanticModel(PR2TaxonRecord)
+        coerce = True
+
+
+class RawReadsStatusTypes(StrEnum):
+    """Class that models the four allowed statuses for successful raw reads analysis runs.
+    Pydantic validates Enums very simply without needing to declare a new function.
+    """
+
+    all_results = "all_results"
+    no_reads = "no_reads"
+    no_results = "no_results"
+    missing_results = "missing_results"
+
+
+class RawReadsPassedRunsRecord(BaseModel):
+    """Class defining a Pydantic model for a single "row" of a raw-reads pipeline passed runs file.
+    Uses the previous nine classes.
+    """
+
+    run: INSDCRunAccession
+    status: RawReadsStatusTypes
+
+
+class RawReadsNonINSDCSPassedRunsRecord(RawReadsPassedRunsRecord):
+    """Class modeling a very similar model as the preceding one, but with no INSDC-validation.
+    This is achieved by replacing the type of the runs with just a simple string so no validation
+    happens.
+    """
+
+    run: str
+
+
+# This is the schema for the whole DF
+class RawReadsPassedRunsSchema(pa.DataFrameModel):
+    """Class modelling a Pandera dataframe schema that uses the RawReadsPassedRunsRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(RawReadsPassedRunsRecord)
+        coerce = True
+
+
+class RawReadsNonINSDCPassedRunsSchema(pa.DataFrameModel):
+    """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation.
+    Uses the RawReadsNonINSDCSPassedRunsRecord as a dtype to achieve this.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(RawReadsNonINSDCSPassedRunsRecord)
+        coerce = True
+
+
+class MotusTaxRank(RootModel):
+    """Class for modelling a single Taxonomic Rank in mOTUs output.
+    Essentially is just a special string with validation of the structure:
+    `${rank}__${taxon}`
+    Where `${rank}` is one of the allowed short ranks defined by the imported
+    `SHORT_MOTUS_TAX_RANKS` variables.
+    And `${taxon}` is the actual taxon for that rank (this isn't validated).
+    It will also validate if the whole string is the permitted "unassigned" or "unclassified".
+    """
+
+    valid_tax_ranks: ClassVar = SHORT_MOTUS_TAX_RANKS
+
+    root: str = Field(
+        unique=True,
+        description="A single taxon in a taxonomy record",
+        examples=["sk__Bacteria", "p__Bacillota", "g__Tundrisphaera"],
+    )
+
+    @field_validator("root", mode="after")
+    @classmethod
+    def rank_structure_validity_check(cls, taxrank: str) -> bool:
+        taxrank_list = taxrank.split("__")
+        rank = taxrank_list[0]
+        if (
+            rank != ""
+            and not rank.capitalize() in {"Unclassified", "Unassigned"}
+            and rank not in cls.valid_tax_ranks
+        ):
+            raise ValueError(f"Invalid taxonomy rank {rank}.")
+
+        return taxrank
+
+
+class MotusTaxon(BaseModel):
+    """Class for modelling an entire MotusTaxon or mOTUs taxonomic assignment.
+    All of the ranks are optional, to model for the taxon being "Unclassified" or "Unassigned".
+    """
+
+    Kingdom: Optional[MotusTaxRank] = None
+    Phylum: Optional[MotusTaxRank] = None
+    Class: Optional[MotusTaxRank] = None
+    Order: Optional[MotusTaxRank] = None
+    Family: Optional[MotusTaxRank] = None
+    Genus: Optional[MotusTaxRank] = None
+    Species: Optional[MotusTaxRank] = None
+
+
+class MotusTaxonRecord(MotusTaxon):
+    """Class for modelling a single taxon record in a mOTUs taxonomy file.
+    It inherits the MotusTaxon class, and simply adds a Count field, modelling the read counts
+    for that particular MotusTaxon record.
+    """
+
+    count: int = Field(alias="Count")
+
+
+class MotusTaxonSchema(pa.DataFrameModel):
+    """Class modelling a Pandera dataframe schema that uses the MotusTaxonRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(MotusTaxonRecord)
+        coerce = True
+
+
+class FunctionProfileRecord(BaseModel):
+    """Class for modelling a single taxon record in a functional profile file.
+    It models the read counts and coverage depth/breadth of each function (gene/protein)
+    for each specific record.
+    """
+
+    count: int = Field(alias="Count")
+    coverage_depth: float = Field(alias="Coverage Depth")
+    coverage_breadth: float = Field(alias="Coverage Breadth")
+
+    class Config:
+        validate_by_name = True
+
+
+class FunctionProfileSchema(pa.DataFrameModel):
+    """Class modelling a Pandera dataframe schema that uses the FunctionProfileRecord class as dtype.
+    This is what actually validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    class Config:
+        """Config with dataframe-level data type."""
+
+        dtype = PydanticModel(FunctionProfileRecord)
         coerce = True
 
 

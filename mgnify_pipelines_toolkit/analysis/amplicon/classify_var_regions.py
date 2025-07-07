@@ -454,7 +454,7 @@ def retrieve_regions(
                 temp_seq_counter[determine_domain(model) + " " + reg] = (
                     len(model_regions) * freq
                 )
-        if total_useful_sequences / len(data) < 0.95 and run_status != "ambiguous":
+        if total_useful_sequences / len(data) < 0.75 and run_status != "ambiguous":
             failed_run_counter += 1
             logging.info("No output will be produced - too few useful sequences")
             continue

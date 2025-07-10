@@ -228,7 +228,7 @@ def generate_db_summary(
         count_df = count_df.astype(int)
 
         count_df.to_csv(
-            f"{output_prefix}_{db_label}_count_study_summary.tsv",
+            f"{output_prefix}_{db_label}_read-count_study_summary.tsv",
             sep="\t",
             index_label="function",
         )
@@ -410,7 +410,7 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                     pass
 
         if db_label in RRAP_FUNCDB_LABELS:
-            for table_type in ["count", "coverage-depth", "coverage-breadth"]:
+            for table_type in ["read-count", "coverage-depth", "coverage-breadth"]:
                 merged_summary_name = (
                     f"{output_prefix}_{db_label}_{table_type}_study_summary.tsv"
                 )

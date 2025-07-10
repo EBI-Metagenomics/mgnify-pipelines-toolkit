@@ -156,21 +156,21 @@ def parse_one_func_file(
     res_df = pd.read_csv(
         func_file,
         sep="\t",
-        names=["Function accession", "Count", "Coverage Depth", "Coverage Breadth"],
+        names=["function", "read_count", "coverage_depth", "coverage_breadth"],
         skiprows=1,
-        dtype={"Count": int, "Coverage Depth": float, "Coverage Breadth": float},
-    ).set_index("Function accession")
+        dtype={"read_count": int, "coverage_depth": float, "coverage_breadth": float},
+    ).set_index("function")
     res_df = res_df.fillna(0)
 
     validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = res_df[["Count"]]
+    count_df = res_df[["read_count"]]
     count_df.columns = [run_acc]
 
-    depth_df = res_df[["Coverage Depth"]]
+    depth_df = res_df[["coverage_depth"]]
     depth_df.columns = [run_acc]
 
-    breadth_df = res_df[["Coverage Breadth"]]
+    breadth_df = res_df[["coverage_breadth"]]
     breadth_df.columns = [run_acc]
 
     return count_df, depth_df, breadth_df

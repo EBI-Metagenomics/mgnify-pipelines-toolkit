@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.2.6"
+version = "1.2.7"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [

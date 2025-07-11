@@ -18,7 +18,7 @@
       md5sum: 535d993ddf93ba6f2151830fc7111445
     - path: "chunk1_SILVA-LSU_study_summary.tsv"
       md5sum: 1855e1663d87b44ea439652c985f34a9
-    - path: "chunk1_Pfam-A_count_study_summary.tsv"
+    - path: "chunk1_Pfam-A_read-count_study_summary.tsv"
       md5sum: 3d40925c439f17f2a17755afc101c0cb
     - path: "chunk1_Pfam-A_coverage-depth_study_summary.tsv"
       md5sum: c73db3ffd2b2f7286e17491e520ee0cc
@@ -46,7 +46,7 @@
       md5sum: 082bffc340fd9212b27832d0d8148fe2
     - path: "chunk2_SILVA-LSU_study_summary.tsv"
       md5sum: a91200fbf670faf61a251e2a6102d10a
-    - path: "chunk2_Pfam-A_count_study_summary.tsv"
+    - path: "chunk2_Pfam-A_read-count_study_summary.tsv"
       md5sum: 84d2f23bada707255b950ea626308c22
     - path: "chunk2_Pfam-A_coverage-depth_study_summary.tsv"
       md5sum: 6ec06f0c501c066ab4bb380e5bbe407d
@@ -82,7 +82,7 @@
       md5sum: e793879513db567f4b5a7f3f67ca39e8
     - path: "merged_SILVA-LSU_study_summary.tsv"
       md5sum: a2eed30af639dada9f168713e47c8a6d
-    - path: "merged_Pfam-A_count_study_summary.tsv"
+    - path: "merged_Pfam-A_read-count_study_summary.tsv"
       md5sum: 944fb8b3f28dbfb5222ff52e912e6fdd
     - path: "merged_Pfam-A_coverage-depth_study_summary.tsv"
       md5sum: 5554fa9d53f3c1cdf29b69507a17d17a

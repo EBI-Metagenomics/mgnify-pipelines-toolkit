@@ -702,9 +702,9 @@ class FunctionProfileRecord(BaseModel):
     for each specific record.
     """
 
-    count: int = Field(alias="Count")
-    coverage_depth: float = Field(alias="Coverage Depth")
-    coverage_breadth: float = Field(alias="Coverage Breadth")
+    read_count: int
+    coverage_depth: float
+    coverage_breadth: float
 
     class Config:
         validate_by_name = True

@@ -156,21 +156,21 @@ def parse_one_func_file(
     res_df = pd.read_csv(
         func_file,
         sep="\t",
-        names=["Function accession", "Count", "Coverage Depth", "Coverage Breadth"],
+        names=["function", "read_count", "coverage_depth", "coverage_breadth"],
         skiprows=1,
-        dtype={"Count": int, "Coverage Depth": float, "Coverage Breadth": float},
-    ).set_index("Function accession")
+        dtype={"read_count": int, "coverage_depth": float, "coverage_breadth": float},
+    ).set_index("function")
     res_df = res_df.fillna(0)
 
     validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = res_df[["Count"]]
+    count_df = res_df[["read_count"]]
     count_df.columns = [run_acc]
 
-    depth_df = res_df[["Coverage Depth"]]
+    depth_df = res_df[["coverage_depth"]]
     depth_df.columns = [run_acc]
 
-    breadth_df = res_df[["Coverage Breadth"]]
+    breadth_df = res_df[["coverage_breadth"]]
     breadth_df.columns = [run_acc]
 
     return count_df, depth_df, breadth_df
@@ -228,7 +228,7 @@ def generate_db_summary(
         count_df = count_df.astype(int)
 
         count_df.to_csv(
-            f"{output_prefix}_{db_label}_count_study_summary.tsv",
+            f"{output_prefix}_{db_label}_read-count_study_summary.tsv",
             sep="\t",
             index_label="function",
         )
@@ -410,7 +410,7 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                     pass
 
         if db_label in RRAP_FUNCDB_LABELS:
-            for table_type in ["count", "coverage-depth", "coverage-breadth"]:
+            for table_type in ["read-count", "coverage-depth", "coverage-breadth"]:
                 merged_summary_name = (
                     f"{output_prefix}_{db_label}_{table_type}_study_summary.tsv"
                 )

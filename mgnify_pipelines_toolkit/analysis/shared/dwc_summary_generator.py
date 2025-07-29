@@ -77,6 +77,7 @@ def get_metadata_from_run_acc(run_acc):
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 
+    # Turn empty values into NA
     for field in full_res_dict.keys():
         val = full_res_dict[field]
         if val == "":
@@ -132,6 +133,7 @@ def cleanup_taxa(df):
 
     ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
 
+    # Turn empty taxa into NA
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(
             lambda x: x.split("__")[1] if pd.notnull(x) else "NA"
@@ -143,6 +145,7 @@ def cleanup_taxa(df):
     # Add a MeasurementUnit Column for the read count for each asv
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
 
+    # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
             "ASVID",

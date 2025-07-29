@@ -120,7 +120,9 @@ def get_all_metadata_from_runs(runs):
 def cleanup_taxa(df):
 
     df.pop("Kingdom")
-    cleaned_df = df.rename(columns={"Superkingdom": "Kingdom", "asv": "ASVID"})
+    cleaned_df = df.rename(
+        columns={"Superkingdom": "Kingdom", "asv": "ASVID", "count": "MeasurementValue"}
+    )
 
     ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
 
@@ -131,6 +133,9 @@ def cleanup_taxa(df):
 
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
+
+    # Add a MeasurementUnit Column for the read count for each asv
+    cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
 
     cleaned_df = cleaned_df[
         [
@@ -149,6 +154,8 @@ def cleanup_taxa(df):
             "Family",
             "Genus",
             "Species",
+            "MeasurementUnit",
+            "MeasurementValue",
             "ASVSeq",
         ]
     ]

@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
 RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
-SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth&limit=10&format=json&download=false"
+SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
 
 
@@ -77,9 +77,7 @@ def get_metadata_from_run_acc(run_acc):
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 
-    fields_to_clean = ["lat", "lon", "depth"]
-
-    for field in fields_to_clean:
+    for field in full_res_dict.keys():
         val = full_res_dict[field]
         if val == "":
             full_res_dict[field] = "NA"
@@ -100,6 +98,9 @@ def get_metadata_from_run_acc(run_acc):
         "depth",
         "decimalLatitude",
         "collectionDate",
+        "center_name",
+        "temperature",
+        "salinity",
     ]
 
     return res_df
@@ -121,7 +122,12 @@ def cleanup_taxa(df):
 
     df.pop("Kingdom")
     cleaned_df = df.rename(
-        columns={"Superkingdom": "Kingdom", "asv": "ASVID", "count": "MeasurementValue"}
+        columns={
+            "Superkingdom": "Kingdom",
+            "asv": "ASVID",
+            "count": "MeasurementValue",
+            "center_name": "InstitutionCode",
+        }
     )
 
     ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
@@ -146,7 +152,10 @@ def cleanup_taxa(df):
             "decimalLongitude",
             "decimalLatitude",
             "depth",
+            "temperature",
+            "salinity",
             "collectionDate",
+            "InstitutionCode",
             "Kingdom",
             "Phylum",
             "Class",

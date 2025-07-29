@@ -12,4 +12,4 @@
   command: dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -o test
   files:
     - path: "test_dwcready.csv"
-      md5sum: aae241b37c354b62a67ac50b80f5544d
+      md5sum: c254fa975d6bf879d17eef7eb9d40883

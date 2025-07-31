@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
 RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
-SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth&limit=10&format=json&download=false"
+SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
 
 
@@ -77,9 +77,8 @@ def get_metadata_from_run_acc(run_acc):
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 
-    fields_to_clean = ["lat", "lon", "depth"]
-
-    for field in fields_to_clean:
+    # Turn empty values into NA
+    for field in full_res_dict.keys():
         val = full_res_dict[field]
         if val == "":
             full_res_dict[field] = "NA"
@@ -92,15 +91,15 @@ def get_metadata_from_run_acc(run_acc):
     del full_res_dict["collection_date"]
 
     res_df = pd.DataFrame(full_res_dict, index=[0])
-    res_df.columns = [
-        "RunID",
-        "SampleID",
-        "StudyID",
-        "decimalLongitude",
-        "depth",
-        "decimalLatitude",
-        "collectionDate",
-    ]
+    res_df = res_df.rename(
+        columns={
+            "run_accession": "RunID",
+            "sample_accession": "SampleID",
+            "secondary_study_accession": "StudyID",
+            "lon": "decimalLongitude",
+            "lat": "decimalLatitude",
+        }
+    )
 
     return res_df
 
@@ -120,10 +119,18 @@ def get_all_metadata_from_runs(runs):
 def cleanup_taxa(df):
 
     df.pop("Kingdom")
-    cleaned_df = df.rename(columns={"Superkingdom": "Kingdom", "asv": "ASVID"})
+    cleaned_df = df.rename(
+        columns={
+            "Superkingdom": "Kingdom",
+            "asv": "ASVID",
+            "count": "MeasurementValue",
+            "center_name": "InstitutionCode",
+        }
+    )
 
     ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
 
+    # Turn empty taxa into NA
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(
             lambda x: x.split("__")[1] if pd.notnull(x) else "NA"
@@ -132,6 +139,9 @@ def cleanup_taxa(df):
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
 
+    # Add a MeasurementUnit Column for the read count for each asv
+    cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
+    # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
             "ASVID",
@@ -141,7 +151,10 @@ def cleanup_taxa(df):
             "decimalLongitude",
             "decimalLatitude",
             "depth",
+            "temperature",
+            "salinity",
             "collectionDate",
+            "InstitutionCode",
             "Kingdom",
             "Phylum",
             "Class",
@@ -149,6 +162,8 @@ def cleanup_taxa(df):
             "Family",
             "Genus",
             "Species",
+            "MeasurementUnit",
+            "MeasurementValue",
             "ASVSeq",
         ]
     ]

@@ -91,18 +91,15 @@ def get_metadata_from_run_acc(run_acc):
     del full_res_dict["collection_date"]
 
     res_df = pd.DataFrame(full_res_dict, index=[0])
-    res_df.columns = [
-        "RunID",
-        "SampleID",
-        "StudyID",
-        "decimalLongitude",
-        "depth",
-        "decimalLatitude",
-        "collectionDate",
-        "center_name",
-        "temperature",
-        "salinity",
-    ]
+    res_df = res_df.rename(
+        columns={
+            "run_accession": "RunID",
+            "sample_accession": "SampleID",
+            "secondary_study_accession": "StudyID",
+            "lon": "decimalLongitude",
+            "lat": "decimalLatitude",
+        }
+    )
 
     return res_df
 
@@ -144,7 +141,6 @@ def cleanup_taxa(df):
 
     # Add a MeasurementUnit Column for the read count for each asv
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
-
     # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [

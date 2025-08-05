@@ -164,6 +164,7 @@ def cleanup_taxa(df):
             "Species",
             "MeasurementUnit",
             "MeasurementValue",
+            "dbhit",
             "ASVSeq",
         ]
     ]
@@ -180,6 +181,19 @@ def get_asv_dict(runs_df, root_path):
 
         if status != "all_results":
             continue
+
+        mapseq_file = sorted(
+            list(
+                (
+                    pathlib.Path(root_path)
+                    / run_acc
+                    / "taxonomy-summary"
+                    / "DADA2-SILVA"
+                ).glob("*_DADA2-SILVA.mseq")
+            )
+        )[0]
+        mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1])
+        mapseq_df.columns = ["asv", "dbhit"]
 
         tax_file = sorted(
             list(
@@ -211,6 +225,8 @@ def get_asv_dict(runs_df, root_path):
         merged_df = all_ampregions_count_df.merge(
             run_tax_df, left_on="asv", right_on="ASV"
         )
+        merged_df = merged_df.merge(mapseq_df, left_on="asv", right_on="asv")
+
         merged_df.pop("ASV")
         run_col = [run_acc] * len(merged_df)
         merged_df["RunID"] = run_col

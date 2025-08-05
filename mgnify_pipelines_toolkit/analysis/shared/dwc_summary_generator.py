@@ -23,12 +23,18 @@ import requests
 import pandas as pd
 import pyfastx
 
+from mgnify_pipelines_toolkit.constants.tax_ranks import (
+    _SILVA_TAX_RANKS,
+    _PR2_TAX_RANKS,
+)
+
 logging.basicConfig(level=logging.DEBUG)
 
 URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
 RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
 SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
+DBS = ["SILVA", "PR2"]
 
 
 def parse_args():
@@ -116,20 +122,20 @@ def get_all_metadata_from_runs(runs):
     return run_metadata_dict
 
 
-def cleanup_taxa(df):
+def cleanup_taxa(df, db):
 
-    df.pop("Kingdom")
     cleaned_df = df.rename(
         columns={
-            "Superkingdom": "Kingdom",
             "asv": "ASVID",
             "count": "MeasurementValue",
             "center_name": "InstitutionCode",
         }
     )
 
-    ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
-
+    if db == "SILVA":
+        ranks = _SILVA_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
     # Turn empty taxa into NA
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(
@@ -141,6 +147,8 @@ def cleanup_taxa(df):
 
     # Add a MeasurementUnit Column for the read count for each asv
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
+    cleaned_df["ASVCaller"] = ["DADA2"] * len(cleaned_df)
+    cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
     # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
@@ -155,13 +163,11 @@ def cleanup_taxa(df):
             "salinity",
             "collectionDate",
             "InstitutionCode",
-            "Kingdom",
-            "Phylum",
-            "Class",
-            "Order",
-            "Family",
-            "Genus",
-            "Species",
+            "ASVCaller",
+            "ReferenceDatabase",
+        ]
+        + ranks
+        + [
             "MeasurementUnit",
             "MeasurementValue",
             "dbhit",
@@ -172,7 +178,7 @@ def cleanup_taxa(df):
     return cleaned_df
 
 
-def get_asv_dict(runs_df, root_path):
+def get_asv_dict(runs_df, root_path, db):
 
     asv_dict = {}
     for i in range(0, len(runs_df)):
@@ -188,8 +194,8 @@ def get_asv_dict(runs_df, root_path):
                     pathlib.Path(root_path)
                     / run_acc
                     / "taxonomy-summary"
-                    / "DADA2-SILVA"
-                ).glob("*_DADA2-SILVA.mseq")
+                    / f"DADA2-{db}"
+                ).glob(f"*_DADA2-{db}.mseq")
             )
         )[0]
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1])
@@ -198,7 +204,7 @@ def get_asv_dict(runs_df, root_path):
         tax_file = sorted(
             list(
                 (pathlib.Path(root_path) / run_acc / "asv").glob(
-                    "*_DADA2-SILVA_asv_tax.tsv"
+                    f"*_DADA2-{db}_asv_tax.tsv"
                 )
             )
         )[0]
@@ -250,21 +256,24 @@ def main():
 
     all_runs = runs_df.run.to_list()
     run_metadata_dict = get_all_metadata_from_runs(all_runs)
-    asv_dict = get_asv_dict(runs_df, root_path)
 
-    all_merged_df = []
+    for db in DBS:
 
-    for run in all_runs:
-        if run in asv_dict.keys() and run in run_metadata_dict.keys():
-            run_asv_data = asv_dict[run]
-            run_metadata = run_metadata_dict[run]
-            run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
-            all_merged_df.append(run_merged_result)
+        asv_dict = get_asv_dict(runs_df, root_path, db)
 
-    final_df = pd.concat(all_merged_df, ignore_index=True)
-    final_df = cleanup_taxa(final_df)
+        all_merged_df = []
 
-    final_df.to_csv(f"{output}_dwcready.csv", index=False, na_rep="NA")
+        for run in all_runs:
+            if run in asv_dict.keys() and run in run_metadata_dict.keys():
+                run_asv_data = asv_dict[run]
+                run_metadata = run_metadata_dict[run]
+                run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
+                all_merged_df.append(run_merged_result)
+
+        final_df = pd.concat(all_merged_df, ignore_index=True)
+        final_df = cleanup_taxa(final_df, db)
+
+        final_df.to_csv(f"{output}_DADA2-{db}_dwcready.csv", index=False, na_rep="NA")
 
 
 if __name__ == "__main__":

@@ -273,7 +273,7 @@ def main():
         final_df = pd.concat(all_merged_df, ignore_index=True)
         final_df = cleanup_taxa(final_df, db)
 
-        final_df.to_csv(f"{output}_DADA2-{db}_dwcready.csv", index=False, na_rep="NA")
+        final_df.to_csv(f"{output}_DADA2_{db}_dwcready.csv", index=False, na_rep="NA")
 
 
 if __name__ == "__main__":

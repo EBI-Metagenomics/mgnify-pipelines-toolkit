@@ -15,3 +15,7 @@
       md5sum: f828907465f29a7ab0360cd721bf342a
     - path: "test_DADA2_PR2_dwcready.csv"
       md5sum: d8624b8235722a6bde51bc9e359d5ebf
+    - path: "test_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: 212ced95e8bb1c6c2a05c73e2970b0f9
+    - path: "test_closedref_PR2_dwcready.csv"
+      md5sum: 672f7b992fdcd08072be5e0b5592da72

@@ -23,11 +23,18 @@ import requests
 import pandas as pd
 import pyfastx
 
+from mgnify_pipelines_toolkit.constants.tax_ranks import (
+    _SILVA_TAX_RANKS,
+    _PR2_TAX_RANKS,
+    SHORT_PR2_TAX_RANKS,
+    SHORT_TAX_RANKS,
+)
+
 logging.basicConfig(level=logging.DEBUG)
 
 URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
 RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
-SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth&limit=10&format=json&download=false"
+SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
 
 
@@ -77,9 +84,8 @@ def get_metadata_from_run_acc(run_acc):
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 
-    fields_to_clean = ["lat", "lon", "depth"]
-
-    for field in fields_to_clean:
+    # Turn empty values into NA
+    for field in full_res_dict.keys():
         val = full_res_dict[field]
         if val == "":
             full_res_dict[field] = "NA"
@@ -92,15 +98,15 @@ def get_metadata_from_run_acc(run_acc):
     del full_res_dict["collection_date"]
 
     res_df = pd.DataFrame(full_res_dict, index=[0])
-    res_df.columns = [
-        "RunID",
-        "SampleID",
-        "StudyID",
-        "decimalLongitude",
-        "depth",
-        "decimalLatitude",
-        "collectionDate",
-    ]
+    res_df = res_df.rename(
+        columns={
+            "run_accession": "RunID",
+            "sample_accession": "SampleID",
+            "secondary_study_accession": "StudyID",
+            "lon": "decimalLongitude",
+            "lat": "decimalLatitude",
+        }
+    )
 
     return res_df
 
@@ -117,13 +123,21 @@ def get_all_metadata_from_runs(runs):
     return run_metadata_dict
 
 
-def cleanup_taxa(df):
+def cleanup_asv_taxa(df, db):
 
-    df.pop("Kingdom")
-    cleaned_df = df.rename(columns={"Superkingdom": "Kingdom", "asv": "ASVID"})
+    cleaned_df = df.rename(
+        columns={
+            "asv": "ASVID",
+            "count": "MeasurementValue",
+            "center_name": "InstitutionCode",
+        }
+    )
 
-    ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
-
+    if db == "SILVA":
+        ranks = _SILVA_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
+    # Turn empty taxa into NA
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(
             lambda x: x.split("__")[1] if pd.notnull(x) else "NA"
@@ -132,6 +146,12 @@ def cleanup_taxa(df):
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
 
+    # Add a MeasurementUnit Column for the read count for each asv
+    cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
+    cleaned_df["ASVCaller"] = ["DADA2"] * len(cleaned_df)
+    cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    cleaned_df["TaxAnnotationTool"] = ["MAPseq"] * len(cleaned_df)
+    # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
             "ASVID",
@@ -141,14 +161,22 @@ def cleanup_taxa(df):
             "decimalLongitude",
             "decimalLatitude",
             "depth",
+            "temperature",
+            "salinity",
             "collectionDate",
-            "Kingdom",
-            "Phylum",
-            "Class",
-            "Order",
-            "Family",
-            "Genus",
-            "Species",
+            "InstitutionCode",
+            "ASVCaller",
+            "ReferenceDatabase",
+            "TaxAnnotationTool",
+        ]
+        + ranks
+        + [
+            "MeasurementUnit",
+            "MeasurementValue",
+            "dbhit",
+            "dbhitIdentity",
+            "dbhitStart",
+            "dbhitEnd",
             "ASVSeq",
         ]
     ]
@@ -156,7 +184,56 @@ def cleanup_taxa(df):
     return cleaned_df
 
 
-def get_asv_dict(runs_df, root_path):
+def cleanup_closedref_taxa(df, db):
+
+    cleaned_df = df.rename(
+        columns={
+            "count": "MeasurementValue",
+            "center_name": "InstitutionCode",
+        }
+    )
+
+    if db == "SILVA-SSU":
+        ranks = _SILVA_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
+
+    # Turn empty taxa into NA
+    for rank in ranks:
+        cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
+
+    # Add a MeasurementUnit Column for the read count for each asv
+    cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
+    cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    cleaned_df["TaxAnnotationTool"] = ["MAPseq"] * len(cleaned_df)
+
+    # Final order of fields in output csv
+    cleaned_df = cleaned_df[
+        [
+            "StudyID",
+            "SampleID",
+            "RunID",
+            "decimalLongitude",
+            "decimalLatitude",
+            "depth",
+            "temperature",
+            "salinity",
+            "collectionDate",
+            "InstitutionCode",
+            "ReferenceDatabase",
+            "TaxAnnotationTool",
+        ]
+        + ranks
+        + [
+            "MeasurementUnit",
+            "MeasurementValue",
+        ]
+    ]
+
+    return cleaned_df
+
+
+def get_asv_dict(runs_df, root_path, db):
 
     asv_dict = {}
     for i in range(0, len(runs_df)):
@@ -166,10 +243,23 @@ def get_asv_dict(runs_df, root_path):
         if status != "all_results":
             continue
 
+        mapseq_file = sorted(
+            list(
+                (
+                    pathlib.Path(root_path)
+                    / run_acc
+                    / "taxonomy-summary"
+                    / f"DADA2-{db}"
+                ).glob(f"*_DADA2-{db}.mseq")
+            )
+        )[0]
+        mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
+        mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
+
         tax_file = sorted(
             list(
                 (pathlib.Path(root_path) / run_acc / "asv").glob(
-                    "*_DADA2-SILVA_asv_tax.tsv"
+                    f"*_DADA2-{db}_asv_tax.tsv"
                 )
             )
         )[0]
@@ -196,6 +286,8 @@ def get_asv_dict(runs_df, root_path):
         merged_df = all_ampregions_count_df.merge(
             run_tax_df, left_on="asv", right_on="ASV"
         )
+        merged_df = merged_df.merge(mapseq_df, left_on="asv", right_on="asv")
+
         merged_df.pop("ASV")
         run_col = [run_acc] * len(merged_df)
         merged_df["RunID"] = run_col
@@ -203,6 +295,45 @@ def get_asv_dict(runs_df, root_path):
         asv_dict[run_acc] = merged_df
 
     return asv_dict
+
+
+def get_closedref_dict(runs_df, root_path, db):
+
+    if db == "SILVA-SSU":
+        ranks = _SILVA_TAX_RANKS
+        short_ranks = SHORT_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
+        short_ranks = SHORT_PR2_TAX_RANKS
+
+    closedref_dict = {}
+    for i in range(0, len(runs_df)):
+        run_acc = runs_df.loc[i, "run"]
+        status = runs_df.loc[i, "status"]
+
+        if status != "all_results":
+            continue
+
+        kronatxt_file = sorted(
+            list(
+                (pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob(
+                    "*.txt"
+                )
+            )
+        )[0]
+
+        krona_taxranks = [rank + "__" for rank in short_ranks]
+
+        column_names = ["count"] + ranks
+        tax_df = pd.read_csv(kronatxt_file, sep="\t", names=column_names)
+        tax_df = tax_df.fillna("NA")
+        tax_df = tax_df.map(lambda x: "NA" if x in krona_taxranks else x)
+
+        run_col = [run_acc] * len(tax_df)
+        tax_df["RunID"] = run_col
+        closedref_dict[run_acc] = tax_df
+
+    return closedref_dict
 
 
 def main():
@@ -219,21 +350,44 @@ def main():
 
     all_runs = runs_df.run.to_list()
     run_metadata_dict = get_all_metadata_from_runs(all_runs)
-    asv_dict = get_asv_dict(runs_df, root_path)
 
-    all_merged_df = []
+    asv_dbs = ["SILVA", "PR2"]
+    for db in asv_dbs:
 
-    for run in all_runs:
-        if run in asv_dict.keys() and run in run_metadata_dict.keys():
-            run_asv_data = asv_dict[run]
-            run_metadata = run_metadata_dict[run]
-            run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
-            all_merged_df.append(run_merged_result)
+        asv_dict = get_asv_dict(runs_df, root_path, db)
+        all_merged_df = []
 
-    final_df = pd.concat(all_merged_df, ignore_index=True)
-    final_df = cleanup_taxa(final_df)
+        for run in all_runs:
+            if run in asv_dict.keys() and run in run_metadata_dict.keys():
+                run_asv_data = asv_dict[run]
+                run_metadata = run_metadata_dict[run]
+                run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
+                all_merged_df.append(run_merged_result)
 
-    final_df.to_csv(f"{output}_dwcready.csv", index=False, na_rep="NA")
+        final_df = pd.concat(all_merged_df, ignore_index=True)
+        final_df = cleanup_asv_taxa(final_df, db)
+
+        final_df.to_csv(f"{output}_DADA2_{db}_dwcready.csv", index=False, na_rep="NA")
+
+    closedref_dbs = ["SILVA-SSU", "PR2"]
+    for db in closedref_dbs:
+
+        closedref_dict = get_closedref_dict(runs_df, root_path, db)
+        all_merged_df = []
+
+        for run in all_runs:
+            if run in closedref_dict.keys() and run in run_metadata_dict.keys():
+                run_closedref_data = closedref_dict[run]
+                run_metadata = run_metadata_dict[run]
+                run_merged_result = run_metadata.merge(run_closedref_data, on="RunID")
+                all_merged_df.append(run_merged_result)
+
+        final_df = pd.concat(all_merged_df, ignore_index=True)
+        final_df = cleanup_closedref_taxa(final_df, db)
+
+        final_df.to_csv(
+            f"{output}_closedref_{db}_dwcready.csv", index=False, na_rep="NA"
+        )
 
 
 if __name__ == "__main__":

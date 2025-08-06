@@ -9,7 +9,13 @@
 - name: dwc_summary_generator test_correct_args
   tags:
     - dwc_summary_generator
-  command: dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -o test
+  command: dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -o test
   files:
-    - path: "test_dwcready.csv"
-      md5sum: aae241b37c354b62a67ac50b80f5544d
+    - path: "test_DADA2_SILVA_dwcready.csv"
+      md5sum: 367fb0237f87634b15d82e9eb2acf7f6
+    - path: "test_DADA2_PR2_dwcready.csv"
+      md5sum: 7834e34c3936e3a0cfd1c611d89b1cdb
+    - path: "test_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: 28db545f224f85d068623af263836086
+    - path: "test_closedref_PR2_dwcready.csv"
+      md5sum: d83bfbfa1d9bb95f23a0310333c1ab34

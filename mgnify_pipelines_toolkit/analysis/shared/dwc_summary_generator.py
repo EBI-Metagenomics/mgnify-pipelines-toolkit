@@ -26,6 +26,8 @@ import pyfastx
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
     _SILVA_TAX_RANKS,
     _PR2_TAX_RANKS,
+    SHORT_PR2_TAX_RANKS,
+    SHORT_TAX_RANKS,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -34,7 +36,6 @@ URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
 RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
 SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
 HEADERS = {"Accept": "application/json"}
-DBS = ["SILVA", "PR2"]
 
 
 def parse_args():
@@ -122,7 +123,7 @@ def get_all_metadata_from_runs(runs):
     return run_metadata_dict
 
 
-def cleanup_taxa(df, db):
+def cleanup_asv_taxa(df, db):
 
     cleaned_df = df.rename(
         columns={
@@ -172,6 +173,52 @@ def cleanup_taxa(df, db):
             "MeasurementValue",
             "dbhit",
             "ASVSeq",
+        ]
+    ]
+
+    return cleaned_df
+
+
+def cleanup_closedref_taxa(df, db):
+
+    cleaned_df = df.rename(
+        columns={
+            "count": "MeasurementValue",
+            "center_name": "InstitutionCode",
+        }
+    )
+
+    if db == "SILVA-SSU":
+        ranks = _SILVA_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
+
+    # Turn empty taxa into NA
+    for rank in ranks:
+        cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
+
+    # Add a MeasurementUnit Column for the read count for each asv
+    cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
+    cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    # Final order of fields in output csv
+    cleaned_df = cleaned_df[
+        [
+            "StudyID",
+            "SampleID",
+            "RunID",
+            "decimalLongitude",
+            "decimalLatitude",
+            "depth",
+            "temperature",
+            "salinity",
+            "collectionDate",
+            "InstitutionCode",
+            "ReferenceDatabase",
+        ]
+        + ranks
+        + [
+            "MeasurementUnit",
+            "MeasurementValue",
         ]
     ]
 
@@ -242,6 +289,45 @@ def get_asv_dict(runs_df, root_path, db):
     return asv_dict
 
 
+def get_closedref_dict(runs_df, root_path, db):
+
+    if db == "SILVA-SSU":
+        ranks = _SILVA_TAX_RANKS
+        short_ranks = SHORT_TAX_RANKS
+    else:
+        ranks = _PR2_TAX_RANKS
+        short_ranks = SHORT_PR2_TAX_RANKS
+
+    closedref_dict = {}
+    for i in range(0, len(runs_df)):
+        run_acc = runs_df.loc[i, "run"]
+        status = runs_df.loc[i, "status"]
+
+        if status != "all_results":
+            continue
+
+        kronatxt_file = sorted(
+            list(
+                (pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob(
+                    "*.txt"
+                )
+            )
+        )[0]
+
+        krona_taxranks = [rank + "__" for rank in short_ranks]
+
+        column_names = ["count"] + ranks
+        tax_df = pd.read_csv(kronatxt_file, sep="\t", names=column_names)
+        tax_df = tax_df.fillna("NA")
+        tax_df = tax_df.map(lambda x: "NA" if x in krona_taxranks else x)
+
+        run_col = [run_acc] * len(tax_df)
+        tax_df["RunID"] = run_col
+        closedref_dict[run_acc] = tax_df
+
+    return closedref_dict
+
+
 def main():
 
     input_path, runs, output = parse_args()
@@ -257,10 +343,10 @@ def main():
     all_runs = runs_df.run.to_list()
     run_metadata_dict = get_all_metadata_from_runs(all_runs)
 
-    for db in DBS:
+    asv_dbs = ["SILVA", "PR2"]
+    for db in asv_dbs:
 
         asv_dict = get_asv_dict(runs_df, root_path, db)
-
         all_merged_df = []
 
         for run in all_runs:
@@ -271,9 +357,29 @@ def main():
                 all_merged_df.append(run_merged_result)
 
         final_df = pd.concat(all_merged_df, ignore_index=True)
-        final_df = cleanup_taxa(final_df, db)
+        final_df = cleanup_asv_taxa(final_df, db)
 
         final_df.to_csv(f"{output}_DADA2_{db}_dwcready.csv", index=False, na_rep="NA")
+
+    closedref_dbs = ["SILVA-SSU", "PR2"]
+    for db in closedref_dbs:
+
+        closedref_dict = get_closedref_dict(runs_df, root_path, db)
+        all_merged_df = []
+
+        for run in all_runs:
+            if run in closedref_dict.keys() and run in run_metadata_dict.keys():
+                run_closedref_data = closedref_dict[run]
+                run_metadata = run_metadata_dict[run]
+                run_merged_result = run_metadata.merge(run_closedref_data, on="RunID")
+                all_merged_df.append(run_merged_result)
+
+        final_df = pd.concat(all_merged_df, ignore_index=True)
+        final_df = cleanup_closedref_taxa(final_df, db)
+
+        final_df.to_csv(
+            f"{output}_closedref_{db}_dwcready.csv", index=False, na_rep="NA"
+        )
 
 
 if __name__ == "__main__":

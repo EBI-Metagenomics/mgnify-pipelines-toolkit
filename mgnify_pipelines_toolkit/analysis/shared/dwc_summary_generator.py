@@ -150,6 +150,7 @@ def cleanup_asv_taxa(df, db):
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
     cleaned_df["ASVCaller"] = ["DADA2"] * len(cleaned_df)
     cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    cleaned_df["TaxAnnotationTool"] = ["MAPseq"] * len(cleaned_df)
     # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
@@ -166,12 +167,16 @@ def cleanup_asv_taxa(df, db):
             "InstitutionCode",
             "ASVCaller",
             "ReferenceDatabase",
+            "TaxAnnotationTool",
         ]
         + ranks
         + [
             "MeasurementUnit",
             "MeasurementValue",
             "dbhit",
+            "dbhitIdentity",
+            "dbhitStart",
+            "dbhitEnd",
             "ASVSeq",
         ]
     ]
@@ -200,6 +205,8 @@ def cleanup_closedref_taxa(df, db):
     # Add a MeasurementUnit Column for the read count for each asv
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
     cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    cleaned_df["TaxAnnotationTool"] = ["MAPseq"] * len(cleaned_df)
+
     # Final order of fields in output csv
     cleaned_df = cleaned_df[
         [
@@ -214,6 +221,7 @@ def cleanup_closedref_taxa(df, db):
             "collectionDate",
             "InstitutionCode",
             "ReferenceDatabase",
+            "TaxAnnotationTool",
         ]
         + ranks
         + [
@@ -245,8 +253,8 @@ def get_asv_dict(runs_df, root_path, db):
                 ).glob(f"*_DADA2-{db}.mseq")
             )
         )[0]
-        mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1])
-        mapseq_df.columns = ["asv", "dbhit"]
+        mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
+        mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
         tax_file = sorted(
             list(

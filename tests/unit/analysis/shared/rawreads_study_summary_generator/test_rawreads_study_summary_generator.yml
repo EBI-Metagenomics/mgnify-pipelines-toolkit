@@ -69,7 +69,7 @@
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_taxranks.csv -p chunk1 --non_insdc
   stderr:
     contains:
-      - "{'Kingdom': 'kkkk__Bacteria',"
+      - "{'Kingdom': 'kkkk__Bacteria'"
 
 - name: rawreads_study_summary_generator test_correct_args_merge
   tags:

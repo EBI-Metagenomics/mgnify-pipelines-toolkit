@@ -84,7 +84,7 @@ def get_file(
         return
 
     analysis_file = Path(
-        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt"
+        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt.gz"
     )
     if not analysis_file.exists():
         logging.error(
@@ -164,13 +164,13 @@ def parse_one_func_file(
 
     validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = res_df[["read_count"]]
+    count_df = pd.DataFrame(res_df[["read_count"]])
     count_df.columns = [run_acc]
 
-    depth_df = res_df[["coverage_depth"]]
+    depth_df = pd.DataFrame(res_df[["coverage_depth"]])
     depth_df.columns = [run_acc]
 
-    breadth_df = res_df[["coverage_breadth"]]
+    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]])
     breadth_df.columns = [run_acc]
 
     return count_df, depth_df, breadth_df

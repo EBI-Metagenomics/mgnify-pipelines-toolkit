@@ -53,7 +53,7 @@ def cli():
 
 def get_file(
     run_acc: str, analyses_dir: Path, db_label: str
-) -> Union[Path, List[Path]]:
+) -> Union[Path, List[Path], None]:
     """Takes path information for a particular analysis and db_label combo, and returns any existing files.
 
     :param run_acc: Run accession for the tax file that should be retrieved.
@@ -119,12 +119,12 @@ def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFr
     :rtype: pd.DataFrame
     """
 
-    tax_ranks = _MOTUS_TAX_RANKS if db_label == "mOTUs" else _SILVA_TAX_RANKS
+    tax_ranks = _MOTUS_TAX_RANKS if db_label == "motus" else _SILVA_TAX_RANKS
     res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
     validate_dataframe(
-        res_df, MotusTaxonSchema if db_label == "mOTUs" else TaxonSchema, str(tax_file)
+        res_df, MotusTaxonSchema if db_label == "motus" else TaxonSchema, str(tax_file)
     )
 
     res_df["full_taxon"] = res_df.iloc[:, 1:].apply(

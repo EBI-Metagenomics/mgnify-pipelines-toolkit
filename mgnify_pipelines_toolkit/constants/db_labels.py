@@ -21,7 +21,7 @@ TAXDB_LABELS = ["SILVA-SSU", "SILVA-LSU", "PR2", "UNITE", "ITSoneDB"]
 ASV_TAXDB_LABELS = ["DADA2-SILVA", "DADA2-PR2"]
 
 # taxonomy_summary labels for Raw Reads Analysis Pipeline
-RRAP_TAXDB_LABELS = ['SILVA-SSU', 'SILVA-LSU', 'mOTUs']
+RRAP_TAXDB_LABELS = ['silva-ssu', 'silva-lsu', 'motus']
 
 # function_summary labels for Raw Reads Analysis Pipeline
-RRAP_FUNCDB_LABELS = ['Pfam-A']
+RRAP_FUNCDB_LABELS = ['pfam']

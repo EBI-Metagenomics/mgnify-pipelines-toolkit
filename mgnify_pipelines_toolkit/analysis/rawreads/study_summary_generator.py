@@ -168,10 +168,10 @@ def parse_one_func_file(
         .rename(columns={'read_count': run_acc})
 
     depth_df = pd.DataFrame(res_df[["coverage_depth"]]) \
-        .rename(columns={'read_count': run_acc})
+        .rename(columns={'coverage_depth': run_acc})
 
     breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]) \
-        .rename(columns={'read_count': run_acc})
+        .rename(columns={'coverage_breadth': run_acc})
 
     return count_df, depth_df, breadth_df
 
@@ -423,7 +423,7 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                         curr_df = pd.read_csv(summary, sep="\t", index_col=0)
                         res_df = res_df.join(curr_df, how="outer")
                         res_df = res_df.fillna(0)
-                        res_df = res_df.astype(int if table_type == "count" else float)
+                        res_df = res_df.astype(int if table_type == "read-count" else float)
 
                     res_df = res_df.reindex(sorted(res_df.columns), axis=1)
                     res_df.to_csv(

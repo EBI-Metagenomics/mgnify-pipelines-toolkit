@@ -1,4 +1,0 @@
-1.0	k__Bacteria	p__Firmicutes	c__Bacilli	o__Lactobacillales	f__Streptococcaceae	g__Streptococcus	s__Streptococcus sp. [Streptococcus equinus/Streptococcus pasteurianus/Streptococcus gallolyticus/Streptococcus macedonicus]
-2.0	k__Bacteria	p__Actinobacteria	c__Actinobacteria	o__Bifidobacteriales	f__Bifidobacteriaceae	g__Bifidobacterium	s__Bifidobacterium longum [Bifidobacterium longum CAG:69/Bifidobacterium longum]
-1.0	k__Bacteria	p__Firmicutes	c__Bacilli	o__Lactobacillales	f__Streptococcaceae	g__Streptococcus	s__Streptococcus salivarius [Streptococcus salivarius/Streptococcus sp. HSISS2/Streptococcus sp. HSISS3/Streptococcus sp. C150]
-1.0	unassigned

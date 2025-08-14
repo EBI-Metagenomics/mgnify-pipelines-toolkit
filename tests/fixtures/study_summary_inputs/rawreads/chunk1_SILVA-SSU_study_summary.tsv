@@ -1,4 +1,6 @@
 taxonomy	ERR10889056	ERR10889147
+sk__Bacteria	1	0
+sk__Bacteria;k__;p__Acidobacteria;c__Blastocatellia;o__Blastocatellales;f__Blastocatellaceae	0	1
 sk__Bacteria;k__;p__Actinobacteria	1	0
 sk__Bacteria;k__;p__Actinobacteria;c__Actinobacteria	1	0
 sk__Bacteria;k__;p__Actinobacteria;c__Actinobacteria;o__Bifidobacteriales;f__Bifidobacteriaceae;g__Bifidobacterium	16	27

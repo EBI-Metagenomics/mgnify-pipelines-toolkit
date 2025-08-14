@@ -532,21 +532,28 @@ class PR2Taxon(Taxon):
     Supergroup: Optional[TaxRank] = None
     Division: Optional[TaxRank] = None
     Subdivision: Optional[TaxRank] = None
+ 
+
+class TaxonCount(BaseModel):
+    """Class for modelling a single taxon record in a taxonomy file.
+    It simply countains a Count field, modelling the read counts for that particular 
+    Taxon record.
+    """
+
+    count: int = Field(alias="Count")
 
 
-class TaxonRecord(Taxon):
+class TaxonRecord(TaxonCount, Taxon):
     """Class for modelling a single taxon record in a taxonomy file.
     It inherits the Taxon class, and simply adds a Count field, modelling the read counts
     for that particular Taxon record.
     """
+    ...
 
-    Count: int
 
-
-class PR2TaxonRecord(PR2Taxon):
+class PR2TaxonRecord(TaxonCount, PR2Taxon):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
-
-    count: int = Field(alias="Count")
+    ...
 
 
 # This is the schema for the whole DF

@@ -534,21 +534,12 @@ class PR2Taxon(Taxon):
     Subdivision: Optional[TaxRank] = None
  
 
-class TaxonCount(BaseModel):
-    """Class for modelling a single taxon record in a taxonomy file.
-    It simply countains a Count field, modelling the read counts for that particular 
-    Taxon record.
-    """
-
-    count: int = Field(alias="Count")
-
-
-class TaxonRecord(TaxonCount, PR2Taxon):
+class TaxonRecord(PR2Taxon):
     """Class for modelling a single taxon record in a taxonomy file.
     It inherits the Taxon class, and simply adds a Count field, modelling the read counts
     for that particular Taxon record.
     """
-    ...
+    count: int = Field(alias="Count")
 
 
 class PR2TaxonRecord(PR2Taxon):
@@ -682,12 +673,12 @@ class MotusTaxon(BaseModel):
     Species: Optional[MotusTaxRank] = None
 
 
-class MotusTaxonRecord(TaxonCount, MotusTaxon):
+class MotusTaxonRecord(MotusTaxon):
     """Class for modelling a single taxon record in a mOTUs taxonomy file.
     It inherits the MotusTaxon class, and simply adds a Count field, modelling the read counts
     for that particular MotusTaxon record.
     """
-    ...
+    count: int = Field(alias="Count")
 
 
 class MotusTaxonSchema(pa.DataFrameModel):

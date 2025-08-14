@@ -1,0 +1,6 @@
+taxonomy	cami-marine-sample0	ERR10889056-short-paired	ERR10889056-short-single	ERR10889147-long-single
+k__Bacteria;p__Actinobacteria;c__Actinobacteria;o__Bifidobacteriales;f__Bifidobacteriaceae;g__Bifidobacterium;s__Bifidobacterium longum [Bifidobacterium longum CAG:69/Bifidobacterium longum]	0	2	1	2
+k__Bacteria;p__Bacteroidetes;c__Bacteroidia;o__Bacteroidales;f__Bacteroidaceae;g__Bacteroides;s__Bacteroides thetaiotaomicron	0	1	1	0
+k__Bacteria;p__Firmicutes;c__Bacilli;o__Lactobacillales;f__Lactobacillaceae;g__Lactobacillus;s__Lactobacillus gasseri	0	1	1	0
+k__Bacteria;p__Firmicutes;c__Bacilli;o__Lactobacillales;f__Streptococcaceae;g__Streptococcus;s__Streptococcus salivarius [Streptococcus salivarius/Streptococcus sp. HSISS2/Streptococcus sp. HSISS3/Streptococcus sp. C150]	0	0	0	1
+unassigned	0	2	1	1

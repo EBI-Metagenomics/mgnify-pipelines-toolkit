@@ -539,11 +539,13 @@ class TaxonRecord(PR2Taxon):
     It inherits the Taxon class, and simply adds a Count field, modelling the read counts
     for that particular Taxon record.
     """
-    count: int = Field(alias="Count")
+    
+    Count: int
 
 
 class PR2TaxonRecord(PR2Taxon):
     """Class for modelling the same thing as the preceding class, but for PR2 ranks."""
+
     count: int = Field(alias="Count")
 
 

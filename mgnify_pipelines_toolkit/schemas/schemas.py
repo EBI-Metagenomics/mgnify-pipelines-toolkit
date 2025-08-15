@@ -534,7 +534,7 @@ class PR2Taxon(Taxon):
     Subdivision: Optional[TaxRank] = None
 
 
-class TaxonRecord(PR2Taxon):
+class TaxonRecord(Taxon):
     """Class for modelling a single taxon record in a taxonomy file.
     It inherits the Taxon class, and simply adds a Count field, modelling the read counts
     for that particular Taxon record.

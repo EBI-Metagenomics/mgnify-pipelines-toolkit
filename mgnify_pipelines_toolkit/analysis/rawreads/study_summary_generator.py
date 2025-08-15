@@ -123,15 +123,21 @@ def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFr
     res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
-    if res_df.shape[0]>0:
+    if res_df.shape[0] > 0:
         validate_dataframe(
-            res_df, MotusTaxonSchema if db_label == "motus" else TaxonSchema, str(tax_file)
+            res_df,
+            MotusTaxonSchema if db_label == "motus" else TaxonSchema,
+            str(tax_file),
         )
 
-    res_df["full_taxon"] = [";".join(r[tax_ranks]).strip(";") for _,r in res_df.iterrows()]
-    final_df = res_df[['Count', 'full_taxon']] \
-        .set_index("full_taxon") \
-        .rename(columns={'Count': run_acc})
+    res_df["full_taxon"] = [
+        ";".join(r[tax_ranks]).strip(";") for _, r in res_df.iterrows()
+    ]
+    final_df = (
+        res_df[["Count", "full_taxon"]]
+        .set_index("full_taxon")
+        .rename(columns={"Count": run_acc})
+    )
 
     return final_df
 
@@ -161,17 +167,20 @@ def parse_one_func_file(
     ).set_index("function")
     res_df = res_df.fillna(0)
 
-    if res_df.shape[0]>0:
+    if res_df.shape[0] > 0:
         validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = pd.DataFrame(res_df[["read_count"]]) \
-        .rename(columns={'read_count': run_acc})
+    count_df = pd.DataFrame(res_df[["read_count"]]).rename(
+        columns={"read_count": run_acc}
+    )
 
-    depth_df = pd.DataFrame(res_df[["coverage_depth"]]) \
-        .rename(columns={'coverage_depth': run_acc})
+    depth_df = pd.DataFrame(res_df[["coverage_depth"]]).rename(
+        columns={"coverage_depth": run_acc}
+    )
 
-    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]) \
-        .rename(columns={'coverage_breadth': run_acc})
+    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]).rename(
+        columns={"coverage_breadth": run_acc}
+    )
 
     return count_df, depth_df, breadth_df
 
@@ -423,7 +432,9 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                         curr_df = pd.read_csv(summary, sep="\t", index_col=0)
                         res_df = res_df.join(curr_df, how="outer")
                         res_df = res_df.fillna(0)
-                        res_df = res_df.astype(int if table_type == "read-count" else float)
+                        res_df = res_df.astype(
+                            int if table_type == "read-count" else float
+                        )
 
                     res_df = res_df.reindex(sorted(res_df.columns), axis=1)
                     res_df.to_csv(

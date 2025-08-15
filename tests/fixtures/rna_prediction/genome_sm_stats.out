@@ -60,26 +60,25 @@ tRNAs with introns:     	0
 
 Isotype / Anticodon Counts:
 
-Ala     : 0	  AGC:         GGC:         CGC:         TGC:       
-Gly     : 0	  ACC:         GCC:         CCC:         TCC:       
-Pro     : 0	  AGG:         GGG:         CGG:         TGG:       
-Thr     : 0	  AGT:         GGT:         CGT:         TGT:       
-Val     : 0	  AAC:         GAC:         CAC:         TAC:       
-Ser     : 0	  AGA:         GGA:         CGA:         TGA:         ACT:         GCT:       
-Arg     : 0	  ACG:         GCG:         CCG:         TCG:         CCT:         TCT:       
-Leu     : 0	  AAG:         GAG:         CAG:         TAG:         CAA:         TAA:       
-Phe     : 0	  AAA:         GAA:                                 
-Asn     : 0	  ATT:         GTT:                                 
-Lys     : 0	                            CTT:         TTT:       
-Asp     : 0	  ATC:         GTC:                                 
-Glu     : 0	                            CTC:         TTC:       
-His     : 0	  ATG:         GTG:                                 
-Gln     : 0	                            CTG:         TTG:       
-Ile     : 0	  AAT:         GAT:         CAT:         TAT:       
-Met/iMet: 1	                            CAT: 1                  
-Tyr     : 0	  ATA:         GTA:                                 
-Supres  : 0	               CTA:         TTA:         TCA:       
-Cys     : 0	  ACA:         GCA:                                 
-Trp     : 0	                            CCA:                    
-SelCys  : 0	                                         TCA:       
-
+Ala     : 0	  AGC:         GGC:         CGC:         TGC:
+Gly     : 0	  ACC:         GCC:         CCC:         TCC:
+Pro     : 0	  AGG:         GGG:         CGG:         TGG:
+Thr     : 0	  AGT:         GGT:         CGT:         TGT:
+Val     : 0	  AAC:         GAC:         CAC:         TAC:
+Ser     : 0	  AGA:         GGA:         CGA:         TGA:         ACT:         GCT:
+Arg     : 0	  ACG:         GCG:         CCG:         TCG:         CCT:         TCT:
+Leu     : 0	  AAG:         GAG:         CAG:         TAG:         CAA:         TAA:
+Phe     : 0	  AAA:         GAA:
+Asn     : 0	  ATT:         GTT:
+Lys     : 0	                            CTT:         TTT:
+Asp     : 0	  ATC:         GTC:
+Glu     : 0	                            CTC:         TTC:
+His     : 0	  ATG:         GTG:
+Gln     : 0	                            CTG:         TTG:
+Ile     : 0	  AAT:         GAT:         CAT:         TAT:
+Met/iMet: 1	                            CAT: 1
+Tyr     : 0	  ATA:         GTA:
+Supres  : 0	               CTA:         TTA:         TCA:
+Cys     : 0	  ACA:         GCA:
+Trp     : 0	                            CCA:
+SelCys  : 0	                                         TCA:

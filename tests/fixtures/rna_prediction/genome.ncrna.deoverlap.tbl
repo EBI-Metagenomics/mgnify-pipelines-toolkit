@@ -19,7 +19,7 @@
 # Pipeline mode:   SCAN
 # Query file:      /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes/dereplication/drep_reps/dereplicated_genomes/MGYG000296009.fna
 # Target file:     /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.cm
-# Option settings: /opt/conda/bin/cmscan -o /dev/null --tblout overlapped_MGYG000296009 --fmt 2 --noali --cut_ga --hmmonly --clanin /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.clanin --cpu 8 /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.cm /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes/dereplication/drep_reps/dereplicated_genomes/MGYG000296009.fna 
+# Option settings: /opt/conda/bin/cmscan -o /dev/null --tblout overlapped_MGYG000296009 --fmt 2 --noali --cut_ga --hmmonly --clanin /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.clanin --cpu 8 /hps/nobackup/rdf/metagenomics/service-team/production/ref-dbs/genomes-pipeline/rfam_14.9/ncrna_cms/Rfam.cm /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes/dereplication/drep_reps/dereplicated_genomes/MGYG000296009.fna
 # Current dir:     /hps/nobackup/rdf/metagenomics/service-team/users/kates/marine_2/mgyg_genomes
 # Date:            Sun Mar  9 15:09:53 2025
 # [ok]

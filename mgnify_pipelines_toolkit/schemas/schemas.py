@@ -532,14 +532,14 @@ class PR2Taxon(Taxon):
     Supergroup: Optional[TaxRank] = None
     Division: Optional[TaxRank] = None
     Subdivision: Optional[TaxRank] = None
- 
+
 
 class TaxonRecord(PR2Taxon):
     """Class for modelling a single taxon record in a taxonomy file.
     It inherits the Taxon class, and simply adds a Count field, modelling the read counts
     for that particular Taxon record.
     """
-    
+
     Count: int
 
 
@@ -680,6 +680,7 @@ class MotusTaxonRecord(MotusTaxon):
     It inherits the MotusTaxon class, and simply adds a Count field, modelling the read counts
     for that particular MotusTaxon record.
     """
+
     count: int = Field(alias="Count")
 
 

@@ -300,7 +300,7 @@ def main():
     if paired_end:
         rev_fr.close()
 
-    if asv_dict:   # if there are matches between taxonomic and ASV annotations
+    if asv_dict:  # if there are matches between taxonomic and ASV annotations
         ref_db = ""
 
         if len(taxa_df.columns) == 9:

@@ -53,7 +53,7 @@ def cli():
 
 def get_file(
     run_acc: str, analyses_dir: Path, db_label: str
-) -> Union[Path, List[Path]]:
+) -> Union[Path, List[Path], None]:
     """Takes path information for a particular analysis and db_label combo, and returns any existing files.
 
     :param run_acc: Run accession for the tax file that should be retrieved.
@@ -84,7 +84,7 @@ def get_file(
         return
 
     analysis_file = Path(
-        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt"
+        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt.gz"
     )
     if not analysis_file.exists():
         logging.error(
@@ -119,20 +119,25 @@ def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFr
     :rtype: pd.DataFrame
     """
 
-    tax_ranks = _MOTUS_TAX_RANKS if db_label == "mOTUs" else _SILVA_TAX_RANKS
+    tax_ranks = _MOTUS_TAX_RANKS if db_label == "motus" else _SILVA_TAX_RANKS
     res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 
-    validate_dataframe(
-        res_df, MotusTaxonSchema if db_label == "mOTUs" else TaxonSchema, str(tax_file)
-    )
+    if res_df.shape[0] > 0:
+        validate_dataframe(
+            res_df,
+            MotusTaxonSchema if db_label == "motus" else TaxonSchema,
+            str(tax_file),
+        )
 
-    res_df["full_taxon"] = res_df.iloc[:, 1:].apply(
-        lambda x: ";".join(x).strip(";"), axis=1
+    res_df["full_taxon"] = [
+        ";".join(r[tax_ranks]).strip(";") for _, r in res_df.iterrows()
+    ]
+    final_df = (
+        res_df[["Count", "full_taxon"]]
+        .set_index("full_taxon")
+        .rename(columns={"Count": run_acc})
     )
-    final_df = res_df.iloc[:, [0, -1]]
-    final_df = final_df.set_index("full_taxon")
-    final_df.columns = [run_acc]
 
     return final_df
 
@@ -162,16 +167,20 @@ def parse_one_func_file(
     ).set_index("function")
     res_df = res_df.fillna(0)
 
-    validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
+    if res_df.shape[0] > 0:
+        validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = res_df[["read_count"]]
-    count_df.columns = [run_acc]
+    count_df = pd.DataFrame(res_df[["read_count"]]).rename(
+        columns={"read_count": run_acc}
+    )
 
-    depth_df = res_df[["coverage_depth"]]
-    depth_df.columns = [run_acc]
+    depth_df = pd.DataFrame(res_df[["coverage_depth"]]).rename(
+        columns={"coverage_depth": run_acc}
+    )
 
-    breadth_df = res_df[["coverage_breadth"]]
-    breadth_df.columns = [run_acc]
+    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]).rename(
+        columns={"coverage_breadth": run_acc}
+    )
 
     return count_df, depth_df, breadth_df
 
@@ -423,7 +432,9 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                         curr_df = pd.read_csv(summary, sep="\t", index_col=0)
                         res_df = res_df.join(curr_df, how="outer")
                         res_df = res_df.fillna(0)
-                        res_df = res_df.astype(int if table_type == "count" else float)
+                        res_df = res_df.astype(
+                            int if table_type == "read-count" else float
+                        )
 
                     res_df = res_df.reindex(sorted(res_df.columns), axis=1)
                     res_df.to_csv(

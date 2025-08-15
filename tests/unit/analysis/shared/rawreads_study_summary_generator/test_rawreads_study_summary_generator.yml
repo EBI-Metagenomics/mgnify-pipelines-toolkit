@@ -12,18 +12,18 @@
     - rawreads_study_summary_generator
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed.csv -p chunk1
   files:
-    - path: "chunk1_mOTUs_study_summary.tsv"
-      md5sum: de9d55812ca35505e84b05d1053f3152
-    - path: "chunk1_SILVA-SSU_study_summary.tsv"
-      md5sum: 535d993ddf93ba6f2151830fc7111445
-    - path: "chunk1_SILVA-LSU_study_summary.tsv"
-      md5sum: 1855e1663d87b44ea439652c985f34a9
-    - path: "chunk1_Pfam-A_read-count_study_summary.tsv"
-      md5sum: 3d40925c439f17f2a17755afc101c0cb
-    - path: "chunk1_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: c73db3ffd2b2f7286e17491e520ee0cc
-    - path: "chunk1_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 9314b10294e9b1407575d1916c03ecb1
+    - path: "chunk1_motus_study_summary.tsv"
+      md5sum: 6f1ca89fc99165ec1e257615a9d0149c
+    - path: "chunk1_silva-ssu_study_summary.tsv"
+      md5sum: 35ed67129c366e41d8f37fb6185fd47b
+    - path: "chunk1_silva-lsu_study_summary.tsv"
+      md5sum: 963c7d7897277a203efff6d07e12cd8d
+    - path: "chunk1_pfam_read-count_study_summary.tsv"
+      md5sum: 3870a3c69fee3a4733aa259c1c34dfa3
+    - path: "chunk1_pfam_coverage-depth_study_summary.tsv"
+      md5sum: fc2a163a5dda5bc4c05a7f4716e31b49
+    - path: "chunk1_pfam_coverage-breadth_study_summary.tsv"
+      md5sum: efc1be4b2a033620ab94463cf7601f85
 
 - name: rawreads_study_summary_generator test_insdc_error
   tags:
@@ -32,26 +32,26 @@
   exit_code: 1
   stderr:
     contains:
-      - "{'run': 'dummy_ERR10889056'}"
-      - "{'run': 'dummy_ERR10889147'}"
+      - "{'run': 'dummy-ERR10889056'}"
+      - "{'run': 'dummy-ERR10889147'}"
 
 - name: rawreads_study_summary_generator test_summarise_multi_noninsdc
   tags:
     - rawreads_study_summary_generator
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_noninsdc.csv -p chunk2 --non_insdc
   files:
-    - path: "chunk2_mOTUs_study_summary.tsv"
-      md5sum: e1bf2aa9f83a26fefcdb207e86a71292
-    - path: "chunk2_SILVA-SSU_study_summary.tsv"
-      md5sum: 082bffc340fd9212b27832d0d8148fe2
-    - path: "chunk2_SILVA-LSU_study_summary.tsv"
-      md5sum: a91200fbf670faf61a251e2a6102d10a
-    - path: "chunk2_Pfam-A_read-count_study_summary.tsv"
-      md5sum: 84d2f23bada707255b950ea626308c22
-    - path: "chunk2_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 6ec06f0c501c066ab4bb380e5bbe407d
-    - path: "chunk2_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 1b97ceef7194c61add7bee07145e2c41
+    - path: "chunk2_motus_study_summary.tsv"
+      md5sum: 7f63df693e79c0f731832f01144e1cca
+    - path: "chunk2_silva-ssu_study_summary.tsv"
+      md5sum: 3c245667c4dd4995736e1ca8bf382d84
+    - path: "chunk2_silva-lsu_study_summary.tsv"
+      md5sum: ae0d346a76c06b7d244ef0e1c316a055
+    - path: "chunk2_pfam_read-count_study_summary.tsv"
+      md5sum: 60f5b7c87862e1c9a32e677d42c8d563
+    - path: "chunk2_pfam_coverage-depth_study_summary.tsv"
+      md5sum: 86d6f80590a59ac2421b1d224066c3e6
+    - path: "chunk2_pfam_coverage-breadth_study_summary.tsv"
+      md5sum: 47575e501751c43c3480a89ae623811b
 
 - name: rawreads_study_summary_generator test_invalid_success_status
   tags:
@@ -69,22 +69,22 @@
   command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_taxranks.csv -p chunk1 --non_insdc
   stderr:
     contains:
-      - "{'Kingdom': 'kkkk__Bacteria',"
+      - "{'Kingdom': 'kkkk__Bacteria'"
 
 - name: rawreads_study_summary_generator test_correct_args_merge
   tags:
     - rawreads_study_summary_generator
   command: rawreads_study_summary_generator merge -a tests/fixtures/study_summary_inputs/rawreads -p merged
   files:
-    - path: "merged_mOTUs_study_summary.tsv"
-      md5sum: 0456f1cba22925a3ca32fd5556e9b75b
-    - path: "merged_SILVA-SSU_study_summary.tsv"
-      md5sum: e793879513db567f4b5a7f3f67ca39e8
-    - path: "merged_SILVA-LSU_study_summary.tsv"
-      md5sum: a2eed30af639dada9f168713e47c8a6d
-    - path: "merged_Pfam-A_read-count_study_summary.tsv"
-      md5sum: 944fb8b3f28dbfb5222ff52e912e6fdd
-    - path: "merged_Pfam-A_coverage-depth_study_summary.tsv"
-      md5sum: 5554fa9d53f3c1cdf29b69507a17d17a
-    - path: "merged_Pfam-A_coverage-breadth_study_summary.tsv"
-      md5sum: 12802f2543be6087bcd8160753958424
+    - path: "merged_motus_study_summary.tsv"
+      md5sum: e98ccf63ead47882a3489da3180ca19c
+    - path: "merged_silva-ssu_study_summary.tsv"
+      md5sum: 21ec281ffd9ece28f9810d8cd4130f97
+    - path: "merged_silva-lsu_study_summary.tsv"
+      md5sum: 2867228e86e41c1750dcb029c5738492
+    - path: "merged_pfam_read-count_study_summary.tsv"
+      md5sum: b759b2f4367946fe2f86c850e26abd6a
+    - path: "merged_pfam_coverage-depth_study_summary.tsv"
+      md5sum: 6bd913bbe3dcc178af6aaeb965febb06
+    - path: "merged_pfam_coverage-breadth_study_summary.tsv"
+      md5sum: eb60d28614750738df184e006cf86e90

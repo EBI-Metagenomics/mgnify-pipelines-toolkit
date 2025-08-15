@@ -581,8 +581,8 @@ class RawReadsStatusTypes(StrEnum):
 
     all_results = "all_results"
     no_reads = "no_reads"
-    no_results = "no_results"
-    missing_results = "missing_results"
+    all_empty_results = "all_empty_results"
+    some_empty_results = "some_empty_results"
 
 
 class RawReadsPassedRunsRecord(BaseModel):

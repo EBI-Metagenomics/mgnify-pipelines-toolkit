@@ -52,7 +52,7 @@ fastq_suffix_header_check = "mgnify_pipelines_toolkit.analysis.shared.fastq_suff
 library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strategy_check:main"
 markergene_study_summary = "mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary:main"
 convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.convert_cmscan_to_cmsearch_tblout:main"
-dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:main"
+dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:cli"
 # analysis.amplicon #
 classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"
 make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"

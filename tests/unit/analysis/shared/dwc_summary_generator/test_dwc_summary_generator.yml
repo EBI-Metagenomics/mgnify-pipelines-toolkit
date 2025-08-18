@@ -5,11 +5,11 @@
   command: dwc_summary_generator --chromosome X
   stderr:
     contains:
-      - "dwc_summary_generator: error: the following arguments are required: -i/--input_path, -r/--runs, -o/--output"
+      - "Error: No such option: --chromosome"
 - name: dwc_summary_generator test_correct_args
   tags:
     - dwc_summary_generator
-  command: dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -o test
+  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p test
   files:
     - path: "test_DADA2_SILVA_dwcready.csv"
       md5sum: 367fb0237f87634b15d82e9eb2acf7f6

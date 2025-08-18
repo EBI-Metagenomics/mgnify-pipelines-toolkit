@@ -19,6 +19,8 @@ from collections import defaultdict
 import pathlib
 import logging
 import requests
+from typing import Union, Dict, List, Literal
+from pathlib import Path
 
 import pandas as pd
 import pyfastx
@@ -68,7 +70,25 @@ def parse_args():
     return input_path, runs, output
 
 
-def get_metadata_from_run_acc(run_acc):
+def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
+    """
+    Fetches and processes metadata from ENA using the provided run accession.
+
+    This function queries the European Nucleotide Archive (ENA) API to retrieve
+    metadata related to the specified run accession. Once the metadata is
+    retrieved, it performs cleaning and formatting to return the data in a
+    structured pandas DataFrame.
+
+    Parameters:
+    run_acc: str
+        Accession identifier for the run to query from ENA.
+
+    Returns:
+    Union[pd.DataFrame, bool]
+        A pandas DataFrame containing the retrieved and processed metadata
+        if the query is successful, or False if the data for the given run
+        accession is not found.
+    """
 
     query = f"{RUNS_URL}&includeAccessions={run_acc}"
     res_run = requests.get(query, headers=HEADERS)
@@ -111,20 +131,46 @@ def get_metadata_from_run_acc(run_acc):
     return res_df
 
 
-def get_all_metadata_from_runs(runs):
+def get_all_ena_metadata_from_runs(runs: List[str]) -> Dict[str, pd.DataFrame]:
+    """
+    Fetches ENA metadata for a list of run accessions.
 
-    run_metadata_dict = defaultdict(dict)
+    This function retrieves metadata from the European Nucleotide Archive (ENA)
+    for the provided list of run accessions. For each valid run accession, the
+    metadata is parsed and stored in a dictionary, where the key is the run
+    accession and the value is a DataFrame containing the metadata.
+
+    Parameters:
+        runs (List[str]): A list of strings representing run accessions for which
+            the metadata needs to be retrieved.
+
+    Returns:
+        Dict[str, pd.DataFrame]: A dictionary where keys are run accessions and
+        values are DataFrames containing the corresponding ENA metadata.
+    """
+    run_metadata_dict = defaultdict(pd.DataFrame)
 
     for run in runs:
-        res_df = get_metadata_from_run_acc(run)
+        res_df = get_ena_metadata_from_run_acc(run)
         if res_df is not False:
             run_metadata_dict[run] = res_df
 
     return run_metadata_dict
 
 
-def cleanup_asv_taxa(df, db):
+def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFrame:
+    """
+    Cleans ASV dataframe by renaming columns, handling empty fields, and adding
+    constant metadata fields.
 
+    Parameters:
+    df : pd.DataFrame
+        Input DataFrame containing ASV data to clean
+    db : Literal["SILVA", "PR2"]
+        Reference database used for taxonomic ranks
+    """
+
+    # Rename some columns
     cleaned_df = df.rename(
         columns={
             "asv": "ASVID",
@@ -137,6 +183,7 @@ def cleanup_asv_taxa(df, db):
         ranks = _SILVA_TAX_RANKS
     else:
         ranks = _PR2_TAX_RANKS
+
     # Turn empty taxa into NA
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(
@@ -146,7 +193,7 @@ def cleanup_asv_taxa(df, db):
     for rank in ranks:
         cleaned_df[rank] = cleaned_df[rank].apply(lambda x: x if x != "" else "NA")
 
-    # Add a MeasurementUnit Column for the read count for each asv
+    # Add a few constant columns
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
     cleaned_df["ASVCaller"] = ["DADA2"] * len(cleaned_df)
     cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
@@ -184,7 +231,27 @@ def cleanup_asv_taxa(df, db):
     return cleaned_df
 
 
-def cleanup_closedref_taxa(df, db):
+def cleanup_closedref_taxa(
+    df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]
+) -> pd.DataFrame:
+    """
+    Cleans closed-reference taxonomy dataframe by renaming columns, handling empty fields,
+    and adding constant metadata fields.
+
+    Similar to cleanup_asv_taxa() but specifically handles closed-reference taxonomy data
+    rather than ASV data. Performs column renaming, empty field handling,
+    and adds relevant metadata columns.
+
+    Parameters:
+    df : pd.DataFrame
+        Input DataFrame containing closed-reference taxonomy data to clean
+    db : Literal["SILVA-SSU", "PR2"]
+        Reference database used for taxonomic ranks
+
+    Returns:
+    pd.DataFrame
+        Cleaned and formatted DataFrame with standardized column names and metadata fields
+    """
 
     cleaned_df = df.rename(
         columns={
@@ -233,16 +300,41 @@ def cleanup_closedref_taxa(df, db):
     return cleaned_df
 
 
-def get_asv_dict(runs_df, root_path, db):
+def get_asv_dict(
+    runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "PR2"]
+) -> Dict[str, pd.DataFrame]:
+    """
+    Generates a dictionary containing ASV (Amplicon Sequence Variant) data for each run.
+
+    This function processes sequencing run data, extracts relevant information, and
+    aggregates it into a dictionary. Each key in the dictionary corresponds to a
+    unique run ID, and its value is a DataFrame containing detailed ASV data such
+    as taxonomy assignments, sequence read counts, MAPseq hit data, and the ASV sequences
+    themselves. The function filters runs to only include those with a
+    complete analysis status ("all_results").
+
+    Arguments:
+        runs_df (pd.DataFrame): A DataFrame containing results status info about the runs.
+        root_path (Path): The base directory path where analysis results files are stored.
+        db (Literal["SILVA", "PR2"]): Specifies the database used for taxonomy assignment
+            (e.g., SILVA or PR2).
+
+    Returns:
+        Dict[str, pd.DataFrame]: A dictionary where keys are run IDs and values are
+            DataFrames containing merged ASV data for corresponding runs.
+    """
 
     asv_dict = {}
     for i in range(0, len(runs_df)):
         run_acc = runs_df.loc[i, "run"]
-        status = runs_df.loc[i, "status"]
+        analysis_status = runs_df.loc[i, "status"]
 
-        if status != "all_results":
+        # Only keep runs that have all_results i.e. includes ASV results
+        if analysis_status != "all_results":
             continue
 
+        # Raw MAPseq taxonomy assignment files
+        # Used to extract hit data like the exact dbhit, %identity, and matching coords
         mapseq_file = sorted(
             list(
                 (
@@ -256,6 +348,7 @@ def get_asv_dict(runs_df, root_path, db):
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
+        # Processed MAPseq taxonomy assignment files
         tax_file = sorted(
             list(
                 (pathlib.Path(root_path) / run_acc / "asv").glob(
@@ -263,10 +356,13 @@ def get_asv_dict(runs_df, root_path, db):
                 )
             )
         )[0]
+        run_tax_df = pd.read_csv(tax_file, sep="\t")
+
+        # ASV read count files
         count_files = sorted(
             list(pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv"))
         )
-
+        # ASV sequence FASTA files
         asv_fasta_file = sorted(
             list(pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta"))
         )[0]
@@ -274,7 +370,6 @@ def get_asv_dict(runs_df, root_path, db):
         asv_fasta_dict = {name: seq for name, seq in fasta}
         asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
         asv_fasta_df["asv"] = asv_fasta_df.index
-        run_tax_df = pd.read_csv(tax_file, sep="\t")
 
         count_dfs = []
 
@@ -282,22 +377,49 @@ def get_asv_dict(runs_df, root_path, db):
             count_df = pd.read_csv(count_file, sep="\t")
             count_dfs.append(count_df)
 
-        all_ampregions_count_df = pd.concat(count_dfs)
-        merged_df = all_ampregions_count_df.merge(
+        # Merge counts into one DF in case there are multiple amplified regions...
+        all_amplified_regions_count_df = pd.concat(count_dfs)
+
+        # ...then merge with taxonomy dataframes...
+        merged_df = all_amplified_regions_count_df.merge(
             run_tax_df, left_on="asv", right_on="ASV"
         )
+        # ...then merge with MAPseq columns...
         merged_df = merged_df.merge(mapseq_df, left_on="asv", right_on="asv")
 
+        # ...then merge with ASV FASTA sequences
         merged_df.pop("ASV")
         run_col = [run_acc] * len(merged_df)
         merged_df["RunID"] = run_col
         merged_df = merged_df.merge(asv_fasta_df, on="asv")
+
+        # Assign final DF to run_acc in dictionary
         asv_dict[run_acc] = merged_df
 
     return asv_dict
 
 
-def get_closedref_dict(runs_df, root_path, db):
+def get_closedref_dict(
+    runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA-SSU", "PR2"]
+) -> Dict[str, pd.DataFrame]:
+    """
+    Generates a dictionary of closed-reference taxonomy data for multiple sequencing runs.
+
+    Processes Krona-formatted taxonomy files from analysis results and converts them
+    to DataFrames mapping taxonomic ranks to abundances. Returns dictionary with run
+    accessions as keys and said DataFrames as values.
+
+    Arguments:
+        runs_df (pd.DataFrame): A DataFrame containing results status info about the runs.
+        root_path (Path): The base directory path where analysis results files are stored.
+        db (Literal["SILVA", "PR2"]): Specifies the database used for taxonomy assignment
+            (e.g., SILVA or PR2).
+
+    Returns:
+        Dict[str, pd.DataFrame]: A dictionary mapping each run accession (str) to its
+        corresponding taxonomy DataFrame (pd.DataFrame). Each DataFrame contains taxonomic
+        abundance counts.
+    """
 
     if db == "SILVA-SSU":
         ranks = _SILVA_TAX_RANKS
@@ -314,6 +436,7 @@ def get_closedref_dict(runs_df, root_path, db):
         if status != "all_results":
             continue
 
+        # Krona formatted results
         kronatxt_file = sorted(
             list(
                 (pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob(
@@ -322,15 +445,18 @@ def get_closedref_dict(runs_df, root_path, db):
             )
         )[0]
 
-        krona_taxranks = [rank + "__" for rank in short_ranks]
-
         column_names = ["count"] + ranks
         tax_df = pd.read_csv(kronatxt_file, sep="\t", names=column_names)
+
+        # Clean up empty ranks
         tax_df = tax_df.fillna("NA")
+        krona_taxranks = [rank + "__" for rank in short_ranks]
         tax_df = tax_df.map(lambda x: "NA" if x in krona_taxranks else x)
 
         run_col = [run_acc] * len(tax_df)
         tax_df["RunID"] = run_col
+
+        # Assign final DF to run_acc in dictionary
         closedref_dict[run_acc] = tax_df
 
     return closedref_dict
@@ -349,8 +475,9 @@ def main():
     runs_df = pd.read_csv(runs, names=["run", "status"])
 
     all_runs = runs_df.run.to_list()
-    run_metadata_dict = get_all_metadata_from_runs(all_runs)
+    run_metadata_dict = get_all_ena_metadata_from_runs(all_runs)
 
+    # Generate DwC-ready files for ASV results
     asv_dbs = ["SILVA", "PR2"]
     for db in asv_dbs:
 
@@ -369,6 +496,7 @@ def main():
 
         final_df.to_csv(f"{output}_DADA2_{db}_dwcready.csv", index=False, na_rep="NA")
 
+    # Generate DwC-ready files for closed reference results
     closedref_dbs = ["SILVA-SSU", "PR2"]
     for db in closedref_dbs:
 

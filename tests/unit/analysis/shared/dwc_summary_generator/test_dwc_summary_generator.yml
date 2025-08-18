@@ -6,7 +6,7 @@
   stderr:
     contains:
       - "Error: No such option: --chromosome"
-- name: dwc_summary_generator test_correct_args
+- name: dwc_summary_generator_summarise test_correct_args
   tags:
     - dwc_summary_generator
   command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1
@@ -23,3 +23,20 @@
       md5sum: 28db545f224f85d068623af263836086
     - path: "chunk1_closedref_PR2_dwcready.csv"
       md5sum: d83bfbfa1d9bb95f23a0310333c1ab34
+- name: dwc_summary_generator_merge test_correct_args
+  tags:
+    - dwc_summary_generator
+  command: dwc_summary_generator merge -a tests/fixtures/study_summary_inputs/amplicon -p merged
+  files:
+    - path: "merged_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: b6421022aca0e0b7c0ed999d804390f8
+    - path: "merged_closedref_PR2_dwcready.csv"
+      md5sum: 79ae04c03d7c06635e45e220a9a51275
+    - path: "merged_DADA2_SILVA_16S-V3-V4_dwcready.csv"
+      md5sum: 68ff47746c6c115bdd1ae9569bbb9af4
+    - path: "merged_DADA2_SILVA_18S-V4_dwcready.csv"
+      md5sum: e3ef5e0a30be9e9841d76e72bcbc7757
+    - path: "merged_DADA2_PR2_16S-V3-V4_dwcready.csv"
+      md5sum: d698b9eeb56fae449ce499ece8da44c6
+    - path: "merged_DADA2_PR2_18S-V4_dwcready.csv"
+      md5sum: 08df9dfdff7be0c51d56177de8db0e4e

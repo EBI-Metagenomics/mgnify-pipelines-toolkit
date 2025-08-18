@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# import shutil
-# from shutil import SameFileError
+import shutil
+from shutil import SameFileError
 
 import argparse
 from collections import defaultdict
@@ -601,33 +601,45 @@ def generate_dwcready_summaries(
         )
 
 
-def organise_study_summaries(all_study_summaries: List[Path]) -> defaultdict[List]:
+def organise_dwcr_summaries(all_study_summaries: List[Path]) -> defaultdict[List]:
     """
-    Matches different summary files of the same database label and analysis
-    type (and amplified region for ASVs) into a dictionary to help merge
-    the correct summaries.
+    Organizes Darwin Core-ready summary files into groups based on their analysis type and database.
 
-    :param all_study_summaries: List of file paths to different summary files
-    :type all_study_summaries: List[str]
-    :return: Organised dictionary where each summary is paired to a specific
-        database label key to be merged together.
-    :rtype: defaultdict[List]
+    This function processes paths to Darwin Core-ready summary files and organizes them into a
+    dictionary based on their type (ASV/DADA2 or closed-reference) and database used. The function
+    handles the two types of summaries differently:
+
+    1. ASV/DADA2 summaries:
+       - Label includes analysis type (DADA2), database, and amplified region
+       - Example label: "DADA2_SILVA_16S-V3-V4"
+    2. Closed-reference summaries:
+       - Label only includes analysis type and database
+       - Example label: "closedref_SILVA-SSU"
+
+    Args:
+        all_study_summaries (List[Path]): List of paths to Darwin Core-ready summary files
+            to be organized.
+
+    Returns:
+        defaultdict[List]: Dictionary where keys are summary labels (combining analysis type,
+            database, and for ASVs, amplified region) and values are lists of paths to
+            corresponding summary files.
     """
+
     summaries_dict = defaultdict(list)
 
     for summary_path in all_study_summaries:
         summary_filename = summary_path.stem
 
         temp_lst = summary_filename.split("_")
-        if "asv_study_summary" in summary_filename:
+        if "DADA2" in summary_filename:
+            summary_db_label = "_".join(
+                temp_lst[1:4]
+            )  # For ASVs we need to include the amplified region in the label
+        else:
             summary_db_label = "_".join(
                 temp_lst[1:3]
-            )  # For ASVs we need to include the amp_region in the label
-        else:
-            summary_db_label = temp_lst[
-                1
-            ]  # For closed reference, just the db_label is needed
-
+            )  # For closed reference, just the db_label is needed
         summaries_dict[summary_db_label].append(summary_path)
 
     return summaries_dict
@@ -652,48 +664,55 @@ def organise_study_summaries(all_study_summaries: List[Path]) -> defaultdict[Lis
     help="Prefix to merged summary files",
     type=str,
 )
-def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
+def merge_dwcr_summaries(analyses_dir: str, output_prefix: str) -> None:
     """
-    Function that will take a file path containing study-level
-    summaries that should be merged together on a per-db-per-amplified-region
-    basis.
-    \f
+    Merges multiple Darwin Core-ready summary files into consolidated summaries by type.
 
-    :param analyses_dir: The filepath to the directory containing all of the analyses.
-    :type analyses_dir: str
-    :param output_prefix: Prefix to be added to the generated summary file.
-    :type output_prefix: str
+    This function takes a directory containing multiple Darwin Core-ready summary files
+    and merges them based on their analysis type (ASV/DADA2 or closed-reference) and
+    reference database. The function processes two types of summaries:
+
+    1. ASV/DADA2 summaries:
+       - Merged by analysis type, database, and amplified region
+       - Output example: "{prefix}_DADA2_SILVA_16S-V3-V4_dwcready.csv"
+    2. Closed-reference summaries:
+       - Merged by analysis type and database only
+       - Output example: "{prefix}_closedref_SILVA-SSU_dwcready.csv"
+
+    If only one summary file exists for a particular combination, it is copied to the
+    output location instead of being merged.
+
+    Args:
+        analyses_dir (str): Path to directory containing Darwin Core-ready summary files
+                           (files ending in "_dwcready.csv")
+        output_prefix (str): Prefix to use for merged output files
+
+    Returns:
+        None: Writes merged summary files to current directory, with names following the
+        pattern "{output_prefix}_{analysis-type}_{database}[_{region}]_dwcready.csv"
     """
-    pass
 
-    # all_dwc_summaries = Path(analyses_dir).glob("*_dwcready.csv")
+    all_dwcr_summaries = Path(analyses_dir).glob("*_dwcready.csv")
 
-    # summaries_dict = organise_study_summaries(all_dwc_summaries)
+    summaries_dict = organise_dwcr_summaries(all_dwcr_summaries)
 
-    # for db_label, summaries in summaries_dict.items():
-    #     merged_summary_name = f"{output_prefix}_{db_label}_study_summary.tsv"
-    #     if len(summaries) > 1:
-    #         res_df = pd.read_csv(summaries[0], sep="\t", index_col=0)
-    #         for summary in summaries[1:]:
-    #             curr_df = pd.read_csv(summary, sep="\t", index_col=0)
-    #             res_df = res_df.join(curr_df, how="outer")
-    #             res_df = res_df.fillna(0)
-    #             res_df = res_df.astype(int)
-    #
-    #         res_df = res_df.reindex(sorted(res_df.columns), axis=1)
-    #         res_df.to_csv(
-    #             merged_summary_name,
-    #             sep="\t",
-    #             index_label="taxonomy",
-    #         )
-    #     elif len(summaries) == 1:
-    #         logging.info(
-    #             f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
-    #         )
-    #         try:
-    #             shutil.copyfile(summaries[0], merged_summary_name)
-    #         except SameFileError:
-    #             pass
+    for db_label, summaries in summaries_dict.items():
+        merged_summary_name = f"{output_prefix}_{db_label}_dwcready.csv"
+        if len(summaries) > 1:
+            res_df = pd.read_csv(summaries[0])
+            for summary in summaries[1:]:
+                curr_df = pd.read_csv(summary)
+                res_df = pd.concat([res_df, curr_df])
+
+            res_df.to_csv(merged_summary_name, index=False, na_rep="NA")
+        elif len(summaries) == 1:
+            logging.info(
+                f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
+            )
+            try:
+                shutil.copyfile(summaries[0], merged_summary_name)
+            except SameFileError:
+                pass
 
 
 if __name__ == "__main__":

@@ -39,9 +39,7 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 
 logging.basicConfig(level=logging.DEBUG)
 
-URL = "https://www.ebi.ac.uk/ena/portal/api/search?result"
-RUNS_URL = f"{URL}=read_run&fields=secondary_study_accession,sample_accession&limit=10&format=json&download=false"
-SAMPLES_URL = f"{URL}=sample&fields=lat,lon,collection_date,depth,center_name,temperature,salinity&limit=10&format=json&download=false"
+URL = "https://www.ebi.ac.uk/ena/portal/api/search"
 HEADERS = {"Accept": "application/json"}
 
 
@@ -100,17 +98,40 @@ def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
         accession is not found.
     """
 
-    query = f"{RUNS_URL}&includeAccessions={run_acc}"
-    res_run = requests.get(query, headers=HEADERS)
+    run_fields_list = ["secondary_study_accession", "sample_accession"]
+    run_query_args = {
+        "result": "read_run",
+        "includeAccessions": run_acc,
+        "fields": ",".join(run_fields_list),
+        "limit": 10,
+        "format": "json",
+        "download": "false",
+    }
+    res_run = requests.get(URL, headers=HEADERS, params=run_query_args)
 
     if res_run.status_code != 200:
         logging.error(f"Data not found for run {run_acc}")
         return False
 
     sample_acc = res_run.json()[0]["sample_accession"]
-
-    query = f"{SAMPLES_URL}&includeAccessions={sample_acc}"
-    res_sample = requests.get(query, headers=HEADERS)
+    sample_fields_list = [
+        "lat",
+        "lon",
+        "collection_date",
+        "depth",
+        "center_name",
+        "temperature",
+        "salinity",
+    ]
+    sample_query_args = {
+        "result": "sample",
+        "includeAccessions": sample_acc,
+        "fields": ",".join(sample_fields_list),
+        "limit": 10,
+        "format": "json",
+        "download": "false",
+    }
+    res_sample = requests.get(URL, headers=HEADERS, params=sample_query_args)
 
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 

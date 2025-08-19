@@ -5,11 +5,38 @@
   command: dwc_summary_generator --chromosome X
   stderr:
     contains:
-      - "dwc_summary_generator: error: the following arguments are required: -i/--input_path, -r/--runs, -o/--output"
-- name: dwc_summary_generator test_correct_args
+      - "Error: No such option: --chromosome"
+- name: dwc_summary_generator_summarise test_correct_args
   tags:
     - dwc_summary_generator
-  command: dwc_summary_generator -i tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -o test
+  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1
   files:
-    - path: "test_dwcready.csv"
-      md5sum: aae241b37c354b62a67ac50b80f5544d
+    - path: "chunk1_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: d506a5fdab921b23fe86fa9241d940b4
+    - path: "chunk1_closedref_PR2_dwcready.csv"
+      md5sum: 32a66237d1a8326d74b850f6527e3af6
+    - path: "chunk1_DADA2_SILVA_16S-V3-V4_dwcready.csv"
+      md5sum: 7551b217f082f75285887fe9949a6c78
+    - path: "chunk1_DADA2_SILVA_18S-V4_dwcready.csv"
+      md5sum: 82b9f11862c441a07faff4204ed3bd7a
+    - path: "chunk1_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: d506a5fdab921b23fe86fa9241d940b4
+    - path: "chunk1_closedref_PR2_dwcready.csv"
+      md5sum: 32a66237d1a8326d74b850f6527e3af6
+- name: dwc_summary_generator_merge test_correct_args
+  tags:
+    - dwc_summary_generator
+  command: dwc_summary_generator merge -a tests/fixtures/study_summary_inputs/amplicon -p merged
+  files:
+    - path: "merged_closedref_SILVA-SSU_dwcready.csv"
+      md5sum: 071f7f39a183dfc95dbd2a0e7af63369
+    - path: "merged_closedref_PR2_dwcready.csv"
+      md5sum: f0cf892cb319d5f09cbe11534cb60730
+    - path: "merged_DADA2_SILVA_16S-V3-V4_dwcready.csv"
+      md5sum: e877a2160655d21d432da1d74f026eb0
+    - path: "merged_DADA2_SILVA_18S-V4_dwcready.csv"
+      md5sum: 10ac20a2f22906d3ab4802ca1f06d810
+    - path: "merged_DADA2_PR2_16S-V3-V4_dwcready.csv"
+      md5sum: b89df30bf0b82e949a2de84a3b49d2c4
+    - path: "merged_DADA2_PR2_18S-V4_dwcready.csv"
+      md5sum: b7546359ebbc2b7c4ab9540371129cae

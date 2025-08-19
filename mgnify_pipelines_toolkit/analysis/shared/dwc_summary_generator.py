@@ -141,10 +141,9 @@ def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
     full_res_dict = res_run.json()[0] | res_sample.json()[0]
 
     # Turn empty values into NA
-    for field in full_res_dict.keys():
-        val = full_res_dict[field]
-        if val == "":
-            full_res_dict[field] = "NA"
+    full_res_dict = {
+        field: "NA" if val == "" else val for field, val in full_res_dict.items()
+    }
 
     if full_res_dict["collection_date"] == "":
         full_res_dict["collectionDate"] = "NA"
@@ -429,7 +428,7 @@ def get_asv_dict(
             run_tax_df, left_on="asv", right_on="ASV"
         )
         # ...then merge with MAPseq columns...
-        merged_df = merged_df.merge(mapseq_df, left_on="asv", right_on="asv")
+        merged_df = merged_df.merge(mapseq_df, on="asv")
 
         # ...then merge with ASV FASTA sequences
         merged_df.pop("ASV")

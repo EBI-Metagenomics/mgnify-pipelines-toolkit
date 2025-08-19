@@ -98,7 +98,11 @@ def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
         accession is not found.
     """
 
-    run_fields_list = ["secondary_study_accession", "sample_accession"]
+    run_fields_list = [
+        "secondary_study_accession",
+        "sample_accession",
+        "instrument_model",
+    ]
     run_query_args = {
         "result": "read_run",
         "includeAccessions": run_acc,
@@ -122,6 +126,7 @@ def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
         "center_name",
         "temperature",
         "salinity",
+        "country",
     ]
     sample_query_args = {
         "result": "sample",
@@ -156,6 +161,7 @@ def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
             "secondary_study_accession": "StudyID",
             "lon": "decimalLongitude",
             "lat": "decimalLatitude",
+            "instrument_model": "seq_meth",
         }
     )
 
@@ -242,6 +248,8 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
             "temperature",
             "salinity",
             "collectionDate",
+            "seq_meth",
+            "country",
             "InstitutionCode",
             "amplifiedRegion",
             "ASVCaller",
@@ -318,6 +326,8 @@ def cleanup_closedref_taxa(
             "temperature",
             "salinity",
             "collectionDate",
+            "seq_meth",
+            "country",
             "InstitutionCode",
             "ReferenceDatabase",
             "TaxAnnotationTool",

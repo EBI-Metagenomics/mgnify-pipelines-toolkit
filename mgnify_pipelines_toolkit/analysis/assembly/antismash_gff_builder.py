@@ -89,8 +89,10 @@ def main():
             if iter_cds and feature["type"] == "CDS":
                 # Annotate CDS features
 
-                start = int(feature["location"].split(":")[0][1:])
-                end = int(feature["location"].split(":")[1].split("]")[0])
+                # The > and < are removed to work with pseudogene outputs in Bakta
+                # A feature["location"] example that can be seen in Bakta outputs: "[81883:>82231](+)"
+                start = int(feature["location"].split(":")[0][1:].lstrip("<>"))
+                end = int(feature["location"].split(":")[1].split("]")[0].lstrip("<>"))
                 strand = feature["location"].split("(")[1][0]  # + or -
 
                 if not region_name or not (region_start <= end and start <= region_end):

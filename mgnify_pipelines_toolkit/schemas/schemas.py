@@ -72,12 +72,13 @@ class INSDCRunAccession(RootModel):
 
 
 class AmpliconResultTypes(StrEnum):
-    """Class that models the two allowed statuses for successful amplicon analysis runs.
+    """Class that models the three allowed statuses for successful amplicon analysis runs.
     Pydantic validates Enums very simply without needing to declare a new function.
     """
 
     all_results = "all_results"
     no_asvs = "no_asvs"
+    dada2_stats_fail = "dada2_stats_fail"
 
 
 class AmpliconPassedRunsRecord(BaseModel):

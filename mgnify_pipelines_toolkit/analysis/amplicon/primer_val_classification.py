@@ -167,7 +167,8 @@ def main():
             matched_primers_list.append(cleaned_primer_name)
 
     res_df = pd.DataFrame.from_dict(res_dict)
-    res_df.to_csv(f"./{sample}_primer_validation.tsv", sep="\t", index=False)
+    res_tsv_name = f"./{sample}_primer_validation.tsv"
+    res_df.to_csv(res_tsv_name, sep="\t", index=False) if not res_df.empty else open(res_tsv_name, "w").close()
 
     fwd_primers_fw.close()
     rev_primers_fw.close()

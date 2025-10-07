@@ -14,32 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import shutil
-from shutil import SameFileError
-
-import click
-from collections import defaultdict
 import glob
 import logging
+import shutil
+from collections import defaultdict
 from pathlib import Path
-from typing import Union, List
+from shutil import SameFileError
+from typing import List, Union
 
+import click
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.db_labels import (
-    RRAP_TAXDB_LABELS,
     RRAP_FUNCDB_LABELS,
+    RRAP_TAXDB_LABELS,
 )
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _SILVA_TAX_RANKS,
     _MOTUS_TAX_RANKS,
+    _SILVA_TAX_RANKS,
 )
-from mgnify_pipelines_toolkit.schemas.schemas import (
-    RawReadsPassedRunsSchema,
-    RawReadsNonINSDCPassedRunsSchema,
-    TaxonSchema,
-    MotusTaxonSchema,
+from mgnify_pipelines_toolkit.schemas.dataframes import (
     FunctionProfileSchema,
+    MotusTaxonSchema,
+    RawReadsNonINSDCPassedRunsSchema,
+    RawReadsPassedRunsSchema,
+    TaxonSchema,
     validate_dataframe,
 )
 
@@ -51,9 +50,7 @@ def cli():
     pass
 
 
-def get_file(
-    run_acc: str, analyses_dir: Path, db_label: str
-) -> Union[Path, List[Path], None]:
+def get_file(run_acc: str, analyses_dir: Path, db_label: str) -> Union[Path, List[Path], None]:
     """Takes path information for a particular analysis and db_label combo, and returns any existing files.
 
     :param run_acc: Run accession for the tax file that should be retrieved.
@@ -78,28 +75,18 @@ def get_file(
     db_path = Path(f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}")
 
     if not db_path.exists():
-        logging.debug(
-            f"DB {db_path} doesn't exist for {run_acc}. Skipping"
-        )  # or error?
+        logging.debug(f"DB {db_path} doesn't exist for {run_acc}. Skipping")  # or error?
         return
 
-    analysis_file = Path(
-        f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt.gz"
-    )
+    analysis_file = Path(f"{analyses_dir}/{run_acc}/{db_dir}/{db_label}/{run_acc}_{db_label}.txt.gz")
     if not analysis_file.exists():
-        logging.error(
-            f"DB path exists but file doesn't - exiting. Path: {analysis_file}"
-        )
+        logging.error(f"DB path exists but file doesn't - exiting. Path: {analysis_file}")
         exit(1)
 
     file_size = analysis_file.stat().st_size
-    if (
-        file_size == 0
-    ):  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
+    if file_size == 0:  # Pipeline can generate files that are empty for ITS DBs (UNITE and ITSoneDB),
         # so need to skip those. Should probably fix that at some point
-        logging.debug(
-            f"File {analysis_file} exists but is empty, so will be skipping it."
-        )
+        logging.debug(f"File {analysis_file} exists but is empty, so will be skipping it.")
         analysis_file = None
 
     return analysis_file
@@ -130,21 +117,13 @@ def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFr
             str(tax_file),
         )
 
-    res_df["full_taxon"] = [
-        ";".join(r[tax_ranks]).strip(";") for _, r in res_df.iterrows()
-    ]
-    final_df = (
-        res_df[["Count", "full_taxon"]]
-        .set_index("full_taxon")
-        .rename(columns={"Count": run_acc})
-    )
+    res_df["full_taxon"] = [";".join(r[tax_ranks]).strip(";") for _, r in res_df.iterrows()]
+    final_df = res_df[["Count", "full_taxon"]].set_index("full_taxon").rename(columns={"Count": run_acc})
 
     return final_df
 
 
-def parse_one_func_file(
-    run_acc: str, func_file: Path, db_label: str
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def parse_one_func_file(run_acc: str, func_file: Path, db_label: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Parses a functional profile file, and returns it as a pandas DataFrame object.
 
     :param run_acc: Run accession of the taxonomy file that will be parsed.
@@ -170,24 +149,16 @@ def parse_one_func_file(
     if res_df.shape[0] > 0:
         validate_dataframe(res_df, FunctionProfileSchema, str(func_file))
 
-    count_df = pd.DataFrame(res_df[["read_count"]]).rename(
-        columns={"read_count": run_acc}
-    )
+    count_df = pd.DataFrame(res_df[["read_count"]]).rename(columns={"read_count": run_acc})
 
-    depth_df = pd.DataFrame(res_df[["coverage_depth"]]).rename(
-        columns={"coverage_depth": run_acc}
-    )
+    depth_df = pd.DataFrame(res_df[["coverage_depth"]]).rename(columns={"coverage_depth": run_acc})
 
-    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]).rename(
-        columns={"coverage_breadth": run_acc}
-    )
+    breadth_df = pd.DataFrame(res_df[["coverage_breadth"]]).rename(columns={"coverage_breadth": run_acc})
 
     return count_df, depth_df, breadth_df
 
 
-def generate_db_summary(
-    db_label: str, analysis_dfs: dict[str, Path], output_prefix: str
-) -> None:
+def generate_db_summary(db_label: str, analysis_dfs: dict[str, Path], output_prefix: str) -> None:
     """Takes paired run accessions taxonomy dataframes in the form of a dictionary,
     and respective db_label, joins them together, and generates a study-wide summary
     in the form of a .tsv file.
@@ -225,9 +196,7 @@ def generate_db_summary(
         breadth_df_list = []
 
         for run_acc, analysis_df in analysis_dfs.items():
-            count_df, depth_df, breadth_df = parse_one_func_file(
-                run_acc, analysis_df, db_label
-            )
+            count_df, depth_df, breadth_df = parse_one_func_file(run_acc, analysis_df, db_label)
             count_df_list.append(count_df)
             depth_df_list.append(depth_df)
             breadth_df_list.append(breadth_df)
@@ -308,18 +277,14 @@ def organise_study_summaries(all_study_summaries: List[str]) -> defaultdict[str,
     help="Input directory to where all the individual analyses subdirectories for summarising",
     type=click.Path(exists=True, path_type=Path, file_okay=False),
 )
-@click.option(
-    "-p", "--output_prefix", required=True, help="Prefix to summary files", type=str
-)
+@click.option("-p", "--output_prefix", required=True, help="Prefix to summary files", type=str)
 @click.option(
     "--non_insdc",
     default=False,
     is_flag=True,
     help="If run accessions aren't INSDC-formatted",
 )
-def summarise_analyses(
-    runs: Path, analyses_dir: Path, output_prefix: str, non_insdc: bool
-) -> None:
+def summarise_analyses(runs: Path, analyses_dir: Path, output_prefix: str, non_insdc: bool) -> None:
     """Function that will take a file of pipeline-successful run accessions
     that should be used for the generation of the relevant db-specific
     study-level summary files.
@@ -337,15 +302,12 @@ def summarise_analyses(
     runs_df = pd.read_csv(runs, names=["run", "status"])
 
     if not non_insdc:
-        RawReadsPassedRunsSchema(
-            runs_df
-        )  # Run validation on the successful_runs .csv file
+        RawReadsPassedRunsSchema(runs_df)  # Run validation on the successful_runs .csv file
     else:
         RawReadsNonINSDCPassedRunsSchema(runs_df)
 
     all_db_labels = RRAP_TAXDB_LABELS + RRAP_FUNCDB_LABELS
     for db_label in all_db_labels:
-
         analysis_files = {}
         for run_acc in runs_df["run"]:
             analysis_file = get_file(run_acc, analyses_dir, db_label)
@@ -410,9 +372,7 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                     index_label="taxonomy",
                 )
             elif len(summaries) == 1:
-                logging.info(
-                    f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}"
-                )
+                logging.info(f"Only one summary ({summaries[0]}) so will use that as {merged_summary_name}")
                 try:
                     shutil.copyfile(summaries[0], merged_summary_name)
                 except SameFileError:
@@ -420,21 +380,15 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
 
         if db_label in RRAP_FUNCDB_LABELS:
             for table_type in ["read-count", "coverage-depth", "coverage-breadth"]:
-                merged_summary_name = (
-                    f"{output_prefix}_{db_label}_{table_type}_study_summary.tsv"
-                )
-                summaries_ = [
-                    v for v in summaries if Path(v).stem.split("_")[2] == table_type
-                ]
+                merged_summary_name = f"{output_prefix}_{db_label}_{table_type}_study_summary.tsv"
+                summaries_ = [v for v in summaries if Path(v).stem.split("_")[2] == table_type]
                 if len(summaries_) > 1:
                     res_df = pd.read_csv(summaries_[0], sep="\t", index_col=0)
                     for summary in summaries_[1:]:
                         curr_df = pd.read_csv(summary, sep="\t", index_col=0)
                         res_df = res_df.join(curr_df, how="outer")
                         res_df = res_df.fillna(0)
-                        res_df = res_df.astype(
-                            int if table_type == "read-count" else float
-                        )
+                        res_df = res_df.astype(int if table_type == "read-count" else float)
 
                     res_df = res_df.reindex(sorted(res_df.columns), axis=1)
                     res_df.to_csv(
@@ -444,9 +398,7 @@ def merge_summaries(analyses_dir: str, output_prefix: str) -> None:
                         float_format="%.6g",
                     )
                 elif len(summaries_) == 1:
-                    logging.info(
-                        f"Only one summary ({summaries_[0]}) so will use that as {merged_summary_name}"
-                    )
+                    logging.info(f"Only one summary ({summaries_[0]}) so will use that as {merged_summary_name}")
                     try:
                         shutil.copyfile(summaries_[0], merged_summary_name)
                     except SameFileError:

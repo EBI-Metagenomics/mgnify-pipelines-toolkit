@@ -14,39 +14,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-from functools import reduce
 import glob
 import logging
+from functools import reduce
 from pathlib import Path
 from typing import Literal
 
+import click
 import pandas as pd
 
-from mgnify_pipelines_toolkit.schemas.schemas import (
-    CompletedAnalysisSchema,
-    TaxonSchema,
-    GOSummarySchema,
-    InterProSummarySchema,
-    KOSummarySchema,
-    SanntisSummarySchema,
-    AntismashSummarySchema,
-    PFAMSummarySchema,
-    KEGGModulesSummarySchema,
-    GOStudySummarySchema,
-    InterProStudySummarySchema,
-    TaxonomyStudySummarySchema,
-    KOStudySummarySchema,
-    SanntisStudySummarySchema,
+from mgnify_pipelines_toolkit.schemas.dataframes import (
     AntismashStudySummarySchema,
-    PFAMStudySummarySchema,
+    AntismashSummarySchema,
+    CompletedAnalysisSchema,
+    GOStudySummarySchema,
+    GOSummarySchema,
+    InterProStudySummarySchema,
+    InterProSummarySchema,
     KEGGModulesStudySummarySchema,
+    KEGGModulesSummarySchema,
+    KOStudySummarySchema,
+    KOSummarySchema,
+    PFAMStudySummarySchema,
+    PFAMSummarySchema,
+    SanntisStudySummarySchema,
+    SanntisSummarySchema,
+    TaxonomyStudySummarySchema,
+    TaxonSchema,
     validate_dataframe,
 )
 
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Keys are the original column names in the input files,
 # values are the standardised column names used in the generated study summary files
@@ -173,9 +171,7 @@ def check_files_exist(file_list: list[Path]) -> None:
     """
     missing_files = [str(path) for path in file_list if not path.is_file()]
     if missing_files:
-        raise FileNotFoundError(
-            f"The following required files are missing: {', '.join(missing_files)}"
-        )
+        raise FileNotFoundError(f"The following required files are missing: {', '.join(missing_files)}")
 
 
 def generate_taxonomy_summary(
@@ -206,9 +202,7 @@ def generate_taxonomy_summary(
         df = validate_dataframe(df, TaxonSchema, str(path))
 
         # Combine all taxonomic ranks in the classification into a single string
-        df["full_taxon"] = (
-            df[TAXONOMY_COLUMN_NAMES[1:]].agg(";".join, axis=1).str.strip(";")
-        )
+        df["full_taxon"] = df[TAXONOMY_COLUMN_NAMES[1:]].agg(";".join, axis=1).str.strip(";")
 
         # Create a new DataFrame with taxonomy as index and count as the only column
         result = df[["Count", "full_taxon"]].set_index("full_taxon")
@@ -229,9 +223,7 @@ def generate_functional_summary(
     file_dict: dict[str, Path],
     column_names: dict[str, str],
     output_prefix: str,
-    label: Literal[
-        "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
-    ],
+    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"],
     outdir: Path = None,
     allow_missing: bool = False,
 ) -> None:
@@ -292,9 +284,7 @@ def generate_functional_summary(
         check_files_exist(list(file_dict.values()))
     except FileNotFoundError as e:
         if allow_missing:
-            logging.warning(
-                f"One of the expected files is missing, but this is allowed for {label}."
-            )
+            logging.warning(f"One of the expected files is missing, but this is allowed for {label}.")
             logging.warning(e)
             return
         raise
@@ -324,9 +314,7 @@ def generate_functional_summary(
         dfs.append(df)
 
     if not dfs:
-        logging.warning(
-            f"No valid files with functional annotation summary were found. Skipping creation of {output_file_name}."
-        )
+        logging.warning(f"No valid files with functional annotation summary were found. Skipping creation of {output_file_name}.")
         return
 
     # Merge all dataframes on the renamed metadata columns
@@ -384,9 +372,7 @@ def generate_functional_summary(
     help="Directory for the output files, by default it will use the current working directory.",
     type=click.Path(exists=True, path_type=Path, file_okay=False),
 )
-def summarise_analyses(
-    assemblies: Path, study_dir: Path, output_prefix: str, outdir: Path
-) -> None:
+def summarise_analyses(assemblies: Path, study_dir: Path, output_prefix: str, outdir: Path) -> None:
     """
     Generate study-level summaries for successfully proccessed assemblies.
 
@@ -405,16 +391,11 @@ def summarise_analyses(
         Construct file paths for each assembly given a subdirectory and filename template.
         Template must contain {acc} as a placeholder.
         """
-        return {
-            acc: study_dir / acc / subdir / filename_template.format(acc=acc)
-            for acc in assembly_list
-        }
+        return {acc: study_dir / acc / subdir / filename_template.format(acc=acc) for acc in assembly_list}
 
     logging.info("Start processing of assembly-level summaries.")
 
-    logging.info(
-        "Generating taxonomy summary from assembly-level summaries <accession>.krona.txt"
-    )
+    logging.info("Generating taxonomy summary from assembly-level summaries <accession>.krona.txt")
     generate_taxonomy_summary(
         get_file_paths("taxonomy", "{acc}.krona.txt.gz"),
         f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}",
@@ -422,9 +403,7 @@ def summarise_analyses(
     )
 
     for summary_type, config in SUMMARY_TYPES_MAP.items():
-        logging.info(
-            f"Generating study-level {summary_type.capitalize()} summary from file <accession>_{summary_type}_summary.tsv.gz"
-        )
+        logging.info(f"Generating study-level {summary_type.capitalize()} summary from file <accession>_{summary_type}_summary.tsv.gz")
         generate_functional_summary(
             get_file_paths(config["folder"], f"{{acc}}_{summary_type}_summary.tsv.gz"),
             config["column_names"],
@@ -469,9 +448,7 @@ def merge_summaries(study_dir: str, output_prefix: str) -> None:
 
     logging.info("Generating combined assembly-level summaries")
     logging.info("Parsing summary files for taxonomic classification")
-    merge_taxonomy_summaries(
-        get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}"
-    )
+    merge_taxonomy_summaries(get_file_paths("taxonomy"), f"{output_prefix}_taxonomy_{OUTPUT_SUFFIX}")
 
     for summary_type, config in SUMMARY_TYPES_MAP.items():
         logging.info(f"Parsing summary files for {summary_type.capitalize()}.")
@@ -500,9 +477,7 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
     sk__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
     """
     if not summary_files:
-        raise FileNotFoundError(
-            "The required taxonomic classification summary files are missing. Exiting."
-        )
+        raise FileNotFoundError("The required taxonomic classification summary files are missing. Exiting.")
 
     summary_dfs = []
     for file in summary_files:
@@ -527,9 +502,7 @@ def merge_functional_summaries(
     summary_files: list[str],
     merge_keys: list[str],
     output_prefix: str,
-    label: Literal[
-        "go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"
-    ],
+    label: Literal["go", "goslim", "interpro", "ko", "sanntis", "antismash", "pfam", "kegg_modules"],
 ) -> None:
     """
     Merge multiple functional study-level summary files into a single study-level summary.
@@ -580,9 +553,7 @@ def merge_functional_summaries(
     output_file_name = f"{output_prefix}_{label}_{OUTPUT_SUFFIX}"
 
     if not summary_files:
-        logging.warning(
-            f"Skipping creation of {output_file_name} because no summaries were found for this type of functional annotation."
-        )
+        logging.warning(f"Skipping creation of {output_file_name} because no summaries were found for this type of functional annotation.")
         return
 
     validation_schema = SUMMARY_TYPES_MAP[label]["study_schema"]
@@ -596,9 +567,7 @@ def merge_functional_summaries(
     if len(dfs) == 1:
         merged_df = dfs[0]
     else:
-        merged_df = reduce(
-            lambda left, right: pd.merge(left, right, on=merge_keys, how="outer"), dfs
-        )
+        merged_df = reduce(lambda left, right: pd.merge(left, right, on=merge_keys, how="outer"), dfs)
 
     # Identify non-key columns (i.e. counts)
     value_columns = [col for col in merged_df.columns if col not in merge_keys]

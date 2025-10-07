@@ -24,6 +24,7 @@ dependencies = [
     "pandera>=0.23.1,<0.24",
     "pyfastx>=2.2.0,<3",
     "intervaltree>=3.1.0,<4",
+    "isort>=6.1.0",
 ]
 
 [build-system]
@@ -96,6 +97,17 @@ test = [
 dev = [
     "pre-commit>=4.2.0",
     "black>=25.1.0",
-    "flake8>=7.1.2",
-    "pep8-naming>=0.14.1"
+    "ruff>=0.8.4",
 ]
+
+[tool.black]
+line-length = 150
+
+[tool.ruff]
+line-length = 150
+
+[tool.ruff.lint]
+ignore = ["E741", "E203"]
+
+[tool.isort]
+profile = "black"

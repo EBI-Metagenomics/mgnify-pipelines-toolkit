@@ -28,45 +28,11 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 )
 
 
-# This is the schema for the whole DF
-class AmpliconPassedRunsSchema(pa.DataFrameModel):
-    """Class modelling a Pandera dataframe schema for amplicon passed runs.
-    Validates the generated dataframe when read by pandas.read_csv.
+class CoerceBaseDataFrameSchema(pa.DataFrameModel):
+    """Base schema for all dataframe models.
+
+    Provides common configuration for automatic type coercion.
     """
-
-    run: Series[str] = pa.Field(str_matches=r"(E|D|S)RR[0-9]{6,}", unique=True)
-    status: Series[str] = pa.Field(isin=["all_results", "no_asvs"])
-
-    class Config:
-        coerce = True
-
-
-class CompletedAnalysisSchema(pa.DataFrameModel):
-    """Class modelling a Pandera dataframe schema for completed assemblies.
-    Validates the generated dataframe when read by pandas.read_csv.
-    """
-
-    assembly: Series[str] = pa.Field(str_matches=r"ERZ\d{6,}", unique=True)
-    status: Series[str] = pa.Field(isin=["success"])
-
-    class Config:
-        coerce = True
-
-
-class BaseSummarySchema(pa.DataFrameModel):
-    """Base schema for summary files.
-
-    All summary schemas inherit from this base and use coerce=True by default.
-    """
-
-    @staticmethod
-    def is_unique(series: Series[str]) -> Series[bool]:
-        """Check if all values in a series are unique.
-
-        :param series: Series to check for uniqueness
-        :return: Boolean series indicating unique values
-        """
-        return ~series.duplicated()
 
     class Config:
         """Pandera configuration.
@@ -75,6 +41,32 @@ class BaseSummarySchema(pa.DataFrameModel):
         """
 
         coerce = True
+
+
+# This is the schema for the whole DF
+class AmpliconPassedRunsSchema(CoerceBaseDataFrameSchema):
+    """Class modelling a Pandera dataframe schema for amplicon passed runs.
+    Validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    run: Series[str] = pa.Field(str_matches=r"(E|D|S)RR[0-9]{6,}", unique=True)
+    status: Series[str] = pa.Field(isin=["all_results", "no_asvs"])
+
+
+class CompletedAnalysisSchema(CoerceBaseDataFrameSchema):
+    """Class modelling a Pandera dataframe schema for completed assemblies.
+    Validates the generated dataframe when read by pandas.read_csv.
+    """
+
+    assembly: Series[str] = pa.Field(str_matches=r"ERZ\d{6,}", unique=True)
+    status: Series[str] = pa.Field(isin=["success"])
+
+
+class BaseSummarySchema(CoerceBaseDataFrameSchema):
+    """Base schema for summary files.
+
+    All summary schemas inherit from this base and use coerce=True by default.
+    """
 
 
 class InterProSummarySchema(BaseSummarySchema):
@@ -136,89 +128,58 @@ class KEGGModulesSummarySchema(BaseSummarySchema):
     pathway_class: Series[str]
 
 
-class BaseStudySummarySchema(BaseSummarySchema):
+class BaseAssemblyStudySummarySchema(BaseSummarySchema):
     """Base schema for study summary files with ERZ* columns and count checks."""
 
-    @pa.check(r"^ERZ\d+", regex=True)
-    def count_columns_are_non_negative(self, s: Series[int]) -> Series[bool]:
-        return s >= 0
+    # Validate all ERZ columns are non-negative integers
+    __root__: Series[int] = pa.Field(ge=0, regex=r"^ERZ\d+")
 
 
-class GOStudySummarySchema(BaseStudySummarySchema):
-    GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$")
+class GOStudySummarySchema(BaseAssemblyStudySummarySchema):
+    GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$", unique=True)
     description: Series[str]
     category: Series[str]
 
-    @pa.check("GO")
-    def go_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
 
-
-class InterProStudySummarySchema(BaseStudySummarySchema):
-    IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$")
+class InterProStudySummarySchema(BaseAssemblyStudySummarySchema):
+    IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$", unique=True)
     description: Series[str]
 
-    @pa.check("IPR")
-    def interpro_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
+
+class AntismashStudySummarySchema(BaseAssemblyStudySummarySchema):
+    label: Series[str] = pa.Field(unique=True)
 
 
-class AntismashStudySummarySchema(BaseStudySummarySchema):
-    label: Series[str]
-
-    @pa.check("label")
-    def class_names_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
+class SanntisStudySummarySchema(BaseAssemblyStudySummarySchema):
+    # TODO: limit mibig to the avaiable mibig categories
+    nearest_mibig: Series[str] = pa.Field(unique=True)
 
 
-class SanntisStudySummarySchema(BaseStudySummarySchema):
-    nearest_mibig: Series[str]
-
-    @pa.check("nearest_mibig")
-    def mibig_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
+class KOStudySummarySchema(BaseAssemblyStudySummarySchema):
+    KO: Series[str] = pa.Field(unique=True)
 
 
-class KOStudySummarySchema(BaseStudySummarySchema):
-    KO: Series[str]
-
-    @pa.check("KO")
-    def ko_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
+class PFAMStudySummarySchema(BaseAssemblyStudySummarySchema):
+    PFAM: Series[str] = pa.Field(unique=True)
 
 
-class PFAMStudySummarySchema(BaseStudySummarySchema):
-    PFAM: Series[str]
-
-    @pa.check("PFAM")
-    def pfam_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
+class KEGGModulesStudySummarySchema(BaseAssemblyStudySummarySchema):
+    module_accession: Series[str] = pa.Field(unique=True)
 
 
-class KEGGModulesStudySummarySchema(BaseStudySummarySchema):
-    module_accession: Series[str]
-
-    @pa.check("module_accession")
-    def module_ids_unique(self, series: Series[str]) -> Series[bool]:
-        return self.is_unique(series)
-
-
-class TaxonomyStudySummarySchema(BaseStudySummarySchema):
+class TaxonomyStudySummarySchema(BaseAssemblyStudySummarySchema):
     pass
 
 
-class AmpliconNonINSDCPassedRunsSchema(pa.DataFrameModel):
+class AmpliconNonINSDCPassedRunsSchema(CoerceBaseDataFrameSchema):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation."""
 
     run: Series[str]
     status: Series[str] = pa.Field(isin=["all_results", "no_asvs"])
 
-    class Config:
-        coerce = True
-
 
 # This is the schema for the whole DF
-class TaxonSchema(pa.DataFrameModel):
+class TaxonSchema(CoerceBaseDataFrameSchema):
     """Class modelling a Pandera dataframe schema for taxonomy records.
     Validates the generated dataframe when read by pandas.read_csv.
     """
@@ -253,16 +214,8 @@ class TaxonSchema(pa.DataFrameModel):
 
         return series.apply(check_format)
 
-    class Config:
-        """Pandera configuration.
 
-        coerce: Automatically convert column dtypes to match schema
-        """
-
-        coerce = True
-
-
-class PR2TaxonSchema(pa.DataFrameModel):
+class PR2TaxonSchema(CoerceBaseDataFrameSchema):
     """Class modelling a Pandera dataframe schema for PR2 taxonomy records."""
 
     Domain: Series[str] = pa.Field(nullable=True)
@@ -296,17 +249,9 @@ class PR2TaxonSchema(pa.DataFrameModel):
 
         return series.apply(check_format)
 
-    class Config:
-        """Pandera configuration.
-
-        coerce: Automatically convert column dtypes to match schema
-        """
-
-        coerce = True
-
 
 # This is the schema for the whole DF
-class RawReadsPassedRunsSchema(pa.DataFrameModel):
+class RawReadsPassedRunsSchema(CoerceBaseDataFrameSchema):
     """Class modelling a Pandera dataframe schema for raw reads passed runs.
     Validates the generated dataframe when read by pandas.read_csv.
     """
@@ -314,21 +259,15 @@ class RawReadsPassedRunsSchema(pa.DataFrameModel):
     run: Series[str] = pa.Field(str_matches=r"(E|D|S)RR[0-9]{6,}", unique=True)
     status: Series[str] = pa.Field(isin=["all_results", "no_reads", "all_empty_results", "some_empty_results"])
 
-    class Config:
-        coerce = True
 
-
-class RawReadsNonINSDCPassedRunsSchema(pa.DataFrameModel):
+class RawReadsNonINSDCPassedRunsSchema(CoerceBaseDataFrameSchema):
     """Class modelling the same dataframe schema as the preceding one, except with no INSDC validation."""
 
     run: Series[str]
     status: Series[str] = pa.Field(isin=["all_results", "no_reads", "all_empty_results", "some_empty_results"])
 
-    class Config:
-        coerce = True
 
-
-class MotusTaxonSchema(pa.DataFrameModel):
+class MotusTaxonSchema(CoerceBaseDataFrameSchema):
     """Class for modelling a single Taxonomic Rank in mOTUs output.
     Essentially is just a special string with validation of the structure:
     `${rank}__${taxon}`
@@ -369,16 +308,8 @@ class MotusTaxonSchema(pa.DataFrameModel):
 
         return series.apply(check_format)
 
-    class Config:
-        """Pandera configuration.
 
-        coerce: Automatically convert column dtypes to match schema
-        """
-
-        coerce = True
-
-
-class FunctionProfileSchema(pa.DataFrameModel):
+class FunctionProfileSchema(CoerceBaseDataFrameSchema):
     """Class modelling a Pandera dataframe schema for functional profile data.
     This is what actually validates the generated dataframe when read by pandas.read_csv.
     """
@@ -386,9 +317,6 @@ class FunctionProfileSchema(pa.DataFrameModel):
     read_count: Series[int]
     coverage_depth: Series[float]
     coverage_breadth: Series[float]
-
-    class Config:
-        coerce = True
 
 
 def validate_dataframe(df: pd.DataFrame, schema: Type[pa.DataFrameModel], df_metadata: str) -> DataFrameBase:

@@ -44,6 +44,7 @@ tasks:
 
   clean:
     desc: Clean up generated files and caches
+    prompt: "This will delete your virtual env. Okay?"
     cmds:
       - rm -rf .venv
       - rm -rf .pytest_cache

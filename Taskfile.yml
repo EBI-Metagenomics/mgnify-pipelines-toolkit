@@ -1,0 +1,55 @@
+version: '3'
+
+tasks:
+  venv:
+    desc: Create a virtual environment with uv
+    cmds:
+      - uv venv
+      - echo "Virtual environment created. Activate with 'source .venv/bin/activate'"
+      - uv pip install -e '.[test,dev]'
+      - uv run pre-commit install
+    sources:
+      - pyproject.toml
+
+  test:
+    desc: Run tests with uv
+    cmds:
+      - uv run pytest
+
+  testk:
+    desc: "Run specific tests from a file (usage: task testk -- test_path)"
+    cmds:
+      - uv run pytest {{.CLI_ARGS}}
+
+  run:
+    desc: "Run toolkit scripts with uv (usage: task run -- <script_name> [args])"
+    cmds:
+      - uv run {{.CLI_ARGS}}
+
+  lint:
+    desc: Run linters (ruff check only)
+    cmds:
+      - uv run ruff check .
+
+  lint-fix:
+    desc: Run linters and fix issues automatically
+    cmds:
+      - uv run black .
+      - uv run ruff check --fix .
+
+  pre-commit:
+    desc: Install pre-commit hooks
+    cmds:
+      - uv run pre-commit
+
+  clean:
+    desc: Clean up generated files and caches
+    prompt: "This will delete your virtual env. Okay?"
+    cmds:
+      - rm -rf .venv
+      - rm -rf .pytest_cache
+      - rm -rf .ruff_cache
+      - rm -rf **/__pycache__
+      - rm -rf *.egg-info
+      - find . -type d -name __pycache__ -exec rm -rf {} +
+      - find . -type f -name "*.pyc" -delete

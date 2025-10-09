@@ -6,6 +6,7 @@
   stderr:
     contains:
       - "Error: No such option: --chromosome"
+
 - name: amplicon_study_summary_generator test_correct_args_summarise_withasvs_noninsdc
   tags:
     - amplicon_study_summary_generator
@@ -19,6 +20,7 @@
       md5sum: 227c7dade83cd0d25386f274378b72a7
     - path: "chunk1_DADA2-PR2_16S-V3-V4_asv_study_summary.tsv"
       md5sum: cc32ee3a746db003ffb066d7d2c652ed
+
 - name: amplicon_study_summary_generator test_correct_args_summarise_withoutasvs_noninsdc
   tags:
     - amplicon_study_summary_generator
@@ -28,6 +30,7 @@
       md5sum: a23b6a9b2d350e777e045c659e5d1480
     - path: "chunk2_SILVA-SSU_study_summary.tsv"
       md5sum: ba685a3526ae29a4151fe15de46eba43
+
 - name: amplicon_study_summary_generator test_insdc_error
   tags:
     - amplicon_study_summary_generator
@@ -35,7 +38,9 @@
   command: amplicon_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_1.csv -p chunk1
   stderr:
     contains:
-      - "{'run': 'mock_V3-V4_V9_double_amp'}"
+      - "failure cases:"
+      - "mock_V3-V4_V9_double_amp"
+
 - name: amplicon_study_summary_generator test_invalid_success_status
   tags:
     - amplicon_study_summary_generator
@@ -43,7 +48,8 @@
   command: amplicon_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/invalid_passed_runs.csv -p chunk1 --non_insdc
   stderr:
     contains:
-      - "{'status': 'all_resultsssss'}"
+      - "failure cases: all_resultsssss"
+
 - name: amplicon_study_summary_generator test_invalid_taxonomic_ranks
   tags:
     - amplicon_study_summary_generator
@@ -51,9 +57,11 @@
   command: amplicon_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/invalid_taxranks_runs.csv -p chunk1 --non_insdc
   stderr:
     contains:
-      - "{'Superkingdom': 'skkkk__Archaea'}"
-      - "{'Phylum': 'ppppp__Acidobacteriota'}"
-      - "{'Family': 'ffffff__Holophagaceae'}"
+      - "failure cases:"
+      - "skkkk__Archaea"
+      - "ppppp__Acidobacteriota"
+      - "ffffff__Holophagaceae"
+
 - name: amplicon_study_summary_generator test_correct_args_merge
   tags:
     - amplicon_study_summary_generator
@@ -67,6 +75,7 @@
       md5sum: 89d3251dc5b143bd08ee17613417d3e7
     - path: "merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
       md5sum: 503fa9bf4df51de93482710679c11268
+
 - name: amplicon_study_summary_generator test_singleton_summarise
   tags:
     - amplicon_study_summary_generator
@@ -80,6 +89,7 @@
       md5sum: f6a5ff7f68d6fec9c13a03c5a316a104
     - path: "singleton_DADA2-SILVA_16S-V3-V4_asv_study_summary.tsv"
       md5sum: e2bc6dda92eca3302a5168bb1274777a
+
 - name: amplicon_study_summary_generator test_singleton_merge
   tags:
     - amplicon_study_summary_generator
@@ -89,6 +99,7 @@
       md5sum: ba9468fdbde331afe860ac37101bdd4c  # identical copy of single run
     - path: "singleton-merged_DADA2-PR2_16S-V3-V4_study_summary.tsv"
       md5sum: f6a5ff7f68d6fec9c13a03c5a316a104
+
 - name: amplicon_study_summary_generator test_schema_error_handling
   tags:
     - amplicon_study_summary_generator
@@ -96,5 +107,7 @@
   exit_code: 1
   stderr:
     contains:
-      - "TaxonSchema validation failure for tests/fixtures/study_summary_inputs/amplicon/EMPTY/taxonomy-summary/SILVA-SSU/EMPTY_SILVA-SSU.txt"
+      - "Error while coercing 'Count' to type int64"
+      - "Column 'Superkingdom' failed element-wise validator number 0"
+      - "expected series 'Count' to have type int64, got object"
       - "DATATYPE_COERCION"

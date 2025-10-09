@@ -128,46 +128,39 @@ class KEGGModulesSummarySchema(BaseSummarySchema):
     pathway_class: Series[str]
 
 
-class BaseAssemblyStudySummarySchema(BaseSummarySchema):
-    """Base schema for study summary files with ERZ* columns and count checks."""
-
-    # Validate all ERZ columns are non-negative integers
-    __root__: Series[int] = pa.Field(ge=0, regex=r"^ERZ\d+")
-
-
-class GOStudySummarySchema(BaseAssemblyStudySummarySchema):
+class GOStudySummarySchema(BaseSummarySchema):
     GO: Series[str] = pa.Field(str_matches=r"^GO:\d{7}$", unique=True)
     description: Series[str]
     category: Series[str]
 
 
-class InterProStudySummarySchema(BaseAssemblyStudySummarySchema):
+class InterProStudySummarySchema(BaseSummarySchema):
     IPR: Series[str] = pa.Field(str_matches=r"^IPR\d{6}$", unique=True)
     description: Series[str]
 
 
-class AntismashStudySummarySchema(BaseAssemblyStudySummarySchema):
+class AntismashStudySummarySchema(BaseSummarySchema):
     label: Series[str] = pa.Field(unique=True)
 
 
-class SanntisStudySummarySchema(BaseAssemblyStudySummarySchema):
+class SanntisStudySummarySchema(BaseSummarySchema):
     # TODO: limit mibig to the avaiable mibig categories
     nearest_mibig: Series[str] = pa.Field(unique=True)
 
 
-class KOStudySummarySchema(BaseAssemblyStudySummarySchema):
+class KOStudySummarySchema(BaseSummarySchema):
     KO: Series[str] = pa.Field(unique=True)
 
 
-class PFAMStudySummarySchema(BaseAssemblyStudySummarySchema):
+class PFAMStudySummarySchema(BaseSummarySchema):
     PFAM: Series[str] = pa.Field(unique=True)
 
 
-class KEGGModulesStudySummarySchema(BaseAssemblyStudySummarySchema):
+class KEGGModulesStudySummarySchema(BaseSummarySchema):
     module_accession: Series[str] = pa.Field(unique=True)
 
 
-class TaxonomyStudySummarySchema(BaseAssemblyStudySummarySchema):
+class TaxonomyStudySummarySchema(BaseSummarySchema):
     pass
 
 

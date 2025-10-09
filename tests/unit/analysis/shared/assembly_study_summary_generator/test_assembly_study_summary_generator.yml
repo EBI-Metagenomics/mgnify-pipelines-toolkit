@@ -191,8 +191,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "{'status': 'sucess'}"
-      - "{'assembly': 'ERP1049445'}"
+      - "failure cases: ERP1049445"
+      - "ERP1049445"
 
 - name: assembly_study_summary_generator summarise_invalid_input_csv2 # duplicate in input.csv
   tags:
@@ -206,7 +206,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "Column 'assembly' failed element-wise validator number 0: <Check accessions_unique> failure cases: ERZ1049443"
+      - "series 'assembly' contains duplicate values"
+      - "ERZ1049443"
 
 - name: assembly_study_summary_generator summarise_invalid_go_summary # one column is missing
   tags:
@@ -220,7 +221,7 @@
   exit_code: 1
   stderr:
     contains:
-      - "failure_case      0  {'go': 'GO:0003824', 'term': 'catalytic activi...1"
+      - "column 'category' not in dataframe"
 
 - name: assembly_study_summary_generator summarise_invalid_go_summary2 # GO0055085 instead of GO:0055085
   tags:
@@ -234,7 +235,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "failure_case0      2  {'go': 'GO0055085'}"
+      - "failure cases:"
+      - "GO0055085"
 
 - name: assembly_study_summary_generator summarise_invalid_go_summary3 # duplicated GO in summary file
   tags:
@@ -248,7 +250,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "Column 'go' failed element-wise validator number 0: <Check go_ids_unique> failure cases: GO:0003674"
+      - "series 'go' contains duplicate values"
+      - "GO:0003674"
 
 - name: assembly_study_summary_generator summarise_invalid_interpro_summary # one column is missing
   tags:
@@ -262,7 +265,7 @@
   exit_code: 1
   stderr:
     contains:
-      - "failure_case      0  {'count': 3241, 'interpro_accession': 'IPR0274...1"
+      - "column 'description' not in dataframe"
 
 - name: assembly_study_summary_generator summarise_invalid_interpro_summary2 # IPRRR036291 instead of IPR036291
   tags:
@@ -276,7 +279,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "{'interpro_accession': 'IPRRR036291'}"
+      - "failure cases:"
+      - "IPRRR036291"
 
 - name: assembly_study_summary_generator summarise_invalid_interpro_summary3 # duplicated IPR id in summary file
   tags:
@@ -290,7 +294,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "Column 'interpro_accession' failed element-wise validator number 0: <Check interpro_ids_unique> failure cases: IPR036188"
+      - "series 'interpro_accession' contains duplicate values"
+      - "IPR036188"
 
 - name: assembly_study_summary_generator summarise_invalid_sanntis_summary # missing column
   tags:
@@ -304,7 +309,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "failure_case      1  {'count': 131, 'nearest_mibig': 'BGC0000866',"
+      - "column"
+      - "not in dataframe"
 
 - name: assembly_study_summary_generator summarise_invalid_antismash_summary # duplicated "label" value
   tags:
@@ -318,7 +324,7 @@
   exit_code: 1
   stderr:
     contains:
-      - "Column 'label' failed element-wise validator"
+      - "series 'label' contains duplicate values"
 
 - name: assembly_study_summary_generator summarise_invalid_ko_summary # missing column
   tags:
@@ -346,7 +352,8 @@
   exit_code: 1
   stderr:
     contains:
-      - "'pfam': 'PFF13558'}"
+      - "failure cases:"
+      - "PFF13558"
 
 - name: assembly_study_summary_generator summarise_invalid_modules_summary # fgd instead of % in completeness column
   tags:
@@ -360,4 +367,5 @@
   exit_code: 1
   stderr:
     contains:
-      - "{'completeness': 'fgd'}"
+      - "expected series 'completeness' to have type float64"
+      - "fgd"

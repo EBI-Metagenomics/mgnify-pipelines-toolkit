@@ -25,16 +25,29 @@ You should then be able to run the packages from the command-line. For example t
 
 `get_subunits -i ${easel_coords} -n ${meta.id}`
 
-## Adding a new script to the package
+## Development
 
-### Local development requirements
-Before starting any development, you should do these few steps:
-- Clone the repo if you haven't already and create a feature branch from the `dev` branch (NOT `main`).
-- Create a virtual environment with the tool of your choice (i.e. `conda create --name my_new_env`)
-- Activate you new environment (i.e. `conda activate my_new_env`)
-- Install dev dependencies `pip install -e '.[tests,dev]'`
-- Install pre-commit hooks `pre-commit install`
-- Run unit tests `pytest`
+### Quick Start with uv and Taskfile
+
+This project uses [uv](https://docs.astral.sh/uv/) for fast Python environment management and [Task](https://taskfile.dev/) for task automation.
+
+Prerequisites:
+- Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Install [Task](https://taskfile.dev/installation/)
+
+Common tasks:
+
+```bash
+task: Available tasks for this project:
+* clean:            Clean up generated files and caches
+* lint:             Run linters (ruff check only)
+* lint-fix:         Run linters and fix issues automatically
+* pre-commit:       Install pre-commit hooks
+* run:              Run toolkit scripts with uv (usage: task run -- <script_name> [args])
+* test:             Run tests with uv
+* testk:            Run specific tests from a file (usage: task testk -- test_path)
+* venv:             Create a virtual environment with uv
+```
 
 When doing these steps above, you ensure that the code you add will be linted and formatted properly.
 

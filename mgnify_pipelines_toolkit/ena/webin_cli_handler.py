@@ -199,7 +199,7 @@ def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
 def check_submission_status_test(report_text):
     submission_exists = False
     line_count = report_text.count("\n") + 1 if report_text else 0
-    if not "This was a TEST submission(s)." in report_text:
+    if "This was a TEST submission(s)." not in report_text:
         logging.info("Submission for that object failed on TEST server")
         return False, submission_exists
     else:
@@ -209,7 +209,7 @@ def check_submission_status_test(report_text):
             submission_exists = True
             return True, submission_exists
         elif "submission has been completed successfully" in report_text:
-            logging.info(f"Submission for that object was done first time on TEST server")
+            logging.info("Submission for that object was done first time on TEST server")
             return True, submission_exists
         else:
             logging.info("Submission for that object failed on TEST server")
@@ -219,14 +219,14 @@ def check_submission_status_test(report_text):
 def check_submission_status_live(report_text):
     submission_exists = False
     if "submission has been completed successfully" in report_text:
-        logging.info(f"Submission for that object was done first time on MAIN server")
+        logging.info("Submission for that object was done first time on MAIN server")
         return True, submission_exists
     elif "object being added already exists in the submission account with accession" in report_text:
-        logging.info(f"Submission for that object has already exist on MAIN server")
+        logging.info("Submission for that object has already exist on MAIN server")
         submission_exists = True
         return True, submission_exists
     else:
-        logging.info(f"Submission for that object failed on MAIN server")
+        logging.info("Submission for that object failed on MAIN server")
         return False, submission_exists
 
 
@@ -259,7 +259,7 @@ def check_report(fasta_location, mode, test):
 def check_result(fasta_location, context, assembly_name, mode, test):
     report_status, submission_exists = check_report(fasta_location, mode, test)
     if not report_status:
-        logging.info(f"Command failed. Check logs")
+        logging.info("Command failed. Check logs")
     else:
         # check submission folder
         if mode == "submit" and not submission_exists:

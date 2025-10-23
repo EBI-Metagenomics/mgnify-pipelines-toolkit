@@ -1,6 +1,4 @@
 import subprocess
-from datetime import datetime as dt
-from pathlib import Path
 
 
 class Tests:

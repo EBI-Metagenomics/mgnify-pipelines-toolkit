@@ -205,7 +205,7 @@ def check_submission_status_test(report_text):
     else:
         if line_count == 2:
             # webin-cli.report has only message 'This was a TEST submission(s).' in case of re-submission
-            logging.info(f"Submission for that object has already exist on TEST server")
+            logging.info("Submission for that object has already exist on TEST server")
             submission_exists = True
             return True, submission_exists
         elif "submission has been completed successfully" in report_text:

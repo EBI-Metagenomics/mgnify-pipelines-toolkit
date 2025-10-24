@@ -22,6 +22,7 @@ import time
 import subprocess
 import shutil
 import urllib.request
+import re
 
 from mgnify_pipelines_toolkit.constants.webin_cli import (
     ENA_WEBIN,
@@ -31,13 +32,17 @@ from mgnify_pipelines_toolkit.constants.webin_cli import (
     # RETRIES,
     # RETRY_DELAY,
     # XMS,
-    # XMX
+    # XMX,
+    # _INSDC_CENTRE_PREFIXES,
+    # ENA_ASSEMBLY_ACCESSION_REGEX
 )
 
 RETRIES = 3
 RETRY_DELAY = 5
 XMS = 10
 XMX = 10
+_INSDC_CENTRE_PREFIXES = "EDS"
+ENA_ASSEMBLY_ACCESSION_REGEX = f"([{_INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -226,9 +231,11 @@ def check_submission_status_test(report_text):
 
 
 def check_submission_status_live(report_text):
+    # for assembly webin report doesn't have information about re-submission
+    # second attempt just return the same result as first
     submission_exists = False
     if "submission has been completed successfully" in report_text:
-        logging.info("Successfully submitted object for the first time on MAIN server")
+        logging.info("Successfully submitted object on MAIN server")
         return True, submission_exists
     elif "object being added already exists in the submission account with accession" in report_text:
         logging.info("Submitted object already exists on MAIN server")
@@ -246,6 +253,11 @@ def check_report(fasta_location, mode, test):
     if os.path.exists(report_file):
         with open(report_file) as f:
             report_text = f.read()
+
+            assembly_accession_match_list = re.findall(
+                ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
+            if assembly_accession_match_list:
+                logging.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
 
         if mode == "submit":
             if test:

@@ -20,6 +20,7 @@ import json
 import os
 import time
 import subprocess
+import shutil
 import urllib.request
 
 from mgnify_pipelines_toolkit.constants.webin_cli import (
@@ -152,12 +153,20 @@ def create_execution_command_jar(jar):
     return cmd
 
 
-def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
+def is_webin_cli_installed():
+    return shutil.which("ena-webin-cli") is not None
 
-    cmd = ["ena-webin-cli"]  # mamba installation
+
+def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
     if jar:
         cmd = create_execution_command_jar(jar)  # webin-cli java execution
-
+    else:
+        # mamba installation in env
+        if is_webin_cli_installed():
+            cmd = ["ena-webin-cli"]  # mamba installation
+        else:
+            logging.error("ena-webin-cli was not found. Install it with mamba or use --download-webin-cli in execution")
+            exit(1)
     cmd += [f"-context={context}", f"-manifest={manifest}", f"-userName={webin}", f"-password='{password}'", f"-{mode}"]
     if test:
         cmd.append("-test")
@@ -200,33 +209,33 @@ def check_submission_status_test(report_text):
     submission_exists = False
     line_count = report_text.count("\n") + 1 if report_text else 0
     if "This was a TEST submission(s)." not in report_text:
-        logging.info("Submission for that object failed on TEST server")
+        logging.info("Submission failed on TEST server")
         return False, submission_exists
     else:
         if line_count == 2:
             # webin-cli.report has only message 'This was a TEST submission(s).' in case of re-submission
-            logging.info("Submission for that object has already exist on TEST server")
+            logging.info("Submitted object already exists on TEST server")
             submission_exists = True
             return True, submission_exists
         elif "submission has been completed successfully" in report_text:
-            logging.info("Submission for that object was done first time on TEST server")
+            logging.info("Successfully submitted object for the first time on TEST server")
             return True, submission_exists
         else:
-            logging.info("Submission for that object failed on TEST server")
+            logging.info("Submission failed on TEST server")
             return False, submission_exists
 
 
 def check_submission_status_live(report_text):
     submission_exists = False
     if "submission has been completed successfully" in report_text:
-        logging.info("Submission for that object was done first time on MAIN server")
+        logging.info("Successfully submitted object for the first time on MAIN server")
         return True, submission_exists
     elif "object being added already exists in the submission account with accession" in report_text:
-        logging.info("Submission for that object has already exist on MAIN server")
+        logging.info("Submitted object already exists on MAIN server")
         submission_exists = True
         return True, submission_exists
     else:
-        logging.info("Submission for that object failed on MAIN server")
+        logging.info("Submission failed on MAIN server")
         return False, submission_exists
 
 

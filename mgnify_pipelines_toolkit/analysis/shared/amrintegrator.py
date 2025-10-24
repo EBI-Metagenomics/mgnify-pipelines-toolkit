@@ -154,15 +154,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="Integration of antimicrobial resistance genes annotation with deeparg, rgi and amrfinderplus into a single gff"
     )
-    parser.add_argument("-d", "--deeparg_hamr", dest="deeparg_hamr", help="Result of deeparg tool after hamronization", required=False)
-    parser.add_argument("-r", "--rgi_hamr", dest="rgi_hamr", help="Result of rgi tool after hamronization", required=False)
-    parser.add_argument("-a", "--amrfp_out", dest="amrfp_out", help="Result of amrfinderplus tool", required=False)
+    parser.add_argument("-d", "--deeparg_hamr", dest="deeparg_hamr", help="Result of deeparg tool after hamronization", required=False, default=None)
+    parser.add_argument("-r", "--rgi_hamr", dest="rgi_hamr", help="Result of rgi tool after hamronization", required=False, default=None)
+    parser.add_argument("-a", "--amrfp_out", dest="amrfp_out", help="Result of amrfinderplus tool", required=False, default=None)
     parser.add_argument(
-        "-c", "--cds_gff", dest="cds_gff", help="GFF file containing the coordinates of the CDSs used for amr prediction", required=True
+        "-c", "--cds_gff", dest="cds_gff", help="GFF file containing the coordinates of the CDSs used for amr prediction", required=True, default=None
     )
-    parser.add_argument("-o", "--output", dest="output", help="Name of the output file", required=False)
+    parser.add_argument("-o", "--output", dest="output", help="Name of the output file", required=False, default="integrated_result.gff")
     args = parser.parse_args()
-    output_file = args.output if args.output else "integrated_result.gff"
 
     optional_inputs = {
         "deeparg": args.deeparg_hamr,
@@ -186,11 +185,11 @@ def main():
         protein_attributes = parse_amr_dict(amr_annotation)
 
         print("Parsing gff file and writing output file")
-        parse_gff(args.cds_gff, output_file, protein_attributes)
+        parse_gff(args.cds_gff, args.output, protein_attributes)
 
     else:
         print("No inputs to parse, generating empty output.")
-        with open(output_file, "w") as out:
+        with open(args.output, "w") as out:
             out.write("##gff-version 3\n")
 
 

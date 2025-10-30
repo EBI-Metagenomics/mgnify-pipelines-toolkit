@@ -15,7 +15,8 @@ class Tests:
             "tests/fixtures/webin_cli_handler/assembly.manifest",
             "--mode",
             "validate",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            "webin-cli-9.0.1.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"

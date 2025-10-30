@@ -4,6 +4,7 @@ import os
 
 
 timestamp = int(time.time())
+timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
 
 class Tests:
@@ -102,7 +103,7 @@ class Tests:
         with open("new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}\n"
                 file_out.write(line)
         command = [
             "python",
@@ -129,7 +130,7 @@ class Tests:
         with open("repeat_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}\n"
                 file_out.write(line)
         command = [
             "python",

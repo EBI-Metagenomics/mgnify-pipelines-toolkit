@@ -269,7 +269,6 @@ def check_report(fasta_location, mode, test):
 
 
 def check_result(result_location, context, assembly_name, mode, test):
-    # test assembly upload - no folder???
     report_status, submission_exists = check_report(result_location, mode, test)
     if not report_status:
         logging.info("Command failed. Check logs")

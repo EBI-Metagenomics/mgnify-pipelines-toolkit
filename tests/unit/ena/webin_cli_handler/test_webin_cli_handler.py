@@ -15,6 +15,7 @@ class Tests:
             "tests/fixtures/webin_cli_handler/assembly.manifest",
             "--mode",
             "validate",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -31,6 +32,7 @@ class Tests:
             "tests/fixtures/webin_cli_handler/genome.manifest",
             "--mode",
             "validate",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -55,6 +57,7 @@ class Tests:
             "--mode",
             "submit",
             "--test",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -80,6 +83,7 @@ class Tests:
             "--mode",
             "submit",
             "--test",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -104,6 +108,7 @@ class Tests:
             "--mode",
             "submit",
             "--test",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -129,6 +134,7 @@ class Tests:
             "--mode",
             "submit",
             "--test",
+            "--download-webin-cli",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"

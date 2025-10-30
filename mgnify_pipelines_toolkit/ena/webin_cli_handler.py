@@ -29,20 +29,12 @@ from mgnify_pipelines_toolkit.constants.webin_cli import (
     ENA_WEBIN_PASSWORD,
     REPORT_FILE,
     WEBIN_SUBMISSION_RESULT_FILES,
-    # RETRIES,
-    # RETRY_DELAY,
-    # XMS,
-    # XMX,
-    # _INSDC_CENTRE_PREFIXES,
-    # ENA_ASSEMBLY_ACCESSION_REGEX
+    RETRIES,
+    RETRY_DELAY,
+    XMS,
+    XMX,
+    ENA_ASSEMBLY_ACCESSION_REGEX,
 )
-
-RETRIES = 3
-RETRY_DELAY = 5
-XMS = 10
-XMX = 10
-_INSDC_CENTRE_PREFIXES = "EDS"
-ENA_ASSEMBLY_ACCESSION_REGEX = f"([{_INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -148,7 +140,7 @@ def check_manifest(manifest_file, workdir):
                     new_line = f"FASTA\t{workdir}/{path_fasta}"
                 file_out.write(new_line)
         logging.info(f"New manifest {manifest_for_submission} was created")
-    return fasta_location, assembly_name, manifest_for_submission
+    return assembly_name, manifest_for_submission
 
 
 def create_execution_command_jar(jar):
@@ -254,8 +246,7 @@ def check_report(fasta_location, mode, test):
         with open(report_file) as f:
             report_text = f.read()
 
-            assembly_accession_match_list = re.findall(
-                ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
+            assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
             if assembly_accession_match_list:
                 logging.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
 
@@ -277,19 +268,20 @@ def check_report(fasta_location, mode, test):
     return False, False
 
 
-def check_result(fasta_location, context, assembly_name, mode, test):
-    report_status, submission_exists = check_report(fasta_location, mode, test)
+def check_result(result_location, context, assembly_name, mode, test):
+    # test assembly upload - no folder???
+    report_status, submission_exists = check_report(result_location, mode, test)
     if not report_status:
         logging.info("Command failed. Check logs")
     else:
         # check submission folder
         if mode == "submit" and not submission_exists:
-            if not os.path.exists(os.path.join(fasta_location, context, assembly_name)):
+            if not os.path.exists(os.path.join(result_location, context, assembly_name)):
                 logging.info(f"No result found for {assembly_name}")
                 return False
             else:
                 # check mode folder
-                submission_path = os.path.join(fasta_location, context, assembly_name, mode)
+                submission_path = os.path.join(result_location, context, assembly_name, mode)
                 if not os.path.exists(submission_path):
                     logging.info(f"No submission result found for {assembly_name}/{mode}")
                     return False
@@ -313,7 +305,7 @@ def main():
 
     webin, password = get_webin_credentials()
 
-    fasta_location, assembly_name, manifest_for_submission = check_manifest(manifest_file, args.workdir)
+    assembly_name, manifest_for_submission = check_manifest(manifest_file, args.workdir)
 
     # pick execution method for webin-cli
     execute_jar = False
@@ -325,7 +317,9 @@ def main():
         manifest=manifest_for_submission, context=args.context, webin=webin, password=password, mode=args.mode, test=args.test, jar=execute_jar
     )
 
-    result_status = check_result(fasta_location=fasta_location, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test)
+    result_status = check_result(
+        result_location=os.path.dirname(manifest_for_submission), context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
+    )
 
     if result_status:
         logging.info(f"Submission/validation done for {manifest_for_submission}")

@@ -1282,9 +1282,7 @@ def test_assembly_study_summary_generator_correct_summarise(
     for file_path, expected_md5 in expected_files_md5.items():
         assert os.path.exists(file_path), f"Output file {file_path} does not exist"
         actual_md5 = calculate_md5(file_path)
-        assert (
-            actual_md5 == expected_md5
-        ), f"MD5 checksum mismatch for {file_path}. Expected: {expected_md5}, Actual: {actual_md5}"
+        assert actual_md5 == expected_md5, f"MD5 checksum mismatch for {file_path}. Expected: {expected_md5}, Actual: {actual_md5}"
 
 
 def test_assembly_study_summary_generator_no_sanntis(

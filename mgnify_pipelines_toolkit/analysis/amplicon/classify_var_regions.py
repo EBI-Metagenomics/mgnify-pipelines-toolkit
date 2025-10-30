@@ -73,11 +73,7 @@ def get_multiregion(raw_sequence_coords, regions):
         region_coverages[region] = overlap
 
     # check if any of the coords are inside the region
-    matched_regions = [
-        region
-        for region, limits in regions.items()
-        if calc_overlap(raw_sequence_coords, limits) >= MIN_OVERLAP
-    ]
+    matched_regions = [region for region, limits in regions.items() if calc_overlap(raw_sequence_coords, limits) >= MIN_OVERLAP]
     if len(matched_regions) > 1:
         amplified_region = "{}-{}".format(min(matched_regions), max(matched_regions))
     elif len(matched_regions) == 1:
@@ -121,13 +117,8 @@ def unsplit_region(long_region):
 
 
 def check_inclusiveness(more_frequent, less_frequent):
-    unsplit_more_frequent, unsplit_less_frequent = [
-        unsplit_region(region) for region in [more_frequent, less_frequent]
-    ]
-    return (
-        unsplit_more_frequent[0] <= unsplit_less_frequent[0]
-        and unsplit_more_frequent[1] >= unsplit_less_frequent[1]
-    )
+    unsplit_more_frequent, unsplit_less_frequent = [unsplit_region(region) for region in [more_frequent, less_frequent]]
+    return unsplit_more_frequent[0] <= unsplit_less_frequent[0] and unsplit_more_frequent[1] >= unsplit_less_frequent[1]
 
 
 def normalise_results(region_matches):
@@ -150,9 +141,7 @@ def normalise_results(region_matches):
         if count / len(region_matches) >= MAX_ERROR_PROPORTION and region != ""
     ]
     # sort by frequency in reverse order
-    var_region_proportions = sorted(
-        var_region_proportions, key=lambda x: x[1], reverse=True
-    )
+    var_region_proportions = sorted(var_region_proportions, key=lambda x: x[1], reverse=True)
 
     if len(var_region_proportions) == 1:
         return dict(var_region_proportions)
@@ -165,9 +154,7 @@ def normalise_results(region_matches):
             else:
                 return None
         else:
-            if min(
-                more_frequent[1], less_frequent[1]
-            ) > 0.1 and not check_inclusiveness(less_frequent[0], more_frequent[0]):
+            if min(more_frequent[1], less_frequent[1]) > 0.1 and not check_inclusiveness(less_frequent[0], more_frequent[0]):
                 return dict(var_region_proportions)
             else:
                 return None
@@ -221,9 +208,7 @@ def determine_marker_gene(domain):
         return "18S"
 
 
-def print_stats(
-    run_id, num_sequences, num_unsupported, num_inside_vr, run_result, stats_out
-):
+def print_stats(run_id, num_sequences, num_unsupported, num_inside_vr, run_result, stats_out):
     summary_num = dict()
     for cm in run_result:
         summary_num[cm] = dict()
@@ -233,14 +218,7 @@ def print_stats(
         del stats[""]
         summary_num[cm]["regions"] = ", ".join(stats.keys())
         summary_num[cm]["freqs"] = ", ".join(
-            [
-                (
-                    "{0:.4f}".format(val / len(run_result[cm]))
-                    if len(run_result[cm]) > 0
-                    else "0"
-                )
-                for val in stats.values()
-            ]
+            [("{0:.4f}".format(val / len(run_result[cm])) if len(run_result[cm]) > 0 else "0") for val in stats.values()]
         )
 
     print_str = ""
@@ -291,9 +269,7 @@ def print_to_table(tsv_out, results, per_read_info):
             marker_gene = determine_marker_gene(domain)
             for vr in amplified_regions.keys():
                 if not vr == "":
-                    record = "{}\tECO_0000363\tautomatic assertion\t{}\t{}\n".format(
-                        run, determine_marker_gene(domain), vr
-                    )
+                    record = "{}\tECO_0000363\tautomatic assertion\t{}\t{}\n".format(run, determine_marker_gene(domain), vr)
                     records.add(record)
                     records_regions.add(f"{marker_gene}.{vr}\n")
                     gene_hv_to_write.append(f"{marker_gene}.{vr}")
@@ -325,9 +301,7 @@ def retrieve_regions(
     sequence_counter_total = 0  # count how many sequences in total were analyzed
     sequence_counter_useful = 0  # count how many sequences an output was generated for
     normalised_matches = dict()  # dictionary that will contain results for all runs
-    failed_run_counter = (
-        0  # total number of excluded runs for any reason (except non-existing files)
-    )
+    failed_run_counter = 0  # total number of excluded runs for any reason (except non-existing files)
     run_counters = {k: 0 for k in ["one", "two", "ambiguous"]}  # counters
     seq_per_variable_region_count = dict()
 
@@ -343,13 +317,9 @@ def retrieve_regions(
         data = load_data(tblout_file)
         run_id = identify_run(tblout_file)
         multiregion_matches = dict()
-        unsupported_matches = (
-            0  # tracks the number of sequences that map to unsupported models
-        )
+        unsupported_matches = 0  # tracks the number of sequences that map to unsupported models
         primer_inside_vr = 0  # tracks the number of sequences that start and/or end inside a variable region
-        per_read_info = (
-            dict()
-        )  # dictionary will contain read names for each variable region
+        per_read_info = dict()  # dictionary will contain read names for each variable region
         all_region_coverages = defaultdict(lambda: defaultdict(list))
         for read in data:
             # Example structure of `read`
@@ -362,18 +332,13 @@ def retrieve_regions(
             if not regions == "unsupported":
                 matches, coverages = get_multiregion(limits, regions)
 
-                [
-                    all_region_coverages[domain][region].append(coverage)
-                    for region, coverage in coverages.items()
-                ]
+                [all_region_coverages[domain][region].append(coverage) for region, coverage in coverages.items()]
 
                 multiregion_matches.setdefault(read[2], []).append(matches)
                 if check_primer_position(limits, regions):
                     primer_inside_vr += 1
                 sequence_counter_useful += 1
-                per_read_info.setdefault(marker_gene + "." + matches, []).append(
-                    read[0]
-                )
+                per_read_info.setdefault(marker_gene + "." + matches, []).append(read[0])
             else:
                 unsupported_matches += 1
 
@@ -394,11 +359,7 @@ def retrieve_regions(
         if unsupported_fract >= MAX_ERROR_PROPORTION:
             failed_run_counter += 1
             logging.info("No output will be produced - too many unsupported models")
-            logging.info(
-                "Excluded\t{}\t{}\t{}\n".format(
-                    tblout_file, "{0:.2f}".format(unsupported_fract), len(data)
-                )
-            )
+            logging.info("Excluded\t{}\t{}\t{}\n".format(tblout_file, "{0:.2f}".format(unsupported_fract), len(data)))
             continue
 
         normalised_matches[run_id] = dict()
@@ -451,9 +412,7 @@ def retrieve_regions(
             run_result[determine_domain(model)] = result
             for reg, freq in result.items():
                 total_useful_sequences += len(model_regions) * freq
-                temp_seq_counter[determine_domain(model) + " " + reg] = (
-                    len(model_regions) * freq
-                )
+                temp_seq_counter[determine_domain(model) + " " + reg] = len(model_regions) * freq
         if total_useful_sequences / len(data) < 0.75 and run_status != "ambiguous":
             failed_run_counter += 1
             logging.info("No output will be produced - too few useful sequences")
@@ -511,16 +470,12 @@ def retrieve_regions(
         seq_count_out.write("{}\t{}\n".format(key, int(value)))
 
     logging.info(
-        "Analyzed {} files and {} sequences. Output generated for {} sequences".format(
-            file_counter, sequence_counter_total, sequence_counter_useful
-        )
+        "Analyzed {} files and {} sequences. Output generated for {} sequences".format(file_counter, sequence_counter_total, sequence_counter_useful)
     )
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(
-        description="Tool to determine which regions were amplified in 16S data"
-    )
+    parser = argparse.ArgumentParser(description="Tool to determine which regions were amplified in 16S data")
     parser.add_argument("files", nargs="+", help="A list of overlapped tblout files")
     parser.add_argument(
         "-d",
@@ -534,9 +489,7 @@ def parse_args(argv):
         default="amplified_regions",
         help="Prefix for all outputs",
     )
-    parser.add_argument(
-        "--statistics", action="store_true", help="Print statistics files"
-    )
+    parser.add_argument("--statistics", action="store_true", help="Print statistics files")
     return parser.parse_args(argv)
 
 
@@ -546,18 +499,10 @@ def main(argv=None):
     if not os.path.isdir(args.output_dir):
         os.mkdir(args.output_dir)
     prefix = os.path.join(args.output_dir, args.output_prefix)
-    stats_file = "{}.stats".format(
-        prefix
-    )  # detailed stats for each run before filtration steps
-    condensed_stats_file = "{}.condensed_stats".format(
-        prefix
-    )  # basic stats for the batch of runs
-    missing_files_log = "{}.missing_files.txt".format(
-        prefix
-    )  # the names of non-existent files
-    seq_count_log = "{}.seq_count.txt".format(
-        prefix
-    )  # the number of sequences per domain/VR in the batch
+    stats_file = "{}.stats".format(prefix)  # detailed stats for each run before filtration steps
+    condensed_stats_file = "{}.condensed_stats".format(prefix)  # basic stats for the batch of runs
+    missing_files_log = "{}.missing_files.txt".format(prefix)  # the names of non-existent files
+    seq_count_log = "{}.seq_count.txt".format(prefix)  # the number of sequences per domain/VR in the batch
     stats_out = open(stats_file, "w")
     condensed_out = open(condensed_stats_file, "w")
     missing_out = open(missing_files_log, "w")
@@ -568,9 +513,7 @@ def main(argv=None):
         "Fraction archaea\tFraction eukaryotes\tUnidentified bact\tRegions bact\tFreqs bact\t"
         "Unidentified arch\tRegions arch\tFreqs arch\tUnidentified euk\tRegions euk\tFreqs euk\n"
     )
-    retrieve_regions(
-        args.files, prefix, stats_out, condensed_out, missing_out, seq_count_out
-    )
+    retrieve_regions(args.files, prefix, stats_out, condensed_out, missing_out, seq_count_out)
     stats_out.close()
     condensed_out.close()
     missing_out.close()

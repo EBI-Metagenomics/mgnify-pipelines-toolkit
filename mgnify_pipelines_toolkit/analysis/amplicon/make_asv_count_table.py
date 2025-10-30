@@ -31,15 +31,9 @@ logging.basicConfig(level=logging.DEBUG)
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "-t", "--taxa", required=True, type=str, help="Path to taxa file"
-    )
-    parser.add_argument(
-        "-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file"
-    )
-    parser.add_argument(
-        "-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file"
-    )
+    parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
+    parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
+    parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
     parser.add_argument(
         "-a",
         "--amp",
@@ -47,9 +41,7 @@ def parse_args():
         type=str,
         help="Path to extracted amp_region reads from inference subworkflow",
     )
-    parser.add_argument(
-        "-hd", "--headers", required=True, type=str, help="Path to fastq headers"
-    )
+    parser.add_argument("-hd", "--headers", required=True, type=str, help="Path to fastq headers")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 
     args = parser.parse_args()
@@ -315,9 +307,7 @@ def main():
                 fw.write(f"{count}\t{tax_assignment}\n")
 
         asv_count_df = generate_asv_count_dict(asv_dict)
-        asv_count_df.to_csv(
-            f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
-        )
+        asv_count_df.to_csv(f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False)
 
 
 if __name__ == "__main__":

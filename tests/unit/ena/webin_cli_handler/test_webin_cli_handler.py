@@ -1,7 +1,9 @@
 from datetime import datetime as dt
 import subprocess
+import time
 
-timestamp = str(int(dt.timestamp(dt.now())))
+timestamp = int(time.time())
+
 
 class Tests:
     def test_validate_assembly_upload(tmp_path):
@@ -16,10 +18,9 @@ class Tests:
             "validate",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
-        print(result.stdout)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Submission validation succeeded" in result.stdout
-        assert "Submission/validation done for" in result.stdout
+        assert "Submission validation succeeded" in result.stderr
+        assert "Submission/validation done for" in result.stderr
 
     def test_validate_genome_upload(tmp_path):
         command = [
@@ -33,18 +34,16 @@ class Tests:
             "validate",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
-        print(result.stdout)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Submission validation succeeded" in result.stdout
-        assert "Submission/validation done for" in result.stdout
+        assert "Submission validation succeeded" in result.stderr
+        assert "Submission/validation done for" in result.stderr
 
     def test_submit_assembly_upload_first_time_test_server(tmp_path):
-        print(tmp_path)
-        test_manifest = "tests/fixtures/webin_cli_handler/assembly_test.manifest"
+        test_manifest = "tests/fixtures/webin_cli_handler/assembly.manifest"
         # create a new manifest with another alias for unique submission
-        with open("new_assembly.manifest", 'w') as file_out, open(test_manifest, 'r') as file_in:
+        with open("new_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
-                if 'ASSEMBLYNAME' in line:
+                if "ASSEMBLYNAME" in line:
                     line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
                 file_out.write(line)
         command = [
@@ -56,52 +55,84 @@ class Tests:
             "new_assembly.manifest",
             "--mode",
             "submit",
-            "--test"
+            "--test",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Assigned accessions: ERZ" in result.stderr
+        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Submission/validation done" in result.stderr
 
-    def test_submit_assembly_upload_second_time(tmp_path):
+    def test_submit_assembly_upload_second_time_test_server(tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/assembly.manifest"
+        # create a new manifest with same alias for second submission
+        with open("repeat_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+            for line in file_in:
+                if "ASSEMBLYNAME" in line:
+                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                file_out.write(line)
         command = [
             "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
             "-c",
             "genome",
             "-m",
-            "tests/fixtures/webin_cli_handler/assembly.manifest",
+            "repeat_assembly.manifest",
             "--mode",
             "submit",
-            "--test"
+            "--test",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Command completed successfully" in result.stderr
+        assert "Submitted object already exists on TEST server" in result.stderr
 
-    def test_submit_genome_upload_first_time(tmp_path):
+    def test_submit_genome_upload_first_time_test_server(tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
+        # create a new manifest with timestamp alias for first submission
+        with open("new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+            for line in file_in:
+                if "ASSEMBLYNAME" in line:
+                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                file_out.write(line)
         command = [
             "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
             "-c",
             "genome",
             "-m",
-            "tests/fixtures/webin_cli_handler/genome.manifest",
+            "new_genome.manifest",
             "--mode",
             "submit",
-            "--test"
+            "--test",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Assigned accessions: ERZ" in result.stderr
+        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Submission/validation done for new_genome.manifest" in result.stderr
 
-    def test_submit_genome_upload_second_time(tmp_path):
+    def test_submit_genome_upload_second_time_test_server(tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
+        # create a second manifest with same timestamp alias as first submission
+        with open("repeat_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+            for line in file_in:
+                if "ASSEMBLYNAME" in line:
+                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                file_out.write(line)
         command = [
             "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
             "-c",
             "genome",
             "-m",
-            "tests/fixtures/webin_cli_handler/genome.manifest",
+            "repeat_genome.manifest",
             "--mode",
             "submit",
-            "--test"
+            "--test",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
+        print(result.stderr)
+        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submission/validation done for repeat_genome.manifest" in result.stderr

@@ -49,12 +49,8 @@ def get_tblout_column_indices(tool):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Script detects bacterial 5S/SSU and LSU rRNA"
-    )
-    parser.add_argument(
-        "-i", "--input", dest="input", help="rrna.tblout.deoverlapped", required=True
-    )
+    parser = argparse.ArgumentParser(description="Script detects bacterial 5S/SSU and LSU rRNA")
+    parser.add_argument("-i", "--input", dest="input", help="rrna.tblout.deoverlapped", required=True)
     parser.add_argument(
         "-s",
         "--source",
@@ -120,9 +116,7 @@ def main():
                 total_length += interval[1] - interval[0]
             except (KeyError, IndexError, TypeError):
                 total_length = 0
-        new_line = "{}\t{}\t{:.2f}\n".format(
-            run_name, rna, float(total_length) / rRNAs_exp[rna] * 100
-        )
+        new_line = "{}\t{}\t{:.2f}\n".format(run_name, rna, float(total_length) / rRNAs_exp[rna] * 100)
         if args.outfile:
             file_out.write(new_line)
         else:

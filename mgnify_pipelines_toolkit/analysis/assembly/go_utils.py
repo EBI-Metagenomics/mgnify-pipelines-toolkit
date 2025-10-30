@@ -20,9 +20,7 @@ import os
 from pathlib import Path
 import re
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
 
 def count_and_assign_go_annotations(

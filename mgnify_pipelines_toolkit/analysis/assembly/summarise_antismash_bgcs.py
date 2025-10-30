@@ -20,9 +20,7 @@ import logging
 import pandas as pd
 
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
 ANTISMASH_VERSION = "7.1.x"
 
@@ -161,9 +159,7 @@ def parse_args():
     )
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-i", "--antismash-gff", help="antiSMASH GFF", required=True)
-    parser.add_argument(
-        "-o", "--output", help="Antisamsh summary TSV output file.", required=True
-    )
+    parser.add_argument("-o", "--output", help="Antisamsh summary TSV output file.", required=True)
     parser.add_argument(
         "-a",
         "--antismash-version",
@@ -173,10 +169,7 @@ def parse_args():
     )
     args = parser.parse_args()
     if args.antismash_version > ANTISMASH_VERSION:
-        logging.error(
-            "Provided version of antiSMASH is bigger than supported. "
-            "Please, make sure you have updated descriptions dictionary. Exit."
-        )
+        logging.error("Provided version of antiSMASH is bigger than supported. " "Please, make sure you have updated descriptions dictionary. Exit.")
         exit(1)
     return args.antismash_gff, args.output
 
@@ -192,18 +185,14 @@ def main():
             info = line.strip().split("\t")[8].split(";")
             entry_dict = {}
             for pair in info:
-                key, value = pair.split(
-                    "=", 1
-                )  # Ensure split only occurs at the first '=' occurrence
+                key, value = pair.split("=", 1)  # Ensure split only occurs at the first '=' occurrence
                 entry_dict[key] = value
             dict_list.append(entry_dict)
 
         # Convert to DataFrame
         df = pd.DataFrame(dict_list)
         df = df[df["product"].notna()]
-        df_grouped = (
-            df.groupby(["product"]).size().reset_index(name="count")
-        ).sort_values(by="count", ascending=False)
+        df_grouped = (df.groupby(["product"]).size().reset_index(name="count")).sort_values(by="count", ascending=False)
 
         df_grouped = df_grouped.rename(
             columns={
@@ -211,12 +200,7 @@ def main():
             }
         )
         df_grouped["description"] = df_grouped["label"].apply(
-            lambda x: ",".join(
-                [
-                    DESCRIPTIONS.get(cls.strip().lower(), cls.strip())
-                    for cls in x.split(",")
-                ]
-            )
+            lambda x: ",".join([DESCRIPTIONS.get(cls.strip().lower(), cls.strip()) for cls in x.split(",")])
         )
         df_grouped = df_grouped[["label", "description", "count"]]
         df_grouped.to_csv(output_filename, sep="\t", index=False)

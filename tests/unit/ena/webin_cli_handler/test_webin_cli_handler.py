@@ -1,8 +1,10 @@
 import subprocess
 import time
+import os
+
 
 timestamp = int(time.time())
-
+webin_version = os.getenv("WEBIN_CLI_VERSION")
 
 class Tests:
     def test_validate_assembly_upload(tmp_path):
@@ -16,7 +18,7 @@ class Tests:
             "--mode",
             "validate",
             "--webin-cli-jar",
-            "webin-cli-9.0.1.jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -33,7 +35,8 @@ class Tests:
             "tests/fixtures/webin_cli_handler/genome.manifest",
             "--mode",
             "validate",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -58,7 +61,8 @@ class Tests:
             "--mode",
             "submit",
             "--test",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -84,7 +88,8 @@ class Tests:
             "--mode",
             "submit",
             "--test",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -109,7 +114,8 @@ class Tests:
             "--mode",
             "submit",
             "--test",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -135,7 +141,8 @@ class Tests:
             "--mode",
             "submit",
             "--test",
-            "--download-webin-cli",
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"

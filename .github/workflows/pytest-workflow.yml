@@ -14,21 +14,25 @@ jobs:
     strategy:
       matrix:
         python-version: [ "3.11", "3.12", "3.13" ]
+    env:
+      ENA_WEBIN: ${{ secrets.ENA_WEBIN }}
+      ENA_WEBIN_PASSWORD: ${{ secrets.ENA_WEBIN_PASSWORD }}
+      WEBIN_CLI_VERSION: ${{ vars.WEBIN_CLI_VERSION }}
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: pip install -e .[test]
+
       - name: Download ena-webin-cli
-        run: wget https://github.com/enasequence/webin-cli/releases/download/9.0.1/webin-cli-9.0.1.jar
+        run: wget https://github.com/enasequence/webin-cli/releases/download/${WEBIN_CLI_VERSION}/webin-cli-${WEBIN_CLI_VERSION}.jar
+
       - uses: pavelzw/pytest-action@v2
-        env:
-          ENA_WEBIN: ${{ secrets.ENA_WEBIN }}
-          ENA_WEBIN_PASSWORD: ${{ secrets.ENA_WEBIN_PASSWORD }}
         with:
           emoji: false
           verbose: true

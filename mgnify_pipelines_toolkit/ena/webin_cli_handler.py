@@ -22,6 +22,7 @@ import time
 import subprocess
 import shutil
 import urllib.request
+from pathlib import Path
 import re
 
 from mgnify_pipelines_toolkit.constants.webin_cli import (
@@ -184,7 +185,7 @@ def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
             logging.info("✅ Command completed successfully")
             return result  # success
 
-        logging.info(f"❌ ena-webin-cli failed with code {result.returncode}")
+        logging.error(f"❌ ena-webin-cli failed with code {result.returncode}")
         message, exit_code = handle_webin_failures(result.stdout)
         logging.info(message)
 
@@ -193,33 +194,36 @@ def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
             return result
         elif attempt < RETRIES:
             sleep_time = RETRY_DELAY * (2 ** (attempt - 1))  # exponential backoff
-            logging.info(f"🔁 Retrying in {sleep_time} seconds...")
+            logging.warning(f"🔁 Retrying in {sleep_time} seconds...")
             time.sleep(sleep_time)
         else:
-            logging.info("💥 All retries failed.")
+            logging.error("💥 All retries failed.")
             message, exit_code = handle_webin_failures(result.stdout)
             logging.error(message)
             exit(exit_code)
 
 
 def check_submission_status_test(report_text):
-    submission_exists = False
+    """
+    Check the status of submission based on the webin-cli report text.
+    Returns:
+        (success: bool, submission_exists: bool)
+    """
     line_count = report_text.count("\n") + 1 if report_text else 0
     if "This was a TEST submission(s)." not in report_text:
         logging.info("Submission failed on TEST server")
-        return False, submission_exists
+        return False, False
     else:
         if line_count == 2:
             # webin-cli.report has only message 'This was a TEST submission(s).' in case of re-submission
             logging.info("Submitted object already exists on TEST server")
-            submission_exists = True
-            return True, submission_exists
+            return True, True
         elif "submission has been completed successfully" in report_text:
             logging.info("Successfully submitted object for the first time on TEST server")
-            return True, submission_exists
+            return True, False
         else:
             logging.info("Submission failed on TEST server")
-            return False, submission_exists
+            return False, False
 
 
 def check_submission_status_live(report_text):
@@ -239,33 +243,38 @@ def check_submission_status_live(report_text):
 
 
 def check_report(fasta_location, mode, test):
+    """
+    Function checks webin report and report status of submisison and existence
+    Returns:
+        (success: bool, submission_exists: bool)
+    """
     report_file = os.path.join(fasta_location, REPORT_FILE)
     logging.info(f"Checking webin report {report_file}")
-    submission_exists = False
-    if os.path.exists(report_file):
-        with open(report_file) as f:
-            report_text = f.read()
 
-            assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-            if assembly_accession_match_list:
-                logging.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
+    if not Path(report_file).exists():
+        logging.warning(f"⚠️ Report file not found: {report_file}")
+        return False, False
 
-        if mode == "submit":
-            if test:
-                return check_submission_status_test(report_text)
-            else:
-                return check_submission_status_live(report_text)
+    with open(report_file) as f:
+        report_text = f.read()
 
-        elif mode == "validate":
-            if "Submission(s) validated successfully." in report_text:
-                logging.info("Submission validation succeeded")
-                return True, submission_exists
-            else:
-                logging.info("Submission validation failed")
-                return False, submission_exists
-    else:
-        logging.info(f"⚠️ Report file not found: {report_file}")
-    return False, False
+        assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
+        if assembly_accession_match_list:
+            logging.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
+
+    if mode == "submit":
+        if test:
+            return check_submission_status_test(report_text)
+        else:
+            return check_submission_status_live(report_text)
+
+    elif mode == "validate":
+        if "Submission(s) validated successfully." in report_text:
+            logging.info("Submission validation succeeded")
+            return True, False
+        else:
+            logging.info("Submission validation failed")
+            return False, False
 
 
 def check_result(result_location, context, assembly_name, mode, test):

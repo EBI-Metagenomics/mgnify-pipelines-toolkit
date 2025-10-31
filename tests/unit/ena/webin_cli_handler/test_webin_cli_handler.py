@@ -7,7 +7,7 @@ timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
 
-class Tests:
+class WebinCliHandlerTests:
     def test_validate_assembly_upload(tmp_path):
         command = [
             "python",

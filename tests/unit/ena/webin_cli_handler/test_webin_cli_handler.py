@@ -50,7 +50,7 @@ class Tests:
         with open("new_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp}_a\n"
                 file_out.write(line)
         command = [
             "python",
@@ -77,7 +77,7 @@ class Tests:
         with open("repeat_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp}_a\n"
                 file_out.write(line)
         command = [
             "python",
@@ -103,7 +103,7 @@ class Tests:
         with open("new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g\n"
                 file_out.write(line)
         command = [
             "python",
@@ -130,7 +130,7 @@ class Tests:
         with open("repeat_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
-                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}\n"
+                    line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g\n"
                 file_out.write(line)
         command = [
             "python",

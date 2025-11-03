@@ -24,24 +24,40 @@ import shutil
 import urllib.request
 from pathlib import Path
 import re
+from typing import Tuple, Optional
 
-from mgnify_pipelines_toolkit.constants.webin_cli import (
-    ENA_WEBIN,
-    ENA_WEBIN_PASSWORD,
-    REPORT_FILE,
-    WEBIN_SUBMISSION_RESULT_FILES,
-    RETRIES,
-    RETRY_DELAY,
-    XMS,
-    XMX,
-    ENA_ASSEMBLY_ACCESSION_REGEX,
-)
+ENA_WEBIN = "ENA_WEBIN"
+ENA_WEBIN_PASSWORD = "ENA_WEBIN_PASSWORD"
+REPORT_FILE = "webin-cli.report"
+WEBIN_SUBMISSION_RESULT_FILES = ["analysis.xml", "receipt.xml", "submission.xml", "webin-submission.xml"]
+RETRIES = 3
+RETRY_DELAY = 5
+JAVA_HEAP_SIZE_INITIAL = 10
+JAVA_HEAP_SIZE_MAX = 10
+INSDC_CENTRE_PREFIXES = "EDS"
+ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def parse_arguments():
+    """
+    Parse command-line arguments for the Webin-CLI submission tool.
+
+    Returns:
+        argparse.Namespace: Parsed arguments object containing attributes:
+            - manifest (str): Path to manifest file
+            - context (str): Submission context: genome, transcriptome, etc.
+            - mode (str): 'submit' or 'validate'
+            - test (bool): Whether to use Webin test server
+            - workdir (Optional[str]): Working directory for temporary output
+            - download_webin_cli (bool): Whether to download Webin-CLI jar
+            - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
+            - download_webin_cli_version (Optional[str]): Specific Webin-CLI version
+            - webin_cli_jar (Optional[str]): Path to pre-downloaded jar file
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-m",
@@ -68,14 +84,30 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def get_latest_webin_cli_version():
+def get_latest_webin_cli_version() -> str:
+    """
+    Fetch the latest release version tag of ena-webin-cli from GitHub API.
+
+    Returns:
+        str: Latest version string (e.g. '9.0.1')
+    """
     api_url = "https://api.github.com/repos/enasequence/webin-cli/releases/latest"
     with urllib.request.urlopen(api_url) as response:
         data = json.load(response)
         return data["tag_name"]
 
 
-def download_webin_cli(version=None, dest_dir=""):
+def download_webin_cli(version: Optional[str] = None, dest_dir: str = "") -> None:
+    """
+    Download the Webin-CLI `.jar` file.
+
+    Args:
+        version (str, optional): Version to download. If None, fetch latest.
+        dest_dir (str): Directory to save the jar file.
+
+    Returns:
+        None
+    """
     if version is None:
         version = get_latest_webin_cli_version()
 
@@ -89,32 +121,41 @@ def download_webin_cli(version=None, dest_dir=""):
         logging.error(f"Failed to download webin-cli.jar: {e}")
 
 
-def ensure_webin_credentials_exist():
+def ensure_webin_credentials_exist() -> None:
     if ENA_WEBIN not in os.environ:
         raise Exception(f"The variable {ENA_WEBIN} is missing from the env.")
     if ENA_WEBIN_PASSWORD not in os.environ:
         raise Exception(f"The variable {ENA_WEBIN_PASSWORD} is missing from the env")
 
 
-def get_webin_credentials():
+def get_webin_credentials() -> Tuple[str, str]:
     ensure_webin_credentials_exist()
     webin = os.environ.get(ENA_WEBIN)
     password = os.environ.get(ENA_WEBIN_PASSWORD)
     return webin, password
 
 
-def handle_webin_failures(log):
-    message = log
-    exit_code = 1
+def handle_webin_failures(log: str) -> Tuple[str, float]:
     if "Invalid submission account user name or password." in log:
-        message = "Invalid credentials for Webin account. Exit 1"
+        return "Invalid credentials for Webin account. Exit 1", 1
     if "The object being added already exists in the submission account with accession:" in log:
-        message = "Submission already exists. Exit without errors."
-        exit_code = 0
-    return message, exit_code
+        return "Submission already exists. Exit without errors.", 0
+    return log, 1
 
 
-def check_manifest(manifest_file, workdir):
+def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str]:
+    """
+    Validate a manifest file and make paths absolute if needed.
+
+    Args:
+        manifest_file (str): Path to the original manifest.
+        workdir (str or None): Optional working directory to prefix FASTA paths.
+
+    Returns:
+        Tuple[str, str]:
+            - assembly_name (str): Parsed value of ASSEMBLYNAME.
+            - manifest_for_submission (str): Path to the (possibly updated) manifest file.
+    """
     if not os.path.exists(manifest_file):
         logging.error(f"{manifest_file} does not exist. Exit")
         exit(1)
@@ -144,10 +185,10 @@ def check_manifest(manifest_file, workdir):
     return assembly_name, manifest_for_submission
 
 
-def create_execution_command_jar(jar):
+def create_execution_command_jar(jar: str) -> str:
     logging.info(f"Using java execution {jar}")
-    logback_config = f"{os.path.abspath(__file__)}/webincli_logback.xml"
-    cmd = ["java", f"-Dlogback.configurationFile={logback_config}", f"-Xms{XMS}g", f"-Xmx{XMX}g", "-jar", jar]
+    logback_config = os.path.join(os.path.dirname(os.path.abspath(__file__)), "webincli_logback.xml")
+    cmd = ["java", f"-Dlogback.configurationFile={logback_config}", f"-Xms{JAVA_HEAP_SIZE_INITIAL}g", f"-Xmx{JAVA_HEAP_SIZE_MAX}g", "-jar", jar]
     return cmd
 
 
@@ -155,7 +196,7 @@ def is_webin_cli_installed():
     return shutil.which("ena-webin-cli") is not None
 
 
-def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
+def run_webin_cli(manifest: str, context: str, webin: str, password: str, mode: str, test: bool, jar: bool =False):
     if jar:
         cmd = create_execution_command_jar(jar)  # webin-cli java execution
     else:
@@ -203,11 +244,18 @@ def run_webin_cli(manifest, context, webin, password, mode, test, jar=False):
             exit(exit_code)
 
 
-def check_submission_status_test(report_text):
+def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
     """
-    Check the status of submission based on the webin-cli report text.
+    Check the test Webin-CLI submission report and determine submission status.
+
+    Args:
+        report_text (str): Contents of the Webin-CLI report file.
+
     Returns:
-        (success: bool, submission_exists: bool)
+        Tuple[bool, bool]: (success, submission_exists)
+            - success (bool): True if submission or validation succeeded.
+            - submission_exists (bool): True if this is a resubmission
+              (object already exists on the test server).
     """
     line_count = report_text.count("\n") + 1 if report_text else 0
     if "This was a TEST submission(s)." not in report_text:
@@ -226,7 +274,7 @@ def check_submission_status_test(report_text):
             return False, False
 
 
-def check_submission_status_live(report_text):
+def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
     # for assembly webin report doesn't have information about re-submission
     # second attempt just return the same result as first
     submission_exists = False
@@ -242,9 +290,9 @@ def check_submission_status_live(report_text):
         return False, submission_exists
 
 
-def check_report(fasta_location, mode, test):
+def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool]:
     """
-    Function checks webin report and report status of submisison and existence
+    Function checks webin report and report status of submission and existence
     Returns:
         (success: bool, submission_exists: bool)
     """
@@ -277,7 +325,7 @@ def check_report(fasta_location, mode, test):
             return False, False
 
 
-def check_result(result_location, context, assembly_name, mode, test):
+def check_result(result_location: str, context: str, assembly_name: str, mode: str, test: bool) -> bool:
     report_status, submission_exists = check_report(result_location, mode, test)
     if not report_status:
         logging.info("Command failed. Check logs")
@@ -309,11 +357,9 @@ def main():
     if args.download_webin_cli:
         download_webin_cli(version=args.download_webin_cli_version, dest_dir=args.download_webin_cli_directory)
 
-    manifest_file = args.manifest
-
     webin, password = get_webin_credentials()
 
-    assembly_name, manifest_for_submission = check_manifest(manifest_file, args.workdir)
+    assembly_name, manifest_for_submission = check_manifest(args.manifest, args.workdir)
 
     # pick execution method for webin-cli
     execute_jar = False

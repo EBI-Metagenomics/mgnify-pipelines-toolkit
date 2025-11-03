@@ -7,8 +7,8 @@ timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
 
-class WebinCliHandlerTests:
-    def test_validate_assembly_upload(tmp_path):
+class TestWebinCliHandler:
+    def test_validate_assembly_upload(self, tmp_path):
         command = [
             "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
@@ -26,7 +26,7 @@ class WebinCliHandlerTests:
         assert "Submission validation succeeded" in result.stderr
         assert "Submission/validation done for" in result.stderr
 
-    def test_validate_genome_upload(tmp_path):
+    def test_validate_genome_upload(self, tmp_path):
         command = [
             "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
@@ -44,7 +44,7 @@ class WebinCliHandlerTests:
         assert "Submission validation succeeded" in result.stderr
         assert "Submission/validation done for" in result.stderr
 
-    def test_submit_assembly_upload_first_time_test_server(tmp_path):
+    def test_submit_assembly_upload_first_time_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/assembly.manifest"
         # create a new manifest with another alias for unique submission
         with open("new_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
@@ -71,7 +71,7 @@ class WebinCliHandlerTests:
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done" in result.stderr
 
-    def test_submit_assembly_upload_second_time_test_server(tmp_path):
+    def test_submit_assembly_upload_second_time_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/assembly.manifest"
         # create a new manifest with same alias for second submission
         with open("repeat_assembly.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
@@ -97,7 +97,7 @@ class WebinCliHandlerTests:
         assert "Command completed successfully" in result.stderr
         assert "Submitted object already exists on TEST server" in result.stderr
 
-    def test_submit_genome_upload_first_time_test_server(tmp_path):
+    def test_submit_genome_upload_first_time_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
         # create a new manifest with timestamp alias for first submission
         with open("new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
@@ -124,7 +124,7 @@ class WebinCliHandlerTests:
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done for new_genome.manifest" in result.stderr
 
-    def test_submit_genome_upload_second_time_test_server(tmp_path):
+    def test_submit_genome_upload_second_time_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
         # create a second manifest with same timestamp alias as first submission
         with open("repeat_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:

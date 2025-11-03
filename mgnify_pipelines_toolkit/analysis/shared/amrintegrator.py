@@ -181,7 +181,7 @@ def main():
             else:
                 amr_annotation = parse_hamronized(amr_annotation, optional_inputs[name])
 
-        print("Parsing the annottion information per protein")
+        print("Parsing the annotation information per protein")
         protein_attributes = parse_amr_dict(amr_annotation)
 
         print("Parsing gff file and writing output file")

@@ -16,95 +16,164 @@
 
 
 import argparse
+import fileinput
 import gzip
+import logging
 import os
+from collections import defaultdict
+from typing import Dict, List, Optional, Union, Any, DefaultDict
 
+# Constant to simplify long strings
+DRUG_REPLACEMENT_STRINGS: Dict[str, str] = {
+    'macrolide antibiotic; lincosamide antibiotic; streptogramin antibiotic': "MLS",
+    'lincosamide/macrolide/streptogramin': "MLS"
+}
 
-def validate_inputs(optional_inputs):
-    valid_inputs = []
+# Set up logger
+logger = logging.getLogger(__name__)
+
+def validate_inputs(optional_inputs: Dict[str, Optional[str]]) -> List[str]:
+    """
+    Validate that input files exist and return a list of valid input names.
+    
+    Args:
+        optional_inputs: Dictionary mapping input names to file paths (can be None)
+        
+    Returns:
+        List of valid input names whose files exist
+    """
+    valid_inputs: List[str] = []
     for name, path in optional_inputs.items():
         if path and os.path.exists(path):
             valid_inputs.append(name)
         elif path:
-            print(f"Warning: file not found for '{name}' → {path}")
+            logger.warning(f"File not found for '{name}' → {path}")
     return valid_inputs
 
-
-def open_file(filename):
+def normalize_drug_class(drug_class: str) -> str:
     """
-    Open a file, handling both compressed (.gz) and uncompressed files.
-    Returns a file handle that can be used for reading.
+    Normalize drug class names by applying replacements and removing suffixes.
+    
+    Args:
+        drug_class: Raw drug class string
+        
+    Returns:
+        Normalized drug class string
     """
-    if filename.endswith(".gz"):
-        return gzip.open(filename, "rt")  # 'rt' for text mode
-    else:
-        return open(filename, "r")
+    # Apply known full-string replacements
+    for original, replacement in DRUG_REPLACEMENT_STRINGS.items():
+        if original in drug_class:
+            drug_class = drug_class.replace(original, replacement)
+
+    # Remove generic suffixes after replacement
+    drug_class = drug_class.replace(" antibiotic", "")
+
+    return drug_class
 
 
-def parse_hamronized(amr_annotation, input_file):
-    with open_file(input_file) as input_table:
+def parse_hamronized(
+    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], 
+    input_file: str
+) -> DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]:
+    """
+    Parse hamronized AMR annotation files (deeparg, rgi).
+    
+    Args:
+        amr_annotation: Nested defaultdict to store AMR annotations
+        input_file: Path to the hamronized input file
+        
+    Returns:
+        Updated amr_annotation defaultdict
+    """
+    with fileinput.hook_compressed(input_file, "r", encoding="utf-8") as input_table:
+        # Skipping the header line
         next(input_table)
         for line in input_table:
-            line_l = line.rstrip().split("\t")
-            analysis_software_name = line_l[6]
-            drug_class = (
-                line_l[13].replace("macrolide antibiotic; lincosamide antibiotic; streptogramin antibiotic", "MLS").replace(" antibiotic", "")
-            )
-            protein_id = line_l[20].split(" ")[0]
-            seq_identity = line_l[35]
-
-            drug_class_list = [cls.strip() for cls in drug_class.split(";")]
-
-            if protein_id not in amr_annotation:
-                amr_annotation[protein_id] = {}
+            line_l: List[str] = line.rstrip().split("\t")
+            analysis_software_name: str = line_l[6]
+            drug_class: str = normalize_drug_class(line_l[13])
+            protein_id: str = line_l[20].split(" ")[0]
+            seq_identity: str = line_l[35]
+            drug_class_list: List[str] = [cls.strip() for cls in drug_class.split(";")]
 
             amr_annotation[protein_id][analysis_software_name] = {"drug_class": drug_class_list, "seq_identity": seq_identity}
 
     return amr_annotation
 
 
-def parse_amrfinderplus(amr_annotation, input_file):
-    with open_file(input_file) as input_table:
+def parse_amrfinderplus(
+    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], 
+    input_file: str
+) -> DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]:
+    """
+    Parse AMRFinderPlus output files.
+    
+    Args:
+        amr_annotation: Nested defaultdict to store AMR annotations
+        input_file: Path to the AMRFinderPlus output file
+        
+    Returns:
+        Updated amr_annotation defaultdict
+    """
+    with fileinput.hook_compressed(input_file, "r", encoding="utf-8") as input_table:
+        # Skipping the header line
         next(input_table)
         for line in input_table:
-            drug_class_list = []
-            line_l = line.rstrip().split("\t")
-            analysis_software_name = "amrfinderplus"
-            drug_class_list.append(line_l[6].lower().replace("lincosamide/macrolide/streptogramin", "MLS"))
-            protein_id = line_l[0]
-            seq_identity = line_l[12]
-
-            if protein_id not in amr_annotation:
-                amr_annotation[protein_id] = {}
+            line_l: List[str] = line.rstrip().split("\t")
+            analysis_software_name: str = "amrfinderplus"
+            drug_class: str = normalize_drug_class(line_l[6].lower())
+            drug_class_list: List[str] = [cls.strip() for cls in drug_class.split(";")]         
+            protein_id: str = line_l[0]
+            seq_identity: str = line_l[12]
 
             amr_annotation[protein_id][analysis_software_name] = {"drug_class": drug_class_list, "seq_identity": seq_identity}
 
     return amr_annotation
 
 
-def parse_amr_dict(amr_annotation):
-    protein_attributes = {}
+def parse_amr_dict(
+    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]
+) -> Dict[str, List[str]]:
+    """
+    Parse AMR annotation dictionary and format protein attributes.
+    
+    Args:
+        amr_annotation: Nested defaultdict containing AMR annotations
+        
+    Returns:
+        Dictionary mapping protein IDs to lists of formatted attribute strings
+    """
+    protein_attributes: Dict[str, List[str]] = {}
 
     for protein, tools in amr_annotation.items():
-        all_drugs = []
-        tool_names = []
-        tool_identities = []
+        all_drugs: List[str] = []
+        tool_names: List[str] = []
+        tool_identities: List[str] = []
 
         for tool, info in tools.items():
             # Collect drug classes
-            all_drugs.extend(info.get("drug_class", []))
+            drug_classes: Union[List[str], str] = info.get("drug_class", [])
+            if isinstance(drug_classes, list):
+                all_drugs.extend(drug_classes)
+            else:
+                all_drugs.append(drug_classes)
+            
             # Collect tool name and identity value
             tool_names.append(tool)
-            tool_identities.append(info.get("seq_identity", "NA"))
+            seq_identity: Union[List[str], str] = info.get("seq_identity", "NA")
+            if isinstance(seq_identity, str):
+                tool_identities.append(seq_identity)
+            else:
+                tool_identities.append("NA")
 
         # Clean up and deduplicate drug classes
-        unique_drugs = list(dict.fromkeys(all_drugs))
+        unique_drugs: List[str] = list(dict.fromkeys(all_drugs))
         unique_drugs = [item.replace(" ", "_") for item in unique_drugs]
 
         # Build attribute strings
-        drugs_string = "drug_class=" + ",".join(unique_drugs)
-        tools_string = "amr_tool=" + ",".join(tool_names)
-        idents_string = "amr_tool_ident=" + ",".join(tool_identities)
+        drugs_string: str = "drug_class=" + ",".join(unique_drugs)
+        tools_string: str = "amr_tool=" + ",".join(tool_names)
+        idents_string: str = "amr_tool_ident=" + ",".join(tool_identities)
 
         # Append to dictionary
         protein_attributes[protein] = [drugs_string, tools_string, idents_string]
@@ -112,15 +181,27 @@ def parse_amr_dict(amr_annotation):
     return protein_attributes
 
 
-def parse_gff(cds_gff, output_file, protein_attributes):
+def parse_gff(
+    cds_gff: str, 
+    output_file: str, 
+    protein_attributes: Dict[str, List[str]]
+) -> None:
+    """
+    Parse GFF file and integrate AMR annotations into output GFF.
+    
+    Args:
+        cds_gff: Path to input GFF file containing CDS coordinates
+        output_file: Path to output GFF file
+        protein_attributes: Dictionary mapping protein IDs to attribute lists
+    """
     with (
-        open_file(cds_gff) as input_table,
+        fileinput.hook_compressed(cds_gff, "r", encoding="utf-8") as input_table,
         open(output_file, "w") as output_gff,
     ):
         output_gff.write("##gff-version 3\n")
         for line in input_table:
             line = line.rstrip()
-            line_l = line.split("\t")
+            line_l: List[str] = line.split("\t")
             # Annotation lines have exactly 9 columns
             if len(line_l) == 9:
                 (
@@ -135,23 +216,21 @@ def parse_gff(cds_gff, output_file, protein_attributes):
                     attr,
                 ) = line.rstrip().split("\t")
                 if seq_type == "CDS":
-                    features_list = attr.split(";")
-                    feature_id = features_list[0].split("=")[1]
+                    features_list: List[str] = attr.split(";")
+                    feature_id: str = features_list[0].split("=")[1]
                     if feature_id in protein_attributes:
-                        new_attribute = attr + ";".join(protein_attributes[feature_id])
+                        new_attribute: str = attr + ";" + ";".join(protein_attributes[feature_id])
                         line_l.pop(-1)
                         line_l.append(new_attribute)
-                        to_print = "\t".join(line_l)
+                        to_print: str = "\t".join(line_l)
                         output_gff.write(to_print + "\n")
 
-    # Example of the output:
-    ##gff-version 3
-    # b20_05_1.circ	Prodigal_v2.6.3	CDS	2925164	2927089	152.2	-	0	ID=b20_05_1.circ_2009;partial=00;start_type=ATG;rbs_motif=TAA;rbs_spacer=5bp;gc_cont=0.398;conf=100.00;score=152.15;cscore=148.05;sscore=4.10;rscore=-0.03;uscore=0.76;tscore=4.02;drug_class=tetracycline;amr_tool=rgi,amrfinderplus;amr_tool_ident=96.41,99.53
-    # b20_05_1.circ	Prodigal_v2.6.3	CDS	3085110	3088241	420.2	+	0	ID=b20_05_1.circ_2130;partial=00;start_type=ATG;rbs_motif=TAAAA;rbs_spacer=9bp;gc_cont=0.462;conf=99.99;score=420.21;cscore=405.19;sscore=15.02;rscore=8.54;uscore=1.45;tscore=4.02;drug_class=fluoroquinolone,tetracycline;amr_tool=rgi;amr_tool_ident=42.24
 
-
-def main():
-    parser = argparse.ArgumentParser(
+def main() -> None:
+    """
+    Main function to orchestrate AMR annotation integration.
+    """
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Integration of antimicrobial resistance genes annotation with deeparg, rgi and amrfinderplus into a single gff"
     )
     parser.add_argument("-d", "--deeparg_hamr", dest="deeparg_hamr", help="Result of deeparg tool after hamronization", required=False, default=None)
@@ -161,36 +240,51 @@ def main():
         "-c", "--cds_gff", dest="cds_gff", help="GFF file containing the coordinates of the CDSs used for amr prediction", required=True, default=None
     )
     parser.add_argument("-o", "--output", dest="output", help="Name of the output file", required=False, default="integrated_result.gff")
-    args = parser.parse_args()
+    parser.add_argument("-v", "--verbose", dest="verbose", help="Enable verbose logging (DEBUG level)", action="store_true", default=False)
+    args: argparse.Namespace = parser.parse_args()
 
-    optional_inputs = {
+    # Configure logging
+    log_level = logging.DEBUG if args.verbose else logging.INFO
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),  # Console output
+        ]
+    )
+
+    optional_inputs: Dict[str, Optional[str]] = {
         "deeparg": args.deeparg_hamr,
         "rgi": args.rgi_hamr,
         "amrfinderplus": args.amrfp_out,
     }
 
-    valid_inputs = validate_inputs(optional_inputs)
+    valid_inputs: List[str] = validate_inputs(optional_inputs)
     if valid_inputs:
-        amr_annotation = {}
-        print(f"The valid inputs provided for integration are: {', '.join(valid_inputs)}")
-        print("Parsing valid inputs")
+        amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]] = defaultdict(dict)
+        logger.info(f"The valid inputs provided for integration are: {', '.join(valid_inputs)}")
+        logger.info("Parsing valid inputs")
 
         for name in valid_inputs:
+            logger.debug(f"Processing {name} input file: {optional_inputs[name]}")
             if name == "amrfinderplus":
                 amr_annotation = parse_amrfinderplus(amr_annotation, optional_inputs[name])
             else:
                 amr_annotation = parse_hamronized(amr_annotation, optional_inputs[name])
 
-        print("Parsing the annotation information per protein")
-        protein_attributes = parse_amr_dict(amr_annotation)
+        logger.info("Parsing the annotation information per protein")
+        protein_attributes: Dict[str, List[str]] = parse_amr_dict(amr_annotation)
+        logger.debug(f"Found AMR annotations for {len(protein_attributes)} proteins")
 
-        print("Parsing gff file and writing output file")
+        logger.info("Parsing gff file and writing output file")
         parse_gff(args.cds_gff, args.output, protein_attributes)
+        logger.info(f"Output written to: {args.output}")
 
     else:
-        print("No inputs to parse, generating empty output.")
+        logger.info("No inputs to parse, generating empty output.")
         with open(args.output, "w") as out:
             out.write("##gff-version 3\n")
+        logger.info(f"Empty output written to: {args.output}")
 
 
 if __name__ == "__main__":

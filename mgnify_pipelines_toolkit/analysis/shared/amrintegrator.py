@@ -17,28 +17,28 @@
 
 import argparse
 import fileinput
-import gzip
 import logging
 import os
 from collections import defaultdict
-from typing import Dict, List, Optional, Union, Any, DefaultDict
+from typing import Dict, List, Optional, Union, DefaultDict
 
 # Constant to simplify long strings
 DRUG_REPLACEMENT_STRINGS: Dict[str, str] = {
-    'macrolide antibiotic; lincosamide antibiotic; streptogramin antibiotic': "MLS",
-    'lincosamide/macrolide/streptogramin': "MLS"
+    "macrolide antibiotic; lincosamide antibiotic; streptogramin antibiotic": "MLS",
+    "lincosamide/macrolide/streptogramin": "MLS",
 }
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
+
 def validate_inputs(optional_inputs: Dict[str, Optional[str]]) -> List[str]:
     """
     Validate that input files exist and return a list of valid input names.
-    
+
     Args:
         optional_inputs: Dictionary mapping input names to file paths (can be None)
-        
+
     Returns:
         List of valid input names whose files exist
     """
@@ -50,13 +50,14 @@ def validate_inputs(optional_inputs: Dict[str, Optional[str]]) -> List[str]:
             logger.warning(f"File not found for '{name}' → {path}")
     return valid_inputs
 
+
 def normalize_drug_class(drug_class: str) -> str:
     """
     Normalize drug class names by applying replacements and removing suffixes.
-    
+
     Args:
         drug_class: Raw drug class string
-        
+
     Returns:
         Normalized drug class string
     """
@@ -72,16 +73,15 @@ def normalize_drug_class(drug_class: str) -> str:
 
 
 def parse_hamronized(
-    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], 
-    input_file: str
+    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], input_file: str
 ) -> DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]:
     """
     Parse hamronized AMR annotation files (deeparg, rgi).
-    
+
     Args:
         amr_annotation: Nested defaultdict to store AMR annotations
         input_file: Path to the hamronized input file
-        
+
     Returns:
         Updated amr_annotation defaultdict
     """
@@ -102,16 +102,15 @@ def parse_hamronized(
 
 
 def parse_amrfinderplus(
-    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], 
-    input_file: str
+    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]], input_file: str
 ) -> DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]:
     """
     Parse AMRFinderPlus output files.
-    
+
     Args:
         amr_annotation: Nested defaultdict to store AMR annotations
         input_file: Path to the AMRFinderPlus output file
-        
+
     Returns:
         Updated amr_annotation defaultdict
     """
@@ -122,7 +121,7 @@ def parse_amrfinderplus(
             line_l: List[str] = line.rstrip().split("\t")
             analysis_software_name: str = "amrfinderplus"
             drug_class: str = normalize_drug_class(line_l[6].lower())
-            drug_class_list: List[str] = [cls.strip() for cls in drug_class.split(";")]         
+            drug_class_list: List[str] = [cls.strip() for cls in drug_class.split(";")]
             protein_id: str = line_l[0]
             seq_identity: str = line_l[12]
 
@@ -131,15 +130,13 @@ def parse_amrfinderplus(
     return amr_annotation
 
 
-def parse_amr_dict(
-    amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]
-) -> Dict[str, List[str]]:
+def parse_amr_dict(amr_annotation: DefaultDict[str, Dict[str, Dict[str, Union[List[str], str]]]]) -> Dict[str, List[str]]:
     """
     Parse AMR annotation dictionary and format protein attributes.
-    
+
     Args:
         amr_annotation: Nested defaultdict containing AMR annotations
-        
+
     Returns:
         Dictionary mapping protein IDs to lists of formatted attribute strings
     """
@@ -157,7 +154,7 @@ def parse_amr_dict(
                 all_drugs.extend(drug_classes)
             else:
                 all_drugs.append(drug_classes)
-            
+
             # Collect tool name and identity value
             tool_names.append(tool)
             seq_identity: Union[List[str], str] = info.get("seq_identity", "NA")
@@ -181,14 +178,10 @@ def parse_amr_dict(
     return protein_attributes
 
 
-def parse_gff(
-    cds_gff: str, 
-    output_file: str, 
-    protein_attributes: Dict[str, List[str]]
-) -> None:
+def parse_gff(cds_gff: str, output_file: str, protein_attributes: Dict[str, List[str]]) -> None:
     """
     Parse GFF file and integrate AMR annotations into output GFF.
-    
+
     Args:
         cds_gff: Path to input GFF file containing CDS coordinates
         output_file: Path to output GFF file
@@ -247,10 +240,10 @@ def main() -> None:
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(
         level=log_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.StreamHandler(),  # Console output
-        ]
+        ],
     )
 
     optional_inputs: Dict[str, Optional[str]] = {

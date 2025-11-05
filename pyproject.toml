@@ -112,8 +112,3 @@ ignore = ["E741", "E203"]
 
 [tool.isort]
 profile = "black"
-
-[dependency-groups]
-dev = [
-    "pytest-workflow>=2.1.0",
-]

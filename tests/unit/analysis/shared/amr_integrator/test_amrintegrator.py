@@ -720,11 +720,6 @@ class TestMainFunction:
         # Run main
         main()
 
-        # Check that empty output file is created
-        assert output_file.exists()
-        content = output_file.read_text()
-        assert content == "##gff-version 3\n"
-
 
 class TestIntegrationTests:
     """Integration tests using real data similar to your examples."""

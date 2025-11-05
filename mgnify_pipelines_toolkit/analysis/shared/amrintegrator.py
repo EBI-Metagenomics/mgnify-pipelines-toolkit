@@ -274,10 +274,7 @@ def main() -> None:
         logger.info(f"Output written to: {args.output}")
 
     else:
-        logger.info("No inputs to parse, generating empty output.")
-        with open(args.output, "w") as out:
-            out.write("##gff-version 3\n")
-        logger.info(f"Empty output written to: {args.output}")
+        logger.info("No inputs to parse, the output file is not generated.")
 
 
 if __name__ == "__main__":

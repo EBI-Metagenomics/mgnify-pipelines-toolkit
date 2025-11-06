@@ -33,7 +33,6 @@ def parse_args():
 
     parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
     parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
-    parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
     parser.add_argument(
         "-a",
         "--amp",
@@ -48,15 +47,14 @@ def parse_args():
 
     taxa = args.taxa
     fwd = args.fwd
-    rev = args.rev
     amp = args.amp
     headers = args.headers
     sample = args.sample
 
-    return taxa, fwd, rev, amp, headers, sample
+    return taxa, fwd, amp, headers, sample
 
 
-def order_df(taxa_df):
+def order_df(taxa_df: pd.DataFrame) -> pd.DataFrame:
     if len(taxa_df.columns) == 9:
         taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
     elif len(taxa_df.columns) == 10:
@@ -68,7 +66,7 @@ def order_df(taxa_df):
     return taxa_df
 
 
-def make_tax_assignment_dict_silva(taxa_df, asv_dict):
+def make_tax_assignment_dict_silva(taxa_df: pd.DataFrame, asv_dict: defaultdict) -> defaultdict:
     tax_assignment_dict = defaultdict(int)
 
     for i in range(len(taxa_df)):
@@ -148,7 +146,7 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
     return tax_assignment_dict
 
 
-def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
+def make_tax_assignment_dict_pr2(taxa_df: pd.DataFrame, asv_dict: defaultdict) -> defaultdict:
     tax_assignment_dict = defaultdict(int)
 
     for i in range(len(taxa_df)):
@@ -233,7 +231,7 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
     return tax_assignment_dict
 
 
-def generate_asv_count_df(asv_dict):
+def generate_asv_count_df(asv_dict: defaultdict) -> pd.DataFrame:
     res_dict = defaultdict(list)
 
     for asv_id, count in asv_dict.items():
@@ -251,16 +249,9 @@ def generate_asv_count_df(asv_dict):
 
 
 def main():
-    taxa, fwd, rev, amp, headers, sample = parse_args()
+    taxa, fwd, amp, headers, sample = parse_args()
 
     fwd_fr = open(fwd, "r")
-    paired_end = True
-
-    if rev is None:
-        paired_end = False
-        rev_fr = [True]
-    else:
-        rev_fr = open(rev, "r")
 
     taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
     taxa_df = taxa_df.fillna("0")
@@ -293,8 +284,6 @@ def main():
             asv_dict[f"seq_{line_fwd}"] += 1
 
     fwd_fr.close()
-    if paired_end:
-        rev_fr.close()
 
     if asv_dict:  # if there are matches between taxonomic and ASV annotations
         if ref_db == "silva":

@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.3.0"
+version = "1.4.1"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -54,6 +54,7 @@ library_strategy_check = "mgnify_pipelines_toolkit.analysis.shared.library_strat
 markergene_study_summary = "mgnify_pipelines_toolkit.analysis.shared.markergene_study_summary:main"
 convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.convert_cmscan_to_cmsearch_tblout:main"
 dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:cli"
+amr_integrator = "mgnify_pipelines_toolkit.analysis.shared.amrintegrator:main"
 # analysis.amplicon #
 classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"
 make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"

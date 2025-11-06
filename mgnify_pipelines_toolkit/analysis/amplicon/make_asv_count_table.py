@@ -15,14 +15,14 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import logging
+from collections import defaultdict
 
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _SILVA_TAX_RANKS,
     _PR2_TAX_RANKS,
+    _SILVA_TAX_RANKS,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,15 +31,9 @@ logging.basicConfig(level=logging.DEBUG)
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "-t", "--taxa", required=True, type=str, help="Path to taxa file"
-    )
-    parser.add_argument(
-        "-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file"
-    )
-    parser.add_argument(
-        "-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file"
-    )
+    parser.add_argument("-t", "--taxa", required=True, type=str, help="Path to taxa file")
+    parser.add_argument("-f", "--fwd", required=True, type=str, help="Path to DADA2 forward map file")
+    parser.add_argument("-r", "--rev", required=False, type=str, help="Path to DADA2 reverse map file")
     parser.add_argument(
         "-a",
         "--amp",
@@ -47,9 +41,7 @@ def parse_args():
         type=str,
         help="Path to extracted amp_region reads from inference subworkflow",
     )
-    parser.add_argument(
-        "-hd", "--headers", required=True, type=str, help="Path to fastq headers"
-    )
+    parser.add_argument("-hd", "--headers", required=True, type=str, help="Path to fastq headers")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 
     args = parser.parse_args()
@@ -99,7 +91,6 @@ def make_tax_assignment_dict_silva(taxa_df, asv_dict):
         tax_assignment = ""
 
         while True:
-
             if sk != "0":
                 sk = "_".join(sk.split(" "))
                 tax_assignment += sk
@@ -242,12 +233,10 @@ def make_tax_assignment_dict_pr2(taxa_df, asv_dict):
     return tax_assignment_dict
 
 
-def generate_asv_count_dict(asv_dict):
-
+def generate_asv_count_df(asv_dict):
     res_dict = defaultdict(list)
 
     for asv_id, count in asv_dict.items():
-
         if count == 0:
             continue
 
@@ -283,6 +272,13 @@ def main():
     headers = [read.split(" ")[0][1:] for read in list(open(headers, "r"))]
     amp_region = ".".join(amp.split(".")[1:3])
 
+    ref_db = ""
+
+    if len(taxa_df.columns) == 9:
+        ref_db = "silva"
+    elif len(taxa_df.columns) == 10:
+        ref_db = "pr2"
+
     asv_dict = defaultdict(int)
 
     counter = -1
@@ -301,23 +297,22 @@ def main():
         rev_fr.close()
 
     if asv_dict:  # if there are matches between taxonomic and ASV annotations
-        ref_db = ""
-
-        if len(taxa_df.columns) == 9:
+        if ref_db == "silva":
             tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
-            ref_db = "silva"
-        elif len(taxa_df.columns) == 10:
+        elif ref_db == "pr2":
             tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
-            ref_db = "pr2"
 
         with open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
             for tax_assignment, count in tax_assignment_dict.items():
                 fw.write(f"{count}\t{tax_assignment}\n")
 
-        asv_count_df = generate_asv_count_dict(asv_dict)
-        asv_count_df.to_csv(
-            f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False
-        )
+        asv_count_df = generate_asv_count_df(asv_dict)
+        asv_count_df.to_csv(f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False)
+    else:  # create empty files instead, a lot easier this way since these will be concatenated in a later pipeline module
+        fw = open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w")
+        fw.close()
+        fw = open(f"./{sample}_{amp_region}_asv_read_counts.tsv", "w")
+        fw.close()
 
 
 if __name__ == "__main__":

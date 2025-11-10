@@ -154,7 +154,7 @@ TAXONOMY_COLUMN_NAMES = [
     "Species",
 ]
 
-OUTPUT_SUFFIX = "summary.tsv"
+OUTPUT_SUFFIX = "study_summary.tsv"
 
 
 @click.group()

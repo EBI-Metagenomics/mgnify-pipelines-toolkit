@@ -14,27 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import shutil
-from shutil import SameFileError
-
 import argparse
-from collections import defaultdict
-import pathlib
 import logging
+import pathlib
+import shutil
+from collections import defaultdict
+from pathlib import Path
+from shutil import SameFileError
+from typing import Dict, List, Literal, Union
 
 import click
-import requests
-from typing import Union, Dict, List, Literal
-from pathlib import Path
-
 import pandas as pd
 import pyfastx
+import requests
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _SILVA_TAX_RANKS,
-    _PR2_TAX_RANKS,
+    PR2_TAX_RANKS,
     SHORT_PR2_TAX_RANKS,
-    SHORT_TAX_RANKS,
+    SHORT_SILVA_TAX_RANKS,
+    SILVA_TAX_RANKS,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -49,7 +47,6 @@ def cli():
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -212,9 +209,9 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
     )
 
     if db == "SILVA":
-        ranks = _SILVA_TAX_RANKS
+        ranks = SILVA_TAX_RANKS
     else:
-        ranks = _PR2_TAX_RANKS
+        ranks = PR2_TAX_RANKS
 
     # Turn empty taxa into NA
     for rank in ranks:
@@ -292,9 +289,9 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]) ->
     )
 
     if db == "SILVA-SSU":
-        ranks = _SILVA_TAX_RANKS
+        ranks = SILVA_TAX_RANKS
     else:
-        ranks = _PR2_TAX_RANKS
+        ranks = PR2_TAX_RANKS
 
     # Turn empty taxa into NA
     for rank in ranks:
@@ -432,10 +429,10 @@ def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILV
     """
 
     if db == "SILVA-SSU":
-        ranks = _SILVA_TAX_RANKS
-        short_ranks = SHORT_TAX_RANKS
+        ranks = SILVA_TAX_RANKS
+        short_ranks = SHORT_SILVA_TAX_RANKS
     else:
-        ranks = _PR2_TAX_RANKS
+        ranks = PR2_TAX_RANKS
         short_ranks = SHORT_PR2_TAX_RANKS
 
     closedref_dict = {}
@@ -538,7 +535,6 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     # Generate DwC-ready files for ASV results
     asv_dbs = ["SILVA", "PR2"]
     for db in asv_dbs:
-
         asv_dict = get_asv_dict(runs_df, root_path, db)
         all_merged_df = []
 
@@ -567,7 +563,6 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     # Generate DwC-ready files for closed reference results
     closedref_dbs = ["SILVA-SSU", "PR2"]
     for db in closedref_dbs:
-
         closedref_dict = get_closedref_dict(runs_df, root_path, db)
         all_merged_df = []
 

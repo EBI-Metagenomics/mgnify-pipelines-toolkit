@@ -27,8 +27,8 @@ import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.db_labels import ASV_TAXDB_LABELS, TAXDB_LABELS
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _PR2_TAX_RANKS,
-    _SILVA_TAX_RANKS,
+    PR2_TAX_RANKS,
+    SILVA_TAX_RANKS,
 )
 from mgnify_pipelines_toolkit.schemas.dataframes import (
     AmpliconNonINSDCPassedRunsSchema,
@@ -144,9 +144,9 @@ def generate_db_summary(db_label: str, tax_dfs: defaultdict[Path], output_prefix
         df_list = []
 
         if "PR2" in db_label:
-            long_tax_ranks = _PR2_TAX_RANKS
+            long_tax_ranks = PR2_TAX_RANKS
         else:
-            long_tax_ranks = _SILVA_TAX_RANKS
+            long_tax_ranks = SILVA_TAX_RANKS
 
         for run_acc, tax_df in tax_dfs.items():
             res_df = parse_one_tax_file(run_acc, tax_df, long_tax_ranks)
@@ -164,9 +164,9 @@ def generate_db_summary(db_label: str, tax_dfs: defaultdict[Path], output_prefix
 
     elif db_label in ASV_TAXDB_LABELS:
         if "PR2" in db_label:
-            long_tax_ranks = _PR2_TAX_RANKS
+            long_tax_ranks = PR2_TAX_RANKS
         else:
-            long_tax_ranks = _SILVA_TAX_RANKS
+            long_tax_ranks = SILVA_TAX_RANKS
 
         amp_region_dict = defaultdict(list)
 

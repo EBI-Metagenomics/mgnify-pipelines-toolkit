@@ -17,13 +17,15 @@
 # Script removes any reads with ambiguous bases (Ns) for the purpose of DADA2
 
 import argparse
-import gzip
+import fileinput
+import logging
 
 from Bio import SeqIO, bgzf
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -45,10 +47,9 @@ def parse_args():
 
 
 def main():
-
     fwd, rev, sample = parse_args()
 
-    fwd_handle = gzip.open(fwd, "rt")
+    fwd_handle = fileinput.hook_compressed(fwd, "r")
     fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
     fwd_handle.close()
 
@@ -57,14 +58,15 @@ def main():
     if rev is None:
         paired_end = False
     else:
-        rev_handle = gzip.open(rev, "rt")
+        rev_handle = fileinput.hook_compressed(rev, "r")
         rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
         rev_handle.close()
+
+    logging.info(f"Number of reads at the beginning: {len(fwd_reads)}")
 
     remove_set = set()
 
     for read_id in fwd_reads.keys():
-
         fwd_read_seq = str(fwd_reads[read_id].seq)
         if len(fwd_read_seq) < 100:
             remove_set.add(read_id)
@@ -88,6 +90,8 @@ def main():
     [fwd_reads.pop(read_id) for read_id in remove_set]
     if paired_end:
         [rev_reads.pop(read_id) for read_id in remove_set]
+
+    logging.info(f"Number of reads after filtering: {len(fwd_reads)}")
 
     if paired_end:
         fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb")

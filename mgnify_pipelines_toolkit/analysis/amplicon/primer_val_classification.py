@@ -15,21 +15,24 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
+import logging
 import re
+from collections import defaultdict
 
+import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
-import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
-    REGIONS_16S_BACTERIA,
     REGIONS_16S_ARCHAEA,
+    REGIONS_16S_BACTERIA,
     REGIONS_18S,
 )
 
 STRAND_FWD = "fwd"
 STRAND_REV = "rev"
+
+logging.basicConfig(level=logging.INFO)
 
 
 def parse_args():
@@ -71,17 +74,23 @@ def get_amp_region(beg, end, strand, model):
     margin = -10
 
     for region, region_coords in model.items():
-
         region_beg = region_coords[0]
+        region_end = region_coords[1]
         beg_diff = region_beg - beg
         end_diff = region_beg - end
 
         if strand == STRAND_FWD:
             if beg_diff >= margin and end_diff >= margin:
                 return region
+            elif (region_beg - beg) < margin and (region_end - end) > margin:
+                logging.warning(f"This primer is within HV region {region}: {str(int(beg))}-{str(int(end))} vs {region_beg}-{region_end}")
+                return ""
         else:
             if beg_diff >= margin and end_diff >= margin:
                 return prev_region
+            elif (region_beg - beg) < margin and (region_end - end) > margin:
+                logging.warning(f"This primer is within HV region {region}: {str(int(beg))}-{str(int(end))} vs {region_beg}-{region_end}")
+                return ""
 
         prev_region = region
 
@@ -89,10 +98,11 @@ def get_amp_region(beg, end, strand, model):
 
 
 def main():
-
     input, fasta, sample, single_end = parse_args()
     res_dict = defaultdict(list)
+
     fasta_dict = SeqIO.to_dict(SeqIO.parse(fasta, "fasta"))
+    logging.info(f"Total primers read (including permutations): {len(fasta_dict)}")
 
     fwd_primers_fw = open("./fwd_primers.fasta", "w")
     rev_primers_fw = open("./rev_primers.fasta", "w")
@@ -100,6 +110,7 @@ def main():
     matched_primers_list = []
 
     with open(input, "r") as fr:
+        logging.info(f"Reading deoverlap file: {input}")
         for line in fr:
             line = line.strip()
             line = re.sub("[ \t]+", "\t", line)
@@ -133,10 +144,6 @@ def main():
                 amp_region = "Unknown"
                 model = ""
 
-            res_dict["Run"].append(sample)
-            res_dict["AssertionEvidence"].append("ECO_0000363")
-            res_dict["AssertionMethod"].append("automatic assertion")
-
             strand = ""
 
             if primer_name[-1] == "F":
@@ -144,18 +151,26 @@ def main():
             elif primer_name[-1] == "R":
                 strand = STRAND_REV
             else:
-                print(f"Not sure what strand this is, exiting: {primer_name}")
+                logging.warning(f"Not sure what strand this is, skipping: {primer_name}")
+                continue
 
             if model:
+                logging.info(f"Checking match coordinates for primer {primer_name}")
                 amp_region = get_amp_region(beg, end, strand, model)
+
+            if not amp_region:
+                logging.warning(f"Primer validation failed for {primer_name}, skipping")
+                continue
 
             primer_seq = str(fasta_dict[cleaned_primer_name].seq)
 
+            res_dict["Run"].append(sample)
+            res_dict["AssertionEvidence"].append("ECO_0000363")
+            res_dict["AssertionMethod"].append("automatic assertion")
             res_dict["Gene"].append(gene)
             res_dict["VariableRegion"].append(amp_region)
             res_dict["PrimerName"].append(cleaned_primer_name)
             res_dict["PrimerStrand"].append(strand)
-            res_dict["PrimerSeq"].append(primer_seq)
 
             if strand == STRAND_FWD:
                 fwd_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
@@ -164,11 +179,21 @@ def main():
                     primer_seq = Seq(primer_seq).reverse_complement()
                 rev_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
 
-            matched_primers_list.append(cleaned_primer_name)
+            res_dict["PrimerSeq"].append(primer_seq)
 
-    res_df = pd.DataFrame.from_dict(res_dict)
+            matched_primers_list.append(cleaned_primer_name)
+            logging.info(f"Added {cleaned_primer_name} to list of matched primers")
+
     res_tsv_name = f"./{sample}_primer_validation.tsv"
-    res_df.to_csv(res_tsv_name, sep="\t", index=False) if not res_df.empty else open(res_tsv_name, "w").close()
+    if res_dict:
+        res_df = pd.DataFrame.from_dict(res_dict)
+        res_df.to_csv(res_tsv_name, sep="\t", index=False) if not res_df.empty else open(res_tsv_name, "w").close()
+        logging.info(f"{len(res_df)} primers validated, generating output")
+
+    else:
+        logging.warning("No primers were successfully validated, generating empty outputs")
+        primer_val_fw = open(res_tsv_name, "w")
+        primer_val_fw.close()
 
     fwd_primers_fw.close()
     rev_primers_fw.close()

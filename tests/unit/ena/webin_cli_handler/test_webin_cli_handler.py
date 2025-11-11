@@ -10,8 +10,7 @@ webin_version = os.getenv("WEBIN_CLI_VERSION")
 class TestWebinCliHandler:
     def test_validate_assembly_upload(self, tmp_path):
         command = [
-            "python",
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",
@@ -28,8 +27,7 @@ class TestWebinCliHandler:
 
     def test_validate_genome_upload(self, tmp_path):
         command = [
-            "python",
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",
@@ -53,7 +51,6 @@ class TestWebinCliHandler:
                     line = f"ASSEMBLYNAME\ttest_{timestamp}_a\n"
                 file_out.write(line)
         command = [
-            "python",
             "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
             "-c",
             "genome",

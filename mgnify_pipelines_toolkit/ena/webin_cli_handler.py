@@ -179,12 +179,12 @@ def ensure_webin_credentials_exist() -> None:
         raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing from the environment.")
 
 
-def get_webin_credentials() -> Tuple[str, str]:
+def get_webin_credentials() -> str:
     """
     Retrieve Webin credentials from environment variables.
 
     Returns:
-        Tuple[str, str]: Webin username and password.
+        str: Webin username.
 
     Raises:
         WebinCredentialsError: If credentials are missing.
@@ -192,10 +192,20 @@ def get_webin_credentials() -> Tuple[str, str]:
     ensure_webin_credentials_exist()
     webin = os.environ.get(ENA_WEBIN)
     password = os.environ.get(ENA_WEBIN_PASSWORD)
-    return webin, password
+    if not password:
+        raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing password.")
+    return webin
 
 
 def handle_webin_failures(log: str) -> Tuple[str, int]:
+    """
+    Function to re-define webin-cli failures.
+    In some cases webin-cli exits with 1 that doesn't always mean a real error.
+    That function currently catches some known issues (but can be expanded).
+    In case of:
+    - invalid credentials exit code should be 1 and no retries following that process
+    - object being added already exists - exit without error because webin-cli doesn't do re-submission of same item
+    """
     if "Invalid submission account user name or password." in log:
         return "Invalid credentials for Webin account. Exit 1", 1
     if "The object being added already exists in the submission account with accession:" in log:
@@ -203,96 +213,67 @@ def handle_webin_failures(log: str) -> Tuple[str, int]:
     return log, 1
 
 
-def parse_manifest(manifest_path: Path) -> Tuple[str, Path, str]:
+def parse_manifest(manifest_path: Path) -> dict[str, str]:
     """
-    Parse manifest file to extract assembly name, FASTA file path, and content.
-
+    Parse manifest file to extract ASSEMBLYNAME, FASTA file path, and other fields into dict.
+    Example:
+    STUDY	PRJ1
+    SAMPLE	SAMEA7687881
+    RUN_REF	ERR4918394
+    ASSEMBLYNAME	ERR4918394_d41d8cd98f00
+    ASSEMBLY_TYPE	primary metagenome
+    COVERAGE	20.0
+    PROGRAM	metaSPADES v3.12.1
+    PLATFORM	DNBSEQ-G400
+    FASTA	tests/fixtures/ERR4918394.fasta.gz
+    TPA	true
     Args:
         manifest_path (Path): Path to the manifest file.
-
     Returns:
-        Tuple[str, Path, str]:
-            - assembly_name (str): Parsed value of ASSEMBLYNAME field.
-            - fasta_path (Path): Path to the FASTA file referenced in manifest.
-            - manifest_text (str): Full content of the manifest file.
-
-    Raises:
-        ManifestValidationError: If manifest file doesn't exist or required fields are missing.
+        Dict[str, str]:
+            - keys: field names from the manifest
+            - values: corresponding values from the manifest
     """
+    manifest_dict = {}
+    with open(manifest_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue  # skip empty lines
+            parts = line.split(None, 1)  # split on any whitespace
+            if len(parts) != 2:
+                continue  # skip malformed lines
+            field, value = parts
+            manifest_dict[field] = value
+    return manifest_dict
+
+
+def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str]:
+    """
+    Validate a manifest file and create an update one with absolute paths if needed.
+    Args:
+        manifest_file (str): Path to the original manifest.
+        workdir (str or None): Optional working directory to prefix FASTA paths.
+    Returns:
+        Tuple[str, str]:
+            - assembly_name (str): Parsed value of ASSEMBLYNAME.
+            - manifest_for_submission (str): Path to the (possibly updated) manifest file.
+    Raises:
+        ManifestValidationError: If manifest validation fails or FASTA file not found.
+    """
+    manifest_path = Path(manifest_file)
     if not manifest_path.exists():
         logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
-
-    manifest_text = manifest_path.read_text()
-    assembly_name = None
-    fasta_path = None
-
-    for line in manifest_text.splitlines():
-        if line.startswith("ASSEMBLYNAME"):
-            assembly_name = line.replace("ASSEMBLYNAME", "").strip()
-        elif line.startswith("FASTA"):
-            # Extract FASTA path from line (format: FASTA\tpath/to/file)
-            fasta_path_str = line.split("\t", 1)[1].strip() if "\t" in line else line.replace("FASTA", "").strip()
-            fasta_path = Path(fasta_path_str)
-
+    manifest_dict = parse_manifest(manifest_path)
+    assembly_name = manifest_dict.get("ASSEMBLYNAME")
+    fasta_path = Path(manifest_dict.get("FASTA")) if manifest_dict.get("FASTA") else None
     if not assembly_name:
         logger.error(f"ASSEMBLYNAME field not found in {manifest_path}")
         raise ManifestValidationError(f"ASSEMBLYNAME field not found in {manifest_path}")
     if not fasta_path:
         logger.error(f"FASTA field not found in {manifest_path}")
         raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
-
-    return assembly_name, fasta_path, manifest_text
-
-
-def create_absolute_path_manifest(manifest_text: str, manifest_path: Path, workdir: Path, fasta_path: Path) -> Path:
-    """
-    Create an updated manifest file with absolute FASTA paths.
-
-    Args:
-        manifest_text (str): Content of the original manifest file.
-        manifest_path (Path): Original manifest file path.
-        workdir (Path): Working directory to use as base for relative paths.
-        fasta_path (Path): FASTA file path from original manifest.
-
-    Returns:
-        Path: Path to the newly created manifest with absolute paths.
-    """
-    updated_manifest_path = manifest_path.parent / f"updated_{manifest_path.name}"
-
-    updated_lines = []
-    for line in manifest_text.splitlines():
-        if line.startswith("FASTA"):
-            # Replace relative path with absolute path
-            absolute_fasta = workdir / fasta_path
-            updated_lines.append(f"FASTA\t{absolute_fasta}")
-        else:
-            updated_lines.append(line)
-
-    updated_manifest_path.write_text("\n".join(updated_lines) + "\n")
-    logger.info(f"New manifest {updated_manifest_path} was created with absolute paths")
-    return updated_manifest_path
-
-
-def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str]:
-    """
-    Validate a manifest file and make paths absolute if needed.
-
-    Args:
-        manifest_file (str): Path to the original manifest.
-        workdir (str or None): Optional working directory to prefix FASTA paths.
-
-    Returns:
-        Tuple[str, str]:
-            - assembly_name (str): Parsed value of ASSEMBLYNAME.
-            - manifest_for_submission (str): Path to the (possibly updated) manifest file.
-
-    Raises:
-        ManifestValidationError: If manifest validation fails or FASTA file not found.
-    """
-    manifest_path = Path(manifest_file)
-    assembly_name, fasta_path, manifest_text = parse_manifest(manifest_path)
-
     # Validate FASTA file exists (if absolute path or workdir provided)
     if fasta_path.is_absolute():
         if not fasta_path.exists():
@@ -305,12 +286,13 @@ def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str
             logger.error(f"FASTA file not found: {full_fasta_path}")
             raise ManifestValidationError(f"FASTA file not found: {full_fasta_path}")
 
-    # Create updated manifest with absolute paths if needed
-    if workdir and not fasta_path.is_absolute():
-        workdir_path = Path(workdir)
-        updated_manifest_path = create_absolute_path_manifest(manifest_text, manifest_path, workdir_path, fasta_path)
+        manifest_dict["FASTA"] = str(full_fasta_path)
+        updated_manifest_path = manifest_path.parent / f"updated_{manifest_path.name}"
+        with open(updated_manifest_path, "w") as f:
+            for key, value in manifest_dict.items():
+                f.write(f"{key}\t{value}\n")
+        logger.info(f"New manifest {updated_manifest_path} was created with absolute paths")
         return assembly_name, str(updated_manifest_path)
-
     return assembly_name, manifest_file
 
 
@@ -318,7 +300,6 @@ def get_webin_cli_command(
     manifest: str,
     context: str,
     webin: str,
-    password: str,
     mode: str,
     test: bool,
     jar: Optional[str] = None,
@@ -388,7 +369,7 @@ def get_webin_cli_command(
         f"-context={context}",
         f"-manifest={manifest}",
         f"-userName={webin}",
-        f"-password={password}",
+        f"-passwordEnv={ENA_WEBIN_PASSWORD}",
         f"-{mode}"
     ]
 
@@ -402,7 +383,6 @@ def run_webin_cli(
     manifest: str,
     context: str,
     webin: str,
-    password: str,
     mode: str,
     test: bool,
     jar: Optional[str] = None,
@@ -434,7 +414,7 @@ def run_webin_cli(
         WebinCredentialsError: If credentials are invalid.
         WebinCLIExecutionError: If all retry attempts fail.
     """
-    cmd = get_webin_cli_command(manifest, context, webin, password, mode, test, jar, java_heap_size_initial, java_heap_size_max)
+    cmd = get_webin_cli_command(manifest, context, webin, mode, test, jar, java_heap_size_initial, java_heap_size_max)
 
     for attempt in range(1, retries + 1):
         logger.info(f"🚀 Running ena-webin-cli (attempt {attempt}/{retries})...")
@@ -701,7 +681,7 @@ def main() -> int:
         if args.download_webin_cli:
             download_webin_cli(version=args.download_webin_cli_version, dest_dir=args.download_webin_cli_directory)
 
-        webin, password = get_webin_credentials()
+        webin = get_webin_credentials()
 
         assembly_name, manifest_for_submission = check_manifest(args.manifest, args.workdir)
 
@@ -716,7 +696,6 @@ def main() -> int:
             manifest=manifest_for_submission,
             context=args.context,
             webin=webin,
-            password=password,
             mode=args.mode,
             test=args.test,
             jar=execute_jar,

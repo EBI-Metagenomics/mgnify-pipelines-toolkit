@@ -15,10 +15,13 @@
 # limitations under the License.
 
 import argparse
+import logging
 from itertools import product
 from pathlib import Path
 
 from Bio import SeqIO
+
+logging.basicConfig(level=logging.DEBUG)
 
 AMBIGUOUS_BASES_DICT = {
     "R": ["A", "G"],
@@ -95,6 +98,7 @@ def write_primer_permutations(primers_dict: dict, prefix: str) -> None:
 def main():
     input_path, prefix = parse_args()
     primers_dict = SeqIO.to_dict(SeqIO.parse(Path(input_path), "fasta"))
+    logging.info(f"Making permutations for {len(primers_dict)} primers")
     write_primer_permutations(primers_dict, prefix)
 
 

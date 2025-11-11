@@ -191,6 +191,11 @@ def main():
 
         # Convert to DataFrame
         df = pd.DataFrame(dict_list)
+        # If the antismash file was empty (or just the header), output an empty summary file with only the header
+        if df.empty:
+            logging.warning("No valid features found in input GFF (only header or empty file).")
+            pd.DataFrame(columns=["label", "description", "count"]).to_csv(output_filename, sep="\t", index=False)
+            return
         df = df[df["product"].notna()]
         df_grouped = (df.groupby(["product"]).size().reset_index(name="count")).sort_values(by="count", ascending=False)
 

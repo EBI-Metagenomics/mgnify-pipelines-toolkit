@@ -21,8 +21,8 @@ from collections import defaultdict
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _PR2_TAX_RANKS,
-    _SILVA_TAX_RANKS,
+    PR2_TAX_RANKS,
+    SILVA_TAX_RANKS,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -57,9 +57,9 @@ def parse_args():
 def order_df(taxa_df: pd.DataFrame, ref_db: str) -> pd.DataFrame:
     match ref_db:
         case "SILVA":
-            taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
+            taxa_df = taxa_df.sort_values(SILVA_TAX_RANKS, ascending=True)
         case "PR2":
-            taxa_df = taxa_df.sort_values(_PR2_TAX_RANKS, ascending=True)
+            taxa_df = taxa_df.sort_values(PR2_TAX_RANKS, ascending=True)
 
     return taxa_df
 

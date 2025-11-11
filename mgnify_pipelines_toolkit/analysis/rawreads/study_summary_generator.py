@@ -30,8 +30,8 @@ from mgnify_pipelines_toolkit.constants.db_labels import (
     RRAP_TAXDB_LABELS,
 )
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _MOTUS_TAX_RANKS,
-    _SILVA_TAX_RANKS,
+    MOTUS_TAX_RANKS,
+    SILVA_TAX_RANKS,
 )
 from mgnify_pipelines_toolkit.schemas.dataframes import (
     FunctionProfileSchema,
@@ -106,7 +106,7 @@ def parse_one_tax_file(run_acc: str, tax_file: Path, db_label: str) -> pd.DataFr
     :rtype: pd.DataFrame
     """
 
-    tax_ranks = _MOTUS_TAX_RANKS if db_label == "motus" else _SILVA_TAX_RANKS
+    tax_ranks = MOTUS_TAX_RANKS if db_label == "motus" else SILVA_TAX_RANKS
     res_df = pd.read_csv(tax_file, sep="\t", skiprows=1, names=["Count"] + tax_ranks)
     res_df = res_df.fillna("")
 

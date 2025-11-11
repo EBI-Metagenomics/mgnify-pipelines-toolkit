@@ -78,18 +78,14 @@ def main():
                 + "Either supply the reverse file, or supply a single-end file."
             )
         elif "_2" not in rev:
-            logging.error(
-                'The expected suffix "_2" for a supplied reverse file is missing. Please verify your inputs.'
-            )
+            logging.error('The expected suffix "_2" for a supplied reverse file is missing. Please verify your inputs.')
         else:
             files_to_parse = [fwd, rev]
 
     else:
         files_to_parse = [fwd]
 
-    open_func = choose_open_func(
-        fwd
-    )  # Choose between gzip.open() and open() by checking the file extension
+    open_func = choose_open_func(fwd)  # Choose between gzip.open() and open() by checking the file extension
     reads_with_err = defaultdict(list)
 
     for file in files_to_parse:
@@ -122,15 +118,11 @@ def main():
             f"Found {num_of_reads_with_err} reads with header strands that don't match file suffix. See log file at {output}/{sample}_suffix_header_err.json"  # noqa: E501
         )
 
-        with open(
-            f"{output}/{sample}_suffix_header_err.json", "w"
-        ) as fw:  # Writes JSON file containing the headers of reads with errors
+        with open(f"{output}/{sample}_suffix_header_err.json", "w") as fw:  # Writes JSON file containing the headers of reads with errors
             json.dump(reads_with_err, fw)
 
     else:
-        with open(
-            f"{output}/{sample}_suffix_header_err.json", "w"
-        ) as fw:  # Creates an empty file if there are no errors
+        with open(f"{output}/{sample}_suffix_header_err.json", "w") as fw:  # Creates an empty file if there are no errors
             print("No errors.")
 
 

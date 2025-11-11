@@ -14,17 +14,17 @@
 # limitations under the License.
 
 """
-    Script to convert cmscan-table to cmsearch-table (swap columns 1 and 2 with 3 and 4)
+Script to convert cmscan-table to cmsearch-table (swap columns 1 and 2 with 3 and 4)
 
-    input example:
-    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
-    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
-    SSU_rRNA_eukarya     RF01960   SRR17062740.1        -          cm      582     1025        1      452      + ..
+input example:
+#target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
+#------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
+SSU_rRNA_eukarya     RF01960   SRR17062740.1        -          cm      582     1025        1      452      + ..
 
-    expected output:
-    #------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
-    #target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
-    SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      452      + ..
+expected output:
+#------------------- --------- -------------------- --------- --- -------- -------- -------- -------- ------ ..
+#target name         accession query name           accession mdl mdl from   mdl to seq from   seq to strand ..
+SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1025        1      452      + ..
 
 """
 
@@ -35,15 +35,9 @@ from itertools import accumulate
 
 
 def parse_args(argv):
-    parser = argparse.ArgumentParser(
-        description="Convert cmscan table to cmsearch table"
-    )
-    parser.add_argument(
-        "-i", "--input", dest="input", help="Input cmscan file", required=True
-    )
-    parser.add_argument(
-        "-o", "--output", dest="output", help="Output filename", required=True
-    )
+    parser = argparse.ArgumentParser(description="Convert cmscan table to cmsearch table")
+    parser.add_argument("-i", "--input", dest="input", help="Input cmscan file", required=True)
+    parser.add_argument("-o", "--output", dest="output", help="Output filename", required=True)
     return parser.parse_args(argv)
 
 
@@ -63,9 +57,7 @@ class TableModifier:
 
     def modify_table(self):
         with (
-            fileinput.hook_compressed(
-                self.input_file, "r", encoding="utf-8"
-            ) as file_in,
+            fileinput.hook_compressed(self.input_file, "r", encoding="utf-8") as file_in,
             open(self.output_file, "w") as file_out,
         ):
             header_written = False
@@ -75,9 +67,7 @@ class TableModifier:
                     if "--" in line:
                         separator_line = line.split(" ")
                         separator_line[0] = separator_line[0].replace("#", "-")
-                        lengths = [0] + list(
-                            accumulate(len(s) + 1 for s in separator_line)
-                        )
+                        lengths = [0] + list(accumulate(len(s) + 1 for s in separator_line))
                     else:
                         header = line
                 else:

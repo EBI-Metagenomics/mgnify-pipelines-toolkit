@@ -23,9 +23,7 @@ from mgnify_pipelines_toolkit.constants.ncrna import TRNA
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Script that extarcts tRNA from tRNAscan-SE"
-    )
+    parser = argparse.ArgumentParser(description="Script that extarcts tRNA from tRNAscan-SE")
     parser.add_argument(
         "-i",
         "--input",
@@ -57,9 +55,7 @@ def main():
                     if (aa_pred in TRNA or "Met" in aa_pred) and counts > 0:
                         trnas += 1
 
-    new_line = "{name}\t{trnas}".format(
-        name=os.path.basename(args.input).split("_stats")[0], trnas=trnas
-    )
+    new_line = "{name}\t{trnas}".format(name=os.path.basename(args.input).split("_stats")[0], trnas=trnas)
     with open(args.output or sys.stdout, "w") as file_out:
         file_out.write(new_line)
 

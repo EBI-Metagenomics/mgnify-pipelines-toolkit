@@ -50,13 +50,9 @@ def parse_gff(gff_file):
             seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
             if feature_type == "CDS":
                 # Parse attributes to get the ID value
-                attr_dict = dict(
-                    attr.split("=") for attr in attributes.split(";") if "=" in attr
-                )
+                attr_dict = dict(attr.split("=") for attr in attributes.split(";") if "=" in attr)
                 protein_id = attr_dict["ID"]
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
+                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the GFF file")
     return predictions
@@ -94,9 +90,7 @@ def parse_pyrodigal_output(file):
                 # Pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
                 protein_id = f"{seq_id}_{fragment_id}"
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
+                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
@@ -127,9 +121,7 @@ def parse_fgsrs_output(file):
                 fields = line.strip().split("\t")
                 start, end, strand, *_ = fields
                 protein_id = f"{seq_id}_{start}_{end}_{strand}"
-                predictions[seq_id][strand].append(
-                    Interval(int(start), int(end), data={"protein_id": protein_id})
-                )
+                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
@@ -191,10 +183,7 @@ def mask_regions(predictions, mask):
                     for mask_region in overlapping_intervals:
                         # If overlap is more than 5 base pairs, mark for masking
                         # Add 1 to make boundaries inclusive
-                        overlap_len = 1 + abs(
-                            min(region.end, mask_region.end)
-                            - max(region.begin, mask_region.begin)
-                        )
+                        overlap_len = 1 + abs(min(region.end, mask_region.end) - max(region.begin, mask_region.begin))
                         if overlap_len > MASK_OVERLAP_THRESHOLD:
                             overlap = True
                             break
@@ -231,9 +220,7 @@ def merge_predictions(predictions, priority):
             secondary_regions = predictions[secondary][seq_id][strand]
             if seq_id in predictions[primary]:
                 primary_regions = merged[primary][seq_id][strand]
-                merged[secondary][seq_id][strand].extend(
-                    check_against_gaps(primary_regions, secondary_regions)
-                )
+                merged[secondary][seq_id][strand].extend(check_against_gaps(primary_regions, secondary_regions))
             else:
                 merged[secondary][seq_id][strand] = secondary_regions
     return merged
@@ -354,9 +341,7 @@ def get_counts(predictions):
     """
     total = {}
     for caller, seq_data in predictions.items():
-        count = sum(
-            len(seq_data[seq_id]["+"] + seq_data[seq_id]["-"]) for seq_id in seq_data
-        )
+        count = sum(len(seq_data[seq_id]["+"] + seq_data[seq_id]["-"]) for seq_id in seq_data)
         total[caller] = count
     return total
 
@@ -389,9 +374,7 @@ def main():
         - FASTA file with transcript sequences
         """
     )
-    parser.add_argument(
-        "--name", "-n", required=True, help="Base name for output files"
-    )
+    parser.add_argument("--name", "-n", required=True, help="Base name for output files")
     parser.add_argument(
         "--priority",
         "-P",
@@ -432,9 +415,7 @@ def main():
         required=True,
         help="FragGeneScanRS *.faa file with proteins",
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Increase verbosity level to debug"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Increase verbosity level to debug")
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.verbose else logging.INFO
@@ -445,14 +426,10 @@ def main():
     )
 
     if not args.pyrodigal_out and not args.pyrodigal_gff:
-        parser.error(
-            "For Pyrodigal, you must provide either --pyrodigal-out or --pyrodigal-gff"
-        )
+        parser.error("For Pyrodigal, you must provide either --pyrodigal-out or --pyrodigal-gff")
 
     if not args.fgsrs_out and not args.fgsrs_gff:
-        parser.error(
-            "For FragGeneScanRS, you must provide either --fgsrs-out or --fgsrs-gff"
-        )
+        parser.error("For FragGeneScanRS, you must provide either --fgsrs-out or --fgsrs-gff")
 
     summary = {}
     all_predictions = {}
@@ -480,9 +457,7 @@ def main():
         mask_regions_file = parse_cmsearch_output(args.mask)
         for caller in all_predictions:
             logging.info(f"Masking {caller} outputs...")
-            all_predictions[caller] = mask_regions(
-                all_predictions[caller], mask_regions_file
-            )
+            all_predictions[caller] = mask_regions(all_predictions[caller], mask_regions_file)
         summary["after_masking"] = get_counts(all_predictions)
 
     logging.info("Merging combined gene caller results")

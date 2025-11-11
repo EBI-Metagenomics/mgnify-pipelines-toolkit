@@ -25,9 +25,7 @@ def parse_args():
 
     description = "Go slim pipeline for processing InterProScan results"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "-i", "--ips_input", help="InterProScan result file", required=True
-    )
+    parser.add_argument("-i", "--ips_input", help="InterProScan result file", required=True)
     parser.add_argument("-o", "--output", help="GO summary output file", required=True)
     args = parser.parse_args()
 
@@ -43,9 +41,7 @@ PROJECT_URL = "http://www.ebi.ac.uk/metagenomics"
 PROJECT_CONTACT = "metagenomics-help@ebi.ac.uk"
 FIXED_TIMESTAMP = "20160528"  # What is this timestamp?
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
 
 def write_gaf_file(gaf_input_file_path: str, go_id_set: set[str]) -> None:

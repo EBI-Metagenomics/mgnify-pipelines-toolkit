@@ -30,12 +30,8 @@ def is_gzipped(filepath):
 
 
 def guess_header_format(header):
-    matches = [
-        (format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()
-    ]
-    guesses = [
-        (format, match.groups()) for format, match in matches if match is not None
-    ]
+    matches = [(format, re.search(regex, header)) for format, regex in FORMAT_REGEX_MAP.items()]
+    guesses = [(format, match.groups()) for format, match in matches if match is not None]
 
     if not guesses:
         raise ValueError("Header format could not be determined")
@@ -66,17 +62,13 @@ def parse_args():
         default="auto",
         help="Format of the input Fasta header",
     )
-    parser.add_argument(
-        "-d", "--delimiter", type=str, default="\t", help="Output column delimiter"
-    )
+    parser.add_argument("-d", "--delimiter", type=str, default="\t", help="Output column delimiter")
     parser.add_argument(
         "--with-hash",
         action="store_true",
         help="Add a MD5 hash of the sequence to the output",
     )
-    parser.add_argument(
-        "--no-header", action="store_true", help="Do not add header to output file"
-    )
+    parser.add_argument("--no-header", action="store_true", help="Do not add header to output file")
 
     args = parser.parse_args()
 
@@ -119,9 +111,7 @@ def main():
 
         fieldnames.append("sequence")
 
-        csv_writer = csv.DictWriter(
-            output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore"
-        )
+        csv_writer = csv.DictWriter(output_fh, fieldnames=fieldnames, delimiter=delimiter, extrasaction="ignore")
 
         if not no_header:
             csv_writer.writeheader()

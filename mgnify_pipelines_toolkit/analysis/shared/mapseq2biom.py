@@ -23,22 +23,15 @@ def main():
     parser.add_argument(
         "--otu-table",
         required=True,
-        help=(
-            "The OTU table produced for the taxonomies found in"
-            " the reference databases that was used with MAPseq."
-        ),
+        help=("The OTU table produced for the taxonomies found in" " the reference databases that was used with MAPseq."),
     )
     parser.add_argument(
         "--query",
         required=True,
         help="The output from the MAPseq that assigns a taxonomy to a sequence.",
     )
-    parser.add_argument(
-        "--out-file", required=True, help="The file storing the tsv file."
-    )
-    parser.add_argument(
-        "--krona", required=False, help="Output file name for the Krona text"
-    )
+    parser.add_argument("--out-file", required=True, help="The file storing the tsv file.")
+    parser.add_argument("--krona", required=False, help="Output file name for the Krona text")
     parser.add_argument(
         "--label",
         required=False,

@@ -1,0 +1,12 @@
+STUDY	PRJEB98843
+SAMPLE	SAMEA7687881
+ASSEMBLYNAME	test_mag1
+ASSEMBLY_TYPE	Metagenome-Assembled Genome (MAG)
+COVERAGE	29.09
+PROGRAM	metaSPAdes_v3.14.1
+PLATFORM	Illumina MiSeq
+MOLECULETYPE	genomic DNA
+DESCRIPTION	Test submission.
+RUN_REF	SRR2018010
+FASTA   tests/fixtures/webin_cli_handler/test.fasta.gz
+TPA	true

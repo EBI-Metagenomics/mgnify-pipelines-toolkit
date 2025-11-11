@@ -38,9 +38,7 @@ def main():
         raise FileNotFoundError(f"Input standards path does not exist: {standard_file}")
 
     if not substrate_path.exists():
-        raise FileNotFoundError(
-            f"Input substrate path does not exist: {substrate_file}"
-        )
+        raise FileNotFoundError(f"Input substrate path does not exist: {substrate_file}")
 
     substrates = load_substrates(substrate_path)
     cgc_locations = load_cgcs(standard_path)
@@ -75,17 +73,11 @@ def print_gff(standard_path, outfile, dbcan_version, substrates, cgc_locations):
         with fileinput.hook_compressed(standard_path, "r", encoding="utf-8") as file_in:
             for line in file_in:
                 if not line.startswith("CGC#"):
-                    cgc, gene_type, contig, prot_id, start, end, strand, protein_fam = (
-                        line.strip().split("\t")
-                    )
+                    cgc, gene_type, contig, prot_id, start, end, strand, protein_fam = line.strip().split("\t")
                     cgc_id = f"{contig}_{cgc}"
                     protein_fam = protein_fam.replace(" ", "")
                     if cgc_id not in cgcs_printed:
-                        substrate = (
-                            substrates[cgc_id]
-                            if cgc_id in substrates
-                            else "substrate_dbcan-pul=N/A;substrate_dbcan-sub=N/A"
-                        )
+                        substrate = substrates[cgc_id] if cgc_id in substrates else "substrate_dbcan-pul=N/A;substrate_dbcan-sub=N/A"
                         file_out.write(
                             "{}\tdbCAN:{}\tpredicted PUL\t{}\t{}\t.\t.\t.\tID={};{}\n".format(
                                 contig,
@@ -125,19 +117,13 @@ def load_substrates(substrate_path):
                     substrate_pul = "N/A"
                 if not substrate_ecami:
                     substrate_ecami = "N/A"
-                substrates[cgc] = (
-                    f"substrate_dbcan-pul={substrate_pul};substrate_dbcan-sub={substrate_ecami}"
-                )
+                substrates[cgc] = f"substrate_dbcan-pul={substrate_pul};substrate_dbcan-sub={substrate_ecami}"
 
     return substrates
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description=(
-            "The script takes dbCAN output and parses it to create a standalone GFF."
-        )
-    )
+    parser = argparse.ArgumentParser(description=("The script takes dbCAN output and parses it to create a standalone GFF."))
     parser.add_argument(
         "-st",
         dest="standard_file",

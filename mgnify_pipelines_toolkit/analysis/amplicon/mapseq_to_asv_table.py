@@ -25,9 +25,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-i", "--input", required=True, type=str, help="Input from MAPseq output"
-    )
+    parser.add_argument("-i", "--input", required=True, type=str, help="Input from MAPseq output")
     parser.add_argument(
         "-l",
         "--label",
@@ -135,19 +133,13 @@ def process_blank_tax_ends(res_df, ranks):
     for i in range(len(res_df)):
         last_empty_rank = ""
         currently_empty = False
-        for j in reversed(
-            range(len(ranks))
-        ):  # Parse an assignment backwards, from Species all the way to Superkingdom/Domain
+        for j in reversed(range(len(ranks))):  # Parse an assignment backwards, from Species all the way to Superkingdom/Domain
             curr_rank = res_df.iloc[i, j + 1]
             if curr_rank in ranks:
-                if (
-                    last_empty_rank == ""
-                ):  # Last rank is empty, start window of consecutive blanks
+                if last_empty_rank == "":  # Last rank is empty, start window of consecutive blanks
                     last_empty_rank = j + 1
                     currently_empty = True
-                elif (
-                    currently_empty
-                ):  # If we're in a window of consecutive blank assignments that started at the beginning
+                elif currently_empty:  # If we're in a window of consecutive blank assignments that started at the beginning
                     last_empty_rank = j + 1
                 else:
                     break

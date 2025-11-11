@@ -55,9 +55,7 @@ def main():
         if "R" in primer_name:
             primers_dict[primer_key].seq = primer.seq.reverse_complement()
 
-    SeqIO.write(
-        primers_dict.values(), f"{output}/{sample}_rev_comp_se_primers.fasta", "fasta"
-    )
+    SeqIO.write(primers_dict.values(), f"{output}/{sample}_rev_comp_se_primers.fasta", "fasta")
 
 
 if __name__ == "__main__":

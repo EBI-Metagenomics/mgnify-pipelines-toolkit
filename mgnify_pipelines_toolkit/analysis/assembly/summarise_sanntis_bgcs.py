@@ -19,9 +19,7 @@ import fileinput
 import logging
 import pandas as pd
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
 SANNTIS_VERSION = "0.9.4.1"
 
@@ -50,9 +48,7 @@ def parse_args():
     )
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-i", "--sanntis-gff", help="SanntiS GFF", required=True)
-    parser.add_argument(
-        "-o", "--output", help="SanntiS summary TSV output file.", required=True
-    )
+    parser.add_argument("-o", "--output", help="SanntiS summary TSV output file.", required=True)
     args = parser.parse_args()
     return args.sanntis_gff, args.output
 
@@ -69,9 +65,7 @@ def main():
             entry_dict = {}
             # TODO: merge this with the GFF toolkit GFF reader
             for pair in info:
-                key, value = pair.split(
-                    "=", 1
-                )  # Ensure split only occurs at the first '=' occurrence
+                key, value = pair.split("=", 1)  # Ensure split only occurs at the first '=' occurrence
                 entry_dict[key] = value
             dict_list.append(entry_dict)
 
@@ -83,36 +77,22 @@ def main():
                 "nearest_MiBIG_class": "nearest_mibig_class",
             }
         )
-        df_grouped = (
-            df.groupby(["nearest_mibig", "nearest_mibig_class"])
-            .size()
-            .reset_index(name="count")
-        )
+        df_grouped = df.groupby(["nearest_mibig", "nearest_mibig_class"]).size().reset_index(name="count")
         df_grouped = df_grouped.sort_values(by="count", ascending=False)
 
-        df_desc = pd.DataFrame(
-            list(DESCRIPTIONS.items()), columns=["mibig_class", "description"]
-        )
+        df_desc = pd.DataFrame(list(DESCRIPTIONS.items()), columns=["mibig_class", "description"])
         df_desc = df_desc.set_index("mibig_class")
-        df_merged = df_grouped.merge(
-            df_desc, left_on="nearest_mibig_class", right_index=True, how="left"
-        )
+        df_merged = df_grouped.merge(df_desc, left_on="nearest_mibig_class", right_index=True, how="left")
         df_merged["description"] = df_merged.apply(
             lambda row: (
-                row["nearest_mibig_class"].replace(
-                    "NRP", df_desc.loc["NRP"]["description"]
-                )
+                row["nearest_mibig_class"].replace("NRP", df_desc.loc["NRP"]["description"])
                 if pd.isna(row["description"]) and "NRP" in row["nearest_mibig_class"]
                 else row["description"]
             ),
             axis=1,
         )
-        df_merged = df_merged[
-            ["nearest_mibig", "nearest_mibig_class", "description", "count"]
-        ]
-        df_merged = df_merged.rename(
-            columns={"Description": "description", "Count": "count"}
-        )
+        df_merged = df_merged[["nearest_mibig", "nearest_mibig_class", "description", "count"]]
+        df_merged = df_merged.rename(columns={"Description": "description", "Count": "count"})
         df_merged.to_csv(output_filename, sep="\t", index=False)
 
 

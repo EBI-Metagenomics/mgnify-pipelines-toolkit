@@ -133,17 +133,13 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                     annotations,
                 ) = line.strip().split("\t")
                 if tool == "sanntis":
-                    for a in annotations.split(
-                        ";"
-                    ):  # go through all parts of the annotation field
+                    for a in annotations.split(";"):  # go through all parts of the annotation field
                         if a.startswith("nearest_MiBIG_class="):
                             class_value = a.split("=")[1]
                         elif a.startswith("nearest_MiBIG="):
                             mibig_value = a.split("=")[1]
                 elif tool == "gecco":
-                    for a in annotations.split(
-                        ";"
-                    ):  # go through all parts of the annotation field
+                    for a in annotations.split(";"):  # go through all parts of the annotation field
                         if a.startswith("Type="):
                             type_value = a.split("=")[1]
                 elif tool == "antismash":
@@ -151,18 +147,14 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         continue
                     type_value = ""
                     as_product = ""
-                    for a in annotations.split(
-                        ";"
-                    ):  # go through all parts of the annotation field
+                    for a in annotations.split(";"):  # go through all parts of the annotation field
                         if a.startswith("as_type="):
                             type_value = a.split("=")[1]
                         elif a.startswith("as_gene_clusters="):
                             as_product = a.split("=")[1]
                 # save cluster positions to a dictionary where key = contig name,
                 # value = list of position pairs (list of lists)
-                cluster_positions.setdefault(contig, list()).append(
-                    [int(start_pos), int(end_pos)]
-                )
+                cluster_positions.setdefault(contig, list()).append([int(start_pos), int(end_pos)])
                 # save BGC annotations to dictionary where key = contig, value = dictionary, where
                 # key = 'start_end' of BGC, value = dictionary, where key = feature type, value = description
                 if tool == "sanntis":
@@ -184,9 +176,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         {"bgc_function": type_value},
                     )
                     if as_product:
-                        tool_result[contig]["_".join([start_pos, end_pos])][
-                            "bgc_product"
-                        ] = as_product
+                        tool_result[contig]["_".join([start_pos, end_pos])]["bgc_product"] = as_product
     # identify CDSs that fall into each of the clusters annotated by the BGC tool
     with fileinput.hook_compressed(prokka_gff, "r", encoding="utf-8") as gff_in:
 
@@ -206,9 +196,7 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                 ) = line.strip().split("\t")
                 if contig in cluster_positions:
                     for i in cluster_positions[contig]:
-                        if int(start_pos) in range(i[0], i[1] + 1) and int(
-                            end_pos
-                        ) in range(i[0], i[1] + 1):
+                        if int(start_pos) in range(i[0], i[1] + 1) and int(end_pos) in range(i[0], i[1] + 1):
                             matching_interval = "_".join([str(i[0]), str(i[1])])
                             break
                 # if the CDS is in an interval, save cluster's annotation to this CDS
@@ -218,36 +206,26 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         bgc_annotations.setdefault(
                             cds_id,
                             {
-                                "nearest_MiBIG": tool_result[contig][matching_interval][
-                                    "nearest_MiBIG"
-                                ],
-                                "nearest_MiBIG_class": tool_result[contig][
-                                    matching_interval
-                                ]["nearest_MiBIG_class"],
+                                "nearest_MiBIG": tool_result[contig][matching_interval]["nearest_MiBIG"],
+                                "nearest_MiBIG_class": tool_result[contig][matching_interval]["nearest_MiBIG_class"],
                             },
                         )
                     elif tool == "gecco":
                         bgc_annotations.setdefault(
                             cds_id,
                             {
-                                "gecco_bgc_type": tool_result[contig][
-                                    matching_interval
-                                ]["bgc_type"],
+                                "gecco_bgc_type": tool_result[contig][matching_interval]["bgc_type"],
                             },
                         )
                     elif tool == "antismash":
                         bgc_annotations.setdefault(
                             cds_id,
                             {
-                                "antismash_bgc_function": tool_result[contig][
-                                    matching_interval
-                                ]["bgc_function"],
+                                "antismash_bgc_function": tool_result[contig][matching_interval]["bgc_function"],
                             },
                         )
                         if "bgc_product" in tool_result[contig][matching_interval]:
-                            bgc_annotations[cds_id]["antismash_product"] = tool_result[
-                                contig
-                            ][matching_interval]["bgc_product"]
+                            bgc_annotations[cds_id]["antismash_product"] = tool_result[contig][matching_interval]["bgc_product"]
             elif line.startswith("##FASTA"):
                 break
     return bgc_annotations
@@ -331,14 +309,12 @@ def get_dbcan(dbcan_file):
                             prot_fam = a.split("=")[1]
                         elif a.startswith("Parent"):
                             parent = a.split("=")[1]
-                    dbcan_annotations[acc] = (
-                        "dbcan_prot_type={};{}={};substrate_dbcan-pul={};substrate_dbcan-sub={}".format(
-                            prot_type,
-                            DBCAN_CLASSES_DICT[prot_type],
-                            prot_fam,
-                            substrates[parent]["substrate_pul"],
-                            substrates[parent]["substrate_ecami"],
-                        )
+                    dbcan_annotations[acc] = "dbcan_prot_type={};{}={};substrate_dbcan-pul={};substrate_dbcan-sub={}".format(
+                        prot_type,
+                        DBCAN_CLASSES_DICT[prot_type],
+                        prot_fam,
+                        substrates[parent]["substrate_pul"],
+                        substrates[parent]["substrate_ecami"],
                     )
 
     return dbcan_annotations
@@ -353,23 +329,15 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
             if line.startswith("#"):
                 continue
             attributes = line.strip().split("\t")[8]
-            attributes_dict = dict(
-                re.split(r"(?<!\\)=", item)
-                for item in re.split(r"(?<!\\);", attributes.rstrip(";"))
-            )
+            attributes_dict = dict(re.split(r"(?<!\\)=", item) for item in re.split(r"(?<!\\);", attributes.rstrip(";")))
             if "num_tools" in attributes_dict and int(attributes_dict["num_tools"]) < 2:
                 continue  # don't keep annotations supported by only one tool within dbcan
             cds_pattern = r"\.CDS\d+$"
-            protein = re.sub(
-                cds_pattern, "", attributes_dict["ID"]
-            )  # remove the CDS number
+            protein = re.sub(cds_pattern, "", attributes_dict["ID"])  # remove the CDS number
             annotation_text = "dbcan_prot_type=CAZyme;"
             for field in ["protein_family", "substrate_dbcan-sub", "eC_number"]:
                 if field in attributes_dict:
-                    annotation_text += (
-                        f"{'dbcan_prot_family' if field == 'protein_family' else field}"
-                        f"={attributes_dict[field]};"
-                    )
+                    annotation_text += f"{'dbcan_prot_family' if field == 'protein_family' else field}" f"={attributes_dict[field]};"
             dbcan_annotations[protein] = annotation_text.strip(";")
     return dbcan_annotations
 
@@ -400,10 +368,8 @@ def get_defense_finder(df_file):
                         id = a.split("=")[1]
                     elif a.startswith("Parent="):
                         parent = a.split("=")[1]
-                defense_finder_annotations[id] = (
-                    "defense_finder_type={};defense_finder_subtype={}".format(
-                        type_info[parent]["df_type"], type_info[parent]["df_subtype"]
-                    )
+                defense_finder_annotations[id] = "defense_finder_type={};defense_finder_subtype={}".format(
+                    type_info[parent]["df_type"], type_info[parent]["df_subtype"]
                 )
     return defense_finder_annotations
 
@@ -455,9 +421,7 @@ def load_annotations(
                     )
                     if feature != "CDS":
                         if caller == "Bakta" and feature == "region":
-                            main_gff.setdefault(contig, dict()).setdefault(
-                                int(start), list()
-                            ).append(line)
+                            main_gff.setdefault(contig, dict()).setdefault(int(start), list()).append(line)
                             continue
                         else:
                             continue
@@ -485,9 +449,7 @@ def load_annotations(
                             pseudogene_report_dict[protein]["pseudofinder"] = True
                             added_annot[protein]["pseudo"] = "true"
                             if pseudogenes[protein]:
-                                cols[8] = add_pseudogene_to_note(
-                                    pseudogenes[protein], cols[8]
-                                )
+                                cols[8] = add_pseudogene_to_note(pseudogenes[protein], cols[8])
                     # record antifams
                     if protein in antifams:
                         pseudogene_report_dict.setdefault(protein, dict())
@@ -556,9 +518,7 @@ def load_annotations(
                         pass
                     try:
                         defense_finder_annotations[protein]
-                        added_annot[protein]["defense_finder"] = (
-                            defense_finder_annotations[protein]
-                        )
+                        added_annot[protein]["defense_finder"] = defense_finder_annotations[protein]
                     except KeyError:
                         pass
                     for a in added_annot[protein]:
@@ -571,9 +531,7 @@ def load_annotations(
                             if not value == "-":
                                 cols[8] = f"{cols[8]};{a}={value}"
                     line = "\t".join(cols)
-                    main_gff.setdefault(contig, dict()).setdefault(
-                        int(start), list()
-                    ).append(line)
+                    main_gff.setdefault(contig, dict()).setdefault(int(start), list()).append(line)
             elif line.startswith("#"):
                 if line == "##FASTA":
                     fasta_flag = True
@@ -628,9 +586,7 @@ def get_ncrnas(ncrnas_file):
                         annot,
                     ]
                 )
-                ncrnas.setdefault(contig, dict()).setdefault(start, list()).append(
-                    newline
-                )
+                ncrnas.setdefault(contig, dict()).setdefault(start, list()).append(newline)
     return ncrnas
 
 
@@ -799,9 +755,7 @@ def get_trnas(trnas_file):
                 contig, feature, start = cols[0], cols[2], cols[3]
                 if feature == "tRNA":
                     line = line.replace("tRNAscan-SE", "tRNAscan-SE:2.0.9")
-                    trnas.setdefault(contig, dict()).setdefault(
-                        int(start), list()
-                    ).append(line.strip().strip(";"))
+                    trnas.setdefault(contig, dict()).setdefault(int(start), list()).append(line.strip().strip(";"))
     return trnas
 
 
@@ -821,11 +775,7 @@ def load_crispr(crispr_file):
                     int(cols[3]),
                     int(cols[4]),
                 )
-                if (
-                    len(record) > 0
-                    and contig == loc_contig
-                    and abs(start - previous_end) < 2
-                ):
+                if len(record) > 0 and contig == loc_contig and abs(start - previous_end) < 2:
                     # the line is a continuation of an existing record
                     record.append(line)
                     previous_end = end
@@ -836,17 +786,13 @@ def load_crispr(crispr_file):
                     previous_end = end
                 else:
                     # the previous record is complete, started reading a new record
-                    crispr_annotations.setdefault(contig, dict()).setdefault(
-                        left_coord, list()
-                    ).append(record)
+                    crispr_annotations.setdefault(contig, dict()).setdefault(left_coord, list()).append(record)
                     record = list()
                     record.append(line)
                     previous_end = end
                     left_coord = start
         if len(record) > 0:
-            crispr_annotations.setdefault(contig, dict()).setdefault(
-                left_coord, list()
-            ).append(record)
+            crispr_annotations.setdefault(contig, dict()).setdefault(left_coord, list()).append(record)
     return crispr_annotations
 
 
@@ -858,9 +804,7 @@ def get_pseudogenes(pseudofinder_file):
         for line in file_in:
             if not line.startswith("#"):
                 col9 = line.strip().split("\t")[8]
-                attributes_dict = dict(
-                    re.split(r"(?<!\\)=", item) for item in re.split(r"(?<!\\);", col9)
-                )
+                attributes_dict = dict(re.split(r"(?<!\\)=", item) for item in re.split(r"(?<!\\);", col9))
                 if "note" in attributes_dict:
                     note = attributes_dict["note"]
                 else:
@@ -874,9 +818,7 @@ def get_pseudogenes(pseudofinder_file):
 
 
 def add_pseudogene_to_note(note_text, col9):
-    col9_dict = dict(
-        re.split(r"(?<!\\)=", item) for item in re.split(r"(?<!\\);", col9)
-    )
+    col9_dict = dict(re.split(r"(?<!\\)=", item) for item in re.split(r"(?<!\\);", col9))
     if "Note" in col9_dict.keys():
         col9_dict["Note"] = col9_dict["Note"] + f", {note_text}"
         return ";".join([f"{key}={value}" for key, value in col9_dict.items()])

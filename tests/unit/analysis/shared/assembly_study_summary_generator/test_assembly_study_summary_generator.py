@@ -14,12 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import gzip
 import hashlib
 import os
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
+import pytest
 from click.testing import CliRunner
 
 from mgnify_pipelines_toolkit.analysis.assembly.study_summary_generator import (
@@ -1268,23 +1268,21 @@ def test_assembly_study_summary_generator_correct_summarise(
 
     # Verify that the output files exist and have the expected MD5 checksums
     expected_files_md5 = {
-        f"{tmpdir}/test_go_summary.tsv": "3783ef924b0f7d598888334025de1834",
-        f"{tmpdir}/test_goslim_summary.tsv": "3783ef924b0f7d598888334025de1834",
-        f"{tmpdir}/test_interpro_summary.tsv": "ccdb11f77c1631ec3dad99226e791cbb",
-        f"{tmpdir}/test_ko_summary.tsv": "9a0e4ebc8d3c096738ab9be5658fbc0d",
-        f"{tmpdir}/test_kegg_modules_summary.tsv": "c66966de0c38f74ed83919c9fe0dd1b4",
-        f"{tmpdir}/test_pfam_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
-        f"{tmpdir}/test_sanntis_summary.tsv": "97b79aee421aaee39bf6409333218e03",
-        f"{tmpdir}/test_antismash_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
-        f"{tmpdir}/test_taxonomy_summary.tsv": "6260f20e4237d81c00d9787e02653734",
+        f"{tmpdir}/test_go_study_summary.tsv": "3783ef924b0f7d598888334025de1834",
+        f"{tmpdir}/test_goslim_study_summary.tsv": "3783ef924b0f7d598888334025de1834",
+        f"{tmpdir}/test_interpro_study_summary.tsv": "ccdb11f77c1631ec3dad99226e791cbb",
+        f"{tmpdir}/test_ko_study_summary.tsv": "9a0e4ebc8d3c096738ab9be5658fbc0d",
+        f"{tmpdir}/test_kegg_modules_study_summary.tsv": "c66966de0c38f74ed83919c9fe0dd1b4",
+        f"{tmpdir}/test_pfam_study_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
+        f"{tmpdir}/test_sanntis_study_summary.tsv": "97b79aee421aaee39bf6409333218e03",
+        f"{tmpdir}/test_antismash_study_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
+        f"{tmpdir}/test_taxonomy_study_summary.tsv": "6260f20e4237d81c00d9787e02653734",
     }
 
     for file_path, expected_md5 in expected_files_md5.items():
         assert os.path.exists(file_path), f"Output file {file_path} does not exist"
         actual_md5 = calculate_md5(file_path)
-        assert (
-            actual_md5 == expected_md5
-        ), f"MD5 checksum mismatch for {file_path}. Expected: {expected_md5}, Actual: {actual_md5}"
+        assert actual_md5 == expected_md5, f"MD5 checksum mismatch for {file_path}. Expected: {expected_md5}, Actual: {actual_md5}"
 
 
 def test_assembly_study_summary_generator_no_sanntis(

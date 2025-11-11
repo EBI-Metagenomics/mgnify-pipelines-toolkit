@@ -77,15 +77,9 @@ def set_model_names(prefix, name, directory, separate_subunits):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Extract lsu, ssu and 5s and other models"
-    )
-    parser.add_argument(
-        "-i", "--input", dest="input", help="Input fasta file", required=True
-    )
-    parser.add_argument(
-        "-p", "--prefix", dest="prefix", help="prefix for models", required=False
-    )
+    parser = argparse.ArgumentParser(description="Extract lsu, ssu and 5s and other models")
+    parser.add_argument("-i", "--input", dest="input", help="Input fasta file", required=True)
+    parser.add_argument("-p", "--prefix", dest="prefix", help="prefix for models", required=False)
     parser.add_argument("-n", "--name", dest="name", help="Accession", required=True)
     parser.add_argument(
         "--separate-subunits-by-models",
@@ -102,9 +96,7 @@ def main():
         os.makedirs(directory)
 
     print("Start fasta mode")
-    pattern_dict = set_model_names(
-        prefix, name, directory, args.separate_subunits_by_models
-    )
+    pattern_dict = set_model_names(prefix, name, directory, args.separate_subunits_by_models)
 
     open_files = {}
     for record in SeqIO.parse(args.input, "fasta"):

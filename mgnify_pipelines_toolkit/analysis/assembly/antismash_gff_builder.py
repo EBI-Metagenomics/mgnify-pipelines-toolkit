@@ -23,12 +23,8 @@ import pandas as pd
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-i", "--input", required=True, type=str, help="Input JSON from antiSMASH"
-    )
-    parser.add_argument(
-        "-o", "--output", required=True, type=str, help="Output GFF3 file name"
-    )
+    parser.add_argument("-i", "--input", required=True, type=str, help="Input JSON from antiSMASH")
+    parser.add_argument("-o", "--output", required=True, type=str, help="Output GFF3 file name")
     parser.add_argument(
         "--cds_tag",
         default="ID",
@@ -57,17 +53,13 @@ def main():
     for record in antismash_analysis["records"]:
         record_id = record["id"]
 
-        iter_cds = (
-            "antismash.detection.genefunctions" in record["modules"].keys()
-        )  # Flag to iterate CDS
+        iter_cds = "antismash.detection.genefunctions" in record["modules"].keys()  # Flag to iterate CDS
         region_name = None
 
         for feature in record["features"]:
             if feature["type"] == "region":
                 # Annotate region features
-                region_name = (
-                    f"{record_id}_region{feature['qualifiers']['region_number'][0]}"
-                )
+                region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}"
                 region_start = int(feature["location"].split(":")[0].split("[")[1])
                 region_end = int(feature["location"].split(":")[1].split("]")[0])
 
@@ -82,9 +74,7 @@ def main():
 
                 product = ",".join(feature["qualifiers"].get("product", []))
 
-                attributes_dict[region_name].update(
-                    {"ID": region_name, "product": product}
-                )
+                attributes_dict[region_name].update({"ID": region_name, "product": product})
 
             if iter_cds and feature["type"] == "CDS":
                 # Annotate CDS features
@@ -111,12 +101,8 @@ def main():
                 attributes_dict[locus_tag].update(
                     {
                         "ID": locus_tag,
-                        "as_type": ",".join(
-                            feature["qualifiers"].get("gene_kind", ["other"])
-                        ),
-                        "gene_functions": ",".join(
-                            feature["qualifiers"].get("gene_functions", [])
-                        )
+                        "as_type": ",".join(feature["qualifiers"].get("gene_kind", ["other"])),
+                        "gene_functions": ",".join(feature["qualifiers"].get("gene_functions", []))
                         .replace(" ", "_")
                         .replace(":_", ":")
                         .replace(";_", "%3B"),
@@ -126,9 +112,7 @@ def main():
 
         # Extended CDS attributes
         if "antismash.detection.hmm_detection" in record["modules"].keys():
-            cds_by_protocluster = record["modules"][
-                "antismash.detection.hmm_detection"
-            ]["rule_results"]["cds_by_protocluster"]
+            cds_by_protocluster = record["modules"]["antismash.detection.hmm_detection"]["rule_results"]["cds_by_protocluster"]
 
             if not cds_by_protocluster:
                 continue
@@ -137,14 +121,10 @@ def main():
                 if locus_tag := feature.get("cds_name"):
                     as_clusters = ",".join(list(feature["definition_domains"].keys()))
                     if locus_tag in attributes_dict:
-                        attributes_dict[locus_tag].update(
-                            {"as_gene_clusters": as_clusters}
-                        )
+                        attributes_dict[locus_tag].update({"as_gene_clusters": as_clusters})
 
         if "antismash.detection.genefunctions" in record["modules"].keys():
-            gene_function_tools = record["modules"][
-                "antismash.detection.genefunctions"
-            ]["tools"]
+            gene_function_tools = record["modules"]["antismash.detection.genefunctions"]["tools"]
             if tool_data := gene_function_tools.get("smcogs"):
 
                 for locus_tag in tool_data["best_hits"]:
@@ -158,18 +138,13 @@ def main():
                     if locus_tag in attributes_dict.keys():
                         attributes_dict[locus_tag].update({"as_notes": smcog_note})
 
-    attributes = [
-        ";".join(f"{k}={v}" for k, v in attrib_data.items() if v)
-        for attrib_data in attributes_dict.values()
-    ]
+    attributes = [";".join(f"{k}={v}" for k, v in attrib_data.items() if v) for attrib_data in attributes_dict.values()]
     res_dict["attributes"] = attributes
 
     res_df = pd.DataFrame.from_dict(res_dict)
 
     with open(output_file, "w") as f_out:
-        f_out.write(
-            "##gff-version 3\n"
-        )  # Save data to the GFF3 file with the proper header
+        f_out.write("##gff-version 3\n")  # Save data to the GFF3 file with the proper header
         res_df.to_csv(f_out, header=False, index=False, sep="\t")
 
 

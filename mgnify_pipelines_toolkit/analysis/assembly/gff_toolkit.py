@@ -79,9 +79,7 @@ def main():
     if crispr_file:
         crispr_annotations = load_crispr(crispr_file)
 
-    write_results_to_file(
-        outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations
-    )
+    write_results_to_file(outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations)
     if pseudogene_report_file:
         print_pseudogene_report(pseudogene_report_dict, pseudogene_report_file)
 
@@ -158,13 +156,9 @@ def parse_args():
         required=False,
     )
     parser.add_argument("-r", dest="rfam", help="Rfam results", required=False)
-    parser.add_argument(
-        "-t", dest="trnascan", help="tRNAScan-SE results", required=False
-    )
+    parser.add_argument("-t", dest="trnascan", help="tRNAScan-SE results", required=False)
     parser.add_argument("-o", dest="outfile", help="Outfile name", required=True)
-    parser.add_argument(
-        "--pseudogene-report", help="Pseudogene report filename", required=False
-    )
+    parser.add_argument("--pseudogene-report", help="Pseudogene report filename", required=False)
 
     args = parser.parse_args()
     return (

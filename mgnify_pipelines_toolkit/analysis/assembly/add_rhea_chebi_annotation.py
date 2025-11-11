@@ -63,9 +63,7 @@ def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        "Use diamond output file to create a table with Rhea and CHEBI reaction annotation for every protein."
-    )
+    parser = argparse.ArgumentParser("Use diamond output file to create a table with Rhea and CHEBI reaction annotation for every protein.")
     parser.add_argument(
         "-d",
         "--diamond_hits",
@@ -105,9 +103,7 @@ def main():
     proteins = args.proteins
     rhea2chebi = args.rhea2chebi
 
-    logging.info(
-        f"Step 1/3: Parse protein fasta and calculating SHA256 hash from {proteins.resolve()}"
-    )
+    logging.info(f"Step 1/3: Parse protein fasta and calculating SHA256 hash from {proteins.resolve()}")
     protein_hashes = {}
     with open(proteins, "r") as fasta_file:
         for record in SeqIO.parse(fasta_file, "fasta"):
@@ -118,17 +114,13 @@ def main():
     df = pd.read_csv(rhea2chebi, delimiter="\t")
     rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
 
-    logging.info(
-        f"Step 3/3: Read DIAMOND results from {'STDIN' if diamond_hits == '-' else Path(diamond_hits).resolve()} and write output"
-    )
+    logging.info(f"Step 3/3: Read DIAMOND results from {'STDIN' if diamond_hits == '-' else Path(diamond_hits).resolve()} and write output")
     with open(output, "w") as output_handler:
         if diamond_hits == "-":
             process_lines(sys.stdin, output_handler, rhea2reaction_dict, protein_hashes)
         else:
             with open(diamond_hits, "r") as input_file:
-                process_lines(
-                    input_file, output_handler, rhea2reaction_dict, protein_hashes
-                )
+                process_lines(input_file, output_handler, rhea2reaction_dict, protein_hashes)
 
     logging.info("Processed successfully. Exiting.")
 

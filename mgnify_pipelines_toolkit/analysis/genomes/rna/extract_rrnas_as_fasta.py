@@ -142,9 +142,7 @@ def main():
                         start = hits[contig][0] - 1
                         end = hits[contig][1]
                         seq = record.seq[start:end]
-                        name = (
-                            os.path.basename(args.input).split(".")[0] + "__" + contig
-                        )
+                        name = os.path.basename(args.input).split(".")[0] + "__" + contig
                         records_to_write.append(SeqRecord(seq, id=name, description=""))
 
         with open(args.outfile or sys.stdout, "w") as file_out:

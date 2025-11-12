@@ -28,3 +28,14 @@
       md5sum: 20b4f1c39097e3bce4e3457f64514a27
     - path: "rev_primers.fasta"
       md5sum: 3a5a33751acd45d57ca0d0645677e080
+- name: primer_val_classification test_correct_args test_primer_val_fail
+  tags:
+    - primer_val_classification
+  command: primer_val_classification -i tests/fixtures/misc/test_primervalfail.cmsearch_matches_.tbl.deoverlapped -f tests/fixtures/sequences/test_permuted_primers_primervalfail.fasta -s test
+  files:
+    - path: "test_primer_validation.tsv"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "fwd_primers.fasta"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "rev_primers.fasta"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e

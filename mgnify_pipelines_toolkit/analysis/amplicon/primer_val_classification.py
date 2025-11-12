@@ -68,7 +68,7 @@ def parse_args():
     return input, fasta, sample, single_end
 
 
-def get_amp_region(primer_beg, primer_end, strand, model):
+def get_amp_region(primer_beg: float, primer_end: float, strand: str, model: dict) -> str:
     prev_region = ""
 
     # some valid primers go inside HV regions a little bit, this margin is to account for that

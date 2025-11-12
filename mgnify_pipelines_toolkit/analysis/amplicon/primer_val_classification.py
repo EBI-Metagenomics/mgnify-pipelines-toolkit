@@ -68,29 +68,44 @@ def parse_args():
     return input, fasta, sample, single_end
 
 
-def get_amp_region(beg, end, strand, model):
+def get_amp_region(primer_beg, primer_end, strand, model):
     prev_region = ""
 
+    # some valid primers go inside HV regions a little bit, this margin is to account for that
     margin = -10
 
     for region, region_coords in model.items():
+        # get current region start and end coordinates
         region_beg = region_coords[0]
         region_end = region_coords[1]
-        beg_diff = region_beg - beg
-        end_diff = region_beg - end
 
-        if strand == STRAND_FWD:
-            if beg_diff >= margin and end_diff >= margin:
+        # compute where primer beginning is in relation to current region
+        region_beg_primer_beg_diff = region_beg - primer_beg
+        region_beg_primer_end_diff = region_beg - primer_end
+        primer_beg_near_region_start = region_beg_primer_beg_diff >= margin
+        primer_end_near_region_start = region_beg_primer_end_diff >= margin
+
+        # compute where primer end is in relation to current region
+        region_end_primer_beg_diff = region_end - primer_beg
+        region_end_primer_end_diff = region_end - primer_end
+        primer_beg_before_region_end = region_end_primer_beg_diff >= margin
+        primer_end_before_region_end = region_end_primer_end_diff >= margin
+
+        if primer_beg_near_region_start and primer_end_near_region_start:
+            # if both these statements are true then primer is before a HV region
+            # i.e. validation = true
+            if strand == STRAND_FWD:
                 return region
-            elif (region_beg - beg) < margin and (region_end - end) > margin:
-                logging.warning(f"This primer is within HV region {region}: {str(int(beg))}-{str(int(end))} vs {region_beg}-{region_end}")
-                return ""
-        else:
-            if beg_diff >= margin and end_diff >= margin:
+            else:
+                # if primer strand is REV then we return the previous region
                 return prev_region
-            elif (region_beg - beg) < margin and (region_end - end) > margin:
-                logging.warning(f"This primer is within HV region {region}: {str(int(beg))}-{str(int(end))} vs {region_beg}-{region_end}")
-                return ""
+        elif primer_beg_before_region_end and primer_end_before_region_end:
+            # if the previous if statement is FALSE
+            # AND if both these statements are true then primer is within a HV region
+            # i.e. validation = false
+            logging.warning(f"This primer is within HV region {region}: {str(int(primer_beg))}-{str(int(primer_end))} vs {region_beg}-{region_end}")
+            return ""
+        # keep iterating through HV regions otherwise
 
         prev_region = region
 

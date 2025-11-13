@@ -49,18 +49,16 @@ def parse_args():
 def main():
     fwd, rev, sample = parse_args()
 
-    fwd_handle = fileinput.hook_compressed(fwd, "r")
-    fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
-    fwd_handle.close()
+    with fileinput.hook_compressed(fwd, "r") as fwd_handle:
+        fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
 
     paired_end = True
 
     if rev is None:
         paired_end = False
     else:
-        rev_handle = fileinput.hook_compressed(rev, "r")
-        rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
-        rev_handle.close()
+        with fileinput.hook_compressed(rev, "r") as rev_handle:
+            rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
 
     logging.info(f"Number of reads at the beginning: {len(fwd_reads)}")
 
@@ -94,18 +92,15 @@ def main():
     logging.info(f"Number of reads after filtering: {len(fwd_reads)}")
 
     if paired_end:
-        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb")
-        rev_handle = bgzf.BgzfWriter(f"./{sample}_noambig_2.fastq.gz", "wb")
-
-        SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
-        SeqIO.write(sequences=rev_reads.values(), handle=rev_handle, format="fastq")
-
-        fwd_handle.close()
-        rev_handle.close()
+        with (
+            bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb") as fwd_handle,
+            bgzf.BgzfWriter(f"./{sample}_noambig_2.fastq.gz", "wb") as rev_handle,
+        ):
+            SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
+            SeqIO.write(sequences=rev_reads.values(), handle=rev_handle, format="fastq")
     else:
-        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig.fastq.gz", "wb")
-        SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
-        fwd_handle.close()
+        with bgzf.BgzfWriter(f"./{sample}_noambig.fastq.gz", "wb") as fwd_handle:
+            SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
 
 
 if __name__ == "__main__":

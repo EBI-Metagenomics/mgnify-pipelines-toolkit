@@ -68,9 +68,7 @@ def load_gff(gff):
                 # Get transcript name from the 9th column for ASA
                 match = re.search(r"ID=([^;]+)", fields[8])
             else:
-                logging.error(
-                    "Not sure what gff annotation delimiter is in use. Exiting"
-                )
+                logging.error("Not sure what gff annotation delimiter is in use. Exiting")
                 exit(1)
 
             transcript_name = match.group(1)
@@ -103,14 +101,7 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
                         ec_number += ec.split(":")[0] + "|"
 
                 ec_number = ec_number.strip("|")
-                cleaned_substrates = ",".join(
-                    sorted(
-                        {
-                            subsrate.strip()
-                            for subsrate in substrates.get(transcript, "N/A").split(",")
-                        }
-                    )
-                )
+                cleaned_substrates = ",".join(sorted({subsrate.strip() for subsrate in substrates.get(transcript, "N/A").split(",")}))
                 # Assemble information to add to the 9th column
                 if recc_subfamily == "-":
                     continue
@@ -168,11 +159,7 @@ def load_substrates(hmm_path):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description=(
-            "The script takes dbCAN output for a eukaryotic genome and parses it to create a standalone GFF."
-        )
-    )
+    parser = argparse.ArgumentParser(description=("The script takes dbCAN output for a eukaryotic genome and parses it to create a standalone GFF."))
     parser.add_argument(
         "-hmm",
         dest="hmm_file",

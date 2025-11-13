@@ -18,31 +18,19 @@
 import csv
 
 
-def write_results_to_file(
-    outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations
-):
+def write_results_to_file(outfile, header, main_gff_extended, fasta, ncrnas, trnas, crispr_annotations):
     with open(outfile, "w") as file_out:
         file_out.write("\n".join(header) + "\n")
         contig_list = list(main_gff_extended.keys())
         # check if there are any contigs that don't have CDS; if so add them in
-        contig_list = check_for_additional_keys(
-            ncrnas, trnas, crispr_annotations, contig_list
-        )
+        contig_list = check_for_additional_keys(ncrnas, trnas, crispr_annotations, contig_list)
         # sort contigs by digit at the end of contig/genome accession
-        if contig_list[0].startswith(
-            "MGYG"
-        ):  # e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
+        if contig_list[0].startswith("MGYG"):  # e.g. 'MGYG000500002_1', 'MGYG000500002_2', 'MGYG000500002_3'
             contig_list = sorted(list(contig_list), key=lambda x: int(x.split("_")[-1]))
-        elif contig_list[0].startswith(
-            "ERZ"
-        ):  # e.g. 'ERZ1049444', 'ERZ1049445', 'ERZ1049446'
-            contig_list = sorted(
-                list(contig_list), key=lambda x: int(x.split("ERZ")[-1])
-            )
+        elif contig_list[0].startswith("ERZ"):  # e.g. 'ERZ1049444', 'ERZ1049445', 'ERZ1049446'
+            contig_list = sorted(list(contig_list), key=lambda x: int(x.split("ERZ")[-1]))
         for contig in contig_list:
-            sorted_pos_list = sort_positions(
-                contig, main_gff_extended, ncrnas, trnas, crispr_annotations
-            )
+            sorted_pos_list = sort_positions(contig, main_gff_extended, ncrnas, trnas, crispr_annotations)
             for pos in sorted_pos_list:
                 for my_dict in (ncrnas, trnas, crispr_annotations, main_gff_extended):
                     if contig in my_dict and pos in my_dict[contig]:

@@ -20,9 +20,7 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser(description="Extract lsu, ssu and 5s")
-    parser.add_argument(
-        "-i", "--input", dest="input", help="Input fasta file", required=True
-    )
+    parser.add_argument("-i", "--input", dest="input", help="Input fasta file", required=True)
     parser.add_argument("-l", "--lsu", dest="lsu", help="LSU pattern", required=True)
     parser.add_argument("-s", "--ssu", dest="ssu", help="SSU pattern", required=True)
 
@@ -49,9 +47,7 @@ def main():
                     out_ssu.write(line)
                     ssu_count += 1
         with open("RNA-counts", "w") as count:
-            count.write(
-                "LSU count\t" + str(lsu_count) + "\nSSU count\t" + str(ssu_count)
-            )
+            count.write("LSU count\t" + str(lsu_count) + "\nSSU count\t" + str(ssu_count))
 
     out_ssu.close()
     out_lsu.close()

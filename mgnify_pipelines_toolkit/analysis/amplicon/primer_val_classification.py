@@ -186,6 +186,7 @@ def main():
             res_dict["VariableRegion"].append(amp_region)
             res_dict["PrimerName"].append(cleaned_primer_name)
             res_dict["PrimerStrand"].append(strand)
+            res_dict["PrimerSeq"].append(primer_seq)
 
             if strand == STRAND_FWD:
                 fwd_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
@@ -193,8 +194,6 @@ def main():
                 if single_end:
                     primer_seq = Seq(primer_seq).reverse_complement()
                 rev_primers_fw.write(f">{cleaned_primer_name}\n{primer_seq}\n")
-
-            res_dict["PrimerSeq"].append(primer_seq)
 
             matched_primers_list.append(cleaned_primer_name)
             logging.info(f"Added {cleaned_primer_name} to list of matched primers")

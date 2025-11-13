@@ -38,7 +38,7 @@
     - path: "fwd_primers.fasta"
       md5sum: d3e8e54f8760c09532deaf1f699bd2e0
     - path: "rev_primers.fasta"
-      md5sum: 85be59f336f4dd4b0419bfcfd62697fa
+      md5sum: 54ac872f081eee1a531b676dbde5d427
 - name: primer_val_classification test_correct_args test_primer_val_fail
   tags:
     - primer_val_classification

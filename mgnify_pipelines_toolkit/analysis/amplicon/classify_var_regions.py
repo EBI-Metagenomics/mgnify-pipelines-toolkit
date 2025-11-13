@@ -36,7 +36,7 @@ from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
 )
 
 raw_f_regex = re.compile(
-    r"([A-z0-9\.\-\:]+)\s+-\s+(\w+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([-+])\s+([-+])\s+(\d+)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(.+)\s!\s+.*"  # noqa: E501
+    r"(\S+)\s+-\s+(\w+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([-+])\s+([-+])\s+(\d+)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(\d+[\.\d]*)\s+(.+)\s!\s+.*"  # noqa: E501
 )
 
 logging.basicConfig(level=logging.DEBUG)

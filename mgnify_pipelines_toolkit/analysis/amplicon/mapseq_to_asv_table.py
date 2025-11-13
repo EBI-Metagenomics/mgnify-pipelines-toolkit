@@ -15,10 +15,17 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import logging
+from collections import defaultdict
 
 import pandas as pd
+
+from mgnify_pipelines_toolkit.constants.tax_ranks import (
+    PR2_TAX_RANKS,
+    SHORT_PR2_TAX_RANKS,
+    SHORT_SILVA_TAX_RANKS,
+    SILVA_TAX_RANKS,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -45,59 +52,28 @@ def parse_args():
     return input, label, sample
 
 
-def parse_label(label):
-    silva_short_ranks = ["sk__", "k__", "p__", "c__", "o__", "f__", "g__", "s__"]
-    pr2_short_ranks = [
-        "d__",
-        "sg__",
-        "dv__",
-        "sdv__",
-        "c__",
-        "o__",
-        "f__",
-        "g__",
-        "s__",
-    ]
+def parse_label(label: str) -> tuple[list[str], list[str]]:
+    chosen_short_ranks = []
+    chosen_long_ranks = []
 
-    silva_long_ranks = [
-        "Superkingdom",
-        "Kingdom",
-        "Phylum",
-        "Class",
-        "Order",
-        "Family",
-        "Genus",
-        "Species",
-    ]
-    pr2_long_ranks = [
-        "Domain",
-        "Supergroup",
-        "Division",
-        "Subdivision",
-        "Class",
-        "Order",
-        "Family",
-        "Genus",
-        "Species",
-    ]
+    match label:
+        case "DADA2-SILVA":
+            logging.info("SILVA label given - will use SILVA ranks")
+            chosen_short_ranks = SHORT_SILVA_TAX_RANKS
+            chosen_long_ranks = SILVA_TAX_RANKS
+        case "DADA2-PR2":
+            logging.info("PR2 label given - will use PR2 ranks")
+            chosen_short_ranks = SHORT_PR2_TAX_RANKS
+            chosen_long_ranks = PR2_TAX_RANKS
 
-    chosen_short_ranks = ""
-    chosen_long_ranks = ""
-
-    if label == "DADA2-SILVA":
-        chosen_short_ranks = silva_short_ranks
-        chosen_long_ranks = silva_long_ranks
-    elif label == "DADA2-PR2":
-        chosen_short_ranks = pr2_short_ranks
-        chosen_long_ranks = pr2_long_ranks
-    else:
-        logging.error("Incorrect database label - exiting.")
-        exit(1)
-
+    # need to add __ to the rank label e.g. k__, g__
+    chosen_short_ranks = [f"{rank}__" for rank in chosen_short_ranks]
+    logging.info(f"Short ranks: {chosen_short_ranks}")
+    logging.info(f"Long ranks: {chosen_long_ranks}")
     return chosen_short_ranks, chosen_long_ranks
 
 
-def parse_mapseq(mseq_df, short_ranks, long_ranks):
+def parse_mapseq(mseq_df: pd.DataFrame, short_ranks: list[str], long_ranks: list[str]) -> pd.DataFrame:
     res_dict = defaultdict(list)
 
     for i in range(len(mseq_df)):
@@ -157,10 +133,12 @@ def main():
     input, label, sample = parse_args()
 
     mseq_df = pd.read_csv(input, header=0, delim_whitespace=True, usecols=[0, 12])
+    logging.info(f"Number of ASVs at start: {len(mseq_df)}")
 
     short_ranks, long_ranks = parse_label(label)
     res_df = parse_mapseq(mseq_df, short_ranks, long_ranks)
     final_res_df = process_blank_tax_ends(res_df, short_ranks)
+    logging.info(f"Number of ASVs at end: {len(final_res_df)}")
 
     final_res_df.to_csv(f"./{sample}_{label}_asv_taxa.tsv", sep="\t", index=False)
 

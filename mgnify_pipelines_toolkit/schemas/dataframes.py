@@ -24,7 +24,7 @@ from pandera.typing.common import DataFrameBase
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
     SHORT_MOTUS_TAX_RANKS,
     SHORT_PR2_TAX_RANKS,
-    SHORT_TAX_RANKS,
+    SHORT_SILVA_TAX_RANKS,
 )
 
 
@@ -230,7 +230,7 @@ class PR2TaxonSchema(CoerceBaseDataFrameSchema):
         :param series: Column series to validate
         :return: Boolean series indicating valid rows
         """
-        valid_ranks = SHORT_TAX_RANKS + SHORT_PR2_TAX_RANKS
+        valid_ranks = SHORT_SILVA_TAX_RANKS + SHORT_PR2_TAX_RANKS
 
         def check_format(val):
             if pd.isna(val) or val == "" or val.capitalize() == "Unclassified":

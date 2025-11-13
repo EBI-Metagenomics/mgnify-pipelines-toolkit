@@ -21,8 +21,8 @@ from collections import defaultdict
 import pandas as pd
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
-    _PR2_TAX_RANKS,
-    _SILVA_TAX_RANKS,
+    PR2_TAX_RANKS,
+    SILVA_TAX_RANKS,
 )
 
 logging.basicConfig(level=logging.DEBUG)
@@ -54,14 +54,12 @@ def parse_args():
     return taxa, fwd, amp, headers, sample
 
 
-def order_df(taxa_df: pd.DataFrame) -> pd.DataFrame:
-    if len(taxa_df.columns) == 9:
-        taxa_df = taxa_df.sort_values(_SILVA_TAX_RANKS, ascending=True)
-    elif len(taxa_df.columns) == 10:
-        taxa_df = taxa_df.sort_values(_PR2_TAX_RANKS, ascending=True)
-    else:
-        logging.error("Data frame not the right size, something wrong.")
-        exit(1)
+def order_df(taxa_df: pd.DataFrame, ref_db: str) -> pd.DataFrame:
+    match ref_db:
+        case "SILVA":
+            taxa_df = taxa_df.sort_values(SILVA_TAX_RANKS, ascending=True)
+        case "PR2":
+            taxa_df = taxa_df.sort_values(PR2_TAX_RANKS, ascending=True)
 
     return taxa_df
 
@@ -254,26 +252,35 @@ def main():
     fwd_fr = open(fwd, "r")
 
     taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
+
+    ref_db = ""
+
+    tax_col_num = len(taxa_df.columns)
+    if tax_col_num == 9:
+        ref_db = "SILVA"
+    elif tax_col_num == 10:
+        ref_db = "PR2"
+    else:
+        logging.error(f"Unsupported column number of {tax_col_num} so can't infer reference DB - exiting.")
+        exit()
+
+    logging.info(f"Successfully inferred DB: {ref_db}")
+
     taxa_df = taxa_df.fillna("0")
-    taxa_df = order_df(taxa_df)
+    taxa_df = order_df(taxa_df, ref_db)
 
     asv_list = taxa_df.ASV.to_list()
+    logging.info(f"Number of ASVs parsed at the start: {len(asv_list)}")
 
     amp_reads = [read.strip() for read in list(open(amp, "r"))]
     headers = [read.split(" ")[0][1:] for read in list(open(headers, "r"))]
     amp_region = ".".join(amp.split(".")[1:3])
 
-    ref_db = ""
-
-    if len(taxa_df.columns) == 9:
-        ref_db = "silva"
-    elif len(taxa_df.columns) == 10:
-        ref_db = "pr2"
-
     asv_dict = defaultdict(int)
 
     counter = -1
     for line_fwd in fwd_fr:
+        # get read count per ASV for only the amplified_region reads
         counter += 1
         line_fwd = line_fwd.strip()
 
@@ -286,16 +293,21 @@ def main():
     fwd_fr.close()
 
     if asv_dict:  # if there are matches between taxonomic and ASV annotations
-        if ref_db == "silva":
+        logging.info(f"Number of ASVs after matching to amp region reads: {len(asv_dict)}")
+        if ref_db == "SILVA":
             tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
-        elif ref_db == "pr2":
+        elif ref_db == "PR2":
             tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
+
+        logging.info(f"Number of unique taxa being written to output: {len(tax_assignment_dict)}")
 
         with open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w") as fw:
             for tax_assignment, count in tax_assignment_dict.items():
                 fw.write(f"{count}\t{tax_assignment}\n")
 
         asv_count_df = generate_asv_count_df(asv_dict)
+
+        logging.info(f"Final number of ASVs being written to output: {len(asv_count_df)}")
         asv_count_df.to_csv(f"./{sample}_{amp_region}_asv_read_counts.tsv", sep="\t", index=False)
     else:  # create empty files instead, a lot easier this way since these will be concatenated in a later pipeline module
         fw = open(f"./{sample}_{amp_region}_{ref_db}_asv_krona_counts.txt", "w")

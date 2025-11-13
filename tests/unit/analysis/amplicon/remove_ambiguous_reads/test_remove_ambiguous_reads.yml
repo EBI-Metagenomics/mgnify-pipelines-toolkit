@@ -12,6 +12,6 @@
   command: remove_ambiguous_reads -f tests/fixtures/sequences/test_1_withNs.fastq.gz -r tests/fixtures/sequences/test_2_withNs.fastq.gz -s sample
   files:
     - path: "sample_noambig_1.fastq.gz"
-      md5sum: 34834a5a828a6feb102330d4d1e2e135
+      md5sum: e4a6582a1f85fc32a1a5077d0cf071cd
     - path: "sample_noambig_2.fastq.gz"
-      md5sum: ff8ed43509b9278821dd47e6cf17fbd4
+      md5sum: 1fd581d22b2cfde590d4bd82f4df23ea

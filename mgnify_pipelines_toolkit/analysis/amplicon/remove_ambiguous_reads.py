@@ -17,13 +17,15 @@
 # Script removes any reads with ambiguous bases (Ns) for the purpose of DADA2
 
 import argparse
-import gzip
+import fileinput
+import logging
 
 from Bio import SeqIO, bgzf
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -45,26 +47,24 @@ def parse_args():
 
 
 def main():
-
     fwd, rev, sample = parse_args()
 
-    fwd_handle = gzip.open(fwd, "rt")
-    fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
-    fwd_handle.close()
+    with fileinput.hook_compressed(fwd, "r") as fwd_handle:
+        fwd_reads = SeqIO.to_dict(SeqIO.parse(fwd_handle, "fastq"))
 
     paired_end = True
 
     if rev is None:
         paired_end = False
     else:
-        rev_handle = gzip.open(rev, "rt")
-        rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
-        rev_handle.close()
+        with fileinput.hook_compressed(rev, "r") as rev_handle:
+            rev_reads = SeqIO.to_dict(SeqIO.parse(rev_handle, "fastq"))
+
+    logging.info(f"Number of reads at the beginning: {len(fwd_reads)}")
 
     remove_set = set()
 
     for read_id in fwd_reads.keys():
-
         fwd_read_seq = str(fwd_reads[read_id].seq)
         if len(fwd_read_seq) < 100:
             remove_set.add(read_id)
@@ -89,19 +89,18 @@ def main():
     if paired_end:
         [rev_reads.pop(read_id) for read_id in remove_set]
 
+    logging.info(f"Number of reads after filtering: {len(fwd_reads)}")
+
     if paired_end:
-        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb")
-        rev_handle = bgzf.BgzfWriter(f"./{sample}_noambig_2.fastq.gz", "wb")
-
-        SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
-        SeqIO.write(sequences=rev_reads.values(), handle=rev_handle, format="fastq")
-
-        fwd_handle.close()
-        rev_handle.close()
+        with (
+            bgzf.BgzfWriter(f"./{sample}_noambig_1.fastq.gz", "wb") as fwd_handle,
+            bgzf.BgzfWriter(f"./{sample}_noambig_2.fastq.gz", "wb") as rev_handle,
+        ):
+            SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
+            SeqIO.write(sequences=rev_reads.values(), handle=rev_handle, format="fastq")
     else:
-        fwd_handle = bgzf.BgzfWriter(f"./{sample}_noambig.fastq.gz", "wb")
-        SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
-        fwd_handle.close()
+        with bgzf.BgzfWriter(f"./{sample}_noambig.fastq.gz", "wb") as fwd_handle:
+            SeqIO.write(sequences=fwd_reads.values(), handle=fwd_handle, format="fastq")
 
 
 if __name__ == "__main__":

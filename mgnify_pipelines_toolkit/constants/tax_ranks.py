@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_SILVA_TAX_RANKS = [
+SILVA_TAX_RANKS = [
     "Superkingdom",
     "Kingdom",
     "Phylum",
@@ -24,7 +24,7 @@ _SILVA_TAX_RANKS = [
     "Genus",
     "Species",
 ]
-_PR2_TAX_RANKS = [
+PR2_TAX_RANKS = [
     "Domain",
     "Supergroup",
     "Division",
@@ -35,8 +35,8 @@ _PR2_TAX_RANKS = [
     "Genus",
     "Species",
 ]
-_MOTUS_TAX_RANKS = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
+MOTUS_TAX_RANKS = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
 
-SHORT_TAX_RANKS = ["sk", "k", "p", "c", "o", "f", "g", "s"]
+SHORT_SILVA_TAX_RANKS = ["sk", "k", "p", "c", "o", "f", "g", "s"]
 SHORT_MOTUS_TAX_RANKS = ["k", "p", "c", "o", "f", "g", "s"]
 SHORT_PR2_TAX_RANKS = ["d", "sg", "dv", "sdv", "c", "o", "f", "g", "s"]

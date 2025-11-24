@@ -212,6 +212,7 @@ def parse_gff(cds_gff: str, output_file: str, protein_attributes: Dict[str, List
                     features_list: List[str] = attr.split(";")
                     feature_id: str = features_list[0].split("=")[1]
                     if feature_id in protein_attributes:
+                        attr = attr.rstrip(';')
                         new_attribute: str = attr + ";" + ";".join(protein_attributes[feature_id])
                         line_l.pop(-1)
                         line_l.append(new_attribute)

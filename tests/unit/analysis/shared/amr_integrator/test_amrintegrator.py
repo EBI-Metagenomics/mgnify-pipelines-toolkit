@@ -445,8 +445,8 @@ class TestValidateInputs:
         # Create temporary files
         file1 = tmp_path / "file1.txt"
         file2 = tmp_path / "file2.txt"
-        file1.write_text("test")
-        file2.write_text("test")
+        file1.write_text("header\ndata")
+        file2.write_text("header\ndata")
 
         optional_inputs = {"deeparg": str(file1), "rgi": str(file2)}
 
@@ -456,7 +456,7 @@ class TestValidateInputs:
     def test_validate_inputs_some_exist(self, tmp_path):
         """Test validation when some files exist."""
         file1 = tmp_path / "file1.txt"
-        file1.write_text("test")
+        file1.write_text("header\ndata")
 
         optional_inputs = {"deeparg": str(file1), "rgi": "/nonexistent/path.txt", "amrfinderplus": None}
 

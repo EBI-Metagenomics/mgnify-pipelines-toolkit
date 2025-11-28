@@ -1,12 +1,15 @@
+import os
 import subprocess
 import time
-import os
 
+import pytest
 
 timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
 
+
+@pytest.mark.webin_cli
 class TestWebinCliHandler:
     def test_validate_assembly_upload(self, tmp_path):
         command = [
@@ -51,7 +54,7 @@ class TestWebinCliHandler:
                     line = f"ASSEMBLYNAME\ttest_{timestamp}_a\n"
                 file_out.write(line)
         command = [
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",
@@ -77,8 +80,7 @@ class TestWebinCliHandler:
                     line = f"ASSEMBLYNAME\ttest_{timestamp}_a\n"
                 file_out.write(line)
         command = [
-            "python",
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",
@@ -96,15 +98,14 @@ class TestWebinCliHandler:
 
     def test_submit_genome_upload_first_time_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
-        # create a new manifest with timestamp alias for first submission
+        # create a new manifest with timestamp alias for the first submission
         with open("new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
                     line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g\n"
                 file_out.write(line)
         command = [
-            "python",
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",
@@ -130,8 +131,7 @@ class TestWebinCliHandler:
                     line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g\n"
                 file_out.write(line)
         command = [
-            "python",
-            "mgnify_pipelines_toolkit/ena/webin_cli_handler.py",
+            "webin_cli_handler",
             "-c",
             "genome",
             "-m",

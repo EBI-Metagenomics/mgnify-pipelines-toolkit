@@ -14,7 +14,7 @@ tasks:
   test:
     desc: Run tests with uv
     cmds:
-      - uv run pytest
+      - uv run pytest {{.CLI_ARGS}}
 
   testk:
     desc: "Run specific tests from a file (usage: task testk -- test_path)"

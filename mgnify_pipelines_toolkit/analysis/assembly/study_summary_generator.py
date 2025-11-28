@@ -122,6 +122,7 @@ SUMMARY_TYPES_MAP = {
     },
     "antismash": {
         "folder": "pathways-and-systems/antismash",
+        "allow_missing": True,
         "column_names": ANTISMASH_COLUMN_NAMES,
         "schema": AntismashSummarySchema,
         "study_schema": AntismashStudySummarySchema,

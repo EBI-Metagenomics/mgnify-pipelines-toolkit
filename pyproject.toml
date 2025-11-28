@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.4.6"
+version = "1.4.8"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -42,7 +42,6 @@ packages = ["mgnify_pipelines_toolkit",
     "mgnify_pipelines_toolkit.analysis.assembly",
     "mgnify_pipelines_toolkit.analysis.genomes",
     "mgnify_pipelines_toolkit.analysis.rawreads",
-    "mgnify_pipelines_toolkit.ena",
 ]
 
 [project.scripts]
@@ -88,9 +87,6 @@ genomes_extract_trnas = "mgnify_pipelines_toolkit.analysis.genomes.rna.extract_t
 # utils
 fasta_to_delimited = "mgnify_pipelines_toolkit.utils.fasta_to_delimited:main"
 get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
-
-# ena webin-cli runner and handler
-webin_cli_handler = "mgnify_pipelines_toolkit.ena.webin_cli_handler:main"
 
 [project.optional-dependencies]
 test = [

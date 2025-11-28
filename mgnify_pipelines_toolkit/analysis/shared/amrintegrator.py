@@ -34,20 +34,44 @@ logger = logging.getLogger(__name__)
 
 def validate_inputs(optional_inputs: Dict[str, Optional[str]]) -> List[str]:
     """
-    Validate that input files exist and return a list of valid input names.
+    Validate that input files exist and are not empty or header-only.
 
     Args:
         optional_inputs: Dictionary mapping input names to file paths (can be None)
 
     Returns:
-        List of valid input names whose files exist
+        List of valid input names whose files should be parsed.
     """
     valid_inputs: List[str] = []
+
     for name, path in optional_inputs.items():
-        if path and os.path.exists(path):
-            valid_inputs.append(name)
-        elif path:
+        if not path:
+            continue
+
+        # Check existence
+        if not os.path.exists(path):
             logger.warning(f"File not found for '{name}' → {path}")
+            continue
+
+        # Check for empty files
+        if os.path.getsize(path) == 0:
+            logger.info(f"Skipping empty file for '{name}' → {path}")
+            continue
+
+        # Read first few lines using hook_compressed (handles .gz automatically)
+        with fileinput.hook_compressed(path, "r", encoding="utf-8", errors="ignore") as input_table:
+            lines = [line for _, line in zip(range(3), input_table)]  # read up to 3 lines
+
+        if len(lines) == 0:
+            logger.info(f"Skipping empty file for '{name}' → {path}")
+            continue
+        elif len(lines) == 1:
+            logger.info(f"Skipping header-only file for '{name}' → {path}")
+            continue
+
+        # If passed all checks
+        valid_inputs.append(name)
+
     return valid_inputs
 
 
@@ -212,6 +236,7 @@ def parse_gff(cds_gff: str, output_file: str, protein_attributes: Dict[str, List
                     features_list: List[str] = attr.split(";")
                     feature_id: str = features_list[0].split("=")[1]
                     if feature_id in protein_attributes:
+                        attr = attr.rstrip(";")
                         new_attribute: str = attr + ";" + ";".join(protein_attributes[feature_id])
                         line_l.pop(-1)
                         line_l.append(new_attribute)

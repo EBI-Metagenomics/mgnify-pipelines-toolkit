@@ -1,0 +1,39 @@
+LOCUS       NODE_1_length_1000_cov_10.5              1000 bp    DNA     linear   01-JAN-1980
+DEFINITION  Genus species strain strain.
+ACCESSION
+VERSION
+KEYWORDS    .
+SOURCE      Genus species
+  ORGANISM  Genus species
+            Unclassified.
+FEATURES             Location/Qualifiers
+     source          1..1000
+                     /organism="Genus species"
+                     /mol_type="genomic DNA"
+                     /strain="strain"
+     CDS             100..300
+                     /locus_tag="GENE_001"
+                     /inference="ab initio prediction:Prodigal:002006"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+ORIGIN
+        1 atgcgatcga tcgatcgatc gatcgatcga tcgatcgatc gatcgatcga tcgatcgatc
+       61 gatagctagc tagctagcta gctagctagc tagctagcta gctagctagc tagctagcta
+//
+LOCUS       NODE_2_length_500_cov_5.2               500 bp    DNA     linear   01-JAN-1980
+DEFINITION  Genus species strain strain.
+ACCESSION
+VERSION
+KEYWORDS    .
+SOURCE      Genus species
+  ORGANISM  Genus species
+            Unclassified.
+FEATURES             Location/Qualifiers
+     source          1..500
+                     /organism="Genus species"
+                     /mol_type="genomic DNA"
+                     /strain="strain"
+ORIGIN
+        1 ttttaaaacc ccggggtttt aaaaccccgg ggttttaaaa ccccggggtt ttaaaacccc
+//

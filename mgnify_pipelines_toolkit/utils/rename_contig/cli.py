@@ -38,7 +38,33 @@ def main():
     """
     Universal contig renaming tool for FASTA, GFF, and GenBank files.
 
-    Rename sequences in multiple file formats using composable strategies.
+    A unified toolkit that replaces pipeline-specific renaming scripts:
+    - metaviraverse.py (viral ID preservation)
+    - virify.py (VirSorter metadata)
+    - mett.py (multi-format support)
+    - asa.py (simple renaming)
+    - map.py (size-based separation)
+
+    \b
+    PIPELINE USAGE EXAMPLES:
+
+    Metaviraverse (preserves viral IDs):
+      mpt rename -i input.fasta -o outdir --parser virify --formatter virify
+
+    Virify (preserves VirSorter metadata):
+      mpt rename -i input.fasta -o outdir --parser virify --formatter virify
+
+    METT (multi-format renaming):
+      mpt rename -i assembly.fasta prokka.gff prokka.gbk -o outdir
+
+    ASA (simple renaming):
+      mpt rename -i input.fasta -o outdir --prefix seq
+
+    MAP/Mobilome (size-based separation):
+      mpt rename -i assembly.fasta -o outdir --separate-by-size
+
+    \b
+    For more info: mpt rename --help
     """
     pass
 
@@ -83,11 +109,46 @@ def rename(
     """
     Rename contigs in FASTA, GFF, and/or GenBank files.
 
-    Supports multiple input files of different formats.
+    Supports multiple input files of different formats. Automatically detects
+    file types by extension and applies consistent renaming across all files.
 
-    Example with viral metadata:
+    \b
+    PIPELINE-SPECIFIC USAGE:
 
-        mpt rename -i input.fasta -o output_dir --parser viral --formatter viral
+    Metaviraverse (preserve viral IDs):
+      mpt rename -i input.fasta -o outdir --parser virify --formatter virify
+      Input:  >ERZ123|viral_id_001
+      Output: >contig_1|viral_id_001
+
+    Virify (preserve VirSorter metadata):
+      mpt rename -i input.fasta -o outdir --parser virify --formatter virify
+      Input:  >seq1|phage-circular
+      Output: >contig_1|phage-circular
+
+    METT (multi-format renaming):
+      mpt rename -i assembly.fasta prokka.gff prokka.gbk -o outdir
+      Renames sequences consistently across FASTA, GFF, and GenBank files
+
+    ASA (simple renaming):
+      mpt rename -i input.fasta -o outdir --prefix seq
+      Input:  >original_name_1
+      Output: >seq1
+
+    MAP/Mobilome (size-based separation):
+      mpt rename -i assembly.fasta -o outdir --separate-by-size
+      Creates: output_1kb_contigs.fasta (>1000bp)
+               output_5kb_contigs.fasta (>5000bp)
+               output_100kb_contigs.fasta (>=100000bp)
+
+    \b
+    USING EXISTING MAPPINGS:
+      mpt rename -i new.fasta -o outdir --use-mapping mapping.tsv
+
+    \b
+    SUPPORTED FILE FORMATS:
+      FASTA:   .fasta, .fa, .fna, .fasta.gz, .fa.gz, .fna.gz
+      GFF:     .gff, .gff3, .gff.gz, .gff3.gz
+      GenBank: .gbk, .gb, .genbank
 
     :param input: Input file(s) (FASTA, GFF, and/or GenBank)
     :param outdir: Output directory
@@ -96,8 +157,8 @@ def rename(
     :param use_mapping: Use existing mapping file instead of generating new names
     :param from_col: Source column in mapping file
     :param to_col: Target column in mapping file
-    :param parser: Header parser to use ('base' or 'viral')
-    :param formatter: Metadata formatter to use ('simple', 'generic', or 'viral')
+    :param parser: Header parser to use ('base' or 'virify')
+    :param formatter: Metadata formatter to use ('simple', 'generic', or 'virify')
     :param separate_by_size: Separate output by contig size
     """
     # Create output directory if it doesn't exist
@@ -254,9 +315,34 @@ def restore(input, outdir, map, from_col, to_col, parser, formatter):
     """
     Restore original contig names using a mapping file.
 
-    Example with Virify metadata:
+    Reverses the renaming process by looking up original names in the mapping
+    file. Preserves metadata when using appropriate parser/formatter modes.
 
-        mpt restore -i renamed.fasta -o output_dir -m mapping.tsv --parser virify --formatter virify
+    \b
+    USAGE EXAMPLES:
+
+    Basic restore (renamed -> original):
+      mpt restore -i renamed.fasta -o outdir -m mapping.tsv
+
+    Restore with viral metadata:
+      mpt restore -i renamed.fasta -o outdir -m mapping.tsv \\
+        --parser virify --formatter virify
+
+    Restore from short names:
+      mpt restore -i renamed.fasta -o outdir -m mapping.tsv \\
+        --from-restore temporary --to-restore short
+
+    \b
+    MAPPING FILE COLUMNS:
+      original:  Full original sequence name
+      renamed:   New sequence name (e.g., contig_1)
+      short:     Short name (first token before space)
+
+    \b
+    TYPICAL WORKFLOW:
+      1. Rename sequences: mpt rename -i input.fasta -o outdir -m mapping.tsv
+      2. Process files...
+      3. Restore names: mpt restore -i processed.fasta -o restored -m mapping.tsv
 
     :param input: Input FASTA file(s) with renamed sequences
     :param outdir: Output directory

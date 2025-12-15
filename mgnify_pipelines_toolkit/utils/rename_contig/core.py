@@ -25,6 +25,7 @@ from mgnify_pipelines_toolkit.utils.io import open_file
 
 from .parsers import ParsedHeader, parse_header
 from .writers import format_header
+from .handlers import GFFHandler, GenBankHandler
 
 
 def read_fasta(file_path: str) -> List:
@@ -244,3 +245,97 @@ def write_mapping_file(
         writer.writerow(["original", "renamed", "short"])
         for new_name, (old_name, short_name) in mapping.items():
             writer.writerow([old_name, new_name, short_name])
+
+
+# API Wrapper Functions for backward compatibility
+
+
+def _parse_fasta_header(header: str) -> Tuple[str, str, List[str], Optional[str]]:
+    """
+    Parse FASTA header and return components as a tuple.
+
+    Wrapper function for backward compatibility with test API.
+
+    :param header: Raw FASTA header
+    :type header: str
+    :returns: Tuple of (seq_name, short_name, metadata, viral_id)
+    :rtype: tuple
+    """
+    parsed = parse_header(header)
+    return parsed.seq_name, parsed.short_name, parsed.metadata, parsed.viral_id
+
+
+def rename_gff(input_file: str, output_file: str, mapping: Dict[str, str]) -> None:
+    """
+    Rename contig IDs in a GFF file.
+
+    Wrapper for GFFHandler.rename for API compatibility.
+
+    :param input_file: Input GFF file path
+    :type input_file: str
+    :param output_file: Output GFF file path
+    :type output_file: str
+    :param mapping: Dictionary mapping old_name -> new_name
+    :type mapping: dict
+    """
+    return GFFHandler.rename(input_file, output_file, mapping)
+
+
+def rename_genbank(input_file: str, output_file: str, mapping: Dict[str, str]) -> None:
+    """
+    Rename contig IDs in a GenBank file.
+
+    Wrapper for GenBankHandler.rename for API compatibility.
+
+    :param input_file: Input GenBank file path
+    :type input_file: str
+    :param output_file: Output GenBank file path
+    :type output_file: str
+    :param mapping: Dictionary mapping old_name -> new_name
+    :type mapping: dict
+    """
+    return GenBankHandler.rename(input_file, output_file, mapping)
+
+
+def rename_fasta_by_size(
+    input_file: str,
+    output_prefix: str,
+    prefix: str = "contig_",
+    parser_fn: Callable[[str], ParsedHeader] = parse_header,
+    formatter_mode: str = "simple",
+    mapping: Optional[Dict[str, str]] = None,
+) -> Dict[str, Tuple[str, str]]:
+    """
+    Rename sequences in FASTA file and separate by size thresholds.
+
+    Creates three output files:
+    - {output_prefix}_1kb_contigs.fasta (sequences > 1000 bp)
+    - {output_prefix}_5kb_contigs.fasta (sequences > 5000 bp)
+    - {output_prefix}_100kb_contigs.fasta (sequences >= 100000 bp)
+
+    This matches the functionality of the map.py script for the Mobilome pipeline.
+
+    :param input_file: Input FASTA file path
+    :type input_file: str
+    :param output_prefix: Output file prefix (without extension)
+    :type output_prefix: str
+    :param prefix: Prefix for new names (default: 'contig_')
+    :type prefix: str
+    :param parser_fn: Header parser function (default: parse_header)
+    :type parser_fn: callable
+    :param formatter_mode: Metadata formatter mode ('simple', 'generic', or 'virify')
+    :type formatter_mode: str
+    :param mapping: Pre-defined mapping of original_name -> new_name (optional)
+    :type mapping: dict or None
+    :returns: Mapping of new_name -> (old_name, short_name)
+    :rtype: dict
+    """
+    return rename_fasta(
+        input_file=input_file,
+        output_file=output_prefix,
+        prefix=prefix,
+        parser_fn=parser_fn,
+        formatter_mode=formatter_mode,
+        mapping=mapping,
+        separate_by_size=True,
+    )

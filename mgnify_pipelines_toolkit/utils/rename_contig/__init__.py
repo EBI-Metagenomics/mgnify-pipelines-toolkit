@@ -161,7 +161,7 @@ from .core import (
 )
 
 # File format handlers
-from .handlers import GenBankHandler, GFFHandler
+from .handlers import FASTAHandler, GenBankHandler, GFFHandler
 
 # Parsers
 from .parsers import FormatterMode, ParsedHeader, parse_header, parse_virify_header
@@ -189,6 +189,7 @@ __all__ = [
     # Writers
     "format_header",
     # File format handlers
+    "FASTAHandler",
     "GFFHandler",
     "GenBankHandler",
     # CLI

@@ -37,3 +37,4 @@ jobs:
           emoji: false
           verbose: true
           job-summary: true
+          custom-arguments: '-m ""'

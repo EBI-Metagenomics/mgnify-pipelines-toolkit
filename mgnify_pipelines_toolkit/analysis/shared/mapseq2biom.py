@@ -23,7 +23,7 @@ def main():
     parser.add_argument(
         "--otu-table",
         required=True,
-        help=("The OTU table produced for the taxonomies found in" " the reference databases that was used with MAPseq."),
+        help=("The OTU table produced for the taxonomies found in the reference databases that was used with MAPseq."),
     )
     parser.add_argument(
         "--query",

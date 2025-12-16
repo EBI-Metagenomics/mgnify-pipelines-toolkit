@@ -16,7 +16,6 @@
 
 """Restore command implementation for CLI."""
 
-import os
 from pathlib import Path
 
 import click

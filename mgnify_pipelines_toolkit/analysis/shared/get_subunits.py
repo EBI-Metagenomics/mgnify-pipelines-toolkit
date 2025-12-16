@@ -17,24 +17,26 @@
 
 import argparse
 import os
+
 from Bio import SeqIO
+
 from mgnify_pipelines_toolkit.constants.ncrna import (
     DIRECTORY_SEQ_CAT,
-    SSU,
     LSU,
-    Seq5S,
+    LSU_MODELS,
+    NON_CODING_RNA,
+    RFAM_MODELS,
+    SSU,
+    SSU_MODELS,
+    LSU_rRNA_archaea,
+    LSU_rRNA_bacteria,
+    LSU_rRNA_eukarya,
     Seq5_8S,
+    Seq5S,
     SSU_rRNA_archaea,
     SSU_rRNA_bacteria,
     SSU_rRNA_eukarya,
     SSU_rRNA_microsporidia,
-    LSU_rRNA_archaea,
-    LSU_rRNA_bacteria,
-    LSU_rRNA_eukarya,
-    NON_CODING_RNA,
-    SSU_MODELS,
-    LSU_MODELS,
-    RFAM_MODELS,
 )
 
 

@@ -18,9 +18,8 @@
 import csv
 from typing import Callable, Dict, List, Optional, Tuple
 
+from .handlers import FASTAHandler, GenBankHandler, GFFHandler
 from .parsers import ParsedHeader, parse_header
-from .handlers import FASTAHandler, GFFHandler, GenBankHandler
-
 
 # Wrapper functions for backward compatibility
 # All FASTA operations now delegate to FASTAHandler

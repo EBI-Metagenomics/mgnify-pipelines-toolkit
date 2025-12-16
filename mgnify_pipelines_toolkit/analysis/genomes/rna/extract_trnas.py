@@ -15,8 +15,8 @@
 # limitations under the License.
 
 
-import os
 import argparse
+import os
 import sys
 
 from mgnify_pipelines_toolkit.constants.ncrna import TRNA

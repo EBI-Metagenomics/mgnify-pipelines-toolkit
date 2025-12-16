@@ -18,7 +18,6 @@ import importlib.metadata
 
 
 def main():
-
     print(importlib.metadata.version("mgnify-pipelines-toolkit"))
 
 

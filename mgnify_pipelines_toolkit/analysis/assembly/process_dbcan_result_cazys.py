@@ -18,14 +18,13 @@
 import argparse
 import fileinput
 import logging
-from pathlib import Path
 import re
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 
 
 def main():
-
     args = parse_args()
     hmm_file, overview_file, genome_gff, outfile, dbcan_ver = (
         args.hmm_file,
@@ -81,7 +80,6 @@ def print_gff(overview_file, outfile, dbcan_version, substrates, genome_gff_line
         file_out.write("##gff-version 3\n")
         with fileinput.hook_compressed(overview_file, "r", encoding="utf-8") as file_in:
             for line in file_in:
-
                 if not line.startswith("MGYG") and not line.startswith("ERZ"):
                     continue
 

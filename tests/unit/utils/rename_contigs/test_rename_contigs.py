@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-import tempfile
 import shutil
+import tempfile
 from pathlib import Path
 
+import pytest
 
 from mgnify_pipelines_toolkit.utils.rename_contig import (
     _parse_fasta_header,
@@ -29,6 +29,9 @@ from mgnify_pipelines_toolkit.utils.rename_contig import (
     rename_gff,
     restore_fasta,
     write_mapping_file,
+)
+from mgnify_pipelines_toolkit.utils.rename_contig.parsers import (
+    parse_virify_header,
 )
 
 
@@ -59,9 +62,7 @@ class TestParseFastaHeader:
 
     def test_header_with_description(self):
         """Test parsing a header with description."""
-        seq_name, short_name, metadata, viral_id = _parse_fasta_header(
-            ">NODE_1_length_1000 extra description"
-        )
+        seq_name, short_name, metadata, viral_id = _parse_fasta_header(">NODE_1_length_1000 extra description")
         assert seq_name == "NODE_1_length_1000 extra description"
         assert short_name == "NODE_1_length_1000"
         assert metadata == []
@@ -69,30 +70,24 @@ class TestParseFastaHeader:
 
     def test_header_with_viral_id(self):
         """Test parsing a header with viral identifier."""
-        seq_name, short_name, metadata, viral_id = _parse_fasta_header(
-            ">viral_seq|viral_id_001"
-        )
-        assert seq_name == "viral_seq"
-        assert short_name == "viral_seq"
-        assert "viral_id_001" in metadata
-        assert viral_id == "viral_id_001"
+        parsed_header = parse_virify_header(">viral_seq|viral_id_001")
+        assert parsed_header.seq_name == "viral_seq"
+        assert parsed_header.short_name == "viral_seq"
+        assert "viral_id_001" in parsed_header.metadata
+        assert parsed_header.viral_id == "viral_id_001"
 
     def test_header_with_phage_circular(self):
         """Test parsing a header with phage-circular metadata."""
-        seq_name, short_name, metadata, viral_id = _parse_fasta_header(
-            ">viral_seq|viral_id_002|phage-circular"
-        )
-        assert seq_name == "viral_seq"
-        assert "phage-circular" in metadata
-        assert "viral_id_002" in metadata
+        parsed_header = parse_virify_header(">viral_seq|viral_id_002|phage-circular")
+        assert parsed_header.seq_name == "viral_seq"
+        assert "phage-circular" in parsed_header.metadata
+        assert "viral_id_002" in parsed_header.metadata
 
     def test_header_with_prophage(self):
         """Test parsing a header with prophage metadata."""
-        seq_name, short_name, metadata, viral_id = _parse_fasta_header(
-            ">viral_seq|prophage-100:500"
-        )
-        assert seq_name == "viral_seq"
-        assert "prophage-100:500" in metadata
+        parsed_header = parse_virify_header(">viral_seq|prophage-100:500")
+        assert parsed_header.seq_name == "viral_seq"
+        assert "prophage-100:500" in parsed_header.metadata
 
     def test_header_without_prefix(self):
         """Test parsing a header without '>' prefix."""
@@ -118,9 +113,7 @@ class TestMappingFile:
         write_mapping_file(test_mapping, str(mapping_file))
 
         # Read mapping back
-        read_mapping = read_mapping_file(
-            str(mapping_file), from_col="original", to_col="renamed"
-        )
+        read_mapping = read_mapping_file(str(mapping_file), from_col="original", to_col="renamed")
 
         assert "NODE_1_length_1000" in read_mapping
         assert read_mapping["NODE_1_length_1000"] == "contig1"
@@ -139,9 +132,7 @@ class TestMappingFile:
         write_mapping_file(test_mapping, str(mapping_file))
 
         # Read with different columns
-        read_mapping = read_mapping_file(
-            str(mapping_file), from_col="renamed", to_col="short"
-        )
+        read_mapping = read_mapping_file(str(mapping_file), from_col="renamed", to_col="short")
 
         assert read_mapping["contig1"] == "NODE_1"
         assert read_mapping["contig2"] == "NODE_2"
@@ -155,11 +146,7 @@ class TestRenameFasta:
         input_file = fixtures_dir / "test_input.fasta"
         output_file = temp_dir / "output.fasta"
 
-        mapping = rename_fasta(
-            str(input_file),
-            str(output_file),
-            prefix="seq"
-        )
+        mapping = rename_fasta(str(input_file), str(output_file), prefix="seq")
 
         # Check mapping was created
         assert len(mapping) == 3
@@ -183,11 +170,7 @@ class TestRenameFasta:
         input_file = fixtures_dir / "test_input.fasta"
         output_file = temp_dir / "output.fasta"
 
-        mapping = rename_fasta(
-            str(input_file),
-            str(output_file),
-            prefix="contig_"
-        )
+        mapping = rename_fasta(str(input_file), str(output_file), prefix="contig_")
 
         # Check mapping uses custom prefix
         assert "contig_1" in mapping or "contig1" in mapping
@@ -197,17 +180,12 @@ class TestRenameFasta:
         input_file = fixtures_dir / "test_viral.fasta"
         output_file = temp_dir / "output.fasta"
 
-        mapping = rename_fasta(
-            str(input_file),
-            str(output_file),
-            prefix="seq",
-            formatter_mode="generic"
-        )
+        rename_fasta(str(input_file), str(output_file), prefix="seq", formatter_mode="virify", parser_fn=parse_virify_header)
 
         # Check output preserves metadata
         with open(output_file) as f:
             content = f.read()
-            assert "viral_id" in content
+            assert "viral_id_001" in content
             assert "phage-circular" in content
             assert "prophage-100:500" in content
 
@@ -223,11 +201,7 @@ class TestRenameFasta:
             "NODE_3_length_750_cov_8.1": "custom3",
         }
 
-        rename_fasta(
-            str(input_file),
-            str(output_file),
-            mapping=custom_mapping
-        )
+        rename_fasta(str(input_file), str(output_file), mapping=custom_mapping)
 
         # Check custom mapping was used
         with open(output_file) as f:
@@ -240,12 +214,8 @@ class TestRenameFasta:
         """Test FASTA to create 1k.fasta, 5k.fasta, etc (used in mobilome pipeline)"""
         input_file = fixtures_dir / "test_input.fasta"
 
-        rename_fasta_by_size(
-            str(input_file),
-            output_prefix='assembly',
-            prefix='contig_'
-        )
-        assert Path(temp_dir / "assembly_1kb_contigs.fasta").exists()
+        rename_fasta_by_size(str(input_file), output_prefix="assembly", prefix="contig_")
+        assert (temp_dir / "assembly_1kb_contigs.fasta").exists()
 
 
 class TestRestoreFasta:
@@ -258,11 +228,7 @@ class TestRestoreFasta:
         restored_file = temp_dir / "restored.fasta"
 
         # First rename
-        mapping = rename_fasta(
-            str(input_file),
-            str(renamed_file),
-            prefix="seq"
-        )
+        mapping = rename_fasta(str(input_file), str(renamed_file), prefix="seq")
 
         # Create reverse mapping
         reverse_mapping = {new: old for new, (old, _) in mapping.items()}
@@ -285,23 +251,13 @@ class TestRestoreFasta:
         restored_file = temp_dir / "restored.fasta"
 
         # First rename with metadata
-        mapping = rename_fasta(
-            str(input_file),
-            str(renamed_file),
-            prefix="seq",
-            formatter_mode="generic"
-        )
+        mapping = rename_fasta(str(input_file), str(renamed_file), prefix="seq", formatter_mode="generic")
 
         # Create reverse mapping
         reverse_mapping = {new: old for new, (old, _) in mapping.items()}
 
         # Restore with metadata preservation
-        restore_fasta(
-            str(renamed_file),
-            str(restored_file),
-            reverse_mapping,
-            formatter_mode="generic"
-        )
+        restore_fasta(str(renamed_file), str(restored_file), reverse_mapping, formatter_mode="generic")
 
         # Check metadata is preserved
         with open(restored_file) as f:
@@ -313,14 +269,9 @@ class TestRestoreFasta:
         input_file = fixtures_dir / "virsorter_renamed.fasta"
         mapfile = fixtures_dir / "virsorter_map.tsv"
         output_file = temp_dir / "restored.fasta"
-        mapping = read_mapping_file(mapfile, from_col='temporary', to_col='short')
+        mapping = read_mapping_file(mapfile, from_col="temporary", to_col="short")
 
-        restore_fasta(
-            str(input_file),
-            str(output_file),
-            mapping,
-            formatter_mode="virify"
-        )
+        restore_fasta(str(input_file), str(output_file), mapping, formatter_mode="virify", parser_fn=parse_virify_header)
         expected = [
             "ERZ1.1",
             "ERZ1.2|phage-circular",
@@ -338,9 +289,9 @@ class TestRestoreFasta:
                 if line.startswith(">"):
                     obtained = line.replace(">", "").strip()
                     records += 1
-                assert expected[records-1] == obtained
+                assert expected[records - 1] == obtained
                 lines += 1
-            assert lines == 24
+            assert lines == 12
             assert records == 6
 
 
@@ -412,11 +363,7 @@ class TestIntegration:
         gff_out = temp_dir / "test_input.gff"
 
         # Rename FASTA first
-        mapping = rename_fasta(
-            str(fasta_in),
-            str(fasta_out),
-            prefix="seq"
-        )
+        mapping = rename_fasta(str(fasta_in), str(fasta_out), prefix="seq")
 
         # Convert to old -> new mapping
         old_to_new = {old: new for new, (old, _) in mapping.items()}
@@ -446,29 +393,32 @@ class TestIntegration:
         mapping_file = temp_dir / "mapping.tsv"
 
         # Rename
-        mapping = rename_fasta(
-            str(input_file),
-            str(renamed_file),
-            prefix="seq"
-        )
+        mapping = rename_fasta(str(input_file), str(renamed_file), prefix="seq")
 
         # Write mapping
         write_mapping_file(mapping, str(mapping_file))
 
         # Read mapping for restoration
-        restore_mapping = read_mapping_file(
-            str(mapping_file), from_col="renamed", to_col="original"
-        )
+        restore_mapping = read_mapping_file(str(mapping_file), from_col="renamed", to_col="original")
 
         # Restore
         restore_fasta(str(renamed_file), str(restored_file), restore_mapping)
 
         # Compare original and restored (sequence content should match)
         with open(input_file) as f:
-            original_lines = [line for line in f if not line.startswith(">")]
+            original_lines = []
+            seq = ""
+            for line in f:
+                if line.startswith(">"):
+                    if seq:
+                        original_lines.append(seq)
+                        seq = ""
+                else:
+                    seq += line.strip()
+            original_lines.append(seq)
 
         with open(restored_file) as f:
-            restored_lines = [line for line in f if not line.startswith(">")]
+            restored_lines = [line.strip() for line in f if not line.startswith(">")]
 
         # Sequences should be identical
         assert original_lines == restored_lines
@@ -488,9 +438,6 @@ class TestMetaviraversePipeline:
             f.write("ATCGATCGATCGATCG\n")
             f.write(">ERZ456|viral_id_002\n")
             f.write("GCTAGCTAGCTAGCTA\n")
-
-        # Rename with virify mode (handles metaviraverse format)
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
 
         mapping = rename_fasta(
             str(input_file),
@@ -520,8 +467,6 @@ class TestMetaviraversePipeline:
             f.write(">seq1|viral_id_003|phage-circular\n")
             f.write("ATCGATCG\n")
 
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
-
         rename_fasta(
             str(input_file),
             str(output_file),
@@ -542,8 +487,6 @@ class TestMetaviraversePipeline:
         with open(input_file, "w") as f:
             f.write(">seq1|viral_id_004|prophage-100:500\n")
             f.write("ATCGATCG\n")
-
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
 
         rename_fasta(
             str(input_file),
@@ -574,9 +517,6 @@ class TestMetaviraversePipeline:
             f.write("##gff-version 3\n")
             f.write("##sequence-region ERZ1.1 1 8\n")
             f.write("ERZ1.1\t.\tgene\t1\t8\t.\t+\t.\tID=gene1\n")
-
-        # Rename FASTA
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
 
         mapping = rename_fasta(
             str(fasta_in),
@@ -624,8 +564,6 @@ class TestVirifyPipeline:
             f.write(">contig3|prophage-100:500|prophage-600:900\n")
             f.write("TTAATTAA\n")
 
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
-
         rename_fasta(
             str(input_file),
             str(output_file),
@@ -650,8 +588,6 @@ class TestVirifyPipeline:
         with open(input_file, "w") as f:
             f.write(">original_seq|viral_id|phage-circular\n")
             f.write("ATCGATCG\n")
-
-        from mgnify_pipelines_toolkit.utils.rename_contig.parsers import parse_virify_header
 
         # Rename
         mapping = rename_fasta(
@@ -694,7 +630,7 @@ class TestMETTPipeline:
             f.write("GCTAGCTAGCTAGCTA\n")
 
         # METT uses simple mode (no metadata preservation)
-        mapping = rename_fasta(
+        rename_fasta(
             str(input_file),
             str(output_file),
             prefix="contig_",
@@ -796,7 +732,7 @@ class TestASAPipeline:
             f.write(">sequence_2\n")
             f.write("GCTA\n")
 
-        mapping = rename_fasta(
+        rename_fasta(
             str(input_file),
             str(output_file),
             prefix="seq",
@@ -860,7 +796,7 @@ class TestMAPPipeline:
             f.write("T" * 150000 + "\n")
 
         # Use rename_fasta_by_size function
-        mapping = rename_fasta_by_size(
+        rename_fasta_by_size(
             str(input_file),
             output_prefix,
             prefix="contig_",

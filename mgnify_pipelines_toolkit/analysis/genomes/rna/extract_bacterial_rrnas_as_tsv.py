@@ -15,8 +15,8 @@
 # limitations under the License.
 
 
-import os
 import argparse
+import os
 
 rRNAs_exp = {  # noqa: N816
     "5S_rRNA": 119,

@@ -17,8 +17,8 @@
 import argparse
 import fileinput
 import logging
-import pandas as pd
 
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
 
@@ -169,7 +169,7 @@ def parse_args():
     )
     args = parser.parse_args()
     if args.antismash_version > ANTISMASH_VERSION:
-        logging.error("Provided version of antiSMASH is bigger than supported. " "Please, make sure you have updated descriptions dictionary. Exit.")
+        logging.error("Provided version of antiSMASH is bigger than supported. Please, make sure you have updated descriptions dictionary. Exit.")
         exit(1)
     return args.antismash_gff, args.output
 

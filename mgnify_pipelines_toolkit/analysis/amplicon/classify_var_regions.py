@@ -15,23 +15,24 @@
 # limitations under the License.
 
 import argparse
-from collections import Counter, defaultdict
 import gzip
-import re
-import os
-import logging
 import json
+import logging
+import os
+import re
 import time
+from collections import Counter, defaultdict
+
 import numpy as np
 
 from mgnify_pipelines_toolkit.constants.thresholds import (
+    MAX_ERROR_PROPORTION,
     MIN_OVERLAP,
     MIN_SEQ_COUNT,
-    MAX_ERROR_PROPORTION,
 )
 from mgnify_pipelines_toolkit.constants.var_region_coordinates import (
-    REGIONS_16S_BACTERIA,
     REGIONS_16S_ARCHAEA,
+    REGIONS_16S_BACTERIA,
     REGIONS_18S,
 )
 

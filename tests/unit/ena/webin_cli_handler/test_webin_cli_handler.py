@@ -1,11 +1,11 @@
+import os
 import subprocess
 import time
-import os
-
 
 timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
+
 
 class TestWebinCliHandler:
     def test_validate_assembly_upload(self, tmp_path):

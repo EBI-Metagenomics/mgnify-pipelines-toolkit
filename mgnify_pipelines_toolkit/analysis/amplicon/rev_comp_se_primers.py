@@ -20,7 +20,6 @@ from Bio import SeqIO
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -42,13 +41,11 @@ def parse_args():
 
 
 def main():
-
     input, sample, output = parse_args()
 
     primers_dict = SeqIO.to_dict(SeqIO.parse(input, "fasta"))
 
     for primer_key in primers_dict.keys():
-
         primer = primers_dict[primer_key]
         primer_name = primer.name
 

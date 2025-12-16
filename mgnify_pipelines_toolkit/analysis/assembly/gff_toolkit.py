@@ -24,13 +24,12 @@ from mgnify_pipelines_toolkit.analysis.assembly.gff_annotation_utils import (
     load_crispr,
 )
 from mgnify_pipelines_toolkit.analysis.assembly.gff_file_utils import (
-    write_results_to_file,
     print_pseudogene_report,
+    write_results_to_file,
 )
 
 
 def main():
-
     (
         gff,
         ipr_file,

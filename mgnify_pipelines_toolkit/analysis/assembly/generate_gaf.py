@@ -15,14 +15,13 @@
 # limitations under the License.
 
 import argparse
-import os
 import logging
+import os
 
 from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_interproscan_tsv
 
 
 def parse_args():
-
     description = "Go slim pipeline for processing InterProScan results"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("-i", "--ips_input", help="InterProScan result file", required=True)

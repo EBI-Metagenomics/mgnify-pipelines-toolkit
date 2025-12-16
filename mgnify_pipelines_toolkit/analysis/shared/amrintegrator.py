@@ -20,7 +20,7 @@ import fileinput
 import logging
 import os
 from collections import defaultdict
-from typing import Dict, List, Optional, Union, DefaultDict
+from typing import DefaultDict, Dict, List, Optional, Union
 
 # Constant to simplify long strings
 DRUG_REPLACEMENT_STRINGS: Dict[str, str] = {

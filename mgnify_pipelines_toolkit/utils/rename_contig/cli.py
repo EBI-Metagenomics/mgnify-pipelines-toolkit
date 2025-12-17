@@ -31,11 +31,11 @@ def main():
     Universal contig renaming tool for FASTA, GFF, and GenBank files.
 
     A unified toolkit that replaces pipeline-specific renaming scripts:
-    - metaviraverse.py (viral ID preservation)
-    - virify.py (VirSorter metadata)
-    - mett.py (multi-format support)
-    - asa.py (simple renaming)
-    - map.py (size-based separation)
+    - metaviraverse (viral ID preservation)
+    - virify (VirSorter metadata)
+    - mett (multi-format support)
+    - asa (simple renaming)
+    - map (size-based separation)
 
     \b
     PIPELINE USAGE EXAMPLES:

@@ -18,7 +18,7 @@ import gzip
 
 
 def open_file(file_path: str, mode: str = "r"):
-    r"""
+    """
     Open a file, handling both compressed and uncompressed formats.
 
     Automatically detects gzip format by file extension (.gz) and opens

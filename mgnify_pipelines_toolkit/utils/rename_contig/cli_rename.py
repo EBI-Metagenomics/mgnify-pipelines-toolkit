@@ -14,19 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rename command implementation for CLI."""
-
 from pathlib import Path
 
 import click
 
+from .constants import SUPPORTED_FASTA_EXTS, SUPPORTED_GBK_EXTS, SUPPORTED_GFF_EXTS
 from .core import read_mapping_file, rename_fasta, write_mapping_file
 from .handlers import GenBankHandler, GFFHandler
 from .parsers import parse_header, parse_virify_header
-
-SUPPORTED_FASTA_EXTS = (".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz", ".fna.gz")
-SUPPORTED_GBK_EXTS = (".gbk", ".gb", ".genbank")
-SUPPORTED_GFF_EXTS = (".gff", ".gff3", ".gff.gz", ".gff3.gz")
 
 
 @click.command()

@@ -14,16 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Restore command implementation for CLI."""
-
 from pathlib import Path
 
 import click
 
+from .constants import SUPPORTED_FASTA_EXTS
 from .core import read_mapping_file, restore_fasta
 from .parsers import parse_header, parse_virify_header
-
-SUPPORTED_FASTA_EXTS = (".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz", ".fna.gz")
 
 
 @click.command()

@@ -14,15 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-File format handlers for renaming sequences in different formats.
-
-Provides consistent class-based interface for handling:
-- FASTA files (FASTAHandler)
-- GFF files (GFFHandler)
-- GenBank files (GenBankHandler)
-"""
-
 import sys
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -291,7 +282,7 @@ class GenBankHandler:
         :param mapping: Dictionary mapping old_name -> new_name
         :type mapping: dict
         """
-        with open(input_file, "r") as in_f, open(output_file, "w") as out_f:
+        with open_file(input_file, "r") as in_f, open(output_file, "w") as out_f:
             for line in in_f:
                 if line.startswith("LOCUS"):
                     parts = line.split()

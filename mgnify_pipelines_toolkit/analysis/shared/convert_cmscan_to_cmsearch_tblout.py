@@ -28,9 +28,9 @@ SRR17062740.1        -         SSU_rRNA_eukarya     RF01960    cm      582     1
 
 """
 
-import sys
 import argparse
 import fileinput
+import sys
 from itertools import accumulate
 
 

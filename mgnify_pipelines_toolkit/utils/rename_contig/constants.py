@@ -14,12 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib.metadata
-
-
-def main():
-    print(importlib.metadata.version("mgnify-pipelines-toolkit"))
-
-
-if __name__ == "__main__":
-    main()
+SUPPORTED_FASTA_EXTS = (".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz", ".fna.gz")
+SUPPORTED_GBK_EXTS = (".gbk", ".gb", ".genbank", ".gbk.gz", ".gb.gz", ".genbank.gz")
+SUPPORTED_GFF_EXTS = (".gff", ".gff3", ".gff.gz", ".gff3.gz")

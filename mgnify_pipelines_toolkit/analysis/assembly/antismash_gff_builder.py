@@ -15,8 +15,8 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import json
+from collections import defaultdict
 
 import pandas as pd
 
@@ -126,7 +126,6 @@ def main():
         if "antismash.detection.genefunctions" in record["modules"].keys():
             gene_function_tools = record["modules"]["antismash.detection.genefunctions"]["tools"]
             if tool_data := gene_function_tools.get("smcogs"):
-
                 for locus_tag in tool_data["best_hits"]:
                     smcog_id = tool_data["best_hits"][locus_tag]["reference_id"]
                     smcog_description = tool_data["best_hits"][locus_tag]["description"]

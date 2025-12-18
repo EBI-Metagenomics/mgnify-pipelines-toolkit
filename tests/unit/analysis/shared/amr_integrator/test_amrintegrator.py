@@ -16,24 +16,24 @@
 
 
 import argparse
-import pytest
-import pandas as pd
 import gzip
-from pathlib import Path
-from unittest.mock import patch
-from typing import Dict, List
 from collections import defaultdict
+from pathlib import Path
+from typing import Dict, List
+from unittest.mock import patch
+
+import pandas as pd
+import pytest
 
 from mgnify_pipelines_toolkit.analysis.shared.amrintegrator import (
-    validate_inputs,
-    normalize_drug_class,
-    parse_hamronized,
-    parse_amrfinderplus,
-    parse_amr_dict,
-    parse_gff,
     main,
+    normalize_drug_class,
+    parse_amr_dict,
+    parse_amrfinderplus,
+    parse_gff,
+    parse_hamronized,
+    validate_inputs,
 )
-
 
 # Test data structures for DeepARG hamronized output
 DEEPARG_TEST_RECORDS: List[Dict[str, str]] = [

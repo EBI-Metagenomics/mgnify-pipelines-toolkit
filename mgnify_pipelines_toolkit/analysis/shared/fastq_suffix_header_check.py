@@ -15,16 +15,15 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import gzip
 import json
 import logging
+from collections import defaultdict
 
 logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser(
         description="Script that sanity checks whether the strand suffix of a FASTQ file matches the headers inside the FASTQ file."
     )
@@ -56,7 +55,6 @@ def parse_args():
 
 
 def choose_open_func(file_path):
-
     open_func = open
 
     if file_path[-2:] == "gz":
@@ -66,7 +64,6 @@ def choose_open_func(file_path):
 
 
 def main():
-
     fwd, rev, sample, output = parse_args()
 
     files_to_parse = []
@@ -89,7 +86,6 @@ def main():
     reads_with_err = defaultdict(list)
 
     for file in files_to_parse:
-
         header_str = ""
 
         if "_1" in file:
@@ -100,7 +96,6 @@ def main():
             header_str = "/1"  # SE files still have "/1" in the headers
 
         for counter, line in enumerate(open_func(file)):
-
             if counter % 4 == 0:  # Only do stuff every four lines to hit the header
                 line = line.decode("ascii").strip()
                 curr_read_strand = line[-2:]
@@ -110,7 +105,6 @@ def main():
                     reads_with_err["total"].append(1)
 
     if len(reads_with_err) != 0:
-
         num_of_reads_with_err = len(reads_with_err["total"])
         reads_with_err["total"] = num_of_reads_with_err
 

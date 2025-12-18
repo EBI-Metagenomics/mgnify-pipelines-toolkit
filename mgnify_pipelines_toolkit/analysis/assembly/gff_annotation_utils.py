@@ -15,13 +15,13 @@
 # limitations under the License.
 
 
+import fileinput
 import re
 import sys
-import fileinput
 
 from mgnify_pipelines_toolkit.constants.thresholds import (
-    EVALUE_CUTOFF_IPS,
     EVALUE_CUTOFF_EGGNOG,
+    EVALUE_CUTOFF_IPS,
 )
 
 DBCAN_CLASSES_DICT = {
@@ -38,7 +38,6 @@ def get_iprs(ipr_annot):
     if not ipr_annot:
         return iprs, antifams
     with fileinput.hook_compressed(ipr_annot, "r", encoding="utf-8") as f:
-
         for line in f:
             cols = line.strip().split("\t")
             protein = cols[0]
@@ -68,7 +67,6 @@ def get_eggnog(eggnog_annot):
     if not eggnog_annot:
         return eggnogs
     with fileinput.hook_compressed(eggnog_annot, "r", encoding="utf-8") as f:
-
         for line in f:
             line = line.rstrip()
             cols = line.split("\t")
@@ -118,7 +116,6 @@ def get_bgcs(bgc_file, prokka_gff, tool):
     # save positions of each BGC cluster to dictionary cluster_positions
     # and save the annotations to dictionary bgc_result
     with fileinput.hook_compressed(bgc_file, "r", encoding="utf-8") as bgc_in:
-
         for line in bgc_in:
             if not line.startswith("#"):
                 (
@@ -179,7 +176,6 @@ def get_bgcs(bgc_file, prokka_gff, tool):
                         tool_result[contig]["_".join([start_pos, end_pos])]["bgc_product"] = as_product
     # identify CDSs that fall into each of the clusters annotated by the BGC tool
     with fileinput.hook_compressed(prokka_gff, "r", encoding="utf-8") as gff_in:
-
         for line in gff_in:
             if not line.startswith("#"):
                 matching_interval = ""
@@ -337,7 +333,7 @@ def get_dbcan_individual_cazys(dbcan_cazys_file):
             annotation_text = "dbcan_prot_type=CAZyme;"
             for field in ["protein_family", "substrate_dbcan-sub", "eC_number"]:
                 if field in attributes_dict:
-                    annotation_text += f"{'dbcan_prot_family' if field == 'protein_family' else field}" f"={attributes_dict[field]};"
+                    annotation_text += f"{'dbcan_prot_family' if field == 'protein_family' else field}={attributes_dict[field]};"
             dbcan_annotations[protein] = annotation_text.strip(";")
     return dbcan_annotations
 
@@ -348,7 +344,6 @@ def get_defense_finder(df_file):
     if not df_file:
         return defense_finder_annotations
     with fileinput.hook_compressed(df_file, "r", encoding="utf-8") as f:
-
         for line in f:
             if "Anti-phage system" in line:
                 annot_fields = line.strip().split("\t")[8].split(";")

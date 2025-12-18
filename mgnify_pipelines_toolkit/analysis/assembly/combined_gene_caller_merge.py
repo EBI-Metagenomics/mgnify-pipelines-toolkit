@@ -15,15 +15,14 @@
 # limitations under the License.
 
 import argparse
+import csv
 import json
 import logging
-from collections import defaultdict
-import csv
 import re
+from collections import defaultdict
 
-from intervaltree import Interval, IntervalTree
 from Bio import SeqIO
-
+from intervaltree import Interval, IntervalTree
 
 MASK_OVERLAP_THRESHOLD = 5
 

@@ -15,12 +15,14 @@
 # limitations under the License.
 
 import argparse
-import sys
-import re
 import csv
-import hashlib
 import gzip
+import hashlib
+import re
+import sys
+
 from Bio import SeqIO
+
 from mgnify_pipelines_toolkit.constants.regex_fasta_header import FORMAT_REGEX_MAP
 
 
@@ -49,7 +51,6 @@ def md5_hash(s):
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument("input", type=str, help="Path to (gzipped) Fasta file")

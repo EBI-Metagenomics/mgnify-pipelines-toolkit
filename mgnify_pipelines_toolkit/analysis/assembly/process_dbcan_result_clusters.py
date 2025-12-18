@@ -23,7 +23,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-
     args = parse_args()
     standard_file, substrate_file, outfile, dbcan_ver = (
         args.standard_file,

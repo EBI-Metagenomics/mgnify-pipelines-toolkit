@@ -15,42 +15,47 @@
 # limitations under the License.
 
 import argparse
-import logging
 import json
+import logging
 import os
+import re
+import shutil
+import subprocess
 import sys
 import time
-import subprocess
-import shutil
 import urllib.request
 from pathlib import Path
-import re
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 
 # Custom Exceptions
 class WebinCredentialsError(Exception):
     """Raised when Webin credentials are missing or invalid."""
+
     pass
 
 
 class ManifestValidationError(Exception):
     """Raised when manifest file validation fails."""
+
     pass
 
 
 class WebinCLINotFoundError(Exception):
     """Raised when webin-cli executable cannot be found."""
+
     pass
 
 
 class WebinCLIExecutionError(Exception):
     """Raised when webin-cli execution fails after all retries."""
+
     pass
 
 
 class DownloadError(Exception):
     """Raised when downloading webin-cli fails."""
+
     pass
 
 
@@ -114,9 +119,23 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--download-webin-cli-version", required=False, type=str, help="Version of ena-webin-cli to download, default: latest")
     parser.add_argument("--webin-cli-jar", required=False, type=str, help="Path to pre-downloaded webin-cli.jar file to execute")
     parser.add_argument("--retries", required=False, type=int, default=RETRIES, help=f"Number of retry attempts (default: {RETRIES})")
-    parser.add_argument("--retry-delay", required=False, type=int, default=RETRY_DELAY, help=f"Initial retry delay in seconds (default: {RETRY_DELAY})")
-    parser.add_argument("--java-heap-size-initial", required=False, type=int, default=JAVA_HEAP_SIZE_INITIAL, help=f"Java initial heap size in GB (default: {JAVA_HEAP_SIZE_INITIAL})")
-    parser.add_argument("--java-heap-size-max", required=False, type=int, default=JAVA_HEAP_SIZE_MAX, help=f"Java maximum heap size in GB (default: {JAVA_HEAP_SIZE_MAX})")
+    parser.add_argument(
+        "--retry-delay", required=False, type=int, default=RETRY_DELAY, help=f"Initial retry delay in seconds (default: {RETRY_DELAY})"
+    )
+    parser.add_argument(
+        "--java-heap-size-initial",
+        required=False,
+        type=int,
+        default=JAVA_HEAP_SIZE_INITIAL,
+        help=f"Java initial heap size in GB (default: {JAVA_HEAP_SIZE_INITIAL})",
+    )
+    parser.add_argument(
+        "--java-heap-size-max",
+        required=False,
+        type=int,
+        default=JAVA_HEAP_SIZE_MAX,
+        help=f"Java maximum heap size in GB (default: {JAVA_HEAP_SIZE_MAX})",
+    )
     return parser.parse_args()
 
 
@@ -304,7 +323,7 @@ def get_webin_cli_command(
     test: bool,
     jar: Optional[str] = None,
     java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX
+    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
 ) -> List[str]:
     """
     Build the webin-cli command list based on execution method.
@@ -332,13 +351,7 @@ def get_webin_cli_command(
         logback_config = Path(__file__).parent / "webincli_logback.xml"
         if not logback_config.exists():
             logger.warning(f"Logback config not found at {logback_config}, continuing without it")
-            cmd = [
-                "java",
-                f"-Xms{java_heap_size_initial}g",
-                f"-Xmx{java_heap_size_max}g",
-                "-jar",
-                jar
-            ]
+            cmd = ["java", f"-Xms{java_heap_size_initial}g", f"-Xmx{java_heap_size_max}g", "-jar", jar]
         else:
             cmd = [
                 "java",
@@ -346,7 +359,7 @@ def get_webin_cli_command(
                 f"-Xms{java_heap_size_initial}g",
                 f"-Xmx{java_heap_size_max}g",
                 "-jar",
-                jar
+                jar,
             ]
     else:
         # Use mamba/conda installation
@@ -355,23 +368,13 @@ def get_webin_cli_command(
             logger.info(f"Using ena-webin-cli from: {webin_cli_path}")
             cmd = ["ena-webin-cli"]
         else:
-            logger.error(
-                "ena-webin-cli was not found in PATH. "
-                "Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
-            )
+            logger.error("ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options.")
             raise WebinCLINotFoundError(
-                "ena-webin-cli was not found in PATH. "
-                "Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
+                "ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
             )
 
     # Add webin-cli arguments
-    cmd += [
-        f"-context={context}",
-        f"-manifest={manifest}",
-        f"-userName={webin}",
-        f"-passwordEnv={ENA_WEBIN_PASSWORD}",
-        f"-{mode}"
-    ]
+    cmd += [f"-context={context}", f"-manifest={manifest}", f"-userName={webin}", f"-passwordEnv={ENA_WEBIN_PASSWORD}", f"-{mode}"]
 
     if test:
         cmd.append("-test")
@@ -389,7 +392,7 @@ def run_webin_cli(
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
     java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX
+    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
 ) -> subprocess.CompletedProcess:
     """
     Execute webin-cli with retry logic and error handling.
@@ -492,9 +495,8 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
 
     # Check for resubmission: minimal report with only success message
     # For resubmissions, report contains only "This was a TEST submission(s)." without details
-    is_minimal_report = (
-        report_text.strip() == "This was a TEST submission(s)." or
-        (report_text.count("\n") <= 2 and "submission has been completed successfully" not in report_text)
+    is_minimal_report = report_text.strip() == "This was a TEST submission(s)." or (
+        report_text.count("\n") <= 2 and "submission has been completed successfully" not in report_text
     )
 
     if is_minimal_report:
@@ -702,7 +704,7 @@ def main() -> int:
             retries=args.retries,
             retry_delay=args.retry_delay,
             java_heap_size_initial=args.java_heap_size_initial,
-            java_heap_size_max=args.java_heap_size_max
+            java_heap_size_max=args.java_heap_size_max,
         )
 
         result_location = str(Path(manifest_for_submission).parent)

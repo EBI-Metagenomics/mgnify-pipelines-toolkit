@@ -15,9 +15,9 @@
 # limitations under the License.
 
 import argparse
-from collections import Counter
 import csv
 import logging
+from collections import Counter
 
 RANK_PREFIXES = {
     "superkingdom": "sk__",

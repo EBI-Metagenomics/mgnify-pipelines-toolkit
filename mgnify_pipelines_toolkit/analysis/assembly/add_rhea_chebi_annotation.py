@@ -20,9 +20,8 @@ import logging
 import sys
 from pathlib import Path
 
-from Bio import SeqIO
 import pandas as pd
-
+from Bio import SeqIO
 
 logging.basicConfig(
     level=logging.INFO,

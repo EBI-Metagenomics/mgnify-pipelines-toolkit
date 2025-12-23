@@ -20,21 +20,25 @@ jobs:
       WEBIN_CLI_VERSION: ${{ vars.WEBIN_CLI_VERSION }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6.0.1
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: pip install -e .[test]
+          enable-cache: true
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Cache ena-webin-cli
+        uses: actions/cache@v5.0.1
+        with:
+          path: webin-cli-${{ vars.WEBIN_CLI_VERSION }}.jar
+          key: webin-cli-${{ vars.WEBIN_CLI_VERSION }}
 
       - name: Download ena-webin-cli
         run: wget https://github.com/enasequence/webin-cli/releases/download/${WEBIN_CLI_VERSION}/webin-cli-${WEBIN_CLI_VERSION}.jar
 
-      - uses: pavelzw/pytest-action@v2
-        with:
-          emoji: false
-          verbose: true
-          job-summary: true
-          custom-arguments: '-m ""'
+      - name: Run tests
+        run: uv run pytest

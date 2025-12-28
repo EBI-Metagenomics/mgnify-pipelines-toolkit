@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.4.9"
+version = "1.4.10"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -16,15 +16,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "biopython>=1.85",
-    "numpy>=2.2.4,<3",
-    "pandas>=2.2.3,<3",
-    "requests>=2.32.3,<3",
-    "click>=8.1.8,<9",
-    "pandera>=0.23.1,<0.24",
-    "pyfastx>=2.2.0,<3",
-    "intervaltree>=3.1.0,<4",
-    "isort>=6.1.0",
+    "biopython==1.85",
+    "pandas==2.2.3",
+    "pandera==0.27.1",
+    "requests==2.32.5",
+    "click==8.3.1",
+    "pyfastx==2.2.0",
+    "intervaltree==3.1.0",
 ]
 
 [build-system]
@@ -94,15 +92,16 @@ webin_cli_handler = "mgnify_pipelines_toolkit.ena.webin_cli_handler:main"
 
 [project.optional-dependencies]
 test = [
-    "pytest>=8.3.5,<9",
-    "pytest-md>=0.2.0",
+    "pytest==8.3.5",
+    "pytest-md==0.2.0",
     "pytest-workflow==2.1.0",
 ]
 
 dev = [
-    "pre-commit>=4.2.0",
-    "black>=25.1.0",
-    "ruff>=0.8.4",
+    "pre-commit==4.2.0",
+    "black==25.1.0",
+    "ruff==0.8.4",
+    "isort==6.1.0",
 ]
 
 [tool.black]

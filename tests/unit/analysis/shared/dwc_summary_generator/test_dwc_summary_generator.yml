@@ -9,20 +9,24 @@
 - name: dwc_summary_generator_summarise test_correct_args
   tags:
     - dwc_summary_generator
-  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1
+  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1 -otu tests/fixtures/refdb_otus
   files:
-    - path: "chunk1_closedref_SILVA-SSU_dwcready.csv"
-      md5sum: d506a5fdab921b23fe86fa9241d940b4
-    - path: "chunk1_closedref_PR2_dwcready.csv"
-      md5sum: 32a66237d1a8326d74b850f6527e3af6
+    - path: "chunk1_DADA2_PR2_16S-V3-V4_dwcready.csv"
+      md5sum: 7ba4911b221dc18db850d46a89341eb2
+    - path: "chunk1_DADA2_PR2_18S-V4_dwcready.csv"
+      md5sum: d740118fb7e7e443da90e44329330ccc
     - path: "chunk1_DADA2_SILVA_16S-V3-V4_dwcready.csv"
-      md5sum: 7551b217f082f75285887fe9949a6c78
+      md5sum: 474813b22731f49f363b4e5cb4c6bc3d
     - path: "chunk1_DADA2_SILVA_18S-V4_dwcready.csv"
-      md5sum: 82b9f11862c441a07faff4204ed3bd7a
+      md5sum: 3330598a33038281c5bc99e6e0727825
     - path: "chunk1_closedref_SILVA-SSU_dwcready.csv"
-      md5sum: d506a5fdab921b23fe86fa9241d940b4
+      md5sum: 481172c643eb943ca42494f056d26c41
     - path: "chunk1_closedref_PR2_dwcready.csv"
-      md5sum: 32a66237d1a8326d74b850f6527e3af6
+      md5sum: fbdf2c7a169e535a535a5392e3620c98
+    - path: "chunk1_closedref_ITSoneDB_dwcready.csv"
+      md5sum: 8be72d6cf1aafaa33f58559fc50f3de2
+    - path: "chunk1_closedref_UNITE_dwcready.csv"
+      md5sum: face929643e1188083572ca472febc33
 - name: dwc_summary_generator_merge test_correct_args
   tags:
     - dwc_summary_generator

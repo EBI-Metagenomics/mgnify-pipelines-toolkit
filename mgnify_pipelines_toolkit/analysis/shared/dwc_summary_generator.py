@@ -248,6 +248,7 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
         ]
         + ranks
         + [
+            "taxonID",
             "MeasurementUnit",
             "MeasurementValue",
             "dbhit",
@@ -261,7 +262,7 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
     return cleaned_df
 
 
-def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]) -> pd.DataFrame:
+def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]) -> pd.DataFrame:
     """
     Cleans closed-reference taxonomy dataframe by renaming columns, handling empty fields,
     and adding constant metadata fields.
@@ -288,10 +289,11 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]) ->
         }
     )
 
-    if db == "SILVA-SSU":
-        ranks = SILVA_TAX_RANKS
-    else:
+    if db == "PR2":
         ranks = PR2_TAX_RANKS
+    else:
+        # These are called SILVA_TAX_RANKS but they're usable for every other ref DB
+        ranks = SILVA_TAX_RANKS
 
     # Turn empty taxa into NA
     for rank in ranks:
@@ -322,6 +324,7 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]) ->
         ]
         + ranks
         + [
+            "taxonID",
             "MeasurementUnit",
             "MeasurementValue",
         ]
@@ -330,7 +333,29 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2"]) ->
     return cleaned_df
 
 
-def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "PR2"]) -> Dict[str, pd.DataFrame]:
+def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path) -> list:
+    # if DB is SILVA, then we have taxids to add too
+    if db == "SILVA":
+        otu_file = otu_dir / "SILVA-SSU.otu"
+    # if DB is ITSoneDB, then we have taxids to add too
+    elif db == "ITSoneDB":
+        otu_file = otu_dir / "ITSone.otu"
+    else:
+        taxid_lst = ["NA"] * len(taxa_df)
+        return taxid_lst
+
+    tax_cols = ["Superkingdom", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
+    # need to join all taxa using `;` as separator to match to the OTU file that contains the taxids
+    # also removes any nans
+    concatenated_taxa = taxa_df.loc[:, tax_cols].apply(lambda x: ";".join(x.values.astype(str)).split(";nan")[0].split(";NA")[0], axis=1)
+    otu_df = pd.read_csv(otu_file, sep="\t", usecols=[1, 2], names=["taxa", "taxid"])
+    # using a defaultdict to set "NA" as a default value in case there's somehow no match for a taxon
+    otu_dict = defaultdict(lambda: {"taxid": "NA"}, otu_df.set_index("taxa").to_dict("index"))
+    taxid_lst = concatenated_taxa.apply(lambda x: otu_dict[x]["taxid"]).to_list()
+    return taxid_lst
+
+
+def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "PR2"], otu_dir: Path) -> Dict[str, pd.DataFrame]:
     """
     Generates a dictionary containing ASV (Amplicon Sequence Variant) data for each run.
 
@@ -363,18 +388,18 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
 
         # Raw MAPseq taxonomy assignment files
         # Used to extract hit data like the exact dbhit, %identity, and matching coords
-        mapseq_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))[0]
+        mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))[0]
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
         # Processed MAPseq taxonomy assignment files
-        tax_file = sorted(list((pathlib.Path(root_path) / run_acc / "asv").glob(f"*_DADA2-{db}_asv_tax.tsv")))[0]
+        tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_DADA2-{db}_asv_tax.tsv")))[0]
         run_tax_df = pd.read_csv(tax_file, sep="\t")
 
         # ASV read count files
-        count_files = sorted(list(pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv")))
+        count_files = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv")))
         # ASV sequence FASTA files
-        asv_fasta_file = sorted(list(pathlib.Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))[0]
+        asv_fasta_file = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))[0]
         fasta = pyfastx.Fasta(str(asv_fasta_file), build_index=False)
         asv_fasta_dict = {name: seq for name, seq in fasta}
         asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
@@ -402,13 +427,18 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
         merged_df["RunID"] = run_col
         merged_df = merged_df.merge(asv_fasta_df, on="asv")
 
+        taxid_lst = generate_taxid_list(merged_df, db, otu_dir)
+        merged_df["taxonID"] = taxid_lst
+
         # Assign final DF to run_acc in dictionary
         asv_dict[run_acc] = merged_df
 
     return asv_dict
 
 
-def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA-SSU", "PR2"]) -> Dict[str, pd.DataFrame]:
+def get_closedref_dict(
+    runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: Path
+) -> Dict[str, pd.DataFrame] | None:
     """
     Generates a dictionary of closed-reference taxonomy data for multiple sequencing runs.
 
@@ -428,12 +458,13 @@ def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILV
         abundance counts.
     """
 
-    if db == "SILVA-SSU":
-        ranks = SILVA_TAX_RANKS
-        short_ranks = SHORT_SILVA_TAX_RANKS
-    else:
+    if db == "PR2":
         ranks = PR2_TAX_RANKS
         short_ranks = SHORT_PR2_TAX_RANKS
+    else:
+        # These are called SILVA_TAX_RANKS but they're usable for every other ref DB
+        ranks = SILVA_TAX_RANKS
+        short_ranks = SHORT_SILVA_TAX_RANKS
 
     closedref_dict = {}
     for i in range(0, len(runs_df)):
@@ -444,7 +475,12 @@ def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILV
             continue
 
         # Krona formatted results
-        kronatxt_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob("*.txt")))[0]
+        kronatxt_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob("*.txt")))
+        if kronatxt_file:
+            kronatxt_file = kronatxt_file[0]
+        else:
+            logging.info(f"Run {run_acc} doesn't have results for DB {db}, skipping it.")
+            continue
 
         column_names = ["count"] + ranks
         tax_df = pd.read_csv(kronatxt_file, sep="\t", names=column_names)
@@ -456,6 +492,9 @@ def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILV
 
         run_col = [run_acc] * len(tax_df)
         tax_df["RunID"] = run_col
+
+        taxid_lst = generate_taxid_list(tax_df, db, otu_dir)
+        tax_df["taxonID"] = taxid_lst
 
         # Assign final DF to run_acc in dictionary
         closedref_dict[run_acc] = tax_df
@@ -482,8 +521,15 @@ def get_closedref_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILV
     help="Input directory to where all the individual analyses subdirectories for summarising",
     type=click.Path(exists=True, path_type=Path, file_okay=False),
 )
+@click.option(
+    "-otu",
+    "--otu_dir",
+    required=True,
+    help="Input directory containing the OTU files for the taxonomic reference databases to extract taxonomic IDs",
+    type=click.Path(exists=True, path_type=Path, file_okay=False),
+)
 @click.option("-p", "--output_prefix", required=True, help="Prefix to summary files", type=str)
-def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: str) -> None:
+def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: str, otu_dir: Path) -> None:
     """
     Generate Darwin Core-ready study-level summaries of amplicon analysis results.
 
@@ -535,7 +581,7 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     # Generate DwC-ready files for ASV results
     asv_dbs = ["SILVA", "PR2"]
     for db in asv_dbs:
-        asv_dict = get_asv_dict(runs_df, root_path, db)
+        asv_dict = get_asv_dict(runs_df, root_path, db, otu_dir)
         all_merged_df = []
 
         for run in all_runs:
@@ -561,9 +607,9 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
             )
 
     # Generate DwC-ready files for closed reference results
-    closedref_dbs = ["SILVA-SSU", "PR2"]
+    closedref_dbs = ["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
     for db in closedref_dbs:
-        closedref_dict = get_closedref_dict(runs_df, root_path, db)
+        closedref_dict = get_closedref_dict(runs_df, root_path, db, otu_dir)
         all_merged_df = []
 
         for run in all_runs:
@@ -573,10 +619,13 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
                 run_merged_result = run_metadata.merge(run_closedref_data, on="RunID")
                 all_merged_df.append(run_merged_result)
 
-        final_df = pd.concat(all_merged_df, ignore_index=True)
-        final_df = cleanup_closedref_taxa(final_df, db)
+        if all_merged_df:
+            final_df = pd.concat(all_merged_df, ignore_index=True)
+            final_df = cleanup_closedref_taxa(final_df, db)
 
-        final_df.to_csv(f"{output_prefix}_closedref_{db}_dwcready.csv", index=False, na_rep="NA")
+            final_df.to_csv(f"{output_prefix}_closedref_{db}_dwcready.csv", index=False, na_rep="NA")
+        else:
+            logging.info(f"No results at all for DB {db} in entire analysis, won't generate summary for it.")
 
 
 def organise_dwcr_summaries(all_study_summaries: List[Path]) -> defaultdict[List]:

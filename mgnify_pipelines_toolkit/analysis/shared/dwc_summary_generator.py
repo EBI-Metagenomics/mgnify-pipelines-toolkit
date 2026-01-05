@@ -274,7 +274,7 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SI
     Parameters:
     df : pd.DataFrame
         Input DataFrame containing closed-reference taxonomy data to clean
-    db : Literal["SILVA-SSU", "PR2"]
+    db : Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
         Reference database used for taxonomic ranks
 
     Returns:
@@ -334,6 +334,19 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SI
 
 
 def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path) -> list:
+    """
+    Generates a list containing the mapping of taxids for each taxon in an input dataframe
+    Takes an OTU dir as one of the inputs which should contain the different refdb OTU files containing the taxids
+
+    :param taxa_df: Description
+    :type taxa_df: pd.DataFrame
+    :param db: Description
+    :type db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
+    :param otu_dir: Description
+    :type otu_dir: pathlib.Path
+    :return: Description
+    :rtype: list[Any]
+    """
     # if DB is SILVA, then we have taxids to add too
     if db == "SILVA":
         otu_file = otu_dir / "SILVA-SSU.otu"
@@ -371,6 +384,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
         root_path (Path): The base directory path where analysis results files are stored.
         db (Literal["SILVA", "PR2"]): Specifies the database used for taxonomy assignment
             (e.g., SILVA or PR2).
+        otu_dir (Path): Directory containing the refdb OTU files containing the taxids
 
     Returns:
         Dict[str, pd.DataFrame]: A dictionary where keys are run IDs and values are
@@ -449,8 +463,10 @@ def get_closedref_dict(
     Arguments:
         runs_df (pd.DataFrame): A DataFrame containing results status info about the runs.
         root_path (Path): The base directory path where analysis results files are stored.
-        db (Literal["SILVA", "PR2"]): Specifies the database used for taxonomy assignment
+        db (Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]): Specifies the database used for taxonomy assignment
             (e.g., SILVA or PR2).
+        otu_dir (Path): Directory containing the refdb OTU files containing the taxids
+
 
     Returns:
         Dict[str, pd.DataFrame]: A dictionary mapping each run accession (str) to its
@@ -535,7 +551,7 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
 
     This function processes amplicon analysis results from both ASV (DADA2) and closed-reference
     analyses to create "Darwin Core Ready" summary files. The function handles both
-    SILVA and PR2 database results, combining taxonomy assignments with ENA metadata.
+    SILVA and PR2 database results for ASVs, +UNITE+ITSoneDB for closed refs, combining taxonomy assignments with ENA metadata.
 
     For ASV data, files are generated per amplified region - that means with SILVA and PR2 as
     reference databases, one CSV is created per amplified region. For example:

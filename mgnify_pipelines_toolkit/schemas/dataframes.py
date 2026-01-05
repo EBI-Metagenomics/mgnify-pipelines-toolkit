@@ -17,7 +17,7 @@ import logging
 from typing import Type
 
 import pandas as pd
-import pandera as pa
+import pandera.pandas as pa
 from pandera.typing import Series
 from pandera.typing.common import DataFrameBase
 

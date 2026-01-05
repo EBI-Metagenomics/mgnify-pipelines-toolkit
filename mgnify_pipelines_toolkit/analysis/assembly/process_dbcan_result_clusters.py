@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2023-2024 EMBL - European Bioinformatics Institute
+# Copyright 2023-2025 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 
 
+# FIXME: Is this deprecated? If so, remove from the pyproject too https://embl.atlassian.net/browse/EMG-9148
 def main():
-
     args = parse_args()
     standard_file, substrate_file, outfile, dbcan_ver = (
         args.standard_file,

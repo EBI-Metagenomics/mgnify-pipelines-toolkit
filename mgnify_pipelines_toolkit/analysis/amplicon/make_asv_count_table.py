@@ -253,7 +253,7 @@ def main():
 
     try:
         taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
-    except EmptyDataError:
+    except pandas.errors.EmptyDataError:
         logging.error("No mapseq annotation found")
         exit()
 

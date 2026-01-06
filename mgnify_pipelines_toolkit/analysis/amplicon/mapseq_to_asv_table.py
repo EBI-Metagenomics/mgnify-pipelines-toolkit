@@ -141,7 +141,7 @@ def main():
     logging.info(f"Number of ASVs at end: {len(final_res_df)}")
 
     res_tsv_name = f"./{sample}_{label}_asv_taxa.tsv"
-    final_res_df.to_csv(res_tsv_name, sep="\t", index=False) if not res_tsv_name.empty else open(res_tsv_name, "w").close()
+    final_res_df.to_csv(res_tsv_name, sep="\t", index=False) if not final_res_df.empty else open(res_tsv_name, "w").close()
 
 
 if __name__ == "__main__":

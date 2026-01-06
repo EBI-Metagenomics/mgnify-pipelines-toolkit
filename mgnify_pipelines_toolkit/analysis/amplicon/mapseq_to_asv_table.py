@@ -140,7 +140,8 @@ def main():
     final_res_df = process_blank_tax_ends(res_df, short_ranks)
     logging.info(f"Number of ASVs at end: {len(final_res_df)}")
 
-    final_res_df.to_csv(f"./{sample}_{label}_asv_taxa.tsv", sep="\t", index=False)
+    res_tsv_name = f"./{sample}_{label}_asv_taxa.tsv"
+    final_res_df.to_csv(res_tsv_name, sep="\t", index=False) if not res_tsv_name.empty else open(res_tsv_name, "w").close()
 
 
 if __name__ == "__main__":

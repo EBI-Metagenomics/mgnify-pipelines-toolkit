@@ -251,7 +251,11 @@ def main():
 
     fwd_fr = open(fwd, "r")
 
-    taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
+    try:
+        taxa_df = pd.read_csv(taxa, sep="\t", dtype=str)
+    except pd.errors.EmptyDataError:
+        logging.error("No mapseq annotation found")
+        exit()
 
     ref_db = ""
 

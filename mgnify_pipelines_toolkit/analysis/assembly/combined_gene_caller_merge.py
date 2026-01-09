@@ -282,7 +282,7 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                         # Replace ending * and replace any other "*" with "X"
                         record.seq = record.seq.rstrip("*").replace("*", "X")
                         sequences.append(record)
-                # To mitigate a pyhmmer bug with alphabet determination
+                # To mitigate a pyhmmer/hmmer bug with alphabet determination
                 # that arises when a FASTA file starts with short repetitive sequences
                 # in the downstream protein annotation step,
                 # we sort sequences by length in descending order

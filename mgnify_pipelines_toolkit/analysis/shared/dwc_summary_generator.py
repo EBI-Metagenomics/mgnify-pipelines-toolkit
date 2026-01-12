@@ -333,6 +333,29 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SI
     return cleaned_df
 
 
+def concatenate_taxa_row(taxa_row: pd.Series, separator: str = ";") -> str:
+    """
+    Concatenate taxonomy columns and remove trailing NaN/NA values.
+
+    This function joins taxonomy values from a row with a separator,
+    then removes any trailing missing value indicators (nan or NA).
+
+    :param taxa_row: A pandas Series containing taxonomy values
+    :param separator: String to use as delimiter
+    :returns: Concatenated taxonomy string with trailing NaN/NA removed
+    """
+    # Convert all values to strings and join with separator
+    concatenated = separator.join(taxa_row.values.astype(str))
+
+    # Remove trailing NaN values
+    concatenated = concatenated.split(f"{separator}nan")[0]
+
+    # Remove trailing NA values
+    concatenated = concatenated.split(f"{separator}NA")[0]
+
+    return concatenated
+
+
 def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path) -> list:
     """
     Generates a list containing the mapping of taxids for each taxon in an input dataframe
@@ -360,7 +383,7 @@ def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "
     tax_cols = ["Superkingdom", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"]
     # need to join all taxa using `;` as separator to match to the OTU file that contains the taxids
     # also removes any nans
-    concatenated_taxa = taxa_df.loc[:, tax_cols].apply(lambda x: ";".join(x.values.astype(str)).split(";nan")[0].split(";NA")[0], axis=1)
+    concatenated_taxa = taxa_df.loc[:, tax_cols].apply(concatenate_taxa_row, axis=1)
     otu_df = pd.read_csv(otu_file, sep="\t", usecols=[1, 2], names=["taxa", "taxid"])
     # using a defaultdict to set "NA" as a default value in case there's somehow no match for a taxon
     otu_dict = defaultdict(lambda: {"taxid": "NA"}, otu_df.set_index("taxa").to_dict("index"))
@@ -400,6 +423,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
         if analysis_status != "all_results":
             continue
 
+        # TODO: need to check for the existence of the files first to avoid errors
         # Raw MAPseq taxonomy assignment files
         # Used to extract hit data like the exact dbhit, %identity, and matching coords
         mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))[0]
@@ -490,6 +514,7 @@ def get_closedref_dict(
         if status != "all_results":
             continue
 
+        # TODO: need to check for the existence of the files first to avoid errors
         # Krona formatted results
         kronatxt_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob("*.txt")))
         if kronatxt_file:

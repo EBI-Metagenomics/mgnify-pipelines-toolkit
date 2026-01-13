@@ -15,15 +15,14 @@
 # limitations under the License.
 
 import argparse
+import csv
 import json
 import logging
-from collections import defaultdict
-import csv
 import re
+from collections import defaultdict
 
-from intervaltree import Interval, IntervalTree
 from Bio import SeqIO
-
+from intervaltree import Interval, IntervalTree
 
 MASK_OVERLAP_THRESHOLD = 5
 
@@ -283,6 +282,12 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                         # Replace ending * and replace any other "*" with "X"
                         record.seq = record.seq.rstrip("*").replace("*", "X")
                         sequences.append(record)
+                # To mitigate a pyhmmer/hmmer bug with alphabet determination
+                # that arises when a FASTA file starts with short repetitive sequences
+                # in the downstream protein annotation step,
+                # we sort sequences by length in descending order
+                # See similar issue: https://github.com/gbouras13/pharokka/issues/331
+                sequences.sort(key=lambda x: len(x.seq), reverse=True)
                 SeqIO.write(sequences, output_file, "fasta")
 
 

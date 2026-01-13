@@ -16,9 +16,11 @@
     -v
   files:
     - path: "prodigal_fgs.faa"
-      md5sum: 1577a0613f7fa5c1d989dd5bd2b81397
+      md5sum: 3016fc84a3aa760d3eab1dfc5d320e6c
     - path: "prodigal_fgs.ffn"
-      md5sum: 9bac7cc2f074517fd8af849f0f3839e6
+      md5sum: b40145886c1c12d7f45e9d8134961b88
+    - path: "prodigal_fgs.gff"
+      md5sum: 7c1fb12df60be84ba071640003fac7e5
 
 - name: Combined Gene Caller merge test (gff input, no masking)
   tags:
@@ -36,9 +38,9 @@
     -v
   files:
     - path: "pyrodigal_fgsrs.faa"
-      md5sum: 85bd33338eebe4c7f6a49121fe1b839c
+      md5sum: 06161453ab0bcfa75285c2b4cdcaf5d4
     - path: "pyrodigal_fgsrs.ffn"
-      md5sum: dbe4300ce254687e182d89b94759c5f4
+      md5sum: b02b98154ab052350adad8b21d9fd074
     - path: "pyrodigal_fgsrs.gff"
       md5sum: 774a5966f0cef53d3b17d4b5f432128e
 

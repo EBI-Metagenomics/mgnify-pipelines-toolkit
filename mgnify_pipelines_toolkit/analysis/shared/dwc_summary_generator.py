@@ -423,21 +423,39 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
         if analysis_status != "all_results":
             continue
 
-        # TODO: need to check for the existence of the files first to avoid errors
         # Raw MAPseq taxonomy assignment files
         # Used to extract hit data like the exact dbhit, %identity, and matching coords
-        mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))[0]
+        mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))
+        if mapseq_file:
+            mapseq_file = mapseq_file[0]
+        else:
+            logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with mapseq file missing. Skipping.")
+            continue
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
         # Processed MAPseq taxonomy assignment files
-        tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_DADA2-{db}_asv_tax.tsv")))[0]
+        tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_DADA2-{db}_asv_tax.tsv")))
+        if tax_file:
+            tax_file = tax_file[0]
+        else:
+            logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with asv tax file missing. Skipping.")
+            continue
         run_tax_df = pd.read_csv(tax_file, sep="\t")
 
         # ASV read count files
         count_files = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv")))
+        if not count_files:
+            logging.info(f"Run {run_acc} missing count files for some reason, cannot generate ASV summaries. Skipping.")
+            continue
+
         # ASV sequence FASTA files
-        asv_fasta_file = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))[0]
+        asv_fasta_file = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))
+        if asv_fasta_file:
+            asv_fasta_file = asv_fasta_file[0]
+        else:
+            logging.info(f"Run {run_acc} does not seem to have ASV FASTA sequence file. Skipping.")
+            continue
         fasta = pyfastx.Fasta(str(asv_fasta_file), build_index=False)
         asv_fasta_dict = {name: seq for name, seq in fasta}
         asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
@@ -514,13 +532,12 @@ def get_closedref_dict(
         if status != "all_results":
             continue
 
-        # TODO: need to check for the existence of the files first to avoid errors
         # Krona formatted results
         kronatxt_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob("*.txt")))
         if kronatxt_file:
             kronatxt_file = kronatxt_file[0]
         else:
-            logging.info(f"Run {run_acc} doesn't have results for DB {db}, skipping it.")
+            logging.info(f"Run {run_acc} doesn't have closed-reference results for DB {db}, skipping it.")
             continue
 
         column_names = ["count"] + ranks

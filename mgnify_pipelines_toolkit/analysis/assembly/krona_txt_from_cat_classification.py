@@ -15,12 +15,12 @@
 # limitations under the License.
 
 import argparse
-from collections import Counter
 import csv
 import logging
+from collections import Counter
 
 RANK_PREFIXES = {
-    "superkingdom": "sk__",
+    "domain": "sk__",
     "kingdom": "k__",
     "phylum": "p__",
     "class": "c__",

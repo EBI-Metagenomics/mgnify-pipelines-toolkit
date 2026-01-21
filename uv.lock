@@ -329,7 +329,7 @@ wheels = [
 
 [[package]]
 name = "mgnify-pipelines-toolkit"
-version = "1.4.10"
+version = "1.4.14"
 source = { editable = "." }
 dependencies = [
     { name = "biopython" },

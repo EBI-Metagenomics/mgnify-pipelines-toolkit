@@ -20,7 +20,7 @@ import logging
 from collections import Counter
 
 RANK_PREFIXES = {
-    "domain": "sk__",
+    "domain": "d__",
     "kingdom": "k__",
     "phylum": "p__",
     "class": "c__",

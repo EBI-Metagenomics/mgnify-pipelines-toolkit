@@ -171,11 +171,55 @@ class AmpliconNonINSDCPassedRunsSchema(CoerceBaseDataFrameSchema):
     status: Series[str] = pa.Field(isin=["all_results", "no_asvs"])
 
 
+class BaseTaxonSchema(CoerceBaseDataFrameSchema):
+    """Base schema for taxonomy records with common validation logic."""
+
+    _valid_ranks = []
+
+    @pa.check(r"^(?!Count$).*$", regex=True)
+    def validate_tax_ranks(cls, series: Series[str]) -> Series[bool]:
+        """Validate that taxonomy rank values follow the format: ${rank}__${taxon}
+        or are 'Unclassified', 'Unassigned' or empty/null.
+        """
+
+        def check_format(val):
+            if pd.isna(val) or val == "":
+                return True
+            if isinstance(val, str) and val.capitalize() in {"Unclassified", "Unassigned"}:
+                return True
+            if not isinstance(val, str) or "__" not in val:
+                return False
+            rank = val.split("__")[0]
+            return rank in cls._valid_ranks or rank == ""
+
+        return series.apply(check_format)
+
+
+class NCBITaxonSchema(BaseTaxonSchema):
+    """
+    Schema for NCBI taxonomy records with specific rank validation.
+    """
+
+    _valid_ranks = ["d", "k", "p", "c", "o", "f", "g", "s"]
+
+    Domain: Series[str] = pa.Field(nullable=True)
+    Kingdom: Series[str] = pa.Field(nullable=True)
+    Phylum: Series[str] = pa.Field(nullable=True)
+    Class: Series[str] = pa.Field(nullable=True)
+    Order: Series[str] = pa.Field(nullable=True)
+    Family: Series[str] = pa.Field(nullable=True)
+    Genus: Series[str] = pa.Field(nullable=True)
+    Species: Series[str] = pa.Field(nullable=True)
+    Count: Series[int]
+
+
 # This is the schema for the whole DF
-class TaxonSchema(CoerceBaseDataFrameSchema):
-    """Class modelling a Pandera dataframe schema for taxonomy records.
+class TaxonSchema(BaseTaxonSchema):
+    """Class modeling a Pandera dataframe schema for taxonomy records.
     Validates the generated dataframe when read by pandas.read_csv.
     """
+
+    _valid_ranks = ["sk", "k", "p", "c", "o", "f", "g", "s"]
 
     Superkingdom: Series[str] = pa.Field(nullable=True)
     Kingdom: Series[str] = pa.Field(nullable=True)
@@ -187,29 +231,11 @@ class TaxonSchema(CoerceBaseDataFrameSchema):
     Species: Series[str] = pa.Field(nullable=True)
     Count: Series[int]
 
-    @pa.check(r"Superkingdom|Kingdom|Phylum|Class|Order|Family|Genus|Species", regex=True)
-    def validate_tax_rank_format(self, series: Series[str]) -> Series[bool]:
-        """Validate that taxonomy rank values follow the format: ${rank}__${taxon}
-        or are 'Unclassified' or empty/null.
 
-        :param series: Column series to validate
-        :return: Boolean series indicating valid rows
-        """
-        valid_ranks = ["sk", "k", "p", "c", "o", "f", "g", "s"]
-
-        def check_format(val):
-            if pd.isna(val) or val == "" or val.capitalize() == "Unclassified":
-                return True
-            if "__" not in val:
-                return False
-            rank = val.split("__")[0]
-            return rank in valid_ranks or rank == ""
-
-        return series.apply(check_format)
-
-
-class PR2TaxonSchema(CoerceBaseDataFrameSchema):
+class PR2TaxonSchema(BaseTaxonSchema):
     """Class modelling a Pandera dataframe schema for PR2 taxonomy records."""
+
+    _valid_ranks = SHORT_SILVA_TAX_RANKS + SHORT_PR2_TAX_RANKS
 
     Domain: Series[str] = pa.Field(nullable=True)
     Supergroup: Series[str] = pa.Field(nullable=True)
@@ -221,26 +247,6 @@ class PR2TaxonSchema(CoerceBaseDataFrameSchema):
     Genus: Series[str] = pa.Field(nullable=True)
     Species: Series[str] = pa.Field(nullable=True)
     Count: Series[int]
-
-    @pa.check(r"Domain|Supergroup|Division|Subdivision|Class|Order|Family|Genus|Species", regex=True)
-    def validate_pr2_tax_rank_format(self, series: Series[str]) -> Series[bool]:
-        """Validate that PR2 taxonomy rank values follow the format: ${rank}__${taxon}
-        or are 'Unclassified' or empty/null.
-
-        :param series: Column series to validate
-        :return: Boolean series indicating valid rows
-        """
-        valid_ranks = SHORT_SILVA_TAX_RANKS + SHORT_PR2_TAX_RANKS
-
-        def check_format(val):
-            if pd.isna(val) or val == "" or val.capitalize() == "Unclassified":
-                return True
-            if "__" not in val:
-                return False
-            rank = val.split("__")[0]
-            return rank in valid_ranks or rank == ""
-
-        return series.apply(check_format)
 
 
 # This is the schema for the whole DF
@@ -260,7 +266,7 @@ class RawReadsNonINSDCPassedRunsSchema(CoerceBaseDataFrameSchema):
     status: Series[str] = pa.Field(isin=["all_results", "no_reads", "all_empty_results", "some_empty_results"])
 
 
-class MotusTaxonSchema(CoerceBaseDataFrameSchema):
+class MotusTaxonSchema(BaseTaxonSchema):
     """Class for modelling a single Taxonomic Rank in mOTUs output.
     Essentially is just a special string with validation of the structure:
     `${rank}__${taxon}`
@@ -270,6 +276,8 @@ class MotusTaxonSchema(CoerceBaseDataFrameSchema):
     It will also validate if the whole string is the permitted "unassigned" or "unclassified".
     """
 
+    _valid_ranks = SHORT_MOTUS_TAX_RANKS
+
     Kingdom: Series[str] = pa.Field(nullable=True)
     Phylum: Series[str] = pa.Field(nullable=True)
     Class: Series[str] = pa.Field(nullable=True)
@@ -278,28 +286,6 @@ class MotusTaxonSchema(CoerceBaseDataFrameSchema):
     Genus: Series[str] = pa.Field(nullable=True)
     Species: Series[str] = pa.Field(nullable=True)
     Count: Series[int]
-
-    @pa.check(r"Kingdom|Phylum|Class|Order|Family|Genus|Species", regex=True)
-    def validate_motus_tax_rank_format(self, series: Series[str]) -> Series[bool]:
-        """Validate that mOTUs taxonomy rank values follow the format: ${rank}__${taxon}
-        or are 'Unclassified', 'Unassigned', or empty/null.
-
-        :param series: Column series to validate
-        :return: Boolean series indicating valid rows
-        """
-        valid_ranks = SHORT_MOTUS_TAX_RANKS
-
-        def check_format(val):
-            if pd.isna(val) or val == "":
-                return True
-            if val.capitalize() in {"Unclassified", "Unassigned"}:
-                return True
-            if "__" not in val:
-                return False
-            rank = val.split("__")[0]
-            return rank in valid_ranks or rank == ""
-
-        return series.apply(check_format)
 
 
 class FunctionProfileSchema(CoerceBaseDataFrameSchema):

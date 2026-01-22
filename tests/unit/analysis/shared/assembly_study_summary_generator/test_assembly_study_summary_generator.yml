@@ -25,7 +25,7 @@
     - path: "test_antismash_study_summary.tsv"
       md5sum: c3105b172ab8c795bb0593e1dc5abe98
     - path: "test_taxonomy_study_summary.tsv"
-      md5sum: 6260f20e4237d81c00d9787e02653734
+      md5sum: ed10006633ed6a056c59aab4617be4a6
 
 - name: assembly_study_summary_generator summarise_singleton
   tags:
@@ -54,7 +54,7 @@
     - path: "test_antismash_study_summary.tsv"
       md5sum: 7b231682fccb3685b9795dae7d54c3b3
     - path: "test_taxonomy_study_summary.tsv"
-      md5sum: ff1a1a359bad0f23dd90a6fa71c38d75
+      md5sum: 239a7da23a7301c5a77fb89d341761a7
 
 - name: assembly_study_summary_generator correct_merge
   tags:
@@ -110,7 +110,7 @@
     - path: "test_antismash_study_summary.tsv"
       md5sum: becd41d1b3920fa2a47214dd5a37270d
     - path: "test_taxonomy_study_summary.tsv"
-      md5sum: 59484d7492be580e531df86d4b96ddcb
+      md5sum: ee7e19e509987c90e5a1e88d3794a0aa
 
 - name: assembly_study_summary_generator summarise_no_tax_file
   tags:

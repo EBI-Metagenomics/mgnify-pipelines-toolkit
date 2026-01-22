@@ -915,7 +915,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
 
     The TSV string includes the following columns:
     - Identifier: A unique identifier for each entry.
-    - Superkingdom: The highest taxonomic rank (e.g., Archaea or Bacteria).
+    - Domain: The highest taxonomic rank (e.g., Archaea or Bacteria).
     - Kingdom: The next taxonomic rank (e.g., Thermoproteati, Bacillati).
     - Phylum: The phylum classification (e.g., Nitrososphaerota, Chloroflexota).
     - Class: The class classification (e.g., Nitrososphaeria, Chloroflexia).
@@ -934,7 +934,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
     rows_per_accession["ERZ1049440"] = [
         [
             53,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -945,7 +945,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             786,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -954,11 +954,11 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__Nitrosotalea",
             "s__Nitrosotalea devaniterrae",
         ],
-        [29, "sk__Bacteria"],
-        [275, "sk__Bacteria", "k__Bacillati"],
+        [29, "d__Bacteria"],
+        [275, "d__Bacteria", "k__Bacillati"],
         [
             62,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Chloroflexota",
             "c__Chloroflexia",
@@ -967,23 +967,23 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__",
             "s__Chloroflexia bacterium",
         ],
-        [7, "sk__Bacteria", "k__Bacillati", "p__Chloroflexota", "c__Dehalococcoidia"],
+        [7, "d__Bacteria", "k__Bacillati", "p__Chloroflexota", "c__Dehalococcoidia"],
         [
             7293,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Actinomycetota",
             "c__Acidimicrobiia",
             "o__Acidimicrobiales",
         ],
-        [742, "sk__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
-        [31, "sk__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
+        [742, "d__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
+        [31, "d__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
         [13, "unclassified"],
     ]
     rows_per_accession["ERZ1049443"] = [
         [
             7,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -994,7 +994,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             3,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1003,11 +1003,11 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__Nitrosotalea",
             "s__Nitrosotalea devaniterrae",
         ],
-        [98, "sk__Bacteria"],
-        [2, "sk__Bacteria", "k__Bacillati"],
+        [98, "d__Bacteria"],
+        [2, "d__Bacteria", "k__Bacillati"],
         [
             3,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Chloroflexota",
             "c__Chloroflexia",
@@ -1016,23 +1016,23 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__",
             "s__Chloroflexia bacterium",
         ],
-        [2, "sk__Bacteria", "k__Bacillati", "p__Chloroflexota", "c__Dehalococcoidia"],
+        [2, "d__Bacteria", "k__Bacillati", "p__Chloroflexota", "c__Dehalococcoidia"],
         [
             8,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Actinomycetota",
             "c__Acidimicrobiia",
             "o__Acidimicrobiales",
         ],
-        [1, "sk__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
-        [1, "sk__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
+        [1, "d__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
+        [1, "d__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
         [46, "unclassified"],
     ]
     rows_per_accession["ERZ1049444"] = [
         [
             3,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1043,7 +1043,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             1,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1054,7 +1054,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             3,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1063,23 +1063,23 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__Nitrosotalea",
             "s__Nitrosotalea devaniterrae",
         ],
-        [23651, "sk__Bacteria"],
-        [2, "sk__Bacteria", "k__Bacillati"],
+        [23651, "d__Bacteria"],
+        [2, "d__Bacteria", "k__Bacillati"],
         [
             8,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Actinomycetota",
             "c__Acidimicrobiia",
             "o__Acidimicrobiales",
         ],
-        [1, "sk__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
+        [1, "d__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
         [6577, "unclassified"],
     ]
     rows_per_accession["ERZ1049445"] = [
         [
             76,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1090,7 +1090,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             575,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1101,7 +1101,7 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
         ],
         [
             786,
-            "sk__Archaea",
+            "d__Archaea",
             "k__Thermoproteati",
             "p__Nitrososphaerota",
             "c__Nitrososphaeria",
@@ -1110,18 +1110,18 @@ def taxonomy_tsv_rows_per_accession() -> Dict:
             "g__Nitrosotalea",
             "s__Nitrosotalea devaniterrae",
         ],
-        [9654, "sk__Bacteria"],
-        [275, "sk__Bacteria", "k__Bacillati"],
+        [9654, "d__Bacteria"],
+        [275, "d__Bacteria", "k__Bacillati"],
         [
             8259,
-            "sk__Bacteria",
+            "d__Bacteria",
             "k__Bacillati",
             "p__Actinomycetota",
             "c__Acidimicrobiia",
             "o__Acidimicrobiales",
         ],
-        [742, "sk__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
-        [31, "sk__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
+        [742, "d__Bacteria", "k__Bacillati", "p__Actinomycetota", "c__Actinomycetes"],
+        [31, "d__Bacteria", "k__Pseudomonadati", "p__Bacteroidota", "c__Bacteroidia"],
         [1521, "unclassified"],
     ]
     return rows_per_accession
@@ -1318,7 +1318,7 @@ def test_assembly_study_summary_generator(
             f"{tmpdir}/test_pfam_study_summary.tsv": "314ec298af0a15fbc764b731a120e54d",
             f"{tmpdir}/test_sanntis_study_summary.tsv": "97b79aee421aaee39bf6409333218e03",
             f"{tmpdir}/test_antismash_study_summary.tsv": "c3105b172ab8c795bb0593e1dc5abe98",
-            f"{tmpdir}/test_taxonomy_study_summary.tsv": "6260f20e4237d81c00d9787e02653734",
+            f"{tmpdir}/test_taxonomy_study_summary.tsv": "ed10006633ed6a056c59aab4617be4a6",
         }
 
         for file_path, expected_md5 in expected_files_md5.items():

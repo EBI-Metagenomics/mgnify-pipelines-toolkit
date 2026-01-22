@@ -20,11 +20,11 @@
     - path: "chunk1_DADA2_SILVA_18S-V4_dwcready.csv"
       md5sum: 3330598a33038281c5bc99e6e0727825
     - path: "chunk1_closedref_SILVA-SSU_dwcready.csv"
-      md5sum: 481172c643eb943ca42494f056d26c41
+      md5sum: c7d3f1bc1d4e54be03f255349c7fce9e
     - path: "chunk1_closedref_PR2_dwcready.csv"
       md5sum: fbdf2c7a169e535a535a5392e3620c98
     - path: "chunk1_closedref_ITSoneDB_dwcready.csv"
-      md5sum: 8be72d6cf1aafaa33f58559fc50f3de2
+      md5sum: bd695d8bceec5375aeb486bcee396be7
     - path: "chunk1_closedref_UNITE_dwcready.csv"
       md5sum: face929643e1188083572ca472febc33
 - name: dwc_summary_generator_merge test_correct_args

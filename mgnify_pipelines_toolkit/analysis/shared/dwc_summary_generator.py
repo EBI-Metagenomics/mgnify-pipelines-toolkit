@@ -356,7 +356,9 @@ def concatenate_taxa_row(taxa_row: pd.Series, separator: str = ";") -> str:
     return concatenated
 
 
-def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path) -> list:
+def generate_taxid_list(
+    taxa_df: pd.DataFrame, db: Literal["SILVA", "SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path
+) -> list:
     """
     Generates a list containing the mapping of taxids for each taxon in an input dataframe
     Takes an OTU dir as one of the inputs which should contain the different refdb OTU files containing the taxids
@@ -371,8 +373,10 @@ def generate_taxid_list(taxa_df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "
     :rtype: list[Any]
     """
     # if DB is SILVA, then we have taxids to add too
-    if db == "SILVA":
+    if db in ("SILVA", "SILVA-SSU"):
         otu_file = otu_dir / "SILVA-SSU.otu"
+    elif db == "SILVA-LSU":
+        otu_file = otu_dir / "SILVA-LSU.otu"
     # if DB is ITSoneDB, then we have taxids to add too
     elif db == "ITSoneDB":
         otu_file = otu_dir / "ITSone.otu"
@@ -542,6 +546,7 @@ def get_closedref_dict(
 
         column_names = ["count"] + ranks
         tax_df = pd.read_csv(kronatxt_file, sep="\t", names=column_names)
+        taxid_lst = generate_taxid_list(tax_df, db, otu_dir)
 
         # Clean up empty ranks
         tax_df = tax_df.fillna("NA")
@@ -551,7 +556,6 @@ def get_closedref_dict(
         run_col = [run_acc] * len(tax_df)
         tax_df["RunID"] = run_col
 
-        taxid_lst = generate_taxid_list(tax_df, db, otu_dir)
         tax_df["taxonID"] = taxid_lst
 
         # Assign final DF to run_acc in dictionary

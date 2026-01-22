@@ -35,12 +35,12 @@ from mgnify_pipelines_toolkit.schemas.dataframes import (
     KEGGModulesSummarySchema,
     KOStudySummarySchema,
     KOSummarySchema,
+    NCBITaxonSchema,
     PFAMStudySummarySchema,
     PFAMSummarySchema,
     SanntisStudySummarySchema,
     SanntisSummarySchema,
     TaxonomyStudySummarySchema,
-    TaxonSchema,
     validate_dataframe,
 )
 
@@ -145,7 +145,7 @@ SUMMARY_TYPES_MAP = {
 # containing of following columns:
 TAXONOMY_COLUMN_NAMES = [
     "Count",
-    "Superkingdom",
+    "Domain",
     "Kingdom",
     "Phylum",
     "Class",
@@ -189,9 +189,9 @@ def generate_taxonomy_summary(
     :param outdir: Optional output directory for the results.
 
     Example of the taxonomy file:
-    23651	sk__Bacteria
-    4985	sk__Archaea	k__Thermoproteati	p__Nitrososphaerota
-    882	sk__Archaea	k__Nanobdellati	p__	c__	o__	f__	g__	s__Candidatus Pacearchaeota archaeon
+    23651	d__Bacteria
+    4985	d__Archaea	k__Thermoproteati	p__Nitrososphaerota
+    882	d__Archaea	k__Nanobdellati	p__	c__	o__	f__	g__	s__Candidatus Pacearchaeota archaeon
     """
     check_files_exist(list(file_dict.values()))
 
@@ -200,7 +200,7 @@ def generate_taxonomy_summary(
         df = pd.read_csv(path, sep="\t", names=TAXONOMY_COLUMN_NAMES).fillna("")
 
         # Note: schema validation will fail if the taxonomy file is empty
-        df = validate_dataframe(df, TaxonSchema, str(path))
+        df = validate_dataframe(df, NCBITaxonSchema, str(path))
 
         # Combine all taxonomic ranks in the classification into a single string
         df["full_taxon"] = df[TAXONOMY_COLUMN_NAMES[1:]].agg(";".join, axis=1).str.strip(";")
@@ -474,8 +474,8 @@ def merge_taxonomy_summaries(summary_files: list[str], output_file_name: str) ->
 
     Example of input taxonomy summary file:
     taxonomy	ERZ1049444	ERZ1049446
-    sk__Eukaryota;k__Metazoa;p__Chordata	2	10
-    sk__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
+    d__Eukaryota;k__Metazoa;p__Chordata	2	10
+    d__Eukaryota;k__Metazoa;p__Chordata;c__Mammalia;o__Primates	118	94
     """
     if not summary_files:
         raise FileNotFoundError("The required taxonomic classification summary files are missing. Exiting.")

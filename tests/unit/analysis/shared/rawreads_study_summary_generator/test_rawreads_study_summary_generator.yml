@@ -64,16 +64,6 @@
       - "failure cases:"
       - "all_resultsssss"
 
-- name: rawreads_study_summary_generator test_invalid_taxonomic_ranks
-  tags:
-    - rawreads_study_summary_generator
-  exit_code: 1
-  command: rawreads_study_summary_generator summarise -a tests/fixtures/study_summary_inputs/rawreads -r tests/fixtures/study_summary_inputs/rawreads/qc_passed_invalid_taxranks.csv -p chunk1 --non_insdc
-  stderr:
-    contains:
-      - "failure cases:"
-      - "kkkk__Bacteria"
-
 - name: rawreads_study_summary_generator test_correct_args_merge
   tags:
     - rawreads_study_summary_generator

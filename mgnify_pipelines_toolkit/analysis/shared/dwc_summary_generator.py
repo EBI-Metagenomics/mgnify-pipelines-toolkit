@@ -187,7 +187,7 @@ def get_all_ena_metadata_from_runs(runs: List[str]) -> Dict[str, pd.DataFrame]:
     return run_metadata_dict
 
 
-def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFrame:
+def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["DADA2-SILVA", "DADA2-PR2"]) -> pd.DataFrame:
     """
     Cleans ASV dataframe by renaming columns, handling empty fields, and adding
     constant metadata fields.
@@ -195,7 +195,7 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
     Parameters:
     df : pd.DataFrame
         Input DataFrame containing ASV data to clean
-    db : Literal["SILVA", "PR2"]
+    db : Literal["DADA2-SILVA", "DADA2-PR2"]
         Reference database used for taxonomic ranks
     """
 
@@ -208,10 +208,12 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
         }
     )
 
-    if db == "SILVA":
+    if db == "DADA2-SILVA":
         ranks = SILVA_TAX_RANKS
     else:
         ranks = PR2_TAX_RANKS
+
+    cleaned_db_string = db.split("-")[1]
 
     # Turn empty taxa into NA
     for rank in ranks:
@@ -223,7 +225,7 @@ def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["SILVA", "PR2"]) -> pd.DataFr
     # Add a few constant columns
     cleaned_df["MeasurementUnit"] = ["Number of reads"] * len(cleaned_df)
     cleaned_df["ASVCaller"] = ["DADA2"] * len(cleaned_df)
-    cleaned_df["ReferenceDatabase"] = [db] * len(cleaned_df)
+    cleaned_df["ReferenceDatabase"] = [cleaned_db_string] * len(cleaned_df)
     cleaned_df["TaxAnnotationTool"] = ["MAPseq"] * len(cleaned_df)
     # Final order of fields in output csv
     cleaned_df = cleaned_df[
@@ -357,7 +359,7 @@ def concatenate_taxa_row(taxa_row: pd.Series, separator: str = ";") -> str:
 
 
 def generate_taxid_list(
-    taxa_df: pd.DataFrame, db: Literal["SILVA", "SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path
+    taxa_df: pd.DataFrame, db: Literal["DADA2-SILVA", "SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"], otu_dir: pathlib.Path
 ) -> list:
     """
     Generates a list containing the mapping of taxids for each taxon in an input dataframe
@@ -366,14 +368,14 @@ def generate_taxid_list(
     :param taxa_df: Description
     :type taxa_df: pd.DataFrame
     :param db: Description
-    :type db: Literal["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
+    :type db: Literal["DADA2-SILVA", "SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
     :param otu_dir: Description
     :type otu_dir: pathlib.Path
     :return: Description
     :rtype: list[Any]
     """
     # if DB is SILVA, then we have taxids to add too
-    if db in ("SILVA", "SILVA-SSU"):
+    if db in ("DADA2-SILVA", "SILVA-SSU"):
         otu_file = otu_dir / "SILVA-SSU.otu"
     elif db == "SILVA-LSU":
         otu_file = otu_dir / "SILVA-LSU.otu"
@@ -395,7 +397,7 @@ def generate_taxid_list(
     return taxid_lst
 
 
-def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "PR2"], otu_dir: Path) -> Dict[str, pd.DataFrame]:
+def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILVA", "DADA2-PR2"], otu_dir: Path) -> Dict[str, pd.DataFrame]:
     """
     Generates a dictionary containing ASV (Amplicon Sequence Variant) data for each run.
 
@@ -409,7 +411,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
     Arguments:
         runs_df (pd.DataFrame): A DataFrame containing results status info about the runs.
         root_path (Path): The base directory path where analysis results files are stored.
-        db (Literal["SILVA", "PR2"]): Specifies the database used for taxonomy assignment
+        db (Literal["DADA2-SILVA", "DADA2-PR2"]): Specifies the database used for taxonomy assignment
             (e.g., SILVA or PR2).
         otu_dir (Path): Directory containing the refdb OTU files containing the taxids
 
@@ -429,7 +431,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
 
         # Raw MAPseq taxonomy assignment files
         # Used to extract hit data like the exact dbhit, %identity, and matching coords
-        mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / f"DADA2-{db}").glob(f"*_DADA2-{db}.mseq")))
+        mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / db).glob(f"*_{db}.mseq")))
         if mapseq_file:
             mapseq_file = mapseq_file[0]
         else:
@@ -439,7 +441,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["SILVA", "P
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
         # Processed MAPseq taxonomy assignment files
-        tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_DADA2-{db}_asv_tax.tsv")))
+        tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_{db}_asv_tax.tsv")))
         if tax_file:
             tax_file = tax_file[0]
         else:
@@ -641,7 +643,7 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     run_metadata_dict = get_all_ena_metadata_from_runs(all_runs)
 
     # Generate DwC-ready files for ASV results
-    asv_dbs = ["SILVA", "PR2"]
+    asv_dbs = ["DADA2-SILVA", "DADA2-PR2"]
     for db in asv_dbs:
         asv_dict = get_asv_dict(runs_df, root_path, db, otu_dir)
         all_merged_df = []
@@ -663,7 +665,7 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
         for amplified_region in present_amplified_regions:
             amplified_region_df = final_df.loc[final_df["amplifiedRegion"] == amplified_region]
             amplified_region_df.to_csv(
-                f"{output_prefix}_DADA2_{db}_{amplified_region}_dwcready.csv",
+                f"{output_prefix}_{db}_{amplified_region}_dwcready.csv",
                 index=False,
                 na_rep="NA",
             )
@@ -721,10 +723,7 @@ def organise_dwcr_summaries(all_study_summaries: List[Path]) -> defaultdict[List
         summary_filename = summary_path.stem
 
         temp_lst = summary_filename.split("_")
-        if "DADA2" in summary_filename:
-            summary_db_label = "_".join(temp_lst[1:4])  # For ASVs we need to include the amplified region in the label
-        else:
-            summary_db_label = "_".join(temp_lst[1:3])  # For closed reference, just the db_label is needed
+        summary_db_label = "_".join(temp_lst[1:3])
         summaries_dict[summary_db_label].append(summary_path)
 
     return summaries_dict

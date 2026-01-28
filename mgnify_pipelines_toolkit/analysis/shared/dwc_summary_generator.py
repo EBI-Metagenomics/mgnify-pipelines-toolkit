@@ -390,7 +390,8 @@ def generate_taxid_list(
     # need to join all taxa using `;` as separator to match to the OTU file that contains the taxids
     # also removes any nans
     concatenated_taxa = taxa_df.loc[:, tax_cols].apply(concatenate_taxa_row, axis=1)
-    otu_df = pd.read_csv(otu_file, sep="\t", usecols=[1, 2], names=["taxa", "taxid"])
+    # skiprows=1 to skip the first line which is `Unclassified`
+    otu_df = pd.read_csv(otu_file, sep="\t", usecols=[1, 2], names=["taxa", "taxid"], skiprows=1)
     # using a defaultdict to set "NA" as a default value in case there's somehow no match for a taxon
     otu_dict = defaultdict(lambda: {"taxid": "NA"}, otu_df.set_index("taxa").to_dict("index"))
     taxid_lst = concatenated_taxa.apply(lambda x: otu_dict[x]["taxid"]).to_list()

@@ -78,7 +78,6 @@ def read_fasta_records_dict(fasta_path: str) -> dict[str, SeqRecord]:
         for rec in SeqIO.parse(handle, "fasta"):
             if rec.id in records:
                 raise ValueError(f"Duplicate FASTA record id: {rec.id}")
-            # normalize contigs similar to ETL
             rec.seq = Seq(str(rec.seq).replace(" ", "").replace("\t", "").upper())
             records[rec.id] = rec
     return records

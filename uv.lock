@@ -25,6 +25,19 @@ wheels = [
 ]
 
 [[package]]
+name = "bcbio-gff"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "biopython" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/20/03/769e86d61923c2febd229a9946bbfd0f5bc5ab09237481fb4c71e39d6966/bcbio-gff-0.7.1.tar.gz", hash = "sha256:d1dc3294147b95baced6033f6386a0fed45c43767ef02d1223df5ef497e9cca6", size = 20102, upload-time = "2024-01-29T14:06:00.728Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/fc/fb0ad7988b7db0bd88c2764fd6b82657786e61cd5ab7f051e823c1aa1d4a/bcbio_gff-0.7.1-py3-none-any.whl", hash = "sha256:98b18c797fbabd27f47c2edc2a5c5e75d37a353cc2286684c4650728e66ff8fd", size = 16008, upload-time = "2024-01-29T14:05:58.911Z" },
+]
+
+[[package]]
 name = "biopython"
 version = "1.85"
 source = { registry = "https://pypi.org/simple" }
@@ -329,9 +342,10 @@ wheels = [
 
 [[package]]
 name = "mgnify-pipelines-toolkit"
-version = "1.4.14"
+version = "1.4.17"
 source = { editable = "." }
 dependencies = [
+    { name = "bcbio-gff" },
     { name = "biopython" },
     { name = "click" },
     { name = "intervaltree" },
@@ -357,6 +371,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
+    { name = "bcbio-gff", specifier = "==0.7.1" },
     { name = "biopython", specifier = "==1.85" },
     { name = "black", marker = "extra == 'dev'", specifier = "==25.1.0" },
     { name = "click", specifier = "~=8.1.8" },

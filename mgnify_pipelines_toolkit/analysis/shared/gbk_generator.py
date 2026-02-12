@@ -28,7 +28,7 @@ Key features:
   - Writes CDS features with qualifiers:
         /protein_id /locus_tag /product [/gene optional] [/translation optional]
   - Tags per-CDS provenance from GFF column 2: /note="gene_caller=<source>"
-  - Can filter CDS by GFF column 2 (source) via --include-sources/--exclude-sources
+  - Can filter CDS by GFF column 2 (source) via --include-sources
   - Prodigal FAA header parsing with strict validation + reporting for malformed headers.
   - Translation fallback from contig nucleotides; drops terminal stop '*'.
 """
@@ -36,7 +36,7 @@ Key features:
 from __future__ import annotations
 
 import argparse
-import gzip
+import fileinput
 import logging
 import os
 import re
@@ -52,19 +52,13 @@ from Bio.SeqRecord import SeqRecord
 
 logger = logging.getLogger(__name__)
 
-_PRODIGAL_SPLIT_RE = re.compile(r"\s+#\s+")
-_TRAILING_INDEX_RE = re.compile(r"^(?P<contig>.+?)_(?P<idx>\d+)$")
+PRODIGAL_SPLIT_RE = re.compile(r"\s+#\s+")
+TRAILING_INDEX_RE = re.compile(r"^(?P<contig>.+?)_(?P<idx>\d+)$")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # IO helpers
 # ──────────────────────────────────────────────────────────────────────────────
-def _open_text_maybe_gzip(path: str, mode: str = "rt"):
-    if path.endswith(".gz"):
-        return gzip.open(path, mode)
-    return open(path, mode, encoding="utf-8")
-
-
 def _file_is_readable(path: str | None) -> bool:
     return bool(path) and os.path.exists(path) and os.path.getsize(path) > 0
 
@@ -74,7 +68,7 @@ def _file_is_readable(path: str | None) -> bool:
 # ──────────────────────────────────────────────────────────────────────────────
 def read_fasta_records_dict(fasta_path: str) -> dict[str, SeqRecord]:
     records: dict[str, SeqRecord] = {}
-    with _open_text_maybe_gzip(fasta_path, "rt") as handle:
+    with fileinput.hook_compressed(fasta_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             if rec.id in records:
                 raise ValueError(f"Duplicate FASTA record id: {rec.id}")
@@ -85,7 +79,7 @@ def read_fasta_records_dict(fasta_path: str) -> dict[str, SeqRecord]:
 
 def read_protein_seqs_dict(proteins_path: str, drop_terminal_stop: bool) -> dict[str, str]:
     proteins: dict[str, str] = {}
-    with _open_text_maybe_gzip(proteins_path, "rt") as handle:
+    with fileinput.hook_compressed(proteins_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             prot = str(rec.seq).replace(" ", "").replace("\t", "").strip()
             if drop_terminal_stop and prot.endswith("*"):
@@ -100,6 +94,17 @@ def read_protein_seqs_dict(proteins_path: str, drop_terminal_stop: bool) -> dict
 # Qualifier helpers
 # ──────────────────────────────────────────────────────────────────────────────
 def _first_qualifier(feature: SeqFeature, keys: Iterable[str]) -> str | None:
+    """
+    Extract the first available qualifier value from a feature.
+    
+    Example qualifiers dict structure:
+    {
+        'ID': ['gene_001'],
+        'locus_tag': ['SAMPLE_001'],
+        'product': ['hypothetical protein'],
+        'note': ['some annotation note']
+    }
+    """
     q = getattr(feature, "qualifiers", {}) or {}
     for k in keys:
         if k in q:
@@ -158,7 +163,7 @@ def parse_prodigal_header(record_id: str, record_description: str) -> ProdigalCa
     contig_id is inferred from gene_id by stripping a trailing _<idx> if present.
     """
     line = record_description or record_id
-    parts = _PRODIGAL_SPLIT_RE.split(line)
+    parts = PRODIGAL_SPLIT_RE.split(line)
     if len(parts) < 4:
         raise ValueError(f"FAA header not parseable as Prodigal: {line!r}")
 
@@ -174,7 +179,7 @@ def parse_prodigal_header(record_id: str, record_description: str) -> ProdigalCa
     if start > end:
         start, end = end, start
 
-    m = _TRAILING_INDEX_RE.match(gene_id_full)
+    m = TRAILING_INDEX_RE.match(gene_id_full)
     contig_id = m.group("contig") if m else gene_id_full
 
     return ProdigalCall(gene_id=gene_id_full, contig_id=contig_id, start_1=start, end_1=end, strand=strand)
@@ -190,7 +195,7 @@ def validate_prodigal_faa_headers(faa_path: str) -> tuple[int, int]:
     """
     total = 0
     bad = 0
-    with _open_text_maybe_gzip(faa_path, "rt") as handle:
+    with fileinput.hook_compressed(faa_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             total += 1
             try:
@@ -202,7 +207,7 @@ def validate_prodigal_faa_headers(faa_path: str) -> tuple[int, int]:
 
 def read_calls_from_prodigal_faa(faa_path: str) -> list[ProdigalCall]:
     calls: list[ProdigalCall] = []
-    with _open_text_maybe_gzip(faa_path, "rt") as handle:
+    with fileinput.hook_compressed(faa_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             call = parse_prodigal_header(rec.id, rec.description or rec.id)
             calls.append(call)
@@ -226,7 +231,6 @@ def ensure_record_annotations(rec: SeqRecord, *, prefix: str) -> None:
     rec.description = f"{prefix} {rec.id}".strip() if prefix else rec.id
     rec.annotations.setdefault("molecule_type", "DNA")
     rec.annotations.setdefault("topology", "linear")
-    rec.annotations.setdefault("data_file_division", "UNC")
 
 
 def drop_terminal_stop_if_requested(prot: str, drop_terminal_stop: bool) -> str:
@@ -255,14 +259,17 @@ def translate_feature_from_contig(
 def should_keep_feature_by_source(
     feature: SeqFeature,
     include_sources: set[str] | None,
-    exclude_sources: set[str] | None,
 ) -> bool:
+    """
+    Determine if a feature should be kept based on its source.
+    If include_sources is None, keep all features.
+    If include_sources is provided, only keep features whose source is in the set.
+    """
+    if include_sources is None:
+        return True
+    
     src = _gff_source(feature)
-    if include_sources is not None:
-        return src in include_sources
-    if exclude_sources is not None:
-        return src not in exclude_sources
-    return True
+    return src in include_sources
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -278,7 +285,7 @@ def build_records_from_gff(
     locus_tag_prefix: str,
     gene_from_locus_tag: bool,
     include_sources: set[str] | None,
-    exclude_sources: set[str] | None,
+    gene_caller_version: str,
     transl_table: int,
     drop_terminal_stop: bool,
 ) -> list[SeqRecord]:
@@ -290,7 +297,7 @@ def build_records_from_gff(
         logger.info("Loaded proteins: %d", len(proteins))
 
     records: list[SeqRecord] = []
-    with _open_text_maybe_gzip(gff_path, "rt") as handle:
+    with fileinput.hook_compressed(gff_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in GFF.parse(handle, base_dict=contigs):
             ensure_record_annotations(rec, prefix=prefix)
 
@@ -304,12 +311,12 @@ def build_records_from_gff(
                     features_out.append(feat)
                     continue
 
-                if not should_keep_feature_by_source(feat, include_sources, exclude_sources):
+                if not should_keep_feature_by_source(feat, include_sources):
                     continue
 
                 src = _gff_source(feat)
                 if src:
-                    _append_note(feat, f"gene_caller={src}")
+                    _append_note(feat, f"gene_caller={gene_caller_version}")
 
                 cds_id = _safe_feature_id(feat)
                 if not cds_id:
@@ -318,7 +325,7 @@ def build_records_from_gff(
 
                 product = _safe_feature_product(feat) or default_product
                 protein_id_val = cds_id
-                locus_tag_val = f"{locus_tag_prefix}{cds_id}" if locus_tag_prefix else cds_id
+                locus_tag_val = f"{locus_tag_prefix},{cds_id}" if locus_tag_prefix else cds_id
 
                 # Build a new CDS feature with GenBank-conventional qualifiers
                 qualifiers: dict[str, list[str]] = {
@@ -383,6 +390,7 @@ def build_records_from_prodigal_faa(
     gene_from_locus_tag: bool,
     skip_missing_contigs: bool,
     require_translation: bool,
+    gene_caller_version: str,
     transl_table: int,
     drop_terminal_stop: bool,
     strict_headers: bool,
@@ -404,7 +412,7 @@ def build_records_from_prodigal_faa(
         logger.info("Loaded proteins (from FAA): %d", len(proteins_by_id))
 
     calls = []
-    with _open_text_maybe_gzip(faa_path, "rt") as handle:
+    with fileinput.hook_compressed(faa_path, "rt", encoding="utf-8", errors="ignore") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             try:
                 call = parse_prodigal_header(rec.id, rec.description or rec.id)
@@ -440,14 +448,14 @@ def build_records_from_prodigal_faa(
             strand = 1 if cds.strand == 1 else -1
 
             protein_id_val = cds.gene_id
-            locus_tag_val = f"{locus_tag_prefix}{protein_id_val}" if locus_tag_prefix else protein_id_val
+            locus_tag_val = f"{locus_tag_prefix},{protein_id_val}" if locus_tag_prefix else protein_id_val
             product_val = default_product
 
             qualifiers: dict[str, list[str]] = {
                 "protein_id": [protein_id_val],
                 "locus_tag": [locus_tag_val],
                 "product": [product_val],
-                "note": ["gene_caller=Prodigal"],  # provenance in FAA-only mode
+                "note": [f"gene_caller={gene_caller_version}"],  # provenance in FAA-only mode
             }
             if gene_from_locus_tag:
                 qualifiers["gene"] = [locus_tag_val]
@@ -496,7 +504,7 @@ def build_records_from_prodigal_faa(
 def write_genbank(records: list[SeqRecord], out_path: str) -> None:
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     mode = "wt"
-    with _open_text_maybe_gzip(out_path, mode) as out_handle:
+    with fileinput.hook_compressed(out_path, mode, encoding="utf-8", errors="ignore") as out_handle:
         SeqIO.write(records, out_handle, "genbank")
 
 
@@ -519,16 +527,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Comma-separated list of allowed GFF column-2 sources (e.g. Pyrodigal,FragGeneScanRS). Applies to CDS only.",
     )
-    p.add_argument(
-        "--exclude-sources",
-        default=None,
-        help="Comma-separated list of disallowed GFF column-2 sources. Applies to CDS only.",
-    )
 
     p.add_argument("--prefix", default="", help="Prefix used in record description (GenBank DEFINITION-like text)")
     p.add_argument("--default-product", default="hypothetical protein", help="Default /product when absent")
     p.add_argument("--locus-tag-prefix", default="", help="Prefix prepended to locus_tag values")
     p.add_argument("--gene-from-locus-tag", action="store_true", help="Also emit /gene=<locus_tag>")
+    p.add_argument("--gene-caller-version", default="unknown", help="Gene caller tool and version for provenance notes")
 
     p.add_argument("--skip-missing-contigs", action="store_true", help="In FAA mode, drop CDS calls whose contig is missing")
     p.add_argument("--require-translation", action="store_true", help="In FAA mode, fail if translation cannot be produced")
@@ -564,9 +568,6 @@ def main() -> None:
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
 
     include_sources = _parse_csv_set(args.include_sources)
-    exclude_sources = _parse_csv_set(args.exclude_sources)
-    if include_sources and exclude_sources:
-        raise ValueError("Use only one of --include-sources or --exclude-sources")
 
     # Choose mode
     gff_mode = _file_is_readable(args.gff)
@@ -587,7 +588,7 @@ def main() -> None:
             locus_tag_prefix=args.locus_tag_prefix,
             gene_from_locus_tag=args.gene_from_locus_tag,
             include_sources=include_sources,
-            exclude_sources=exclude_sources,
+            gene_caller_version=args.gene_caller_version,
             transl_table=args.transl_table,
             drop_terminal_stop=args.drop_terminal_stop,
         )
@@ -602,6 +603,7 @@ def main() -> None:
             gene_from_locus_tag=args.gene_from_locus_tag,
             skip_missing_contigs=args.skip_missing_contigs,
             require_translation=args.require_translation,
+            gene_caller_version=args.gene_caller_version,
             transl_table=args.transl_table,
             drop_terminal_stop=args.drop_terminal_stop,
             strict_headers=args.strict_prodigal_headers,

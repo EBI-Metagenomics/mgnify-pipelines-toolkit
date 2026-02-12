@@ -90,14 +90,12 @@ def read_protein_seqs_dict(proteins_path: str, drop_terminal_stop: bool) -> dict
 
 
 def read_prodigal_faa_with_validation(
-    faa_path: str, 
-    drop_terminal_stop: bool, 
-    strict_headers: bool
+    faa_path: str, drop_terminal_stop: bool, strict_headers: bool
 ) -> tuple[dict[str, str], list[ProdigalCall], int, int]:
     """
     Read Prodigal FAA file once, performing validation and extracting both
     protein sequences and coordinate calls simultaneously.
-    
+
     Returns:
         - proteins_by_id: dict mapping gene_id to protein sequence
         - calls: list of ProdigalCall objects with coordinates
@@ -108,18 +106,18 @@ def read_prodigal_faa_with_validation(
     calls: list[ProdigalCall] = []
     total = 0
     bad = 0
-    
+
     with fileinput.hook_compressed(faa_path, "rt") as handle:
         for rec in SeqIO.parse(handle, "fasta"):
             total += 1
-            
+
             # Process protein sequence
             prot = str(rec.seq).replace(" ", "").replace("\t", "").strip()
             if drop_terminal_stop and prot.endswith("*"):
                 prot = prot[:-1]
             if prot:
                 proteins_by_id[rec.id] = prot
-            
+
             # Validate and parse Prodigal header
             try:
                 call = parse_prodigal_header(rec.id, rec.description or rec.id)
@@ -129,11 +127,11 @@ def read_prodigal_faa_with_validation(
                 if strict_headers:
                     # Continue collecting bad count for complete error message
                     continue
-    
+
     logger.info("Prodigal header validation: total=%d bad=%d", total, bad)
     if strict_headers and bad > 0:
         raise ValueError(f"{bad} of {total} FAA records do not follow Prodigal header convention")
-    
+
     logger.info("Loaded proteins (from Prodigal FAA): %d", len(proteins_by_id))
     return proteins_by_id, calls, total, bad
 
@@ -144,7 +142,7 @@ def read_prodigal_faa_with_validation(
 def _first_qualifier(feature: SeqFeature, keys: Iterable[str]) -> str | None:
     """
     Extract the first available qualifier value from a feature.
-    
+
     Example qualifiers dict structure:
     {
         'ID': ['gene_001'],
@@ -269,7 +267,7 @@ def should_keep_feature_by_source(
     """
     if include_sources is None:
         return True
-    
+
     src = _gff_source(feature)
     return src in include_sources
 
@@ -388,9 +386,7 @@ def build_records_from_prodigal_faa(
     contigs = read_fasta_records_dict(contigs_path)
 
     # Read Prodigal FAA once, getting both proteins and calls with validation
-    proteins_by_id, calls, total, bad = read_prodigal_faa_with_validation(
-        prodigal_headers_faa_path, drop_terminal_stop, strict_headers
-    )
+    proteins_by_id, calls, total, bad = read_prodigal_faa_with_validation(prodigal_headers_faa_path, drop_terminal_stop, strict_headers)
 
     by_contig: dict[str, list[ProdigalCall]] = {}
     for c in calls:
@@ -476,14 +472,16 @@ def parse_args() -> argparse.Namespace:
     )
 
     p.add_argument("--contigs", required=True, help="Contigs FASTA (.fa/.fna/.fasta, optionally .gz)")
-    
+
     # Default mode arguments
     p.add_argument("--gff", required=False, help="CDS GFF3 (optionally .gz). Uses BCBio.GFF. Required for default mode.")
     p.add_argument("--faa", required=False, help="Proteins FASTA for translations (optionally .gz). Required for default mode.")
-    
+
     # Prodigal mode arguments
-    p.add_argument("--prodigal-headers-faa", required=False, help="Prodigal proteins FAA with coords in headers (optionally .gz). Enables Prodigal mode.")
-    
+    p.add_argument(
+        "--prodigal-headers-faa", required=False, help="Prodigal proteins FAA with coords in headers (optionally .gz). Enables Prodigal mode."
+    )
+
     p.add_argument("--output_gbk", required=True, help="Output GenBank path (.gb/.gbk, optionally .gz)")
 
     p.add_argument(
@@ -539,12 +537,12 @@ def main() -> None:
     # Validate input combinations
     if prodigal_mode and default_mode:
         raise ValueError("Cannot use both default mode (--gff + --faa) and Prodigal mode (--prodigal-headers-faa). Choose one mode.")
-    
+
     if prodigal_mode:
         # Prodigal mode: only allow prodigal-headers-faa
         if _file_is_readable(args.gff) or _file_is_readable(args.faa):
             raise ValueError("Prodigal mode: cannot provide --gff or --faa when using --prodigal-headers-faa")
-        
+
         logger.info("Running in Prodigal mode")
         records = build_records_from_prodigal_faa(
             contigs_path=args.contigs,
@@ -559,12 +557,12 @@ def main() -> None:
             drop_terminal_stop=args.drop_terminal_stop,
             strict_headers=args.strict_prodigal_headers,
         )
-    
+
     elif default_mode:
         # Default mode: require both GFF and FAA
         if args.prodigal_headers_faa:
             raise ValueError("Default mode: cannot provide --prodigal-headers-faa when using --gff + --faa")
-        
+
         logger.info("Running in default mode (GFF + FAA)")
         records = build_records_from_gff_and_faa(
             contigs_path=args.contigs,
@@ -578,11 +576,9 @@ def main() -> None:
             gene_caller_version=args.gene_caller_version,
             drop_terminal_stop=args.drop_terminal_stop,
         )
-    
+
     else:
-        raise ValueError("Must provide either:\n"
-                        "  Default mode: --gff + --faa\n"
-                        "  Prodigal mode: --prodigal-headers-faa")
+        raise ValueError("Must provide either:\n  Default mode: --gff + --faa\n  Prodigal mode: --prodigal-headers-faa")
 
     write_genbank(records, args.output_gbk)
     logger.info("Wrote GenBank: %s (records=%d)", args.output_gbk, len(records))

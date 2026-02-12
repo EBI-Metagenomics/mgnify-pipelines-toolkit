@@ -7,9 +7,9 @@ import pytest
 from Bio import SeqIO
 
 from mgnify_pipelines_toolkit.analysis.shared.gbk_generator import (
-    build_records_from_gff,
+    build_records_from_gff_and_faa,
     build_records_from_prodigal_faa,
-    validate_prodigal_faa_headers,
+    read_prodigal_faa_with_validation,
     write_genbank,
 )
 
@@ -49,7 +49,7 @@ def _write_faa_with_headers(path: Path, header_to_seq: dict[str, str]) -> None:
 def _write_gff3(path: Path, rows: list[dict[str, str]]) -> None:
     """
     rows expects dicts with keys:
-      seqid, source, type, start, end, strand, id
+    seqid, source, type, start, end, strand, id
     Optionally: product, locus_tag
     """
     with path.open("w", encoding="utf-8") as fh:
@@ -113,7 +113,6 @@ def _cds_by_protein_id(gbk_path: Path) -> dict[str, dict[str, list[str]]]:
 def _good_prodigal_headers() -> dict[str, str]:
     """
     Well-formed headers based on your examples:
-      <gene_id> # <start> # <end> # <strand> # <extra...>
     """
     return {
         # Canonical example
@@ -153,7 +152,8 @@ def test_validate_prodigal_headers_counts_bad(tmp_path: Path) -> None:
     headers.update(_bad_headers_like_cgc())
     _write_faa_with_headers(faa, headers)
 
-    total, bad = validate_prodigal_faa_headers(str(faa))
+    proteins_by_id, calls, total, bad = read_prodigal_faa_with_validation(str(faa), drop_terminal_stop=True, strict_headers=False)
+
     assert total == len(headers)
     assert bad == len(_bad_headers_like_cgc())
 
@@ -172,15 +172,14 @@ def test_prodigal_mode_strict_headers_raises(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match=r"FAA records do not follow Prodigal header convention"):
         build_records_from_prodigal_faa(
             contigs_path=str(contigs),
-            faa_path=str(faa),
-            proteins_path=None,
+            prodigal_headers_faa_path=str(faa),
             prefix="test",
             default_product="hypothetical protein",
             locus_tag_prefix="",
             gene_from_locus_tag=False,
             skip_missing_contigs=True,
             require_translation=False,
-            transl_table=11,
+            gene_caller_version="Prodigal_v2.6.3",
             drop_terminal_stop=True,
             strict_headers=True,
         )
@@ -233,19 +232,19 @@ def test_gff_mode_emits_source_feature_and_conventional_qualifiers(
         },
     )
 
-    records = build_records_from_gff(
+    records = build_records_from_gff_and_faa(
         contigs_path=str(contigs),
         gff_path=str(gff),
-        proteins_path=str(prots),
+        faa_path=str(prots),
         prefix="genbank",
         default_product="hypothetical protein",
         locus_tag_prefix="LT_",
         gene_from_locus_tag=True,
         include_sources=None,
-        exclude_sources=None,
-        transl_table=11,
+        gene_caller_version="Pyrodigal_v3.0.0",
         drop_terminal_stop=True,
     )
+
     write_genbank(records, str(out_gbk))
 
     feats = _load_gbk_features(out_gbk)
@@ -257,15 +256,15 @@ def test_gff_mode_emits_source_feature_and_conventional_qualifiers(
 
     q1 = cds_map["ERZ1290913_80_1"]
     assert q1["protein_id"][0] == "ERZ1290913_80_1"
-    assert q1["locus_tag"][0] == "LT_ERZ1290913_80_1"
+    assert q1["locus_tag"][0] == "LT_,ERZ1290913_80_1"
     assert q1["product"][0] == "foo enzyme"
-    assert q1["gene"][0] == "LT_ERZ1290913_80_1"
+    assert q1["gene"][0] == "LT_,ERZ1290913_80_1"
     assert q1["translation"][0] == "MKT"
-    assert any("gene_caller=Pyrodigal" in n for n in q1.get("note", []))
+    assert any("gene_caller=Pyrodigal_v3.0.0" in n for n in q1.get("note", []))
 
     q2 = cds_map["ERZ1290913_80_2_100_189_+"]
     assert q2["translation"][0] == "VVV"
-    assert any("gene_caller=FragGeneScanRS" in n for n in q2.get("note", []))
+    assert any("gene_caller=Pyrodigal_v3.0.0" in n for n in q2.get("note", []))
 
 
 def test_gff_mode_include_sources_filters_by_column2(tmp_path: Path) -> None:
@@ -308,28 +307,29 @@ def test_gff_mode_include_sources_filters_by_column2(tmp_path: Path) -> None:
         },
     )
 
-    records = build_records_from_gff(
+    records = build_records_from_gff_and_faa(
         contigs_path=str(contigs),
         gff_path=str(gff),
-        proteins_path=str(prots),
+        faa_path=str(prots),
         prefix="genbank",
         default_product="hypothetical protein",
         locus_tag_prefix="",
         gene_from_locus_tag=False,
         include_sources={"Pyrodigal"},
-        exclude_sources=None,
-        transl_table=11,
+        gene_caller_version="Pyrodigal_v3.0.0",
         drop_terminal_stop=True,
     )
+
     write_genbank(records, str(out_gbk))
 
     cds_map = _cds_by_protein_id(out_gbk)
     assert set(cds_map.keys()) == {"ERZ1290913_80_1"}
 
 
-def test_gff_mode_fallback_translation_drops_terminal_stop(tmp_path: Path) -> None:
+def test_gff_mode_no_fallback_translation_without_proteins(tmp_path: Path) -> None:
     """
-    Ensure nucleotide fallback translation removes trailing '*' when the CDS ends with a stop codon.
+    Ensure that when no proteins file is provided, CDS features are created
+    without translation qualifiers (no fallback translation from nucleotides).
     """
     contigs = tmp_path / "contigs.fna"
     gff = tmp_path / "calls.gff"
@@ -355,22 +355,80 @@ def test_gff_mode_fallback_translation_drops_terminal_stop(tmp_path: Path) -> No
         ],
     )
 
-    # No proteins file provided => must fallback translate from contigs
-    records = build_records_from_gff(
+    # No proteins file provided => no translation should be added
+    records = build_records_from_gff_and_faa(
         contigs_path=str(contigs),
         gff_path=str(gff),
-        proteins_path=None,
+        faa_path=str(contigs),  # Use contigs as dummy FAA (empty protein dict)
         prefix="genbank",
         default_product="hypothetical protein",
         locus_tag_prefix="",
         gene_from_locus_tag=False,
         include_sources=None,
-        exclude_sources=None,
-        transl_table=11,
-        drop_terminal_stop=True,  # required behavior
+        gene_caller_version="Pyrodigal_v3.0.0",
+        drop_terminal_stop=True,
     )
+
     write_genbank(records, str(out_gbk))
 
     cds_map = _cds_by_protein_id(out_gbk)
-    tr = cds_map["ERZ_STOP_1"]["translation"][0]
-    assert tr == "MK", f"Expected stop codon removed; got {tr!r}"
+    # Should have the CDS but no translation qualifier
+    assert "ERZ_STOP_1" in cds_map
+    assert "translation" not in cds_map["ERZ_STOP_1"]
+
+
+def test_prodigal_mode_processes_coordinates_correctly(tmp_path: Path) -> None:
+    """
+    Test that Prodigal mode correctly processes coordinates from headers
+    and creates CDS features at the right locations.
+    """
+    contigs = tmp_path / "contigs.fna"
+    faa = tmp_path / "calls.faa"
+    out_gbk = tmp_path / "out.gbk"
+
+    # Create a contig
+    _write_fasta(contigs, {"NC_000913": "A" * 10000})
+
+    # Create Prodigal FAA with coordinate headers
+    _write_faa_with_headers(
+        faa,
+        {
+            "NC_000913_1 # 100 # 300 # 1 # ID=1_1;partial=00": "MKT",
+            "NC_000913_2 # 500 # 700 # -1 # ID=1_2;partial=00": "VVV",
+        },
+    )
+
+    records = build_records_from_prodigal_faa(
+        contigs_path=str(contigs),
+        prodigal_headers_faa_path=str(faa),
+        prefix="test",
+        default_product="hypothetical protein",
+        locus_tag_prefix="TEST_",
+        gene_from_locus_tag=True,
+        skip_missing_contigs=False,
+        require_translation=True,
+        gene_caller_version="Prodigal_v2.6.3",
+        drop_terminal_stop=True,
+        strict_headers=False,
+    )
+
+    write_genbank(records, str(out_gbk))
+
+    # Check that CDS features have correct coordinates
+    recs = list(SeqIO.parse(str(out_gbk), "genbank"))
+    assert len(recs) == 1
+
+    cds_features = [f for f in recs[0].features if f.type == "CDS"]
+    assert len(cds_features) == 2
+
+    # First CDS: 100-300 on + strand (convert to 0-based: 99-300)
+    cds1 = next(f for f in cds_features if f.qualifiers["protein_id"][0] == "NC_000913_1")
+    assert cds1.location.start == 99  # 0-based
+    assert cds1.location.end == 300
+    assert cds1.location.strand == 1
+
+    # Second CDS: 500-700 on - strand (convert to 0-based: 499-700)
+    cds2 = next(f for f in cds_features if f.qualifiers["protein_id"][0] == "NC_000913_2")
+    assert cds2.location.start == 499  # 0-based
+    assert cds2.location.end == 700
+    assert cds2.location.strand == -1

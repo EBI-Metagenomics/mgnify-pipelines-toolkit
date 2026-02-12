@@ -30,7 +30,6 @@ Key features:
   - Tags per-CDS provenance from GFF column 2: /note="gene_caller=<source>"
   - Can filter CDS by GFF column 2 (source) via --include-sources
   - Prodigal FAA header parsing with strict validation + reporting for malformed headers.
-  - Translation fallback from contig nucleotides; drops terminal stop '*'.
 """
 
 from __future__ import annotations
@@ -239,23 +238,6 @@ def drop_terminal_stop_if_requested(prot: str, drop_terminal_stop: bool) -> str:
     return prot
 
 
-def translate_feature_from_contig(
-    rec: SeqRecord,
-    feature: SeqFeature,
-    *,
-    transl_table: int,
-    drop_terminal_stop: bool,
-) -> str | None:
-    # Extract nucleotide sequence of feature and translate.
-    nuc = feature.extract(rec.seq)
-    nuc = nuc[: (len(nuc) // 3) * 3]
-    if len(nuc) == 0:
-        return None
-    prot = str(nuc.translate(table=transl_table))
-    prot = drop_terminal_stop_if_requested(prot, drop_terminal_stop=drop_terminal_stop)
-    return prot or None
-
-
 def should_keep_feature_by_source(
     feature: SeqFeature,
     include_sources: set[str] | None,
@@ -286,7 +268,6 @@ def build_records_from_gff_and_faa(
     gene_from_locus_tag: bool,
     include_sources: set[str] | None,
     gene_caller_version: str,
-    transl_table: int,
     drop_terminal_stop: bool,
 ) -> list[SeqRecord]:
     contigs = read_fasta_records_dict(contigs_path)
@@ -342,17 +323,10 @@ def build_records_from_gff_and_faa(
                     else:
                         qualifiers["note"] = [str(x) for x in note]
 
-                # Prefer protein FASTA translation, else translate from contig
+                # Use protein FASTA translation if available
                 translation: str | None = None
                 if cds_id in proteins:
                     translation = proteins[cds_id]
-                else:
-                    translation = translate_feature_from_contig(
-                        rec,
-                        feat,
-                        transl_table=transl_table,
-                        drop_terminal_stop=drop_terminal_stop,
-                    )
 
                 if translation:
                     qualifiers["translation"] = [translation]
@@ -388,7 +362,6 @@ def build_records_from_prodigal_faa(
     skip_missing_contigs: bool,
     require_translation: bool,
     gene_caller_version: str,
-    transl_table: int,
     drop_terminal_stop: bool,
     strict_headers: bool,
 ) -> list[SeqRecord]:
@@ -453,19 +426,6 @@ def build_records_from_prodigal_faa(
                 qualifiers["gene"] = [locus_tag_val]
 
             translation: str | None = proteins_by_id.get(cds.gene_id)
-            if not translation:
-                # Fallback translation from contig
-                tmp_feat = SeqFeature(
-                    location=FeatureLocation(start0, end0, strand=strand),
-                    type="CDS",
-                    qualifiers={},
-                )
-                translation = translate_feature_from_contig(
-                    rec,
-                    tmp_feat,
-                    transl_table=transl_table,
-                    drop_terminal_stop=drop_terminal_stop,
-                )
 
             if require_translation and not translation:
                 raise ValueError(f"Missing translation for {cds.gene_id} on {cds.contig_id}")
@@ -540,7 +500,6 @@ def parse_args() -> argparse.Namespace:
         help="In Prodigal mode, fail if any FAA headers do not match Prodigal convention. Always logs counts.",
     )
 
-    p.add_argument("--transl-table", type=int, default=11, help="NCBI translation table for nucleotide translation fallback")
     p.add_argument("--drop-terminal-stop", action="store_true", default=True, help="Drop trailing '*' in translations")
     p.add_argument(
         "--no-drop-terminal-stop",
@@ -590,7 +549,6 @@ def main() -> None:
             skip_missing_contigs=args.skip_missing_contigs,
             require_translation=args.require_translation,
             gene_caller_version=args.gene_caller_version,
-            transl_table=args.transl_table,
             drop_terminal_stop=args.drop_terminal_stop,
             strict_headers=args.strict_prodigal_headers,
         )
@@ -611,7 +569,6 @@ def main() -> None:
             gene_from_locus_tag=args.gene_from_locus_tag,
             include_sources=include_sources,
             gene_caller_version=args.gene_caller_version,
-            transl_table=args.transl_table,
             drop_terminal_stop=args.drop_terminal_stop,
         )
     

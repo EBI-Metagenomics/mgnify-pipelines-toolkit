@@ -46,12 +46,12 @@ def parse_gff(gff_file):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
+            seq_id, source, feature_type, start, end, _, strand, _, attributes = fields
             if feature_type == "CDS":
                 # Parse attributes to get the ID value
                 attr_dict = dict(attr.split("=") for attr in attributes.split(";") if "=" in attr)
                 protein_id = attr_dict["ID"]
-                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
+                predictions[seq_id][strand].append( Interval(int(start), int(end), data={"protein_id": protein_id, "source": source}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the GFF file")
     return predictions
@@ -75,9 +75,13 @@ def parse_pyrodigal_output(file):
             also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
+    model_source = None
     with open(file) as file_in:
         for line in file_in:
             if line.startswith("# Model Data"):
+                matches = re.search(r"version=([^;]+)", line)
+                if matches:
+                    model_source = matches.group(1)
                 continue
             if line.startswith("# Sequence Data"):
                 matches = re.search(r'seqhdr="(\S+)"', line)
@@ -89,7 +93,7 @@ def parse_pyrodigal_output(file):
                 # Pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
                 protein_id = f"{seq_id}_{fragment_id}"
-                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
+                predictions[seq_id][strand].append( Interval(int(start), int(end), data={"protein_id": protein_id, "source": model_source}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
@@ -310,7 +314,7 @@ def output_gff(predictions, output_gff):
                         writer.writerow(
                             [
                                 seq_id,  # Sequence ID
-                                caller,  # Source
+                                region.data.get("source") or caller,  # Source
                                 "CDS",  # Feature type
                                 region.begin,  # Start position
                                 region.end,  # End position

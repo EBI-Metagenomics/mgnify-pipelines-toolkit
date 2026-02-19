@@ -20,7 +20,7 @@
     - path: "prodigal_fgs.ffn"
       md5sum: b40145886c1c12d7f45e9d8134961b88
     - path: "prodigal_fgs.gff"
-      md5sum: 7c1fb12df60be84ba071640003fac7e5
+      md5sum: 3103e1206441051b1ac1a7fc8bf9c0bc
 
 - name: Combined Gene Caller merge test (gff input, no masking)
   tags:
@@ -42,7 +42,7 @@
     - path: "pyrodigal_fgsrs.ffn"
       md5sum: b02b98154ab052350adad8b21d9fd074
     - path: "pyrodigal_fgsrs.gff"
-      md5sum: 774a5966f0cef53d3b17d4b5f432128e
+      md5sum: 034579440bf929c8d59364d87be46feb
 
 # TODO: we need to run and validate this
 # - name: fraggenescan_prodigal_with_masking

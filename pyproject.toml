@@ -57,7 +57,11 @@ convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.co
 dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:cli"
 amr_integrator = "mgnify_pipelines_toolkit.analysis.shared.amrintegrator:main"
 gbk_generator = "mgnify_pipelines_toolkit.analysis.shared.gbk_generator:main"
+<<<<<<< feature/bgc_mapper
 bgc_mapper = "mgnify_pipelines_toolkit.analysis.shared.bgc_mapper:main"
+=======
+download_zenodo = "mgnify_pipelines_toolkit.analysis.shared.download_zenodo:main"
+>>>>>>> main
 # analysis.amplicon #
 classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"
 make_asv_count_table = "mgnify_pipelines_toolkit.analysis.amplicon.make_asv_count_table:main"

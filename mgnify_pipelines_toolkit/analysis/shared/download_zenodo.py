@@ -19,6 +19,13 @@ import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+# ------------------------------
+# Global endpoints
+# ------------------------------
+ZENODO_API_BASE = "https://zenodo.org/api"
+ZENODO_RECORDS_API = f"{ZENODO_API_BASE}/records"  # e.g. https://zenodo.org/api/records/<id>
+ZENODO_RECORDS_BASE = "https://zenodo.org/records"  # e.g. https://zenodo.org/records/<id>/files/<filename>
+
 
 def download_file(url, output_file, user_agent, max_retries=3, retry_delay=5):
     """Download file using urllib with retry logic"""
@@ -50,7 +57,7 @@ def download_file(url, output_file, user_agent, max_retries=3, retry_delay=5):
 
 def get_zenodo_metadata(zenodo_id, user_agent):
     """Fetch Zenodo record metadata using urllib"""
-    api_url = f"https://zenodo.org/api/records/{zenodo_id}"
+    api_url = f"{ZENODO_RECORDS_API}/{zenodo_id}"
 
     try:
         req = Request(api_url, headers={"User-Agent": user_agent})
@@ -123,7 +130,7 @@ def main():
     file_entry = api_data["files"][args.file_index]
     filename = file_entry["key"]
     file_size = file_entry.get("size", "unknown")
-    download_url = f"https://zenodo.org/records/{zenodo_id}/files/{filename}"
+    download_url = f"{ZENODO_RECORDS_BASE}/{zenodo_id}/files/{filename}"
 
     # Determine output filename
     output_file = args.output_file if args.output_file else filename

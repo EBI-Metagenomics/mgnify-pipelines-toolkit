@@ -6,3 +6,4 @@ build/
 .task/
 .claude/
 .idea/
+.venv/

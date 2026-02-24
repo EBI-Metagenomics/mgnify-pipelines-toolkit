@@ -13,6 +13,8 @@
     --fgsrs-ffn tests/fixtures/combined_gene_caller_merge/input_fgs.ffn
     --fgsrs-faa tests/fixtures/combined_gene_caller_merge/input_fgs.faa
     --mask tests/fixtures/combined_gene_caller_merge/cmsearch.all.tblout.deoverlapped
+    --pyrodigal-version 2.0.0
+    --fgsrs-version 1.1.0
     -v
   files:
     - path: "prodigal_fgs.faa"
@@ -20,7 +22,7 @@
     - path: "prodigal_fgs.ffn"
       md5sum: b40145886c1c12d7f45e9d8134961b88
     - path: "prodigal_fgs.gff"
-      md5sum: 7c1fb12df60be84ba071640003fac7e5
+      md5sum: 63236d96cc9277c637fbefe7ba4bc833
 
 - name: Combined Gene Caller merge test (gff input, no masking)
   tags:
@@ -35,6 +37,8 @@
     --fgsrs-gff tests/fixtures/combined_gene_caller_merge/input_fgsrs.gff
     --fgsrs-ffn tests/fixtures/combined_gene_caller_merge/input_fgsrs.ffn
     --fgsrs-faa tests/fixtures/combined_gene_caller_merge/input_fgsrs.faa
+    --pyrodigal-version 3.6.3
+    --fgsrs-version 1.1.0
     -v
   files:
     - path: "pyrodigal_fgsrs.faa"
@@ -42,7 +46,7 @@
     - path: "pyrodigal_fgsrs.ffn"
       md5sum: b02b98154ab052350adad8b21d9fd074
     - path: "pyrodigal_fgsrs.gff"
-      md5sum: 774a5966f0cef53d3b17d4b5f432128e
+      md5sum: a5caaa4b85f488f60b1783dc5557b6d1
 
 # TODO: we need to run and validate this
 # - name: fraggenescan_prodigal_with_masking

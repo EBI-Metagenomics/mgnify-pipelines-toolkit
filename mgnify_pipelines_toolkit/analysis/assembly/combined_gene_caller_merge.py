@@ -46,12 +46,12 @@ def parse_gff(gff_file):
             if line.startswith("#"):
                 continue
             fields = line.strip().split("\t")
-            seq_id, source, feature_type, start, end, _, strand, _, attributes = fields
+            seq_id, _, feature_type, start, end, _, strand, _, attributes = fields
             if feature_type == "CDS":
                 # Parse attributes to get the ID value
                 attr_dict = dict(attr.split("=") for attr in attributes.split(";") if "=" in attr)
                 protein_id = attr_dict["ID"]
-                predictions[seq_id][strand].append( Interval(int(start), int(end), data={"protein_id": protein_id, "source": source}))
+                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the GFF file")
     return predictions
@@ -75,13 +75,9 @@ def parse_pyrodigal_output(file):
             also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
-    model_source = None
     with open(file) as file_in:
         for line in file_in:
             if line.startswith("# Model Data"):
-                matches = re.search(r"version=([^;]+)", line)
-                if matches:
-                    model_source = matches.group(1)
                 continue
             if line.startswith("# Sequence Data"):
                 matches = re.search(r'seqhdr="(\S+)"', line)
@@ -93,7 +89,7 @@ def parse_pyrodigal_output(file):
                 # Pyrodigal uses these (rather than coordinates) to identify sequences in the fasta output
                 fragment_id, start, end, strand = fields
                 protein_id = f"{seq_id}_{fragment_id}"
-                predictions[seq_id][strand].append( Interval(int(start), int(end), data={"protein_id": protein_id, "source": model_source}))
+                predictions[seq_id][strand].append(Interval(int(start), int(end), data={"protein_id": protein_id}))
     if not predictions:
         raise ValueError("Zero gene predictions was read from the *.out file")
     return predictions
@@ -295,7 +291,7 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 SeqIO.write(sequences, output_file, "fasta")
 
 
-def output_gff(predictions, output_gff):
+def output_gff(predictions, output_gff, versions=None):
     """
     Write merged gene predictions to a GFF output file.
 
@@ -303,18 +299,25 @@ def output_gff(predictions, output_gff):
         predictions (dict): Nested dictionary with merged gene predictions as Interval objects.
             Each Interval object stores a protein ID in the data attribute.
         output_gff (str): Path to the output GFF file.
+        versions (dict): Optional dictionary mapping caller names to version strings.
     """
     with open(output_gff, "w") as gff_out:
         writer = csv.writer(gff_out, delimiter="\t")
         gff_out.write("##gff-version 3\n")
         for caller, seq_data in predictions.items():
+            # Format source as {caller}_v{version} if version is provided
+            if versions and caller in versions and versions[caller]:
+                source = f"{caller}_v{versions[caller]}"
+            else:
+                source = caller
+            
             for seq_id, strand_dict in seq_data.items():
                 for strand, regions in strand_dict.items():
                     for region in regions:
                         writer.writerow(
                             [
                                 seq_id,  # Sequence ID
-                                region.data.get("source") or caller,  # Source
+                                source,  # Source
                                 "CDS",  # Feature type
                                 region.begin,  # Start position
                                 region.end,  # End position
@@ -410,6 +413,10 @@ def main():
         required=True,
         help="Pyrodigal *.faa file with proteins",
     )
+    parser.add_argument(
+        "--pyrodigal-version",
+        help="Pyrodigal version string (e.g., '3.6.3')",
+    )
     parser.add_argument("--fgsrs-gff", "-fg", help="FragGeneScanRS *.gff file")
     parser.add_argument("--fgsrs-out", "-fo", help="FragGeneScanRS *.out file")
     parser.add_argument(
@@ -423,6 +430,10 @@ def main():
         "-fp",
         required=True,
         help="FragGeneScanRS *.faa file with proteins",
+    )
+    parser.add_argument(
+        "--fgsrs-version",
+        help="FragGeneScanRS version string (e.g., '1.1.0')",
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Increase verbosity level to debug")
     args = parser.parse_args()
@@ -475,7 +486,13 @@ def main():
 
     logging.info("Writing output files...")
     output_summary(summary, f"{args.name}.summary.txt")
-    output_gff(merged_predictions, f"{args.name}.gff")
+    
+    versions = {
+        "Pyrodigal": args.pyrodigal_version,
+        "FragGeneScanRS": args.fgsrs_version,
+    }
+    output_gff(merged_predictions, f"{args.name}.gff", versions)
+    
     files = {
         "Pyrodigal": {
             "proteins": args.pyrodigal_faa,

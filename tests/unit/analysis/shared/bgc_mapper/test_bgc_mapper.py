@@ -6,26 +6,33 @@ Pytest suite for bgc_mapper.py script.
 Tests BGC integration from GECCO/antiSMASH/SanntiS into a base GFF.
 """
 
-from pathlib import Path
-
 import pytest
+from click.testing import CliRunner
 
-from mgnify_pipelines_toolkit.analysis.shared.bgc_mapper import (
+from mgnify_pipelines_toolkit.analysis.shared.bgc.cli import (
+    load_base_cds,
+    main,
+    validate_inputs,
+)
+from mgnify_pipelines_toolkit.analysis.shared.bgc.gff_output import build_region_lines
+from mgnify_pipelines_toolkit.analysis.shared.bgc.merge import (
+    merge_overlaps,
+    support_and_filter_cds,
+)
+from mgnify_pipelines_toolkit.analysis.shared.bgc.models import (
     BGCRegion,
     CDSRec,
     MergedRegion,
-    build_region_lines,
-    build_sideload_json_payload,
-    load_base_cds,
-    merge_overlaps,
-    parse_antismash_regions_and_genes,
-    parse_args,
-    parse_gecco_regions,
-    parse_sanntis_regions,
-    support_and_filter_cds,
-    validate_inputs,
-    write_gff,
 )
+from mgnify_pipelines_toolkit.analysis.shared.bgc.sideload_json import (
+    build_sideload_json_payload,
+)
+from mgnify_pipelines_toolkit.analysis.shared.bgc.tool_parsers import (
+    AntiSMASHParser,
+    GECCOParser,
+    SanntiSParser,
+)
+from mgnify_pipelines_toolkit.analysis.shared.gff.io import write_gff
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Test data fixtures - using dictionaries to build inputs
@@ -282,8 +289,8 @@ def test_bgc_region_creation():
 
 def test_merged_region_creation():
     """Test MergedRegion dataclass creation."""
-    region1 = BGCRegion("contig1", 100, 500, "gecco", "GECCO v0.9.8", {"Type": "NRP"})
-    region2 = BGCRegion("contig1", 400, 800, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"})
+    region1 = BGCRegion(contig="contig1", start=100, end=500, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"})
+    region2 = BGCRegion(contig="contig1", start=400, end=800, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"})
 
     merged = MergedRegion(contig="contig1", start=100, end=800, members=[region1, region2])
     assert merged.contig == "contig1"
@@ -335,7 +342,7 @@ def test_parse_gecco_regions(tmp_path, gecco_regions_data):
             )
             f.write(line + "\n")
 
-    regions = parse_gecco_regions(gecco_gff)
+    regions, _ = GECCOParser().parse_regions(gecco_gff)
     assert len(regions) == 2
     assert regions[0].tool == "gecco"
     assert regions[0].source == "GECCO v0.9.8"
@@ -366,7 +373,7 @@ def test_parse_sanntis_regions(tmp_path, sanntis_regions_data):
             )
             f.write(line + "\n")
 
-    regions = parse_sanntis_regions(sanntis_gff)
+    regions, _ = SanntiSParser().parse_regions(sanntis_gff)
     assert len(regions) == 3
     assert regions[0].tool == "sanntis"
     assert regions[0].source == "SanntiSv0.9.3.3"
@@ -417,7 +424,8 @@ def test_parse_antismash_regions_and_genes(tmp_path, antismash_regions_data):
             )
             f.write(line + "\n")
 
-    regions, gene_ann = parse_antismash_regions_and_genes(antismash_gff)
+    parser = AntiSMASHParser()
+    regions, gene_ann = parser.parse_regions(antismash_gff)
     assert len(regions) == 2
     assert regions[0].tool == "antismash"
     assert regions[0].source == "antiSMASH:8.0.1"
@@ -437,8 +445,8 @@ def test_parse_antismash_regions_and_genes(tmp_path, antismash_regions_data):
 def test_merge_overlaps_no_overlap():
     """Test merging when regions don't overlap."""
     regions = [
-        BGCRegion("contig1", 100, 200, "gecco", "GECCO v0.9.8", {"Type": "NRP"}),
-        BGCRegion("contig1", 300, 400, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"}),
+        BGCRegion(contig="contig1", start=100, end=200, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"}),
+        BGCRegion(contig="contig1", start=300, end=400, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"}),
     ]
     merged = merge_overlaps(regions)
     assert len(merged) == 2
@@ -450,8 +458,8 @@ def test_merge_overlaps_no_overlap():
 def test_merge_overlaps_with_overlap():
     """Test merging when regions overlap."""
     regions = [
-        BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"Type": "NRP"}),
-        BGCRegion("contig1", 250, 400, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"}),
+        BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"}),
+        BGCRegion(contig="contig1", start=250, end=400, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"}),
     ]
     merged = merge_overlaps(regions)
     assert len(merged) == 1
@@ -463,8 +471,8 @@ def test_merge_overlaps_with_overlap():
 def test_merge_overlaps_adjacent():
     """Test merging when regions are adjacent (touching)."""
     regions = [
-        BGCRegion("contig1", 100, 200, "gecco", "GECCO v0.9.8", {"Type": "NRP"}),
-        BGCRegion("contig1", 200, 300, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"}),
+        BGCRegion(contig="contig1", start=100, end=200, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"}),
+        BGCRegion(contig="contig1", start=200, end=300, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"}),
     ]
     merged = merge_overlaps(regions)
     # Adjacent regions should merge
@@ -477,17 +485,17 @@ def test_support_and_filter_cds_single_tool():
     """Test CDS filtering and support calculation with one tool."""
     contig_to_cds = {
         "contig1": [
-            CDSRec("contig1", 150, 250, "contig1\tProdigal\tCDS\t150\t250\t.\t+\t0\tID=cds001"),
-            CDSRec("contig1", 500, 600, "contig1\tProdigal\tCDS\t500\t600\t.\t+\t0\tID=cds002"),
+            CDSRec(contig="contig1", start=150, end=250, line="contig1\tProdigal\tCDS\t150\t250\t.\t+\t0\tID=cds001"),
+            CDSRec(contig="contig1", start=500, end=600, line="contig1\tProdigal\tCDS\t500\t600\t.\t+\t0\tID=cds002"),
         ]
     }
 
     merged_regions = [
         MergedRegion(
-            "contig1",
-            100,
-            300,
-            [BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"Type": "NRP"})],
+            contig="contig1",
+            start=100,
+            end=300,
+            members=[BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"})],
         )
     ]
 
@@ -503,18 +511,18 @@ def test_support_and_filter_cds_multiple_tools():
     """Test CDS filtering and support calculation with multiple tools."""
     contig_to_cds = {
         "contig1": [
-            CDSRec("contig1", 150, 250, "contig1\tProdigal\tCDS\t150\t250\t.\t+\t0\tID=cds001"),
+            CDSRec(contig="contig1", start=150, end=250, line="contig1\tProdigal\tCDS\t150\t250\t.\t+\t0\tID=cds001"),
         ]
     }
 
     merged_regions = [
         MergedRegion(
-            "contig1",
-            100,
-            300,
-            [
-                BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"Type": "NRP"}),
-                BGCRegion("contig1", 100, 300, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"}),
+            contig="contig1",
+            start=100,
+            end=300,
+            members=[
+                BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"Type": "NRP"}),
+                BGCRegion(contig="contig1", start=100, end=300, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"}),
             ],
         )
     ]
@@ -537,10 +545,10 @@ def test_build_region_lines_single_member():
     """Test building region lines for non-merged regions."""
     merged_regions = [
         MergedRegion(
-            "contig1",
-            100,
-            300,
-            [BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"gecco_bgc_type": "NRP"})],
+            contig="contig1",
+            start=100,
+            end=300,
+            members=[BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"gecco_bgc_type": "NRP"})],
         )
     ]
 
@@ -560,12 +568,12 @@ def test_build_region_lines_merged():
     """Test building region lines for merged regions."""
     merged_regions = [
         MergedRegion(
-            "contig1",
-            100,
-            400,
-            [
-                BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"gecco_bgc_type": "NRP"}),
-                BGCRegion("contig1", 250, 400, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC001"}),
+            contig="contig1",
+            start=100,
+            end=400,
+            members=[
+                BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"gecco_bgc_type": "NRP"}),
+                BGCRegion(contig="contig1", start=250, end=400, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC001"}),
             ],
         )
     ]
@@ -589,20 +597,20 @@ def test_build_sideload_json_payload():
     """Test building antiSMASH sideloader JSON payload."""
     merged_regions = [
         MergedRegion(
-            "contig1",
-            100,
-            300,
-            [
-                BGCRegion("contig1", 100, 300, "gecco", "GECCO v0.9.8", {"gecco_bgc_type": "NRP"}),
+            contig="contig1",
+            start=100,
+            end=300,
+            members=[
+                BGCRegion(contig="contig1", start=100, end=300, tool="gecco", source="GECCO v0.9.8", attrs={"gecco_bgc_type": "NRP"}),
             ],
         ),
         MergedRegion(
-            "contig1",
-            500,
-            800,
-            [
-                BGCRegion("contig1", 500, 700, "gecco", "GECCO v0.9.8", {"gecco_bgc_type": "Polyketide"}),
-                BGCRegion("contig1", 650, 800, "sanntis", "SanntiSv0.9.3.3", {"nearest_MiBIG": "BGC002"}),
+            contig="contig1",
+            start=500,
+            end=800,
+            members=[
+                BGCRegion(contig="contig1", start=500, end=700, tool="gecco", source="GECCO v0.9.8", attrs={"gecco_bgc_type": "Polyketide"}),
+                BGCRegion(contig="contig1", start=650, end=800, tool="sanntis", source="SanntiSv0.9.3.3", attrs={"nearest_MiBIG": "BGC002"}),
             ],
         ),
     ]
@@ -635,93 +643,70 @@ def test_build_sideload_json_payload():
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Tests for command-line argument parsing
+# Tests for command-line interface
 # ──────────────────────────────────────────────────────────────────────────────
 
 
-def test_parse_args_minimal():
-    """Test minimal argument parsing."""
-    args = parse_args(
-        [
-            "--base_gff",
-            "base.gff",
-            "--gecco_gff",
-            "gecco.gff",
-            "--output_gff",
-            "output.gff",
-        ]
-    )
-    assert args.base_gff == Path("base.gff")
-    assert args.gecco_gff == Path("gecco.gff")
-    assert args.output_gff == Path("output.gff")
-    assert args.antismash_gff is None
-    assert args.sanntis_gff is None
+def test_cli_requires_base_gff():
+    """Test CLI errors when --base_gff is not provided."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--gecco_gff", "gecco.gff", "--output_gff", "output.gff"])
+    assert result.exit_code == 2  # Click missing required option exit code
 
 
-def test_parse_args_all_tools():
-    """Test argument parsing with all tools."""
-    args = parse_args(
-        [
-            "--base_gff",
-            "base.gff",
-            "--gecco_gff",
-            "gecco.gff",
-            "--antismash_gff",
-            "antismash.gff",
-            "--sanntis_gff",
-            "sanntis.gff",
-            "--output_gff",
-            "output.gff",
-        ]
-    )
-    assert args.gecco_gff == Path("gecco.gff")
-    assert args.antismash_gff == Path("antismash.gff")
-    assert args.sanntis_gff == Path("sanntis.gff")
+def test_cli_requires_output_gff():
+    """Test CLI errors when --output_gff is not provided."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--base_gff", "base.gff", "--gecco_gff", "gecco.gff"])
+    assert result.exit_code == 2  # Click missing required option exit code
+
+
+def test_cli_minimal(tmp_path):
+    """Test CLI minimal invocation with gecco only and no regions produces output."""
+    runner = CliRunner()
+    base = tmp_path / "base.gff"
+    gecco = tmp_path / "gecco.gff"
+    out = tmp_path / "out.gff"
+    base.write_text("##gff-version 3\n")
+    gecco.write_text("##gff-version 3\n")
+    result = runner.invoke(main, ["--base_gff", str(base), "--gecco_gff", str(gecco), "--output_gff", str(out)])
+    assert result.exit_code == 0
+    assert out.exists()
+
+
+def test_cli_help():
+    """Test --help lists expected options."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--help"])
+    assert result.exit_code == 0
+    assert "--base_gff" in result.output
+    assert "--gecco_gff" in result.output
+    assert "--antismash_gff" in result.output
+    assert "--sanntis_gff" in result.output
 
 
 def test_validate_inputs_missing_base(tmp_path):
     """Test validation with missing base GFF."""
-    args_dict = {
-        "base_gff": tmp_path / "nonexistent.gff",
-        "gecco_gff": None,
-        "antismash_gff": None,
-        "sanntis_gff": None,
-        "output_gff": tmp_path / "output.gff",
-    }
-
-    class Args:
-        pass
-
-    args = Args()
-    for k, v in args_dict.items():
-        setattr(args, k, v)
-
     with pytest.raises(FileNotFoundError, match="Base GFF not found"):
-        validate_inputs(args)
+        validate_inputs(
+            base_gff=tmp_path / "nonexistent.gff",
+            gecco_gff=None,
+            antismash_gff=None,
+            sanntis_gff=None,
+        )
 
 
 def test_validate_inputs_no_predictors(tmp_path):
     """Test validation with no predictor GFFs."""
     base_gff = tmp_path / "base.gff"
     base_gff.write_text("##gff-version 3\n")
-
-    args_dict = {
-        "base_gff": base_gff,
-        "gecco_gff": None,
-        "antismash_gff": None,
-        "sanntis_gff": None,
-        "output_gff": tmp_path / "output.gff",
-    }
-
-    class Args:
-        pass
-
-    args = Args()
-    for k, v in args_dict.items():
-        setattr(args, k, v)
-
     with pytest.raises(ValueError, match="At least one optional predictor"):
-        validate_inputs(args)
+        validate_inputs(
+            base_gff=base_gff,
+            gecco_gff=None,
+            antismash_gff=None,
+            sanntis_gff=None,
+        )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -814,14 +799,18 @@ def test_full_workflow(tmp_path):
 
     # Load and process
     contig_to_cds = load_base_cds(base_gff)
-    gecco_regions = parse_gecco_regions(gecco_gff)
+    gecco_regions, _ = GECCOParser().parse_regions(gecco_gff)
     merged = merge_overlaps(gecco_regions)
     filtered_cds = support_and_filter_cds(contig_to_cds, merged, {}, n_tools=1)
     region_lines = build_region_lines(merged)
 
     # Write output
     output_gff = tmp_path / "output.gff"
-    write_gff(output_gff, region_lines, filtered_cds)
+    all_lines = list(region_lines)
+    for contig, cds_lines in filtered_cds.items():
+        for ln in cds_lines:
+            all_lines.append((contig, int(ln.split("\t")[3]), ln))
+    write_gff(output_gff, all_lines)
 
     # Verify output
     assert output_gff.exists()

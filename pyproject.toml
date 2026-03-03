@@ -40,6 +40,8 @@ packages = ["mgnify_pipelines_toolkit",
     "mgnify_pipelines_toolkit.schemas",
     "mgnify_pipelines_toolkit.ena",
     "mgnify_pipelines_toolkit.analysis.shared",
+    "mgnify_pipelines_toolkit.analysis.shared.gff",
+    "mgnify_pipelines_toolkit.analysis.shared.bgc",
     "mgnify_pipelines_toolkit.analysis.amplicon",
     "mgnify_pipelines_toolkit.analysis.assembly",
     "mgnify_pipelines_toolkit.analysis.genomes",
@@ -58,7 +60,7 @@ convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.co
 dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:cli"
 amr_integrator = "mgnify_pipelines_toolkit.analysis.shared.amrintegrator:main"
 gbk_generator = "mgnify_pipelines_toolkit.analysis.shared.gbk_generator:main"
-bgc_mapper = "mgnify_pipelines_toolkit.analysis.shared.bgc_mapper:main"
+bgc_mapper = "mgnify_pipelines_toolkit.analysis.shared.bgc.cli:main"
 download_zenodo = "mgnify_pipelines_toolkit.analysis.shared.download_zenodo:main"
 # analysis.amplicon #
 classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"

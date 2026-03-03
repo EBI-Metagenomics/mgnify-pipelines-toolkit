@@ -48,10 +48,10 @@ Tool metadata propagation rules:
           - antiSMASH contributes antismash_product to bgc_region rows
           - merged regions: antiSMASH contributes only product values
   - GECCO:
-      gecco_bgc_type               ← from GECCO Type (BGC + CDS)
+      gecco_bgc_type ← from GECCO Type (BGC + CDS)
   - SanntiS:
-      nearest_MiBIG                ← from SanntiS nearest_MiBIG (BGC + CDS)
-      nearest_MiBIG_class          ← from SanntiS nearest_MiBIG_class (BGC + CDS)
+      nearest_MiBIG ← from SanntiS nearest_MiBIG (BGC + CDS)
+      nearest_MiBIG_class ← from SanntiS nearest_MiBIG_class (BGC + CDS)
 
 Support/scoring rule (FIXED):
   - Let N = number of tools provided as input (min=1, max=3).
@@ -61,16 +61,23 @@ Support/scoring rule (FIXED):
       - N=3 → 0.33, 0.67, 1.00
       - N=2 → 0.50, 1.00
       - N=1 → 1.00
+
+Optional json output:
+  - Write antiSMASH sideloader JSON (records/subregions/details only; no protoclusters),
+    with same basename as the output GFF.
+  - Validate JSON against the official antiSMASH schemas (vendored locally).
 """
 
 from __future__ import annotations
 
 import argparse
 import fileinput
+import json
 import logging
 import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -85,7 +92,6 @@ META_KEYS_ORDER = [
     "nearest_MiBIG",
     "nearest_MiBIG_class",
 ]
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Data structures
@@ -125,8 +131,8 @@ class MergedRegion:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        prog="bgc_integrator.py",
-        description="Integrate optional GECCO/antiSMASH/SanntiS BGC calls into a base GFF3 (table parsing; no BCBio).",
+        prog="bgc_mapper.py",
+        description="Integrate optional GECCO/antiSMASH/SanntiS BGC calls into a base GFF3 file",
     )
     p.add_argument(
         "--base_gff",
@@ -152,7 +158,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Optional SanntiS output GFF (may be compressed).",
     )
+
     p.add_argument("--output_gff", required=True, type=Path, help="Output integrated GFF3.")
+
     p.add_argument("--log_level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return p.parse_args(argv)
 
@@ -180,7 +188,7 @@ def validate_inputs(args: argparse.Namespace) -> list[tuple[str, Path]]:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# GFF parsing utilities (table-based)
+# GFF parsing utilities
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -247,11 +255,9 @@ def replace_or_append_attr(attr: str, key: str, value: str) -> str:
     value = _sanitize_attr_value(value)
     if attr == "." or attr.strip() == "":
         return f"{key}={value}"
-
     if f"{key}=" in attr:
         pattern = rf"(?:(?<=;)|^){re.escape(key)}=[^;]*"
         return re.sub(pattern, f"{key}={value}", attr)
-
     return attr + f";{key}={value}"
 
 
@@ -262,7 +268,6 @@ def replace_or_append_attr(attr: str, key: str, value: str) -> str:
 
 def load_base_cds(base_gff: Path) -> dict[str, list[CDSRec]]:
     contig_to_cds: dict[str, list[CDSRec]] = {}
-
     with fileinput.input(files=[str(base_gff)], openhook=fileinput.hook_compressed) as handle:
         for raw in handle:
             line = raw.rstrip("\n")
@@ -290,7 +295,7 @@ def load_base_cds(base_gff: Path) -> dict[str, list[CDSRec]]:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Parse predictor outputs into BGC regions (table-based)
+# Parse predictor outputs into BGC regions
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -371,17 +376,14 @@ def parse_antismash_regions_and_genes(
             parent = attrs.get("Parent")
             if not gid or not parent:
                 continue
-
             gene_parent_by_id[gid] = parent
             g: dict[str, str] = {}
-
             if "gene_functions" in attrs:
                 g["antismash_gene_function"] = attrs["gene_functions"]
             if "as_type" in attrs:
                 g["antismash_as_type"] = attrs["as_type"]
             if "as_gene_clusters" in attrs:
                 g["antismash_as_gene_clusters"] = attrs["as_gene_clusters"]
-
             if g:
                 gene_ann_by_id[gid] = g
 
@@ -413,7 +415,7 @@ def parse_antismash_regions_and_genes(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Merge overlaps + support + metadata propagation to CDS
+# Merge overlaps + support score + metadata propagation to CDS
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -428,10 +430,8 @@ def merge_overlaps(regions: Sequence[BGCRegion]) -> list[MergedRegion]:
         if not regs:
             continue
         regs_sorted = sorted(regs, key=lambda r: r.start)
-
         cur_start, cur_end = regs_sorted[0].start, regs_sorted[0].end
         cur_members = [regs_sorted[0]]
-
         for r in regs_sorted[1:]:
             if r.start <= cur_end:
                 cur_end = max(cur_end, r.end)
@@ -439,9 +439,7 @@ def merge_overlaps(regions: Sequence[BGCRegion]) -> list[MergedRegion]:
             else:
                 merged.append(MergedRegion(contig=contig, start=cur_start, end=cur_end, members=cur_members))
                 cur_start, cur_end, cur_members = r.start, r.end, [r]
-
         merged.append(MergedRegion(contig=contig, start=cur_start, end=cur_end, members=cur_members))
-
     return merged
 
 
@@ -495,7 +493,6 @@ def support_and_filter_cds(
         raise ValueError("n_tools must be >= 1")
 
     out: dict[str, list[str]] = {}
-
     for mr in merged_regions:
         cds_list = contig_to_cds.get(mr.contig, [])
         if not cds_list or not mr.members:
@@ -547,6 +544,7 @@ def support_and_filter_cds(
 
     for contig in out:
         out[contig].sort(key=lambda ln: int(ln.split("\t")[3]))
+
     return out
 
 
@@ -582,16 +580,13 @@ def build_region_lines(
       - members == 1 => source EXACT original source string from predictor GFF (member.source)
       - type 'bgc_region'
       - ID first: contig|bgc:start-end
-      - Add bgc_tools=<comma-separated tools in this region> (merged and non-merged)
+      - Add bgc_tools= (merged and non-merged)
     """
     lines: list[tuple[str, int, str]] = []
-
     for mr in merged_regions:
         if not mr.members:
             continue
-
         tools = sorted({m.tool for m in mr.members})
-
         attrs: dict[str, str] = {
             "ID": f"{mr.contig}|bgc:{mr.start}-{mr.end}",
             "bgc_tools": ",".join(tools),
@@ -602,7 +597,7 @@ def build_region_lines(
             attrs["member_bgcs"] = str(len(mr.members))
             attrs.update(_collect_member_meta_for_region(mr.members))
         else:
-            # FIX: preserve the *exact* source string from the original predictor file (col2)
+            # preserve the *exact* source string from the original predictor file (col2)
             source = mr.members[0].source
             attrs.update(mr.members[0].attrs)
 
@@ -620,7 +615,6 @@ def build_region_lines(
             ]
         )
         lines.append((mr.contig, mr.start, line))
-
     return lines
 
 
@@ -631,7 +625,6 @@ def write_gff(
 ) -> None:
     sortable: list[tuple[str, int, str]] = []
     sortable.extend(region_lines)
-
     for contig, cds_lines in cds_lines_by_contig.items():
         for ln in cds_lines:
             start = int(ln.split("\t")[3])
@@ -643,6 +636,238 @@ def write_gff(
         out.write("##gff-version 3\n")
         for _, _, ln in sortable:
             out.write(ln + "\n")
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# antiSMASH sideloader JSON output (subregions only) + jsonschema validation
+# ──────────────────────────────────────────────────────────────────────────────
+
+
+def _derive_output_json_path(output_gff: Path) -> Path:
+    """Derive a JSON output path with the same basename as *output_gff*.
+
+    Examples:
+      - out.gff   -> out.json
+      - out.gff3  -> out.json
+      - out.gff.gz -> out.json
+    """
+    name = output_gff.name
+    # Handle compressed gff names (even if we don't write compressed output ourselves).
+    if name.endswith(".gff.gz") or name.endswith(".gff3.gz"):
+        base = name.rsplit(".", 2)[0]  # drop .gff(.3).gz
+        return output_gff.with_name(f"{base}.json")
+    if name.endswith(".gff") or name.endswith(".gff3"):
+        base = name.rsplit(".", 1)[0]
+        return output_gff.with_name(f"{base}.json")
+    return output_gff.with_suffix(".json")
+
+
+def _default_antismash_schema_dir() -> Path:
+    """Expected location for vendored antiSMASH sideloader schemas."""
+    return (Path(__file__).resolve().parent / "antismash_sideload_schemas" / "general").resolve()
+
+
+def _fix_refs(node):
+    """Recursively strip 'file:' from $ref values (antiSMASH uses file: URIs)."""
+    if isinstance(node, dict):
+        out = {}
+        for k, v in node.items():
+            if k == "$ref" and isinstance(v, str):
+                out[k] = v.replace("file:", "")
+            else:
+                out[k] = _fix_refs(v)
+        return out
+    if isinstance(node, list):
+        return [_fix_refs(x) for x in node]
+    return node
+
+
+def _load_schema_files(schema_dir: Path) -> tuple[dict, dict[str, dict]]:
+    """Load root schema.json + subschemas into a resolver store."""
+    schema_path = schema_dir / "schema.json"
+    subs_dir = schema_dir / "subschemas"
+    if not schema_path.exists():
+        raise FileNotFoundError(f"schema.json not found at: {schema_path}")
+    if not subs_dir.exists():
+        raise FileNotFoundError(f"subschemas/ dir not found at: {subs_dir}")
+
+    def _read(p: Path) -> dict:
+        return _fix_refs(json.loads(p.read_text(encoding="utf-8")))
+
+    root = _read(schema_path)
+
+    store: dict[str, dict] = {}
+
+    def _register_keys_for_doc(p: Path, doc: dict) -> None:
+        # Absolute file URI for *actual* file
+        store[p.resolve().as_uri()] = doc
+
+        # Common relative keys
+        store[p.name] = doc
+        store[str(p)] = doc
+
+        # If this is a subschema, also register it under subschemas/<name>
+        if p.parent.name == "subschemas":
+            store[f"subschemas/{p.name}"] = doc
+
+            # ALSO: register as if it were located at the root schema_dir
+            # (this covers refs like "tool.json" resolving to <schema_dir>/tool.json)
+            fake_root_path = (schema_dir / p.name).resolve()
+            store[fake_root_path.as_uri()] = doc
+            store[str(fake_root_path)] = doc
+
+    # root
+    _register_keys_for_doc(schema_path, root)
+
+    # subschemas
+    for p in sorted(subs_dir.glob("*.json")):
+        doc = _read(p)
+        _register_keys_for_doc(p, doc)
+
+    return root, store
+
+
+def validate_sideload_json(payload: dict, schema_dir: Path | None = None) -> None:
+    """Validate *payload* against the official antiSMASH sideloader schema (local copies)."""
+    try:
+        import jsonschema  # type: ignore
+    except Exception as e:
+        raise RuntimeError(
+            "jsonschema is required for validation but is not available. Install it (e.g. pip install jsonschema) or remove validation."
+        ) from e
+
+    schema_dir = _default_antismash_schema_dir() if schema_dir is None else schema_dir
+    root, store = _load_schema_files(schema_dir)
+
+    # jsonschema's resolver API changed over time; RefResolver is still widely supported.
+    resolver = jsonschema.RefResolver(
+        base_uri=(schema_dir / "schema.json").resolve().as_uri(),
+        referrer=root,
+        store=store,
+    )
+    jsonschema.validate(instance=payload, schema=root, resolver=resolver)
+
+
+def _sanitize_details_value(value: str) -> str:
+    """Make sure details values are schema-friendly (string, no leading whitespace)."""
+    v = str(value).strip()
+    # details.json disallows leading '=' '_' ',' or whitespace; we strip and then replace if needed
+    while v and v[0] in ("_", "=", ","):
+        v = v[1:]
+    return v if v else "NA"
+
+
+def _choose_subregion_label(mr: MergedRegion) -> str:
+    """Choose a conservative <=20 char label for a subregion."""
+    if len(mr.members) > 1:
+        return "MergedBGC"
+    m = mr.members[0]
+    if m.tool == "antismash" and m.attrs.get("antismash_product"):
+        lbl = str(m.attrs["antismash_product"])
+    elif m.tool == "gecco" and m.attrs.get("gecco_bgc_type"):
+        lbl = str(m.attrs["gecco_bgc_type"])
+    elif m.tool == "sanntis" and m.attrs.get("nearest_MiBIG_class"):
+        lbl = str(m.attrs["nearest_MiBIG_class"])
+    else:
+        lbl = m.tool
+    # Keep it short and avoid whitespace-heavy labels
+    lbl = re.sub(r"\s+", "_", lbl)
+    lbl = re.sub(r"[^A-Za-z0-9_\-\.]", "_", lbl)
+    return (lbl[:20] if len(lbl) > 20 else lbl) or "BGC"
+
+
+def build_sideload_json_payload(
+    merged_regions: Sequence[MergedRegion],
+    *,
+    tool_name: str,
+    tool_version: str,
+    tool_description: str,
+) -> dict:
+    """Build an antiSMASH sideloader JSON payload using only records/subregions/details."""
+    records_by_name: dict[str, list[dict]] = {}
+
+    for mr in merged_regions:
+        if not mr.members:
+            continue
+
+        # Convert from GFF (1-based inclusive) to sideloader JSON (0-based start, end-exclusive)
+        start0 = max(0, int(mr.start) - 1)
+        end_excl = int(mr.end)
+
+        tools = sorted({m.tool for m in mr.members})
+        sources = sorted({m.source for m in mr.members if m.source})
+
+        # Union member attrs as list-of-strings (schema allows str or list[str]; lists preserve multiplicity)
+        union: dict[str, set[str]] = {}
+        for m in mr.members:
+            for k, v in m.attrs.items():
+                if v is None or str(v).strip() == "":
+                    continue
+                union.setdefault(k, set()).add(_sanitize_details_value(v))
+
+        details: dict[str, object] = {
+            "ID": _sanitize_details_value(f"{mr.contig}|bgc:{mr.start}-{mr.end}"),
+            "bgc_tools": [_sanitize_details_value(t) for t in tools],
+        }
+        if len(mr.members) > 1:
+            details["member_bgcs"] = _sanitize_details_value(str(len(mr.members)))
+        if sources:
+            details["sources"] = [_sanitize_details_value(s) for s in sources]
+
+        for k, vals in union.items():
+            # Avoid clobbering our own keys
+            if k in details:
+                k = f"member_{k}"
+            details[k] = sorted(vals)
+
+        subregion = {
+            "start": start0,
+            "end": end_excl,
+            "label": _choose_subregion_label(mr),
+            "details": details,
+        }
+        records_by_name.setdefault(mr.contig, []).append(subregion)
+
+    records: list[dict] = []
+    for name in sorted(records_by_name.keys()):
+        subregions = sorted(records_by_name[name], key=lambda d: int(d["start"]))
+        records.append({"name": name, "subregions": subregions})
+
+    payload = {
+        "tool": {
+            "name": tool_name,
+            "version": tool_version if str(tool_version).strip() else "unknown",
+            "description": tool_description,
+            "configuration": {},  # keep empty by default; can be filled later if needed
+        },
+        "records": records,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    return payload
+
+
+def write_sideload_json(
+    out_json: Path,
+    merged_regions: Sequence[MergedRegion],
+    *,
+    schema_dir: Path | None = None,
+    tool_name: str = "MGnify BGC mapper",
+    tool_version: str = "unknown",
+    tool_description: str = "BGC subregions integrated from GECCO/antiSMASH/SanntiS into a base GFF.",
+) -> None:
+    """Write sideloader JSON and validate it against the official antiSMASH schema files."""
+    payload = build_sideload_json_payload(
+        merged_regions,
+        tool_name=tool_name,
+        tool_version=tool_version,
+        tool_description=tool_description,
+    )
+
+    validate_sideload_json(payload, schema_dir=schema_dir)
+
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    log.info("Wrote sideloader JSON: %s", out_json)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -701,6 +926,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     write_gff(args.output_gff, region_lines, cds_lines_by_contig)
 
     log.info("Wrote integrated GFF: %s", args.output_gff)
+
+    # Write antiSMASH-compatible sideloader JSON (subregions only), same basename as output_gff
+    out_json = _derive_output_json_path(args.output_gff)
+    try:
+        write_sideload_json(out_json, merged_regions)
+    except Exception as e:
+        log.error("Failed to write/validate sideloader JSON: %s", e)
+        return 3
+
     return 0
 
 

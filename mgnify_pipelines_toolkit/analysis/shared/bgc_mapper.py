@@ -138,7 +138,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--base_gff",
         required=True,
         type=Path,
-        help="Mandatory base GFF (may be compressed).",
+        help="Mandatory base GFF containing the coordinates of the original CDS used for BGC prediction (may be compressed).",
     )
     p.add_argument(
         "--gecco_gff",
@@ -161,7 +161,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
     p.add_argument("--output_gff", required=True, type=Path, help="Output integrated GFF3.")
 
-    p.add_argument("--log_level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    p.add_argument("--verbose", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return p.parse_args(argv)
 
 
@@ -878,7 +878,7 @@ def write_sideload_json(
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     logging.basicConfig(
-        level=getattr(logging, args.log_level),
+        level=getattr(logging, args.verbose),
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     )
 

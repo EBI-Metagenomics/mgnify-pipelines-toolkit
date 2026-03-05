@@ -31,6 +31,7 @@ from mgnify_pipelines_toolkit.analysis.shared.bgc.models import (
     MergedRegion,
 )
 from mgnify_pipelines_toolkit.analysis.shared.bgc.sideload_json import (
+    _derive_output_json_path,
     write_sideload_json,
 )
 from mgnify_pipelines_toolkit.analysis.shared.bgc.tool_parsers import (
@@ -130,6 +131,12 @@ def load_base_cds(base_gff: Path) -> dict[str, list[CDSRec]]:
 @click.option("--sanntis_gff", type=click.Path(path_type=Path), default=None, help="Optional SanntiS output GFF (may be compressed).")
 @click.option("--output_gff", required=True, type=click.Path(path_type=Path), help="Output integrated GFF3.")
 @click.option(
+    "--validate_json",
+    is_flag=True,
+    default=False,
+    help="Validate the produced antiSMASH sideloader JSON against the local schema copies (dev/debug). Disabled by default.",
+)
+@click.option(
     "--verbose",
     default="INFO",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),
@@ -141,6 +148,7 @@ def main(
     antismash_gff: Path | None,
     sanntis_gff: Path | None,
     output_gff: Path,
+    validate_json: bool,
     verbose: str,
 ) -> None:
     """Integrate optional GECCO/antiSMASH/SanntiS BGC calls into a base GFF3 file."""
@@ -190,11 +198,12 @@ def main(
     write_gff(output_gff, all_lines)
     logger.info("Wrote integrated GFF: %s", output_gff)
 
+    # Write antiSMASH-compatible sideloader JSON (subregions only), same basename as output_gff
+    out_json = _derive_output_json_path(output_gff)
     try:
-        write_sideload_json(output_gff, merged_regions)
+        write_sideload_json(out_json, merged_regions, validate=validate_json)
     except Exception as e:
         raise click.ClickException(f"Failed to write/validate sideloader JSON: {e}")
-
 
 if __name__ == "__main__":
     main()

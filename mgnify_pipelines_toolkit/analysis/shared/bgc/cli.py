@@ -69,11 +69,11 @@ def validate_inputs(
     :type sanntis_gff: Path | None
     :returns: List of (tool_name, path) tuples for provided optional inputs.
     :rtype: list[tuple[str, Path]]
-    :raises FileNotFoundError: If base_gff or any optional GFF does not exist.
-    :raises ValueError: If no optional predictor GFF is provided.
+    :raises click.FileError: If base_gff or any optional GFF does not exist.
+    :raises ValueError: If no optional predictor GFF is provided.    
     """
     if not base_gff.exists():
-        raise FileNotFoundError(f"Base GFF not found: {base_gff}")
+        raise click.FileError(str(base_gff), hint="Base GFF not found")
 
     optional: list[tuple[str, Path]] = []
     if gecco_gff:
@@ -88,8 +88,8 @@ def validate_inputs(
 
     for tool, path in optional:
         if not path.exists():
-            raise FileNotFoundError(f"{tool} GFF not found: {path}")
-
+            raise click.FileError(str(path), hint=f"{tool} GFF not found")
+    
     return optional
 
 

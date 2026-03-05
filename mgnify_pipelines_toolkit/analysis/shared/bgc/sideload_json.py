@@ -133,6 +133,9 @@ def _load_schema_files(schema_dir: Path) -> tuple[dict, dict[str, dict]]:
 def validate_sideload_json(payload: dict, schema_dir: Path | None = None) -> None:
     """Validate payload against the official antiSMASH sideloader schema (local copies).
 
+    Uses jsonschema Draft7Validator with a referencing.Registry to resolve $ref
+    from in-memory schemas.
+
     :param payload: JSON payload to validate.
     :type payload: dict
     :param schema_dir: Optional path to schema directory; defaults to vendored schemas.
@@ -140,21 +143,29 @@ def validate_sideload_json(payload: dict, schema_dir: Path | None = None) -> Non
     :raises RuntimeError: If jsonschema is not available.
     :raises jsonschema.ValidationError: If the payload fails schema validation.
     """
+    print("Validating json format")
+
     try:
-        import jsonschema  # type: ignore
+        from jsonschema import Draft7Validator  # type: ignore
+        from referencing import Registry, Resource  # type: ignore
     except Exception as e:
         raise RuntimeError(
-            "jsonschema is required for validation but is not available. Install it (e.g. pip install jsonschema) or remove validation."
+            "Validation requires 'jsonschema' (and its 'referencing' dependency). "
+            "Install it (e.g. pip install jsonschema) or disable validation."
         ) from e
 
     schema_dir = _default_antismash_schema_dir() if schema_dir is None else schema_dir
     root, store = _load_schema_files(schema_dir)
-    resolver = jsonschema.RefResolver(
-        base_uri=(schema_dir / "schema.json").resolve().as_uri(),
-        referrer=root,
-        store=store,
-    )
-    jsonschema.validate(instance=payload, schema=root, resolver=resolver)
+
+    # Build a registry that can resolve $ref values seen in antiSMASH schemas.
+    # We register *every* key from store as a Resource.
+    registry = Registry()
+    for key, doc in store.items():
+        registry = registry.with_resource(key, Resource.from_contents(doc))
+
+    # Validate (raises jsonschema.ValidationError on failure)
+    validator = Draft7Validator(schema=root, registry=registry)
+    validator.validate(payload)
 
 
 def _sanitize_details_value(value: str) -> str:
@@ -272,25 +283,25 @@ def build_sideload_json_payload(
 
 
 def write_sideload_json(
-    output_gff: Path,
+    out_json: Path,
     merged_regions: Sequence[MergedRegion],
     *,
     schema_dir: Path | None = None,
+    validate: bool = False,
     tool_name: str = "MGnify BGC mapper",
-    tool_version: str = "unknown",
+    tool_version: str = "mgnify_pipelines_toolkit_v1.4.18",
     tool_description: str = "BGC subregions integrated from GECCO/antiSMASH/SanntiS into a base GFF.",
 ) -> None:
-    """Build, validate, and write the antiSMASH sideloader JSON file.
+    """Build and write the antiSMASH sideloader JSON file. Optionally validate against the official antiSMASH schema files.
 
-    The output path is derived automatically from output_gff (e.g.
-    ``out.gff`` → ``out.json``).
-
-    :param output_gff: Path to the output GFF file; JSON path is derived from it.
-    :type output_gff: Path
+    :param out_json: Path where the JSON output should be written.
+    :type out_json: Path
     :param merged_regions: Merged BGC regions to serialise.
     :type merged_regions: Sequence[MergedRegion]
     :param schema_dir: Optional schema directory override.
     :type schema_dir: Path | None
+    :param validate: Whether to validate the JSON against the schema (default: False).
+    :type validate: bool
     :param tool_name: Name of the tool for the JSON payload.
     :type tool_name: str
     :param tool_version: Version string for the JSON payload.
@@ -298,14 +309,20 @@ def write_sideload_json(
     :param tool_description: Description for the JSON payload.
     :type tool_description: str
     """
-    out_json = _derive_output_json_path(output_gff)
+    print("writing json output")
+
     payload = build_sideload_json_payload(
         merged_regions,
         tool_name=tool_name,
         tool_version=tool_version,
         tool_description=tool_description,
     )
-    validate_sideload_json(payload, schema_dir=schema_dir)
+
+    # Write first (so you still get an artifact even if validation is slow/fails when enabled)
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_json.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     logger.info("Wrote sideloader JSON: %s", out_json)
+
+    # Validate only if requested
+    if validate:
+        validate_sideload_json(payload, schema_dir=schema_dir)

@@ -32,15 +32,18 @@ Usage::
 """
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
 
 BASE_URL = "https://raw.githubusercontent.com/antismash/antismash/master/antismash/detection/sideloader/schemas/general"
+ANTISMASH_REPO = "https://api.github.com/repos/antismash/antismash"
 
 # Maps local filename -> remote URL (flattened into a single directory).
 SCHEMAS: dict[str, str] = {
@@ -69,6 +72,41 @@ def fix_refs(node: Any) -> Any:
     return node
 
 
+def get_commit_info() -> dict[str, str]:
+    """Fetch the latest commit information from the antiSMASH repository.
+
+    :return: Dictionary with 'sha', 'short_sha', 'date', and 'message' keys.
+    :raises requests.RequestException: If the GitHub API request fails.
+    """
+    print("  Fetching commit information from antiSMASH repository ...")
+    response = requests.get(
+        f"{ANTISMASH_REPO}/commits?path=antismash/detection/sideloader/schemas/general&per_page=1",
+        timeout=30,
+    )
+    response.raise_for_status()
+    commits = response.json()
+    if not commits:
+        return {
+            "sha": "unknown",
+            "short_sha": "unknown",
+            "date": "unknown",
+            "message": "unknown",
+        }
+
+    commit = commits[0]
+    sha = commit["sha"]
+    short_sha = sha[:7]
+    date = commit["commit"]["committer"]["date"]
+    message = commit["commit"]["message"].split("\n")[0]  # First line only
+
+    return {
+        "sha": sha,
+        "short_sha": short_sha,
+        "date": date,
+        "message": message,
+    }
+
+
 def download_schemas(dest: Path) -> None:
     """Download all schema files into *dest*, fixing ``$ref`` paths.
 
@@ -82,11 +120,12 @@ def download_schemas(dest: Path) -> None:
         (dest / filename).write_text(json.dumps(schema, indent=2))
 
 
-def generate_models(schema_path: Path, output: Path) -> None:
-    """Run datamodel-codegen to produce Pydantic v2 models.
+def generate_models(schema_path: Path, output: Path, commit_info: dict[str, str]) -> None:
+    """Run datamodel-codegen to produce Pydantic v2 models with commit metadata.
 
     :param schema_path: Path to the root ``schema.json`` file.
     :param output: Destination ``.py`` file for the generated models.
+    :param commit_info: Dictionary containing commit metadata from GitHub.
     :raises SystemExit: If datamodel-codegen returns a non-zero exit code.
     """
     cmd = [
@@ -109,6 +148,39 @@ def generate_models(schema_path: Path, output: Path) -> None:
         print(result.stderr, file=sys.stderr)
         sys.exit(result.returncode)
 
+    # Add commit information to the generated file header
+    add_commit_metadata(output, commit_info)
+
+
+def add_commit_metadata(output: Path, commit_info: dict[str, str]) -> None:
+    """Append commit metadata to the generated models file header.
+
+    :param output: Path to the generated models.py file.
+    :param commit_info: Dictionary containing commit metadata.
+    """
+    content = output.read_text()
+
+    # Find the end of the auto-generated header (after timestamp line)
+    # and insert our metadata before the first blank line
+    lines = content.split("\n")
+    insert_idx = 0
+
+    for i, line in enumerate(lines):
+        if line.startswith("#   timestamp:"):
+            insert_idx = i + 1
+            break
+
+    if insert_idx > 0:
+        metadata_lines = [
+            f"#   source: antiSMASH repository (master branch)",
+            f"#   commit: {commit_info['sha']}",
+            f"#   commit_date: {commit_info['date']}",
+            f"#   commit_msg: {commit_info['message']}",
+        ]
+        lines[insert_idx:insert_idx] = metadata_lines
+        output.write_text("\n".join(lines))
+        print(f"  Added commit metadata (commit {commit_info['short_sha']})")
+
 
 def main() -> None:
     """Entry point: download schemas, fix refs, and generate models.
@@ -121,10 +193,11 @@ def main() -> None:
         tmppath = Path(tmpdir)
 
         print("Downloading schemas ...")
+        commit_info = get_commit_info()
         download_schemas(tmppath)
 
         print("Generating models ...")
-        generate_models(tmppath / "schema.json", output.resolve())
+        generate_models(tmppath / "schema.json", output.resolve(), commit_info)
 
     print(f"Done — models written to {output}")
 

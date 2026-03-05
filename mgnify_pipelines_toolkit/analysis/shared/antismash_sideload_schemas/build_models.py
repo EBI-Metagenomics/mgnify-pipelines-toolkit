@@ -33,7 +33,6 @@ Usage::
 
 import json
 import re
-import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -121,32 +120,28 @@ def download_schemas(dest: Path) -> None:
 
 
 def generate_models(schema_path: Path, output: Path, commit_info: dict[str, str]) -> None:
-    """Run datamodel-codegen to produce Pydantic v2 models with commit metadata.
+    """Generate Pydantic v2 models from JSON schema using datamodel-code-generator as a module.
 
     :param schema_path: Path to the root ``schema.json`` file.
     :param output: Destination ``.py`` file for the generated models.
     :param commit_info: Dictionary containing commit metadata from GitHub.
-    :raises SystemExit: If datamodel-codegen returns a non-zero exit code.
+    :raises Exception: If model generation fails (with full traceback).
     """
-    cmd = [
-        "datamodel-codegen",
-        "--input",
-        str(schema_path),
-        "--input-file-type",
-        "jsonschema",
-        "--output",
-        str(output),
-        "--output-model-type",
-        "pydantic_v2.BaseModel",
-        "--use-annotated",
-        "--field-constraints",
-        "--use-double-quotes",
-    ]
-    print(f"  Running: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(result.stderr, file=sys.stderr)
-        sys.exit(result.returncode)
+    from datamodel_code_generator import DataModelType, InputFileType, generate
+
+    print(f"  Generating models from {schema_path} -> {output}")
+    
+    # Use datamodel-code-generator as a module instead of CLI
+    # This provides better error handling and integrated tracebacks
+    generate(
+        input_=schema_path,
+        input_file_type=InputFileType.JsonSchema,
+        output=output,
+        output_model_type=DataModelType.PydanticV2BaseModel,
+        use_annotated=True,
+        field_constraints=True,
+        use_double_quotes=True,
+    )
 
     # Add commit information to the generated file header
     add_commit_metadata(output, commit_info)

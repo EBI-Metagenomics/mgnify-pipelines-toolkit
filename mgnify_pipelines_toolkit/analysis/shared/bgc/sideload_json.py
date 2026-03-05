@@ -26,7 +26,6 @@ from mgnify_pipelines_toolkit.analysis.shared.bgc.models import MergedRegion
 
 logger = logging.getLogger(__name__)
 
-
 def _derive_output_json_path(output_gff: Path) -> Path:
     """Derive a JSON output path with the same basename as output_gff.
 
@@ -40,13 +39,17 @@ def _derive_output_json_path(output_gff: Path) -> Path:
     :returns: Derived JSON output path.
     :rtype: Path
     """
-    name = output_gff.name
-    if name.endswith(".gff.gz") or name.endswith(".gff3.gz"):
-        base = name.rsplit(".", 2)[0]
-        return output_gff.with_name(f"{base}.json")
-    if name.endswith(".gff") or name.endswith(".gff3"):
-        base = name.rsplit(".", 1)[0]
-        return output_gff.with_name(f"{base}.json")
+    suffixes = output_gff.suffixes
+    
+    # Handle .gff.gz, .gff3.gz cases (two suffixes)
+    if len(suffixes) >= 2 and suffixes[-1] == ".gz" and suffixes[-2] in (".gff", ".gff3"):
+        return output_gff.with_suffix("").with_suffix(".json")
+    
+    # Handle .gff, .gff3 cases (single suffix)
+    if suffixes and suffixes[-1] in (".gff", ".gff3"):
+        return output_gff.with_suffix(".json")
+    
+    # Fallback for other extensions
     return output_gff.with_suffix(".json")
 
 

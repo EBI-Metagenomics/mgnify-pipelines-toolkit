@@ -41,7 +41,7 @@ def _collect_member_meta_for_region(members: list[BGCRegion]) -> dict[str, str]:
     collected: dict[str, list[str]] = {k: [] for k in META_KEYS_ORDER}
     for m in members:
         for k in META_KEYS_ORDER:
-            if k in m.attrs and m.attrs[k]:
+            if m.attrs.get(k):
                 collected[k].append(m.attrs[k])
 
     out: dict[str, str] = {}

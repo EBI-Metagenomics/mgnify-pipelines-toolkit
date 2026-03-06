@@ -26,6 +26,7 @@ from mgnify_pipelines_toolkit.analysis.shared.bgc.models import MergedRegion
 
 logger = logging.getLogger(__name__)
 
+
 def _derive_output_json_path(output_gff: Path) -> Path:
     """Derive a JSON output path with the same basename as output_gff.
 
@@ -40,135 +41,39 @@ def _derive_output_json_path(output_gff: Path) -> Path:
     :rtype: Path
     """
     suffixes = output_gff.suffixes
-    
+
     # Handle .gff.gz, .gff3.gz cases (two suffixes)
     if len(suffixes) >= 2 and suffixes[-1] == ".gz" and suffixes[-2] in (".gff", ".gff3"):
         return output_gff.with_suffix("").with_suffix(".json")
-    
+
     # Handle .gff, .gff3 cases (single suffix)
     if suffixes and suffixes[-1] in (".gff", ".gff3"):
         return output_gff.with_suffix(".json")
-    
+
     # Fallback for other extensions
     return output_gff.with_suffix(".json")
 
 
-def _default_antismash_schema_dir() -> Path:
-    """Expected location for vendored antiSMASH sideloader schemas.
-
-    :returns: Path to the antismash_sideload_schemas/general directory.
-    :rtype: Path
-    """
-    # __file__ is analysis/shared/bgc/sideload_json.py → parent.parent = analysis/shared/
-    return (Path(__file__).resolve().parent.parent / "antismash_sideload_schemas" / "general").resolve()
-
-
-def _fix_refs(node):
-    """Recursively strip 'file:' from $ref values in a JSON schema node.
-
-    The vendored antiSMASH schemas use 'file:subschemas/foo.json' as $ref
-    values. jsonschema's RefResolver looks up refs in the store by URI/path
-    key; the store is keyed by plain paths (e.g. 'subschemas/foo.json').
-    Stripping 'file:' makes the $ref values match the store keys.
-
-    :param node: JSON-like node (dict, list, or scalar).
-    :returns: Node with file: prefixes stripped from $ref values.
-    """
-    if isinstance(node, dict):
-        out = {}
-        for k, v in node.items():
-            if k == "$ref" and isinstance(v, str):
-                out[k] = v.replace("file:", "")
-            else:
-                out[k] = _fix_refs(v)
-        return out
-    if isinstance(node, list):
-        return [_fix_refs(x) for x in node]
-    return node
-
-
-def _load_schema_files(schema_dir: Path) -> tuple[dict, dict[str, dict]]:
-    """Load root schema.json and subschemas into a resolver store.
-
-    jsonschema's RefResolver resolves $ref values by looking them up in a
-    store dict. The antiSMASH schemas can appear under several different
-    reference formats depending on how the resolver constructs the URI, so
-    each document is registered under multiple keys to cover all cases.
-
-    :param schema_dir: Directory containing schema.json and subschemas/.
-    :type schema_dir: Path
-    :returns: Tuple of (root_schema, store) where store maps URI/path keys to schema dicts.
-    :rtype: tuple[dict, dict[str, dict]]
-    :raises FileNotFoundError: If schema.json or subschemas/ directory is missing.
-    """
-    schema_path = schema_dir / "schema.json"
-    subs_dir = schema_dir / "subschemas"
-    if not schema_path.exists():
-        raise FileNotFoundError(f"schema.json not found at: {schema_path}")
-    if not subs_dir.exists():
-        raise FileNotFoundError(f"subschemas/ dir not found at: {subs_dir}")
-
-    def _read(p: Path) -> dict:
-        return _fix_refs(json.loads(p.read_text(encoding="utf-8")))
-
-    root = _read(schema_path)
-    store: dict[str, dict] = {}
-
-    def _register_keys_for_doc(p: Path, doc: dict) -> None:
-        store[p.resolve().as_uri()] = doc  # absolute file:// URI
-        store[p.name] = doc  # bare filename (e.g. "schema.json")
-        store[str(p)] = doc  # absolute POSIX path string
-        if p.parent.name == "subschemas":
-            store[f"subschemas/{p.name}"] = doc  # relative path used in some $ref values
-            # Also register under a URI as if the subschema were at the schema root,
-            # because the resolver may construct a URI relative to schema.json.
-            fake_root_path = (schema_dir / p.name).resolve()
-            store[fake_root_path.as_uri()] = doc
-            store[str(fake_root_path)] = doc
-
-    _register_keys_for_doc(schema_path, root)
-    for p in sorted(subs_dir.glob("*.json")):
-        _register_keys_for_doc(p, _read(p))
-
-    return root, store
-
-
 def validate_sideload_json(payload: dict, schema_dir: Path | None = None) -> None:
-    """Validate payload against the official antiSMASH sideloader schema (local copies).
-
-    Uses jsonschema Draft7Validator with a referencing.Registry to resolve $ref
-    from in-memory schemas.
+    """Validate payload using Pydantic models instead of JSON schemas.
 
     :param payload: JSON payload to validate.
     :type payload: dict
-    :param schema_dir: Optional path to schema directory; defaults to vendored schemas.
+    :param schema_dir: Kept for backward compatibility but not used (Pydantic doesn't need it).
     :type schema_dir: Path | None
-    :raises RuntimeError: If jsonschema is not available.
-    :raises jsonschema.ValidationError: If the payload fails schema validation.
+    :raises ValueError: If the payload fails Pydantic validation.
     """
     print("Validating json format")
 
+    from mgnify_pipelines_toolkit.analysis.shared.bgc.antismash_sideload_schemas.antismash_schema import (
+        Model,
+    )
+
     try:
-        from jsonschema import Draft7Validator  # type: ignore
-        from referencing import Registry, Resource  # type: ignore
+        Model.model_validate(payload)
+        logger.info("✓ Validation successful")
     except Exception as e:
-        raise RuntimeError(
-            "Validation requires 'jsonschema' (and its 'referencing' dependency). "
-            "Install it (e.g. pip install jsonschema) or disable validation."
-        ) from e
-
-    schema_dir = _default_antismash_schema_dir() if schema_dir is None else schema_dir
-    root, store = _load_schema_files(schema_dir)
-
-    # Build a registry that can resolve $ref values seen in antiSMASH schemas.
-    # We register *every* key from store as a Resource.
-    registry = Registry()
-    for key, doc in store.items():
-        registry = registry.with_resource(key, Resource.from_contents(doc))
-
-    # Validate (raises jsonschema.ValidationError on failure)
-    validator = Draft7Validator(schema=root, registry=registry)
-    validator.validate(payload)
+        raise ValueError(f"Schema validation failed:\n{e}") from e
 
 
 def _sanitize_details_value(value: str) -> str:

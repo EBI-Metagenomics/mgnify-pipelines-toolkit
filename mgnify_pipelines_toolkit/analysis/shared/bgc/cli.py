@@ -70,7 +70,7 @@ def validate_inputs(
     :returns: List of (tool_name, path) tuples for provided optional inputs.
     :rtype: list[tuple[str, Path]]
     :raises click.FileError: If base_gff or any optional GFF does not exist.
-    :raises ValueError: If no optional predictor GFF is provided.    
+    :raises ValueError: If no optional predictor GFF is provided.
     """
     if not base_gff.exists():
         raise click.FileError(str(base_gff), hint="Base GFF not found")
@@ -89,7 +89,7 @@ def validate_inputs(
     for tool, path in optional:
         if not path.exists():
             raise click.FileError(str(path), hint=f"{tool} GFF not found")
-    
+
     return optional
 
 
@@ -204,6 +204,7 @@ def main(
         write_sideload_json(out_json, merged_regions, validate=validate_json)
     except Exception as e:
         raise click.ClickException(f"Failed to write/validate sideloader JSON: {e}")
+
 
 if __name__ == "__main__":
     main()

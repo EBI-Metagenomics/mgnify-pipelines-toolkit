@@ -252,14 +252,9 @@ The antiSMASH sideloader JSON follows the official schema:
 
 ### Schema Validation
 
-The module includes vendored copies of the official antiSMASH sideloader schemas. Validation is **opt-in** via the `--validate_json` flag for performance reasons.
+The module includes vendored copies of the official antiSMASH sideloader schemas. Validation is **opt-in** via the `--validate_json` flag for performance reasons. Requires jsonschema isntalled.
 
-**Schema location**: `mgnify_pipelines_toolkit/analysis/shared/antismash_sideload_schemas/general/`
-
-**Dependencies** (optional):
-```bash
-pip install jsonschema  # Required only if using --validate_json
-```
+**Schema location**: `mgnify_pipelines_toolkit/analysis/shared/bgc/antismash_sideload_schemas/general/`
 
 **Validation behavior**:
 - JSON is **always written** first (you get output even if validation fails)
@@ -316,7 +311,7 @@ pip install jsonschema
 
 #### JSON validation fails with schema errors
 **Cause**: Generated JSON doesn't conform to antiSMASH schema
-**Solution**: 
+**Solution**:
 1. Check that merged regions have valid attributes
 2. Verify tool metadata (name, version) are set correctly
 3. File an issue with example data if schema appears incorrect
@@ -350,7 +345,7 @@ When adding support for new BGC prediction tools:
        @property
        def tool_name(self) -> str:
            return "newtool"
-       
+
        def parse_regions(self, gff_path: Path) -> tuple[list[BGCRegion], dict[str, dict[str, str]]]:
            # Parse tool-specific GFF format
            # Return (regions, gene_annotations)
@@ -372,4 +367,3 @@ When adding support for new BGC prediction tools:
    ```
 
 4. **Write tests** in `tests/unit/analysis/shared/bgc/test_tool_parsers.py`
-

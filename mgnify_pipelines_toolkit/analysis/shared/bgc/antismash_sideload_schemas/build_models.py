@@ -32,10 +32,8 @@ Usage::
 """
 
 import json
-import re
 import sys
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -130,7 +128,7 @@ def generate_models(schema_path: Path, output: Path, commit_info: dict[str, str]
     from datamodel_code_generator import DataModelType, InputFileType, generate
 
     print(f"  Generating models from {schema_path} -> {output}")
-    
+
     # Use datamodel-code-generator as a module instead of CLI
     # This provides better error handling and integrated tracebacks
     generate(
@@ -167,7 +165,7 @@ def add_commit_metadata(output: Path, commit_info: dict[str, str]) -> None:
 
     if insert_idx > 0:
         metadata_lines = [
-            f"#   source: antiSMASH repository (master branch)",
+            "#   source: antiSMASH repository (master branch)",
             f"#   commit: {commit_info['sha']}",
             f"#   commit_date: {commit_info['date']}",
             f"#   commit_msg: {commit_info['message']}",

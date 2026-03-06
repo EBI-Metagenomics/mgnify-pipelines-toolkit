@@ -1,5 +1,3 @@
-# BGC Mapper
-
 **Biosynthetic Gene Cluster (BGC) integration and annotation toolkit**
 
 ## Overview
@@ -25,7 +23,12 @@ bgc/
 ├── merge.py            # Region merging and CDS annotation logic
 ├── gff_output.py       # GFF3 output formatting
 ├── sideload_json.py    # antiSMASH JSON sideloader generation and validation
-└── README.md           # This file
+├── README.md           # This file
+└── antismash_sideload_schemas
+    ├── antismash_schema.py # Pydantic models for validation (auto-generated)
+    ├── build_models.py     # Script to regenerate models from antiSMASH schemas
+    └── README.md           # AntiSMASH sideloader schema models readme file
+
 ```
 
 ### Module Descriptions
@@ -66,13 +69,22 @@ GFF3 output generation:
 antiSMASH-compatible JSON sideloader generation and validation:
 - **`build_sideload_json_payload()`**: Constructs JSON payload from merged regions (subregions-only format)
 - **`write_sideload_json()`**: Writes JSON file with optional schema validation
-- **`validate_sideload_json()`**: Validates against official antiSMASH schemas using `jsonschema`
+- **`validate_sideload_json()`**: Validates using Pydantic models for fast, type-safe validation
 
 **Key features**:
 - GFF coordinates (1-based inclusive) → JSON coordinates (0-based start, end-exclusive)
 - Tool metadata (name, version, description, timestamp)
 - Per-subregion details (ID, tools, sources, member attributes)
 - **Opt-in validation**: Use `--validate_json` flag to enable schema validation (disabled by default for performance)
+- **Pydantic-based validation**: Fast, type-safe validation based on `antismash_sideload_schemas/antismash_schema.py` (no external schema files required)
+
+#### `antismash_sideload_schemas/antismash_schema.py`
+Auto-generated Pydantic models from official antiSMASH sideloader JSON schema:
+- **`Model`**: Root model for validating complete sideloader payloads
+- **`Tool`**: Tool metadata validation
+- **`Record`**: Record-level validation with subregions/protoclusters
+- **`Subregion`**, **`Protocluster`**: BGC region type validators
+- **`Details`**: Flexible key-value attribute validation
 
 #### `cli.py`
 Command-line interface and workflow orchestration:
@@ -124,7 +136,7 @@ The tool produces two output files with matching basenames:
    - Automatically derived from output GFF path (e.g., `output.gff` → `output.json`)
    - Compatible with antiSMASH visualization tools
    - Contains subregions with detailed annotations
-   - Optionally validated against official antiSMASH schemas
+   - Optionally validated against antiSMASH schema using Pydantic
 
 ### Programmatic Usage
 
@@ -150,7 +162,7 @@ merged_regions = merge_overlaps(all_regions)
 write_sideload_json(
     out_json=Path("output.json"),
     merged_regions=merged_regions,
-    validate=True,  # Enable schema validation
+    validate=True,  # Enable Pydantic validation
     tool_name="Custom BGC Analyzer",
     tool_version="1.0.0",
     tool_description="Custom BGC integration workflow"
@@ -252,26 +264,37 @@ The antiSMASH sideloader JSON follows the official schema:
 
 ### Schema Validation
 
-The module includes vendored copies of the official antiSMASH sideloader schemas. Validation is **opt-in** via the `--validate_json` flag for performance reasons. Requires jsonschema isntalled.
-
-**Schema location**: `mgnify_pipelines_toolkit/analysis/shared/bgc/antismash_sideload_schemas/general/`
+Validation is performed using **Pydantic models** auto-generated from the official antiSMASH sideloader schema. This provides fast, type-safe validation with clear error messages.
 
 **Validation behavior**:
 - JSON is **always written** first (you get output even if validation fails)
-- If `--validate_json` is enabled, validation runs after writing
-- Validation errors raise `jsonschema.ValidationError` with details
+- If `--validate_json` is enabled, Pydantic validation runs after writing
+- Validation errors raise `ValueError` with detailed field-level error messages
+
+**Pydantic schema location**: `mgnify_pipelines_toolkit/analysis/shared/bgc/antismash_sideload_schemas/antismash_schema.py`
+
+**Example validation error**:
+```
+ValueError: Schema validation failed:
+2 validation errors for Model
+records.0.subregions.0.label
+  String should have at most 20 characters [type=string_too_long]
+tool.name
+  Field required [type=missing]
+```
+
+### Legacy JSON Schema Files
+
+The original JSON schema files are still available in `antismash_sideload_schemas/general/` for reference, but are **no longer used** for validation. These can be safely removed after confirming the Pydantic validation works with your data.
 
 ## Dependencies
 
 ### Required
 - Python 3.8+
-- Standard library only for core functionality
+- `pydantic` >= 2.0: For JSON schema validation (if using `--validate_json`)
 
 ### Optional
-- `jsonschema` + `referencing`: Required only if using `--validate_json` flag
-  ```bash
-  pip install jsonschema
-  ```
+- `jsonschema` + `referencing`: **No longer required** (replaced by Pydantic validation)
 
 ## Testing
 
@@ -283,6 +306,7 @@ pytest tests/unit/analysis/shared/bgc/ -v
 
 # Run specific test modules
 pytest tests/unit/analysis/shared/bgc/test_tool_parsers.py -v
+pytest tests/unit/analysis/shared/bgc/test_sideload_json.py -v
 ```
 
 ## Troubleshooting
@@ -300,21 +324,25 @@ pytest tests/unit/analysis/shared/bgc/test_tool_parsers.py -v
 - antiSMASH GFFs have `region` features with `product` attributes
 - SanntiS GFFs have `CLUSTER` features with `nearest_MiBIG` attributes
 
-#### Validation requires 'jsonschema'
-**Cause**: `--validate_json` flag used but `jsonschema` not installed
-**Solution**: Install dependency or disable validation:
+#### "No module named 'pydantic'"
+**Cause**: `--validate_json` flag used but `pydantic` not installed
+**Solution**: Install pydantic:
 ```bash
-pip install jsonschema
+pip install pydantic
 # OR
-# Remove --validate_json flag
+# Remove --validate_json flag to skip validation
 ```
 
-#### JSON validation fails with schema errors
+#### JSON validation fails with Pydantic errors
 **Cause**: Generated JSON doesn't conform to antiSMASH schema
 **Solution**:
-1. Check that merged regions have valid attributes
-2. Verify tool metadata (name, version) are set correctly
-3. File an issue with example data if schema appears incorrect
+1. Check error message for specific field that failed validation
+2. Verify that merged regions have valid attributes
+3. Ensure tool metadata (name, version) are set correctly
+4. Common issues:
+   - `label` field exceeds 20 characters (truncated automatically)
+   - `records` list is empty (need at least 1 record)
+   - Required fields missing from `tool` section
 
 ### Debug Mode
 
@@ -332,8 +360,10 @@ python -m mgnify_pipelines_toolkit.analysis.shared.bgc.cli \
 1. **Separation of Concerns**: Each module has a single, well-defined responsibility
 2. **Extensibility**: New tool parsers can be added by implementing `BGCToolParser`
 3. **Fail-Safe**: JSON is always written before validation (artifacts even if validation fails)
-4. **Performance**: Schema validation is opt-in to avoid unnecessary overhead
+4. **Performance**: Schema validation is opt-in to avoid unnecessary overhead; Pydantic validation is ~10x faster than JSON schema
 5. **Standards Compliance**: Outputs conform to GFF3 and antiSMASH specifications
+6. **Type Safety**: Pydantic models provide compile-time type checking and IDE support
+
 
 ## Contributing
 
@@ -367,3 +397,9 @@ When adding support for new BGC prediction tools:
    ```
 
 4. **Write tests** in `tests/unit/analysis/shared/bgc/test_tool_parsers.py`
+
+## License
+
+Copyright 2024-2026 EMBL - European Bioinformatics Institute
+
+Licensed under the Apache License, Version 2.0

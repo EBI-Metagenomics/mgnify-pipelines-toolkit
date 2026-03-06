@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.4.17"
+version = "1.4.18"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -24,7 +24,8 @@ dependencies = [
     "intervaltree==3.1.0",
     "click~=8.1.8",
     "requests~=2.32",
-    "bcbio-gff==0.7.1"
+    "bcbio-gff==0.7.1",
+    "datamodel-code-generator==0.54.1"
 ]
 
 [build-system]
@@ -39,6 +40,8 @@ packages = ["mgnify_pipelines_toolkit",
     "mgnify_pipelines_toolkit.schemas",
     "mgnify_pipelines_toolkit.ena",
     "mgnify_pipelines_toolkit.analysis.shared",
+    "mgnify_pipelines_toolkit.analysis.shared.gff",
+    "mgnify_pipelines_toolkit.analysis.shared.bgc",
     "mgnify_pipelines_toolkit.analysis.amplicon",
     "mgnify_pipelines_toolkit.analysis.assembly",
     "mgnify_pipelines_toolkit.analysis.genomes",
@@ -57,6 +60,7 @@ convert_cmscan_to_cmsearch_tblout = "mgnify_pipelines_toolkit.analysis.shared.co
 dwc_summary_generator = "mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator:cli"
 amr_integrator = "mgnify_pipelines_toolkit.analysis.shared.amrintegrator:main"
 gbk_generator = "mgnify_pipelines_toolkit.analysis.shared.gbk_generator:main"
+bgc_mapper = "mgnify_pipelines_toolkit.analysis.shared.bgc.cli:main"
 download_zenodo = "mgnify_pipelines_toolkit.analysis.shared.download_zenodo:main"
 # analysis.amplicon #
 classify_var_regions = "mgnify_pipelines_toolkit.analysis.amplicon.classify_var_regions:main"

@@ -63,8 +63,6 @@ def validate_sideload_json(payload: dict, schema_dir: Path | None = None) -> Non
     :type schema_dir: Path | None
     :raises ValueError: If the payload fails Pydantic validation.
     """
-    print("Validating json format")
-
     from mgnify_pipelines_toolkit.analysis.shared.bgc.antismash_sideload_schemas.antismash_schema import (
         Model,
     )
@@ -217,8 +215,6 @@ def write_sideload_json(
     :param tool_description: Description for the JSON payload.
     :type tool_description: str
     """
-    print("writing json output")
-
     payload = build_sideload_json_payload(
         merged_regions,
         tool_name=tool_name,

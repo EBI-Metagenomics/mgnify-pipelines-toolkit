@@ -1,0 +1,43 @@
+{
+  "version": "7.1.0",
+  "records": [
+    {
+      "id": "circular_contig_1",
+      "modules": {
+        "antismash.detection.genefunctions": {
+          "tools": {}
+        }
+      },
+      "features": [
+        {
+          "type": "source",
+          "location": "[0:4647689](+)"
+        },
+        {
+          "type": "region",
+          "location": "[0:4647689](+)",
+          "qualifiers": {
+            "region_number": ["1"],
+            "product": ["other"]
+          }
+        },
+        {
+          "type": "CDS",
+          "location": "join{[0:345](-), [4646840:4647689](-)}",
+          "qualifiers": {
+            "ID": ["gene_wrap_a"],
+            "gene_kind": ["other"]
+          }
+        },
+        {
+          "type": "CDS",
+          "location": "join{[4646840:4647689](-), [0:345](-)}",
+          "qualifiers": {
+            "ID": ["gene_wrap_b"],
+            "gene_kind": ["other"]
+          }
+        }
+      ]
+    }
+  ]
+}

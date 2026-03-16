@@ -1,0 +1,4 @@
+##gff-version 3
+circular_contig_1	antiSMASH:7.1.0	region	1	4647689	.	.	.	ID=circular_contig_1_region1;product=other
+circular_contig_1	antiSMASH:7.1.0	gene	4646841	4648034	.	-	.	ID=gene_wrap_a;as_type=other;Parent=circular_contig_1_region1
+circular_contig_1	antiSMASH:7.1.0	gene	4646841	4648034	.	-	.	ID=gene_wrap_b;as_type=other;Parent=circular_contig_1_region1

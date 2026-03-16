@@ -128,11 +128,11 @@ def parse_antismash_location(location: str, record_length: int | None = None) ->
 
 def get_record_length(record: dict) -> int:
     """
-    Infer record length from the antiSMASH JSON 'source' feature.
+    Infer record length from antiSMASH JSON.
 
-    antiSMASH JSON usually stores the full contig span as:
-        type = "source"
-        location = "[0:4647689](+)"
+    Preferred sources:
+      1. 'source' feature spanning the full contig
+      2. sequence length from record['seq']['data']
     """
     for feature in record.get("features", []):
         if feature.get("type") == "source":
@@ -141,7 +141,11 @@ def get_record_length(record: dict) -> int:
                 raise ValueError(f"Unexpected source feature start for record {record.get('id', 'unknown')}: {feature['location']}")
             return end
 
-    raise ValueError(f"Could not infer record length for record {record.get('id', 'unknown')}: no source feature found")
+    seq_data = record.get("seq", {}).get("data")
+    if isinstance(seq_data, str) and seq_data:
+        return len(seq_data)
+
+    raise ValueError(f"Could not infer record length for record {record.get('id', 'unknown')}: no source feature and no sequence data found")
 
 
 def main():

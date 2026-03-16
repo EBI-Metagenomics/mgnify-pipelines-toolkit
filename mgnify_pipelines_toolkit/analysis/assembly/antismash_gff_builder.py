@@ -15,8 +15,9 @@
 # limitations under the License.
 
 import argparse
-from collections import defaultdict
 import json
+import re
+from collections import defaultdict
 
 import pandas as pd
 
@@ -37,6 +38,112 @@ def parse_args():
     return args.input, args.output, args.cds_tag
 
 
+def _strip_fuzzy(coord: str) -> int:
+    """Remove GenBank-style fuzzy markers such as < or > and cast to int."""
+    return int(coord.lstrip("<>"))
+
+
+def parse_antismash_location(location: str, record_length: int | None = None) -> tuple[int, int, str]:
+    """
+    Parse antiSMASH JSON location strings and return:
+        (start_0_based, end_1_based_like_antismash, strand)
+
+    Supported formats:
+        [81883:82231](+)
+        [<81883:>82231](-)
+        join{[0:345](-), [4646840:4647689](-)}
+        join{[4646840:4647689](-), [0:345](-)}
+
+    Notes
+    -----
+    antiSMASH JSON uses:
+      - 0-based starts
+      - end as right boundary
+      - strand in (+)/(-)
+
+    For origin-crossing circular joins, this function linearizes the feature:
+      join{[0:C](strand), [A:L](strand)}  ->  start=A, end=L+C
+    where L is the contig length.
+
+    The caller should then convert to GFF with:
+      gff_start = start + 1
+      gff_end = end
+    """
+    location = location.strip()
+
+    # Simple location: [start:end](strand)
+    m = re.fullmatch(r"\[(<??\d+):(>??\d+)\]\(([+-])\)", location)
+    if m:
+        start = _strip_fuzzy(m.group(1))
+        end = _strip_fuzzy(m.group(2))
+        strand = m.group(3)
+        return start, end, strand
+
+    # Joined location: join{[s1:e1](strand), [s2:e2](strand)}
+    m = re.fullmatch(
+        r"join\{\[(<??\d+):(>??\d+)\]\(([+-])\),\s*\[(<??\d+):(>??\d+)\]\(([+-])\)\}",
+        location,
+    )
+    if m:
+        s1 = _strip_fuzzy(m.group(1))
+        e1 = _strip_fuzzy(m.group(2))
+        strand1 = m.group(3)
+        s2 = _strip_fuzzy(m.group(4))
+        e2 = _strip_fuzzy(m.group(5))
+        strand2 = m.group(6)
+
+        if strand1 != strand2:
+            raise ValueError(f"Inconsistent strand in joined location: {location}")
+        strand = strand1
+
+        seg1 = (s1, e1)
+        seg2 = (s2, e2)
+
+        # Detect circular origin-crossing join regardless of segment order
+        # antiSMASH JSON example:
+        #   join{[0:345](-), [4646840:4647689](-)}
+        # or
+        #   join{[4646840:4647689](-), [0:345](-)}
+        if seg1[0] == 0 and seg2[1] == record_length:
+            origin_seg = seg1
+            end_seg = seg2
+            start = end_seg[0]
+            end = record_length + origin_seg[1]
+            return start, end, strand
+
+        if seg2[0] == 0 and seg1[1] == record_length:
+            origin_seg = seg2
+            end_seg = seg1
+            start = end_seg[0]
+            end = record_length + origin_seg[1]
+            return start, end, strand
+
+        # Non-origin join fallback: collapse to min/max
+        start = min(s1, s2)
+        end = max(e1, e2)
+        return start, end, strand
+
+    raise ValueError(f"Unsupported antiSMASH location string: {location}")
+
+
+def get_record_length(record: dict) -> int:
+    """
+    Infer record length from the antiSMASH JSON 'source' feature.
+
+    antiSMASH JSON usually stores the full contig span as:
+        type = "source"
+        location = "[0:4647689](+)"
+    """
+    for feature in record.get("features", []):
+        if feature.get("type") == "source":
+            start, end, _ = parse_antismash_location(feature["location"])
+            if start != 0:
+                raise ValueError(f"Unexpected source feature start for record {record.get('id', 'unknown')}: {feature['location']}")
+            return end
+
+    raise ValueError(f"Could not infer record length for record {record.get('id', 'unknown')}: no source feature found")
+
+
 def main():
     """Transform an antiSMASH JSON into a GFF3 with 'regions' and CDS within those regions"""
 
@@ -55,13 +162,19 @@ def main():
 
         iter_cds = "antismash.detection.genefunctions" in record["modules"].keys()  # Flag to iterate CDS
         region_name = None
+        region_start = None
+        region_end = None
+
+        record_length = get_record_length(record)
 
         for feature in record["features"]:
             if feature["type"] == "region":
                 # Annotate region features
                 region_name = f"{record_id}_region{feature['qualifiers']['region_number'][0]}"
-                region_start = int(feature["location"].split(":")[0].split("[")[1])
-                region_end = int(feature["location"].split(":")[1].split("]")[0])
+                region_start, region_end, region_strand = parse_antismash_location(
+                    feature["location"],
+                    record_length,
+                )
 
                 res_dict["contig"].append(record_id)
                 res_dict["version"].append(f"antiSMASH:{antismash_ver}")
@@ -73,17 +186,16 @@ def main():
                 res_dict["phase"].append(".")
 
                 product = ",".join(feature["qualifiers"].get("product", []))
-
                 attributes_dict[region_name].update({"ID": region_name, "product": product})
 
             if iter_cds and feature["type"] == "CDS":
                 # Annotate CDS features
-
                 # The > and < are removed to work with pseudogene outputs in Bakta
                 # A feature["location"] example that can be seen in Bakta outputs: "[81883:>82231](+)"
-                start = int(feature["location"].split(":")[0][1:].lstrip("<>"))
-                end = int(feature["location"].split(":")[1].split("]")[0].lstrip("<>"))
-                strand = feature["location"].split("(")[1][0]  # + or -
+                start, end, strand = parse_antismash_location(
+                    feature["location"],
+                    record_length,
+                )
 
                 if not region_name or not (region_start <= end and start <= region_end):
                     continue
@@ -126,7 +238,6 @@ def main():
         if "antismash.detection.genefunctions" in record["modules"].keys():
             gene_function_tools = record["modules"]["antismash.detection.genefunctions"]["tools"]
             if tool_data := gene_function_tools.get("smcogs"):
-
                 for locus_tag in tool_data["best_hits"]:
                     smcog_id = tool_data["best_hits"][locus_tag]["reference_id"]
                     smcog_description = tool_data["best_hits"][locus_tag]["description"]

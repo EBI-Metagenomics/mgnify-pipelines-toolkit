@@ -96,6 +96,21 @@ def parse_arguments() -> argparse.Namespace:
             - java_heap_size_initial (int): Java initial heap size in GB
             - java_heap_size_max (int): Java maximum heap size in GB
     """
+
+    def positive_int(value: str) -> int:
+        """Argparse type: integer >= 1."""
+        parsed_value = int(value)
+        if parsed_value < 1:
+            raise argparse.ArgumentTypeError("Value must be >= 1")
+        return parsed_value
+
+    def non_negative_int(value: str) -> int:
+        """Argparse type: integer >= 0."""
+        parsed_value = int(value)
+        if parsed_value < 0:
+            raise argparse.ArgumentTypeError("Value must be >= 0")
+        return parsed_value
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-m",
@@ -119,9 +134,19 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--download-webin-cli-directory", required=False, default=".", type=str, help="Path to save webin-cli into")
     parser.add_argument("--download-webin-cli-version", required=False, type=str, help="Version of ena-webin-cli to download, default: latest")
     parser.add_argument("--webin-cli-jar", required=False, type=str, help="Path to pre-downloaded webin-cli.jar file to execute")
-    parser.add_argument("--retries", required=False, type=int, default=RETRIES, help=f"Number of retry attempts (default: {RETRIES})")
     parser.add_argument(
-        "--retry-delay", required=False, type=int, default=RETRY_DELAY, help=f"Initial retry delay in seconds (default: {RETRY_DELAY})"
+        "--retries",
+        required=False,
+        type=positive_int,
+        default=RETRIES,
+        help=f"Number of retry attempts (must be >= 1, default: {RETRIES})",
+    )
+    parser.add_argument(
+        "--retry-delay",
+        required=False,
+        type=non_negative_int,
+        default=RETRY_DELAY,
+        help=f"Initial retry delay in seconds (must be >= 0, default: {RETRY_DELAY})",
     )
     parser.add_argument(
         "--java-heap-size-initial",

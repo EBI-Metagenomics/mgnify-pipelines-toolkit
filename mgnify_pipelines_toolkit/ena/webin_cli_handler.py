@@ -15,11 +15,11 @@
 # limitations under the License.
 
 import argparse
+import csv
 import json
 import logging
 import os
 import re
-import shlex
 import shutil
 import subprocess
 import sys
@@ -118,6 +118,14 @@ def parse_arguments() -> argparse.Namespace:
         required=True,
         type=str,
         help="Manifest text file containing file and metadata fields",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-accessions",
+        required=False,
+        default="ena_accessions.tsv",
+        type=str,
+        help="File to write assigned accessions to (TSV, default: ena_accessions.tsv)",
     )
     parser.add_argument(
         "-c",
@@ -448,7 +456,7 @@ def run_webin_cli(
                 redacted.append(f"{key}=***")
             else:
                 redacted.append(token)
-        return shlex.join(redacted)
+        return " ".join(redacted)
 
     cmd = get_webin_cli_command(manifest, context, webin, mode, test, jar, java_heap_size_initial, java_heap_size_max)
     logger.info(f"Command: {redact_command(cmd)}")
@@ -703,6 +711,30 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
     return True
 
 
+def write_assigned_accessions(result_location: str, output_accessions: str, assembly_name: str) -> None:
+    """
+    Write assigned assembly accession(s) from webin-cli report into a TSV file.
+
+    Args:
+        result_location (str): Directory where webin-cli.report is located.
+        output_accessions (str): Path to output TSV file.
+        assembly_name (str): Assembly alias/name to write in the TSV.
+    """
+    report_path = Path(result_location) / REPORT_FILE
+    report_text = report_path.read_text()
+    accessions = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
+    if accessions and len(accessions) == 1:
+        output_file = Path(output_accessions)
+        with open(output_file, "w", newline="") as tsv_out:
+            writer = csv.writer(tsv_out, delimiter="\t")
+            writer.writerow(["alias", "accession"])
+            for accession in accessions:
+                writer.writerow([assembly_name, accession])
+        logger.info(f"Assigned accession written to {output_file}")
+    else:
+        logger.warning(f"No accession found in {REPORT_FILE} or multiple accessions assigned, skipping writing output file.")
+
+
 def main() -> int:
     """
     Main entry point for the webin-cli handler.
@@ -746,6 +778,12 @@ def main() -> int:
         )
 
         if result_status:
+            if args.mode == "submit":
+                write_assigned_accessions(
+                    result_location=result_location,
+                    output_accessions=args.output_accessions,
+                    assembly_name=assembly_name,
+                )
             logger.info(f"Submission/validation done for {manifest_for_submission}")
             return 0
         else:

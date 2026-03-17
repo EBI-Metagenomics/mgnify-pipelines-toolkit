@@ -15,42 +15,48 @@
 # limitations under the License.
 
 import argparse
-import logging
 import json
+import logging
 import os
+import re
+import shlex
+import shutil
+import subprocess
 import sys
 import time
-import subprocess
-import shutil
 import urllib.request
 from pathlib import Path
-import re
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 
 # Custom Exceptions
 class WebinCredentialsError(Exception):
     """Raised when Webin credentials are missing or invalid."""
+
     pass
 
 
 class ManifestValidationError(Exception):
     """Raised when manifest file validation fails."""
+
     pass
 
 
 class WebinCLINotFoundError(Exception):
     """Raised when webin-cli executable cannot be found."""
+
     pass
 
 
 class WebinCLIExecutionError(Exception):
     """Raised when webin-cli execution fails after all retries."""
+
     pass
 
 
 class DownloadError(Exception):
     """Raised when downloading webin-cli fails."""
+
     pass
 
 
@@ -66,7 +72,7 @@ INSDC_CENTRE_PREFIXES = "EDS"
 ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -114,9 +120,23 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--download-webin-cli-version", required=False, type=str, help="Version of ena-webin-cli to download, default: latest")
     parser.add_argument("--webin-cli-jar", required=False, type=str, help="Path to pre-downloaded webin-cli.jar file to execute")
     parser.add_argument("--retries", required=False, type=int, default=RETRIES, help=f"Number of retry attempts (default: {RETRIES})")
-    parser.add_argument("--retry-delay", required=False, type=int, default=RETRY_DELAY, help=f"Initial retry delay in seconds (default: {RETRY_DELAY})")
-    parser.add_argument("--java-heap-size-initial", required=False, type=int, default=JAVA_HEAP_SIZE_INITIAL, help=f"Java initial heap size in GB (default: {JAVA_HEAP_SIZE_INITIAL})")
-    parser.add_argument("--java-heap-size-max", required=False, type=int, default=JAVA_HEAP_SIZE_MAX, help=f"Java maximum heap size in GB (default: {JAVA_HEAP_SIZE_MAX})")
+    parser.add_argument(
+        "--retry-delay", required=False, type=int, default=RETRY_DELAY, help=f"Initial retry delay in seconds (default: {RETRY_DELAY})"
+    )
+    parser.add_argument(
+        "--java-heap-size-initial",
+        required=False,
+        type=int,
+        default=JAVA_HEAP_SIZE_INITIAL,
+        help=f"Java initial heap size in GB (default: {JAVA_HEAP_SIZE_INITIAL})",
+    )
+    parser.add_argument(
+        "--java-heap-size-max",
+        required=False,
+        type=int,
+        default=JAVA_HEAP_SIZE_MAX,
+        help=f"Java maximum heap size in GB (default: {JAVA_HEAP_SIZE_MAX})",
+    )
     return parser.parse_args()
 
 
@@ -195,22 +215,6 @@ def get_webin_credentials() -> str:
     if not password:
         raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing password.")
     return webin
-
-
-def handle_webin_failures(log: str) -> Tuple[str, int]:
-    """
-    Function to re-define webin-cli failures.
-    In some cases webin-cli exits with 1 that doesn't always mean a real error.
-    That function currently catches some known issues (but can be expanded).
-    In case of:
-    - invalid credentials exit code should be 1 and no retries following that process
-    - object being added already exists - exit without error because webin-cli doesn't do re-submission of same item
-    """
-    if "Invalid submission account user name or password." in log:
-        return "Invalid credentials for Webin account. Exit 1", 1
-    if "The object being added already exists in the submission account with accession:" in log:
-        return "Submission already exists. Exit without errors.", 0
-    return log, 1
 
 
 def parse_manifest(manifest_path: Path) -> dict[str, str]:
@@ -304,7 +308,7 @@ def get_webin_cli_command(
     test: bool,
     jar: Optional[str] = None,
     java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX
+    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
 ) -> List[str]:
     """
     Build the webin-cli command list based on execution method.
@@ -332,13 +336,7 @@ def get_webin_cli_command(
         logback_config = Path(__file__).parent / "webincli_logback.xml"
         if not logback_config.exists():
             logger.warning(f"Logback config not found at {logback_config}, continuing without it")
-            cmd = [
-                "java",
-                f"-Xms{java_heap_size_initial}g",
-                f"-Xmx{java_heap_size_max}g",
-                "-jar",
-                jar
-            ]
+            cmd = ["java", f"-Xms{java_heap_size_initial}g", f"-Xmx{java_heap_size_max}g", "-jar", jar]
         else:
             cmd = [
                 "java",
@@ -346,7 +344,7 @@ def get_webin_cli_command(
                 f"-Xms{java_heap_size_initial}g",
                 f"-Xmx{java_heap_size_max}g",
                 "-jar",
-                jar
+                jar,
             ]
     else:
         # Use mamba/conda installation
@@ -355,23 +353,13 @@ def get_webin_cli_command(
             logger.info(f"Using ena-webin-cli from: {webin_cli_path}")
             cmd = ["ena-webin-cli"]
         else:
-            logger.error(
-                "ena-webin-cli was not found in PATH. "
-                "Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
-            )
+            logger.error("ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options.")
             raise WebinCLINotFoundError(
-                "ena-webin-cli was not found in PATH. "
-                "Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
+                "ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
             )
 
     # Add webin-cli arguments
-    cmd += [
-        f"-context={context}",
-        f"-manifest={manifest}",
-        f"-userName={webin}",
-        f"-passwordEnv={ENA_WEBIN_PASSWORD}",
-        f"-{mode}"
-    ]
+    cmd += [f"-context={context}", f"-manifest={manifest}", f"-userName={webin}", f"-passwordEnv={ENA_WEBIN_PASSWORD}", f"-{mode}"]
 
     if test:
         cmd.append("-test")
@@ -389,7 +377,7 @@ def run_webin_cli(
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
     java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX
+    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
 ) -> subprocess.CompletedProcess:
     """
     Execute webin-cli with retry logic and error handling.
@@ -414,11 +402,34 @@ def run_webin_cli(
         WebinCredentialsError: If credentials are invalid.
         WebinCLIExecutionError: If all retry attempts fail.
     """
+
+    def get_combined_log(run_result: subprocess.CompletedProcess) -> str:
+        """Combine stdout and stderr from the subprocess result for logging."""
+        output_parts = []
+        if run_result.stdout and run_result.stdout.strip():
+            output_parts.append(run_result.stdout.strip())
+        if run_result.stderr and run_result.stderr.strip():
+            output_parts.append(run_result.stderr.strip())
+        if not output_parts:
+            return "webin-cli produced no stdout/stderr output"
+        return "\n".join(output_parts)
+
+    def redact_command(command: List[str]) -> str:
+        """Return a shell-quoted command string with credential values replaced by ***."""
+        redacted = []
+        for token in command:
+            if token.startswith("-userName=") or token.startswith("-passwordEnv="):
+                key, _ = token.split("=", 1)
+                redacted.append(f"{key}=***")
+            else:
+                redacted.append(token)
+        return shlex.join(redacted)
+
     cmd = get_webin_cli_command(manifest, context, webin, mode, test, jar, java_heap_size_initial, java_heap_size_max)
+    logger.info(f"Command: {redact_command(cmd)}")
 
     for attempt in range(1, retries + 1):
         logger.info(f"🚀 Running ena-webin-cli (attempt {attempt}/{retries})...")
-        logger.debug(f"Command: {' '.join(cmd)}")
 
         result = subprocess.run(
             cmd,
@@ -432,27 +443,27 @@ def run_webin_cli(
             logger.info("✅ Command completed successfully")
             return result  # success
 
-        logger.error(f"❌ ena-webin-cli failed with code {result.returncode}")
-        message, exit_code = handle_webin_failures(result.stdout)
-        logger.info(message)
+        logger.warning(f"❌ ena-webin-cli exited with non-zero code {result.returncode}")
+        combined_log = get_combined_log(result)
 
-        # Check for non-retryable errors (invalid credentials)
-        if "Invalid credentials for Webin account" in message:
-            logger.error("💥 Invalid credentials - not retrying.")
+        if "Invalid submission account user name or password." in combined_log:
+            logger.error("💥 Invalid credentials for Webin account - not retrying")
             raise WebinCredentialsError("Invalid credentials for Webin account")
 
-        if exit_code == 0:
+        if "The object being added already exists in the submission account with accession:" in combined_log:
+            logger.info("📦 Submission already exists")
             logger.info("✅ Command completed successfully")
             return result
-        elif attempt < retries:
+
+        logger.error("ena-webin-cli output:\n" + combined_log)
+
+        if attempt < retries:
             sleep_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
             logger.warning(f"🔁 Retrying in {sleep_time} seconds...")
             time.sleep(sleep_time)
         else:
             logger.error("💥 All retries failed.")
-            message, exit_code = handle_webin_failures(result.stdout)
-            logger.error(message)
-            raise WebinCLIExecutionError(f"Webin-CLI execution failed after {retries} attempts: {message}")
+            raise WebinCLIExecutionError(f"Webin-CLI execution failed after {retries} attempts. See logs for details.")
 
 
 def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
@@ -492,9 +503,8 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
 
     # Check for resubmission: minimal report with only success message
     # For resubmissions, report contains only "This was a TEST submission(s)." without details
-    is_minimal_report = (
-        report_text.strip() == "This was a TEST submission(s)." or
-        (report_text.count("\n") <= 2 and "submission has been completed successfully" not in report_text)
+    is_minimal_report = report_text.strip() == "This was a TEST submission(s)." or (
+        report_text.count("\n") <= 2 and "submission has been completed successfully" not in report_text
     )
 
     if is_minimal_report:
@@ -702,7 +712,7 @@ def main() -> int:
             retries=args.retries,
             retry_delay=args.retry_delay,
             java_heap_size_initial=args.java_heap_size_initial,
-            java_heap_size_max=args.java_heap_size_max
+            java_heap_size_max=args.java_heap_size_max,
         )
 
         result_location = str(Path(manifest_for_submission).parent)

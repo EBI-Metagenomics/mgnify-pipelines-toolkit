@@ -21,3 +21,10 @@
   stderr:
     contains:
       - "KeyError: 'IDD'"
+- name: antismash_gff_builder test_bakta_circular_join_locations
+  tags:
+    - antismash_gff_builder
+  command: antismash_gff_builder -i tests/fixtures/misc/test_antismash_bakta_circular.json -o test.gff --cds_tag ID
+  files:
+    - path: "test.gff"
+      md5sum: 67c0941a9868a7afe82b922fd57c6844

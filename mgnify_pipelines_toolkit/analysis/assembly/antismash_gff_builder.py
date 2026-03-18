@@ -166,9 +166,6 @@ def main():
 
         iter_cds = "antismash.detection.genefunctions" in record["modules"].keys()  # Flag to iterate CDS
         region_name = None
-        region_start = None
-        region_end = None
-
         record_length = get_record_length(record)
 
         for feature in record["features"]:

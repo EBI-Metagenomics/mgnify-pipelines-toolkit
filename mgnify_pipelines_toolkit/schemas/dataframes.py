@@ -50,7 +50,7 @@ class AmpliconPassedRunsSchema(CoerceBaseDataFrameSchema):
     """
 
     run: Series[str] = pa.Field(str_matches=r"(E|D|S)RR[0-9]{6,}", unique=True)
-    status: Series[str] = pa.Field(isin=["all_results", "no_asvs", "dada2_stats_fail"])
+    status: Series[str] = pa.Field(isin=["all_results", "no_asvs", "asvs_only", "dada2_stats_fail"])
 
 
 class CompletedAnalysisSchema(CoerceBaseDataFrameSchema):

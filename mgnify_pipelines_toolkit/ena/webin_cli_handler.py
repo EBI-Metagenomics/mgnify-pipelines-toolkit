@@ -66,8 +66,6 @@ REPORT_FILE = "webin-cli.report"
 WEBIN_SUBMISSION_RESULT_FILES = ["analysis.xml", "receipt.xml", "submission.xml", "webin-submission.xml"]
 RETRIES = 3
 RETRY_DELAY = 5
-JAVA_HEAP_SIZE_INITIAL = 10
-JAVA_HEAP_SIZE_MAX = 10
 INSDC_CENTRE_PREFIXES = "EDS"
 ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 
@@ -93,8 +91,8 @@ def parse_arguments() -> argparse.Namespace:
             - webin_cli_jar (Optional[str]): Path to pre-downloaded jar file
             - retries (int): Number of retry attempts
             - retry_delay (int): Initial retry delay in seconds
-            - java_heap_size_initial (int): Java initial heap size in GB
-            - java_heap_size_max (int): Java maximum heap size in GB
+            - java_heap_size_initial (Optional[int]): Java initial heap size in GB
+            - java_heap_size_max (Optional[int]): Java maximum heap size in GB
     """
 
     def positive_int(value: str) -> int:
@@ -159,16 +157,16 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--java-heap-size-initial",
         required=False,
-        type=int,
-        default=JAVA_HEAP_SIZE_INITIAL,
-        help=f"Java initial heap size in GB (default: {JAVA_HEAP_SIZE_INITIAL})",
+        type=positive_int,
+        default=None,
+        help="Java initial heap size in GB (-Xms); only added when explicitly provided",
     )
     parser.add_argument(
         "--java-heap-size-max",
         required=False,
-        type=int,
-        default=JAVA_HEAP_SIZE_MAX,
-        help=f"Java maximum heap size in GB (default: {JAVA_HEAP_SIZE_MAX})",
+        type=positive_int,
+        default=None,
+        help="Java maximum heap size in GB (-Xmx); only added when explicitly provided",
     )
     return parser.parse_args()
 
@@ -340,8 +338,8 @@ def get_webin_cli_command(
     mode: str,
     test: bool,
     jar: Optional[str] = None,
-    java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
+    java_heap_size_initial: Optional[int] = None,
+    java_heap_size_max: Optional[int] = None,
 ) -> List[str]:
     """
     Build the webin-cli command list based on execution method.
@@ -354,8 +352,8 @@ def get_webin_cli_command(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
-        java_heap_size_initial (int): Java initial heap size in GB (-Xms).
-        java_heap_size_max (int): Java maximum heap size in GB (-Xmx).
+        java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
+        java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
 
     Returns:
         List[str]: Complete command list ready for execution.
@@ -367,18 +365,17 @@ def get_webin_cli_command(
         # Use jar file execution
         logger.info(f"Using java execution with jar: {jar}")
         logback_config = Path(__file__).parent / "webincli_logback.xml"
-        if not logback_config.exists():
-            logger.warning(f"Logback config not found at {logback_config}, continuing without it")
-            cmd = ["java", f"-Xms{java_heap_size_initial}g", f"-Xmx{java_heap_size_max}g", "-jar", jar]
+        cmd = ["java"]
+        if logback_config.exists():
+            cmd.append(f"-Dlogback.configurationFile={logback_config}")
         else:
-            cmd = [
-                "java",
-                f"-Dlogback.configurationFile={logback_config}",
-                f"-Xms{java_heap_size_initial}g",
-                f"-Xmx{java_heap_size_max}g",
-                "-jar",
-                jar,
-            ]
+            logger.warning(f"Logback config not found at {logback_config}, continuing without it")
+        if java_heap_size_initial is not None:
+            cmd.append(f"-Xms{java_heap_size_initial}g")
+        if java_heap_size_max is not None:
+            cmd.append(f"-Xmx{java_heap_size_max}g")
+
+        cmd += ["-jar", jar]
     else:
         # Use mamba/conda installation
         webin_cli_path = shutil.which("ena-webin-cli")
@@ -409,8 +406,8 @@ def run_webin_cli(
     jar: Optional[str] = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
-    java_heap_size_initial: int = JAVA_HEAP_SIZE_INITIAL,
-    java_heap_size_max: int = JAVA_HEAP_SIZE_MAX,
+    java_heap_size_initial: Optional[int] = None,
+    java_heap_size_max: Optional[int] = None,
 ) -> subprocess.CompletedProcess:
     """
     Execute webin-cli with retry logic and error handling.
@@ -425,8 +422,8 @@ def run_webin_cli(
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
-        java_heap_size_initial (int): Java initial heap size in GB (-Xms).
-        java_heap_size_max (int): Java maximum heap size in GB (-Xmx).
+        java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
+        java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
 
     Returns:
         subprocess.CompletedProcess: Result of successful webin-cli execution.

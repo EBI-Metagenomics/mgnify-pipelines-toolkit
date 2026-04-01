@@ -114,8 +114,8 @@ def parse_arguments() -> argparse.Namespace:
         "-m",
         "--manifest",
         required=True,
-        type=str,
-        help="Manifest text file containing file and metadata fields",
+        nargs="+",
+        help="Manifest file(s) containing submission file and metadata fields",
     )
     parser.add_argument(
         "-o",
@@ -722,9 +722,11 @@ def write_assigned_accessions(result_location: str, output_accessions: str, asse
     accessions = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
     if accessions and len(accessions) == 1:
         output_file = Path(output_accessions)
-        with open(output_file, "w", newline="") as tsv_out:
+        file_exists = output_file.exists()
+        with open(output_file, "a", newline="") as tsv_out:
             writer = csv.writer(tsv_out, delimiter="\t")
-            writer.writerow(["alias", "accession"])
+            if not file_exists:
+                writer.writerow(["alias", "accession"])
             for accession in accessions:
                 writer.writerow([assembly_name, accession])
         logger.info(f"Assigned accession written to {output_file}")
@@ -747,8 +749,6 @@ def main() -> int:
 
         webin = get_webin_credentials()
 
-        assembly_name, manifest_for_submission = check_manifest(args.manifest, args.workdir)
-
         # pick execution method for webin-cli
         execute_jar = None
         if args.download_webin_cli:
@@ -756,36 +756,42 @@ def main() -> int:
         elif args.webin_cli_jar:
             execute_jar = args.webin_cli_jar
 
-        run_webin_cli(
-            manifest=manifest_for_submission,
-            context=args.context,
-            webin=webin,
-            mode=args.mode,
-            test=args.test,
-            jar=execute_jar,
-            retries=args.retries,
-            retry_delay=args.retry_delay,
-            java_heap_size_initial=args.java_heap_size_initial,
-            java_heap_size_max=args.java_heap_size_max,
-        )
+        failed_manifests = []
+        for manifest in args.manifest:
+            assembly_name, manifest_for_submission = check_manifest(manifest, args.workdir)
+            run_webin_cli(
+                manifest=manifest_for_submission,
+                context=args.context,
+                webin=webin,
+                mode=args.mode,
+                test=args.test,
+                jar=execute_jar,
+                retries=args.retries,
+                retry_delay=args.retry_delay,
+                java_heap_size_initial=args.java_heap_size_initial,
+                java_heap_size_max=args.java_heap_size_max,
+            )
 
-        result_location = str(Path(manifest_for_submission).parent)
-        result_status = check_result(
-            result_location=result_location, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
-        )
+            result_location = str(Path(manifest_for_submission).parent)
+            result_status = check_result(
+                result_location=result_location, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
+            )
 
-        if result_status:
-            if args.mode == "submit":
-                write_assigned_accessions(
-                    result_location=result_location,
-                    output_accessions=args.output_accessions,
-                    assembly_name=assembly_name,
-                )
-            logger.info(f"Submission/validation done for {manifest_for_submission}")
-            return 0
-        else:
-            logger.error(f"Submission/validation failed for {manifest_for_submission}")
+            if result_status:
+                if args.mode == "submit":
+                    write_assigned_accessions(
+                        result_location=result_location,
+                        output_accessions=args.output_accessions,
+                        assembly_name=assembly_name,
+                    )
+                logger.info(f"Submission/validation done for {manifest_for_submission}")
+            else:
+                logger.error(f"Submission/validation failed for {manifest_for_submission}")
+                failed_manifests.append(manifest_for_submission)
+
+        if failed_manifests:
             return 1
+        return 0
 
     except WebinCredentialsError as e:
         logger.error(f"Credentials error: {e}")

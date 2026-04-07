@@ -26,7 +26,7 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 # Custom Exceptions
@@ -80,7 +80,7 @@ def parse_arguments() -> argparse.Namespace:
 
     Returns:
         argparse.Namespace: Parsed arguments object containing attributes:
-            - manifest (str): Path to manifest file
+            - manifest (str): Path to a manifest file or a directory of manifest files
             - context (str): Submission context: genome, transcriptome, etc.
             - mode (str): 'submit' or 'validate'
             - test (bool): Whether to use Webin test server
@@ -114,8 +114,8 @@ def parse_arguments() -> argparse.Namespace:
         "-m",
         "--manifest",
         required=True,
-        nargs="+",
-        help="Manifest file(s) containing submission file and metadata fields",
+        type=str,
+        help="Path to a single manifest file or a directory containing manifest files",
     )
     parser.add_argument(
         "-o",
@@ -592,7 +592,7 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         return False, is_resubmission
 
 
-def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool]:
+def check_report(fasta_location: str, assembly_name: str, mode: str, test: bool) -> Tuple[bool, bool]:
     """
     Parse and validate the webin-cli report file to determine operation outcome.
 
@@ -603,6 +603,7 @@ def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool
     Args:
         fasta_location (str): Directory path where webin-cli.report is located
             (typically the directory containing the FASTA file).
+        assembly_name (str): Assembly identifier
         mode (str): Operation mode - either 'submit' or 'validate'.
         test (bool): Whether operation was run against test server (True) or
             live server (False).
@@ -626,6 +627,11 @@ def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool
     if not report_path.exists():
         logger.warning(f"⚠️ Report file not found: {report_path}")
         return False, False
+
+    # Preserve report copy
+    report_copy_path = Path(fasta_location) / f"webin-cli.{assembly_name}.report"
+    shutil.copyfile(report_path, report_copy_path)
+    logger.info(f"Preserved run report copy at {report_copy_path}")
 
     report_text = report_path.read_text()
 
@@ -670,7 +676,7 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
         For resubmissions (when object already exists), we only check the report
         status and don't verify output files, since webin-cli may not regenerate them.
     """
-    success, is_resubmission = check_report(result_location, mode, test)
+    success, is_resubmission = check_report(result_location, assembly_name, mode, test)
 
     if not success:
         logger.info("Command failed. Check logs")
@@ -708,30 +714,53 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
     return True
 
 
-def write_assigned_accessions(result_location: str, output_accessions: str, assembly_name: str) -> None:
+def resolve_manifests(manifest_input: str) -> List[str]:
     """
-    Write assigned assembly accession(s) from webin-cli report into a TSV file.
+    Resolve a manifest argument to a list of manifest file paths.
+
+    Accepts either a single manifest file or a directory containing manifest files
+    (matched by the ``*.manifest`` glob pattern).
 
     Args:
-        result_location (str): Directory where webin-cli.report is located.
-        output_accessions (str): Path to output TSV file.
-        assembly_name (str): Assembly alias/name to write in the TSV.
+        manifest_input (str): Path to a manifest file or a directory of manifests.
+
+    Returns:
+        List[str]: Sorted list of manifest file paths.
+
+    Raises:
+        ManifestValidationError: If the input is neither a file nor a directory,
+            or if a directory contains no ``*.manifest`` files.
     """
-    report_path = Path(result_location) / REPORT_FILE
-    report_text = report_path.read_text()
-    accessions = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-    if accessions and len(accessions) == 1:
-        output_file = Path(output_accessions)
-        file_exists = output_file.exists()
-        with open(output_file, "a", newline="") as tsv_out:
-            writer = csv.writer(tsv_out, delimiter="\t")
-            if not file_exists:
-                writer.writerow(["alias", "accession"])
-            for accession in accessions:
-                writer.writerow([assembly_name, accession])
-        logger.info(f"Assigned accession written to {output_file}")
+    path = Path(manifest_input)
+    if path.is_file():
+        return [str(path)]
+    elif path.is_dir():
+        manifests = sorted(path.glob("*.manifest"))
+        if not manifests:
+            raise ManifestValidationError(f"No .manifest files found in directory: {path}")
+        return [str(m) for m in manifests]
     else:
-        logger.warning(f"No accession found in {REPORT_FILE} or multiple accessions assigned, skipping writing output file.")
+        raise ManifestValidationError(f"Invalid manifest input '{manifest_input}': must be a single manifest file or a directory of manifest files.")
+
+
+def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str) -> None:
+    """
+    Write assigned assembly accessions for all successful submissions to a TSV file.
+
+    Args:
+        accessions (Dict[str, str]): Mapping of assembly name to accession.
+        output_accessions (str): Path to output TSV file (overwritten each run).
+    """
+    if not accessions:
+        logger.warning("No accessions to write.")
+        return
+    output_file = Path(output_accessions)
+    with open(output_file, "w", newline="") as tsv_out:
+        writer = csv.writer(tsv_out, delimiter="\t")
+        writer.writerow(["alias", "accession"])
+        for assembly_name, accession in accessions.items():
+            writer.writerow([assembly_name, accession])
+    logger.info(f"Assigned accessions written to {output_file}")
 
 
 def main() -> int:
@@ -756,8 +785,11 @@ def main() -> int:
         elif args.webin_cli_jar:
             execute_jar = args.webin_cli_jar
 
+        manifests = resolve_manifests(args.manifest)
+
         failed_manifests = []
-        for manifest in args.manifest:
+        accessions_to_write: Dict[str, str] = {}
+        for manifest in manifests:
             assembly_name, manifest_for_submission = check_manifest(manifest, args.workdir)
             run_webin_cli(
                 manifest=manifest_for_submission,
@@ -779,17 +811,22 @@ def main() -> int:
 
             if result_status:
                 if args.mode == "submit":
-                    write_assigned_accessions(
-                        result_location=result_location,
-                        output_accessions=args.output_accessions,
-                        assembly_name=assembly_name,
-                    )
+                    report_text = (Path(result_location) / REPORT_FILE).read_text()
+                    found = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
+                    if found and len(found) == 1:
+                        accessions_to_write[assembly_name] = found[0]
+                    else:
+                        logger.warning(f"No accession found in {REPORT_FILE} for {assembly_name}, skipping.")
                 logger.info(f"Submission/validation done for {manifest_for_submission}")
             else:
                 logger.error(f"Submission/validation failed for {manifest_for_submission}")
                 failed_manifests.append(manifest_for_submission)
 
+        if args.mode == "submit":
+            write_assigned_accessions(accessions_to_write, args.output_accessions)
+
         if failed_manifests:
+            logger.error(f"There are failed submissions for manifests: {','.join(manifest_for_submission)}")
             return 1
         return 0
 

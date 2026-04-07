@@ -2,14 +2,12 @@ import os
 import subprocess
 import time
 
-import pytest
 
 timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
 
 
-@pytest.mark.webin_cli
 class TestWebinCliHandler:
     def test_validate_assembly_upload(self, tmp_path):
         command = [
@@ -150,13 +148,15 @@ class TestWebinCliHandler:
 
     def test_submit_genome_upload_multiple_manifests_test_server(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
-        # create 2 manifests for submission
-        with open("first_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+        manifest_dir = tmp_path / "manifests"
+        manifest_dir.mkdir()
+        # create 2 manifests in a directory for submission
+        with open(manifest_dir / "first_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
                     line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g1\n"
                 file_out.write(line)
-        with open("second_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+        with open(manifest_dir / "second_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
                     line = f"ASSEMBLYNAME\ttest_{timestamp_genomes}_g2\n"
@@ -167,8 +167,7 @@ class TestWebinCliHandler:
             "-c",
             "genome",
             "-m",
-            "first_genome.manifest",
-            "second_genome.manifest",
+            str(manifest_dir),
             "--mode",
             "submit",
             "--test",
@@ -179,10 +178,16 @@ class TestWebinCliHandler:
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accessions: ERZ" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
-        assert "Submission/validation done for first_genome.manifest" in result.stderr
-        assert "Submission/validation done for second_genome.manifest" in result.stderr
-        assert os.path.exists("webin-cli.report"), "webin-cli.report not found after submission"
+        assert "first_genome.manifest" in result.stderr
+        assert "second_genome.manifest" in result.stderr
+        assert (manifest_dir / f"webin-cli.test_{timestamp_genomes}_g1.report").exists(), "webin-cli.report for g1 not found after submission"
+        assert (manifest_dir / f"webin-cli.test_{timestamp_genomes}_g2.report").exists(), "webin-cli.report for g2 not found after submission"
+        with open(manifest_dir / f"webin-cli.test_{timestamp_genomes}_g1.report") as f:
+            webin_report_lines = "\n".join(f.readlines())
+        assert "ERZ" in webin_report_lines, f"No ERZ found in webin-cli.test_{timestamp_genomes}_g1.report, got {webin_report_lines}"
         assert os.path.exists("ena_accessions.tsv"), "ena_accessions.tsv not found after submission"
         with open("ena_accessions.tsv") as f:
-            report_lines = [line for line in f if line.strip()]
-        assert len(report_lines) == 3, f"Expected 3 lines in ena_accessions.tsv, got {len(report_lines)}: {report_lines}"
+            accession_lines = [line for line in f if line.strip()]
+        assert len(accession_lines) == 3, (
+            f"Expected 3 lines (header and 2 genomes) in ena_accessions.tsv, got {len(accession_lines)}: {accession_lines}"
+        )

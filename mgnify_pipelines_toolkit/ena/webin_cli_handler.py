@@ -580,6 +580,11 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
         logger.info("Submission failed on TEST server")
         return False, False
 
+    # TODO: discuss with ENA team if test server should return consistent messaging for resubmissions
+    if "object being added already exists in the submission account with accession" in report_text.lower():
+        logger.info("Submitted object already exists on TEST server")
+        return True, True
+
     # Check for resubmission: minimal report with only success message
     # For resubmissions, report contains only "This was a TEST submission(s)." without details
     is_minimal_report = report_text.strip() == "This was a TEST submission(s)." or (

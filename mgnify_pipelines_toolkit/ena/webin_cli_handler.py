@@ -88,8 +88,8 @@ def parse_arguments() -> argparse.Namespace:
             - context (str): Submission context: genome, transcriptome, etc.
             - mode (str): 'submit' or 'validate'
             - test (bool): Whether to use Webin test server
-            - workdir (Optional[str]): Root directory for the files declared in the manifest file(s),
-              required if manifest(s) contains relative paths to files outside of execution directory
+            - fasta_dir (Optional[str]): Path to the FASTA files declared in the manifest file(s),
+              required if manifest(s) reference file(s) that cannot be accessed from the execution directory
             - outdir (Optional[str]): Base output directory for webin-cli files
             - download_webin_cli (bool): Whether to download Webin-CLI jar
             - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
@@ -143,9 +143,9 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--mode", required=True, type=str, help="submit or validate", choices=["submit", "validate"])
     parser.add_argument("--test", required=False, action="store_true", help="Specify to use test server instead of live")
     parser.add_argument(
-        "--workdir",
+        "--fasta-dir",
         required=False,
-        help="Root directory for the files declared in the manifest file(s), required if manifest(s) contains relative paths to files outside of execution directory",
+        help="Path to the FASTA files declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
     )
     parser.add_argument("--outdir", required=False, help="Base output directory for webin-cli files")
     parser.add_argument("--download-webin-cli", required=False, action="store_true", help="Specify if you do not have ena-webin-cli installed")
@@ -298,21 +298,21 @@ def parse_manifest(manifest_path: Path) -> dict[str, str]:
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str]:
+def check_manifest(manifest_file: str, fasta_root: Optional[str]) -> Tuple[str, str]:
     """
-    Validate a manifest file and create an update one with absolute paths if needed.
+    Validate a manifest file and ensure referenced FASTA file is accessible.
     Args:
         manifest_file (str): Path to the original manifest.
-        workdir (str or None): Optional root directory to prefix relative paths in the manifest.
+        fasta_root (str or None): Optional root directory for relative FASTA paths.
     Returns:
         Tuple[str, str]:
             - assembly_name (str): Parsed value of ASSEMBLYNAME.
-            - manifest_for_submission (str): Path to the (possibly updated) manifest file.
+            - manifest_for_submission (str): Path to the manifest file.
     Raises:
         ManifestValidationError: If manifest validation fails or FASTA file not found.
     """
     manifest_path = Path(manifest_file)
-    logger.debug(f"Checking manifest file {manifest_path} with workdir={workdir}")
+    logger.debug(f"Checking manifest file {manifest_path} with fasta_root={fasta_root}")
     if not manifest_path.exists():
         logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
@@ -325,28 +325,19 @@ def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str
     if not fasta_path:
         logger.error(f"FASTA field not found in {manifest_path}")
         raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
-    # Validate FASTA file exists (if absolute path or workdir provided)
+    # Validate FASTA file exists when the manifest uses an absolute path or fasta_root is provided
     if fasta_path.is_absolute():
         logger.debug(f"FASTA path is absolute: {fasta_path}")
         if not fasta_path.exists():
             logger.error(f"FASTA file not found: {fasta_path}")
             raise ManifestValidationError(f"FASTA file not found: {fasta_path}")
-    elif workdir:
-        # Check if FASTA exists relative to workdir
-        full_fasta_path = Path(workdir) / fasta_path
-        logger.debug(f"Resolved FASTA path using workdir: {full_fasta_path}")
+    elif fasta_root:
+        full_fasta_path = Path(fasta_root) / fasta_path
+        logger.debug(f"Resolved FASTA path using fasta_root: {full_fasta_path}")
         if not full_fasta_path.exists():
             logger.error(f"FASTA file not found: {full_fasta_path}")
             raise ManifestValidationError(f"FASTA file not found: {full_fasta_path}")
-
-        manifest_dict["FASTA"] = str(full_fasta_path)
-        updated_manifest_path = manifest_path.parent / f"updated_{manifest_path.name}"
-        with open(updated_manifest_path, "w") as f:
-            for key, value in manifest_dict.items():
-                f.write(f"{key}\t{value}\n")
-        logger.info(f"New manifest {updated_manifest_path} was created with absolute paths")
-        return assembly_name, str(updated_manifest_path)
-    logger.debug(f"Manifest check complete without update: {manifest_file}")
+    logger.debug(f"Manifest check complete: {manifest_file}")
     return assembly_name, manifest_file
 
 
@@ -357,6 +348,7 @@ def get_webin_cli_command(
     mode: str,
     test: bool,
     output_dir: str,
+    fasta_root: Optional[str] = None,
     jar: Optional[str] = None,
     java_heap_size_initial: Optional[int] = None,
     java_heap_size_max: Optional[int] = None,
@@ -372,6 +364,7 @@ def get_webin_cli_command(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
+        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
         java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
@@ -422,6 +415,9 @@ def get_webin_cli_command(
     if test:
         cmd.append("-test")
 
+    if fasta_root:
+        cmd.append(f"-inputDir={fasta_root}")
+
     return cmd
 
 
@@ -447,6 +443,7 @@ def run_webin_cli(
     mode: str,
     test: bool,
     output_dir: str,
+    fasta_root: Optional[str] = None,
     jar: Optional[str] = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
@@ -464,6 +461,7 @@ def run_webin_cli(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
+        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
@@ -500,7 +498,7 @@ def run_webin_cli(
                 redacted.append(token)
         return " ".join(redacted)
 
-    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, jar, java_heap_size_initial, java_heap_size_max)
+    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, fasta_root, jar, java_heap_size_initial, java_heap_size_max)
     logger.info(f"Command: {redact_command(cmd)}")
 
     for attempt in range(1, retries + 1):
@@ -825,7 +823,7 @@ def main() -> int:
         configure_logging(debug=args.debug)
         logger.debug(
             f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, "
-            f"workdir={args.workdir}, outdir={args.outdir}, download_webin_cli={args.download_webin_cli}, "
+            f"fasta_dir={args.fasta_dir}, outdir={args.outdir}, download_webin_cli={args.download_webin_cli}, "
             f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
             f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
             f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"
@@ -850,7 +848,7 @@ def main() -> int:
         accessions_to_write: Dict[str, str] = {}
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
-            assembly_name, manifest_for_submission = check_manifest(manifest, args.workdir)
+            assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir)
             output_dir = prepare_output_dir(manifest_for_submission, assembly_name, args.outdir)
             run_webin_cli(
                 manifest=manifest_for_submission,
@@ -859,6 +857,7 @@ def main() -> int:
                 mode=args.mode,
                 test=args.test,
                 output_dir=output_dir,
+                fasta_root=args.fasta_dir,
                 jar=execute_jar,
                 retries=args.retries,
                 retry_delay=args.retry_delay,

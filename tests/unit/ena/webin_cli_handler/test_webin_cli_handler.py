@@ -53,13 +53,13 @@ class TestWebinCliHandler:
         assert "Submission validation succeeded" in result.stderr
         assert "Submission/validation done for" in result.stderr
 
-    def test_validate_genome_upload_relative_fasta_without_workdir_fails(self, tmp_path):
+    def test_validate_genome_upload_relative_fasta_without_fasta_dir_fails(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
         fasta_dir = tmp_path / "fasta"
         fasta_dir.mkdir()
         shutil.copyfile("tests/fixtures/webin_cli_handler/test.fasta.gz", fasta_dir / "test.fasta.gz")
 
-        manifest_path = tmp_path / "relative_no_workdir.manifest"
+        manifest_path = tmp_path / "relative_no_fasta_dir.manifest"
         with open(manifest_path, "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
@@ -82,17 +82,17 @@ class TestWebinCliHandler:
             f"webin-cli-{webin_version}.jar",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
-        assert result.returncode != 0, "Validation unexpectedly succeeded without --workdir for a relative FASTA path"
+        assert result.returncode != 0, "Validation unexpectedly succeeded without --fasta-dir for a relative FASTA path"
         assert 'Could not read data file: "test.fasta.gz"' in result.stderr
         assert "test.fasta.gz" in result.stderr
 
-    def test_validate_genome_upload_relative_fasta_with_workdir_succeeds(self, tmp_path):
+    def test_validate_genome_upload_relative_fasta_with_fasta_dir_succeeds(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
         fasta_dir = tmp_path / "fasta"
         fasta_dir.mkdir()
         shutil.copyfile("tests/fixtures/webin_cli_handler/test.fasta.gz", fasta_dir / "test.fasta.gz")
 
-        manifest_path = tmp_path / "relative_with_workdir.manifest"
+        manifest_path = tmp_path / "relative_with_fasta_dir.manifest"
         with open(manifest_path, "w") as file_out, open(test_manifest, "r") as file_in:
             for line in file_in:
                 if "ASSEMBLYNAME" in line:
@@ -109,7 +109,7 @@ class TestWebinCliHandler:
             str(manifest_path),
             "--mode",
             "validate",
-            "--workdir",
+            "--fasta-dir",
             str(fasta_dir),
             "--outdir",
             test_output_dir,
@@ -118,7 +118,6 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "New manifest" in result.stderr
         assert "Submission validation succeeded" in result.stderr
         assert "Submission/validation done for" in result.stderr
 

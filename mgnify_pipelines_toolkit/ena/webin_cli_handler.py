@@ -88,7 +88,9 @@ def parse_arguments() -> argparse.Namespace:
             - context (str): Submission context: genome, transcriptome, etc.
             - mode (str): 'submit' or 'validate'
             - test (bool): Whether to use Webin test server
-            - workdir (Optional[str]): Working directory for temporary output
+            - workdir (Optional[str]): Root directory for the files declared in the manifest file(s),
+              required if manifest(s) contains relative paths to files outside of execution directory
+            - outdir (Optional[str]): Base output directory for webin-cli files
             - download_webin_cli (bool): Whether to download Webin-CLI jar
             - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
             - download_webin_cli_version (Optional[str]): Specific Webin-CLI version
@@ -140,7 +142,12 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument("--mode", required=True, type=str, help="submit or validate", choices=["submit", "validate"])
     parser.add_argument("--test", required=False, action="store_true", help="Specify to use test server instead of live")
-    parser.add_argument("--workdir", required=False, help="Path to working directory")
+    parser.add_argument(
+        "--workdir",
+        required=False,
+        help="Root directory for the files declared in the manifest file(s), required if manifest(s) contains relative paths to files outside of execution directory",
+    )
+    parser.add_argument("--outdir", required=False, help="Base output directory for webin-cli files")
     parser.add_argument("--download-webin-cli", required=False, action="store_true", help="Specify if you do not have ena-webin-cli installed")
     parser.add_argument("--download-webin-cli-directory", required=False, default=".", type=str, help="Path to save webin-cli into")
     parser.add_argument("--download-webin-cli-version", required=False, type=str, help="Version of ena-webin-cli to download, default: latest")
@@ -296,7 +303,7 @@ def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str
     Validate a manifest file and create an update one with absolute paths if needed.
     Args:
         manifest_file (str): Path to the original manifest.
-        workdir (str or None): Optional working directory to prefix FASTA paths.
+        workdir (str or None): Optional root directory to prefix relative paths in the manifest.
     Returns:
         Tuple[str, str]:
             - assembly_name (str): Parsed value of ASSEMBLYNAME.
@@ -418,9 +425,10 @@ def get_webin_cli_command(
     return cmd
 
 
-def prepare_output_dir(manifest: str, assembly_name: str) -> str:
+def prepare_output_dir(manifest: str, assembly_name: str, outdir: Optional[str] = None) -> str:
     """Prepare webin-cli output directory named after assembly name."""
-    output_dir = Path(manifest).parent / assembly_name
+    output_root = Path(outdir) if outdir else Path(manifest).parent
+    output_dir = output_root / assembly_name
     if output_dir.exists():
         if output_dir.is_dir():
             logger.warning(f"Output directory already exists and will be reused: {output_dir}")
@@ -817,7 +825,7 @@ def main() -> int:
         configure_logging(debug=args.debug)
         logger.debug(
             f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, "
-            f"workdir={args.workdir}, download_webin_cli={args.download_webin_cli}, "
+            f"workdir={args.workdir}, outdir={args.outdir}, download_webin_cli={args.download_webin_cli}, "
             f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
             f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
             f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"
@@ -843,7 +851,7 @@ def main() -> int:
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
             assembly_name, manifest_for_submission = check_manifest(manifest, args.workdir)
-            output_dir = prepare_output_dir(manifest_for_submission, assembly_name)
+            output_dir = prepare_output_dir(manifest_for_submission, assembly_name, args.outdir)
             run_webin_cli(
                 manifest=manifest_for_submission,
                 context=args.context,

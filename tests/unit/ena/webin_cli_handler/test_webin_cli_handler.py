@@ -2,12 +2,15 @@ import os
 import shutil
 import subprocess
 import time
+from pathlib import Path
+
 import pytest
 
 
 timestamp = int(time.time())
 timestamp_genomes = int(time.time())
 webin_version = os.getenv("WEBIN_CLI_VERSION")
+test_output_dir = Path("test_output")
 
 
 @pytest.mark.webin_cli
@@ -21,6 +24,8 @@ class TestWebinCliHandler:
             "tests/fixtures/webin_cli_handler/assembly.manifest",
             "--mode",
             "validate",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -38,6 +43,8 @@ class TestWebinCliHandler:
             "tests/fixtures/webin_cli_handler/genome.manifest",
             "--mode",
             "validate",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -69,6 +76,8 @@ class TestWebinCliHandler:
             str(manifest_path),
             "--mode",
             "validate",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -102,6 +111,8 @@ class TestWebinCliHandler:
             "validate",
             "--workdir",
             str(fasta_dir),
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -128,6 +139,8 @@ class TestWebinCliHandler:
             "--mode",
             "submit",
             "--test",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -154,6 +167,8 @@ class TestWebinCliHandler:
             "--mode",
             "submit",
             "--test",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -179,6 +194,8 @@ class TestWebinCliHandler:
             "--mode",
             "submit",
             "--test",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -205,6 +222,8 @@ class TestWebinCliHandler:
             "--mode",
             "submit",
             "--test",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -239,6 +258,8 @@ class TestWebinCliHandler:
             "--mode",
             "submit",
             "--test",
+            "--outdir",
+            test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
         ]
@@ -248,8 +269,8 @@ class TestWebinCliHandler:
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "first_genome.manifest" in result.stderr
         assert "second_genome.manifest" in result.stderr
-        first_output_dir = manifest_dir / f"test_{timestamp_genomes}_g1"
-        second_output_dir = manifest_dir / f"test_{timestamp_genomes}_g2"
+        first_output_dir = test_output_dir / f"test_{timestamp_genomes}_g1"
+        second_output_dir = test_output_dir / f"test_{timestamp_genomes}_g2"
         first_report = first_output_dir / "webin-cli.report"
         second_report = second_output_dir / "webin-cli.report"
 

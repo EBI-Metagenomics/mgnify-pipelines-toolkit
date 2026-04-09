@@ -349,6 +349,7 @@ def get_webin_cli_command(
     webin: str,
     mode: str,
     test: bool,
+    output_dir: str,
     jar: Optional[str] = None,
     java_heap_size_initial: Optional[int] = None,
     java_heap_size_max: Optional[int] = None,
@@ -363,6 +364,7 @@ def get_webin_cli_command(
         password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
+        output_dir (str): Directory where webin-cli writes output files.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
         java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
@@ -401,12 +403,33 @@ def get_webin_cli_command(
             )
 
     # Add webin-cli arguments
-    cmd += [f"-context={context}", f"-manifest={manifest}", f"-userName={webin}", f"-passwordEnv={ENA_WEBIN_PASSWORD}", f"-{mode}"]
+    cmd += [
+        f"-context={context}",
+        f"-manifest={manifest}",
+        f"-userName={webin}",
+        f"-passwordEnv={ENA_WEBIN_PASSWORD}",
+        f"-outputDir={output_dir}",
+        f"-{mode}",
+    ]
 
     if test:
         cmd.append("-test")
 
     return cmd
+
+
+def prepare_output_dir(manifest: str, assembly_name: str) -> str:
+    """Prepare webin-cli output directory named after assembly name."""
+    output_dir = Path(manifest).parent / assembly_name
+    if output_dir.exists():
+        if output_dir.is_dir():
+            logger.warning(f"Output directory already exists and will be reused: {output_dir}")
+        else:
+            raise ManifestValidationError(f"Output path exists and is not a directory: {output_dir}")
+    else:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        logger.debug(f"Created output directory for webin-cli: {output_dir}")
+    return str(output_dir)
 
 
 def run_webin_cli(
@@ -415,6 +438,7 @@ def run_webin_cli(
     webin: str,
     mode: str,
     test: bool,
+    output_dir: str,
     jar: Optional[str] = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
@@ -431,6 +455,7 @@ def run_webin_cli(
         password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
+        output_dir (str): Directory where webin-cli writes output files.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
@@ -467,7 +492,7 @@ def run_webin_cli(
                 redacted.append(token)
         return " ".join(redacted)
 
-    cmd = get_webin_cli_command(manifest, context, webin, mode, test, jar, java_heap_size_initial, java_heap_size_max)
+    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, jar, java_heap_size_initial, java_heap_size_max)
     logger.info(f"Command: {redact_command(cmd)}")
 
     for attempt in range(1, retries + 1):
@@ -647,11 +672,6 @@ def check_report(fasta_location: str, assembly_name: str, mode: str, test: bool)
         logger.warning(f"⚠️ Report file not found: {report_path}")
         return False, False
 
-    # Preserve report copy
-    report_copy_path = Path(fasta_location) / f"webin-cli.{assembly_name}.report"
-    shutil.copyfile(report_path, report_copy_path)
-    logger.info(f"Preserved run report copy at {report_copy_path}")
-
     report_text = report_path.read_text()
     logger.debug(f"Report content:\n{report_text}")
     assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
@@ -823,12 +843,14 @@ def main() -> int:
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
             assembly_name, manifest_for_submission = check_manifest(manifest, args.workdir)
+            output_dir = prepare_output_dir(manifest_for_submission, assembly_name)
             run_webin_cli(
                 manifest=manifest_for_submission,
                 context=args.context,
                 webin=webin,
                 mode=args.mode,
                 test=args.test,
+                output_dir=output_dir,
                 jar=execute_jar,
                 retries=args.retries,
                 retry_delay=args.retry_delay,
@@ -836,15 +858,14 @@ def main() -> int:
                 java_heap_size_max=args.java_heap_size_max,
             )
 
-            result_location = str(Path(manifest_for_submission).parent)
-            logger.debug(f"Result location for manifest {manifest_for_submission}: {result_location}")
+            logger.debug(f"Result location for manifest {manifest_for_submission}: {output_dir}")
             result_status = check_result(
-                result_location=result_location, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
+                result_location=output_dir, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
             )
 
             if result_status:
                 if args.mode == "submit":
-                    report_text = (Path(result_location) / REPORT_FILE).read_text()
+                    report_text = (Path(output_dir) / REPORT_FILE).read_text()
                     found = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
                     logger.debug(f"Accession matches for assembly {assembly_name}: {found}")
                     if found and len(found) == 1:
@@ -861,7 +882,7 @@ def main() -> int:
             logger.debug(f"Submission mode complete with {len(accessions_to_write)} accession(s) captured")
 
         if failed_manifests:
-            logger.error(f"There are failed submissions for manifests: {','.join(manifest_for_submission)}")
+            logger.error(f"There are failed submissions for manifests: {','.join(failed_manifests)}")
             return 1
         return 0
 

@@ -642,7 +642,33 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         return False, is_resubmission
 
 
-def check_report(fasta_location: str, assembly_name: str, mode: str, test: bool) -> Tuple[bool, bool]:
+def parse_accession_from_report(report_filepath: Path) -> Optional[str]:
+    """Extract a unique assembly accession from a webin-cli report file.
+
+    Args:
+        report_filepath (Path): Path to a webin-cli report file.
+
+    Returns:
+        Optional[str]:
+            - A single unique accession when exactly one unique match is present.
+            - None when there are no matches or multiple unique matches.
+    """
+    report_text = report_filepath.read_text()
+    unique_matches = sorted(set(re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)))
+
+    if not unique_matches:
+        logger.warning(f"No accession found in {report_filepath}")
+        return None
+
+    if len(unique_matches) > 1:
+        logger.warning(f"Multiple accessions found in {report_filepath}: {','.join(unique_matches)}")
+        return None
+
+    accession = unique_matches[0]
+    return accession
+
+
+def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool]:
     """
     Parse and validate the webin-cli report file to determine operation outcome.
 
@@ -653,7 +679,6 @@ def check_report(fasta_location: str, assembly_name: str, mode: str, test: bool)
     Args:
         fasta_location (str): Directory path where webin-cli.report is located
             (typically the directory containing the FASTA file).
-        assembly_name (str): Assembly identifier
         mode (str): Operation mode - either 'submit' or 'validate'.
         test (bool): Whether operation was run against test server (True) or
             live server (False).
@@ -675,16 +700,17 @@ def check_report(fasta_location: str, assembly_name: str, mode: str, test: bool)
     logger.info(f"Checking webin report {report_path}")
 
     if not report_path.exists():
-        logger.warning(f"⚠️ Report file not found: {report_path}")
+        logger.error(f"⚠️ Report file not found: {report_path}")
         return False, False
 
     report_text = report_path.read_text()
     logger.debug(f"Report content:\n{report_text}")
-    assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-    if assembly_accession_match_list:
-        logger.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
 
     if mode == "submit":
+        accession = parse_accession_from_report(report_path)
+        if not accession:
+            logger.error(f"No accession found in report: {report_path}")
+            return False, False
         if test:
             return check_submission_status_test(report_text)
         else:
@@ -721,7 +747,7 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
         For resubmissions (when object already exists), we only check the report
         status and don't verify output files, since webin-cli may not regenerate them.
     """
-    success, is_resubmission = check_report(result_location, assembly_name, mode, test)
+    success, is_resubmission = check_report(result_location, mode, test)
     logger.debug(f"Result status after report parsing: success={success}, is_resubmission={is_resubmission}, mode={mode}, context={context}")
 
     if not success:
@@ -872,13 +898,10 @@ def main() -> int:
 
             if result_status:
                 if args.mode == "submit":
-                    report_text = (Path(output_dir) / REPORT_FILE).read_text()
-                    found = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-                    logger.debug(f"Accession matches for assembly {assembly_name}: {found}")
-                    if found and len(found) == 1:
-                        accessions_to_write[assembly_name] = found[0]
-                    else:
-                        logger.warning(f"No accession found in {REPORT_FILE} for {assembly_name}, skipping.")
+                    accession = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
+                    if accession:
+                        logger.info(f"Assigned accessions: {accession}")
+                        accessions_to_write[assembly_name] = accession
                 logger.info(f"Submission/validation done for {manifest_for_submission}")
             else:
                 logger.error(f"Submission/validation failed for {manifest_for_submission}")

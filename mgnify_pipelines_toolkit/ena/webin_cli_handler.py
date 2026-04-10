@@ -839,12 +839,15 @@ def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str
         logger.warning("No accessions to write.")
         return
     output_file = Path(output_accessions)
-    with open(output_file, "w", newline="") as tsv_out:
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    tmp_output = output_file.with_suffix(output_file.suffix + ".tmp")
+    with open(tmp_output, "w", newline="") as tsv_out:
         writer = csv.writer(tsv_out, delimiter="\t")
         writer.writerow(["alias", "accession"])
         for assembly_name, accession in accessions.items():
             writer.writerow([assembly_name, accession])
-    logger.info(f"Assigned accessions written to {output_file}")
+    tmp_output.replace(output_file)
+    logger.debug(f"Assigned accessions written to {output_file}")
 
 
 def main() -> int:
@@ -910,15 +913,16 @@ def main() -> int:
                 if args.mode == "submit":
                     accession = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
                     if accession:
-                        logger.info(f"Assigned accessions: {accession}")
+                        logger.info(f"Assigned accessions for {assembly_name}: {accession}")
                         accessions_to_write[assembly_name] = accession
+                        # Persist progress immediately so long-running runs can resume after interruption
+                        write_assigned_accessions(accessions_to_write, args.output_accessions)
                 logger.info(f"Submission/validation done for {manifest_for_submission}")
             else:
                 logger.error(f"Submission/validation failed for {manifest_for_submission}")
                 failed_manifests.append(manifest_for_submission)
 
         if args.mode == "submit":
-            write_assigned_accessions(accessions_to_write, args.output_accessions)
             logger.debug(f"Submission mode complete with {len(accessions_to_write)} accession(s) captured")
 
         if failed_manifests:

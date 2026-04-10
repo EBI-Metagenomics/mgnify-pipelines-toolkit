@@ -145,7 +145,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions: ERZ" in result.stderr
+        assert "Assigned accessions for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done" in result.stderr
 
@@ -170,6 +170,7 @@ class TestWebinCliHandler:
             test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
+            "--debug",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -200,7 +201,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions: ERZ" in result.stderr
+        assert "Assigned accessions for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done for new_genome.manifest" in result.stderr
 
@@ -225,6 +226,7 @@ class TestWebinCliHandler:
             test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
+            "--debug",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -264,7 +266,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions: ERZ" in result.stderr
+        assert "Assigned accessions for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "first_genome.manifest" in result.stderr
         assert "second_genome.manifest" in result.stderr
@@ -284,3 +286,63 @@ class TestWebinCliHandler:
         assert len(accession_lines) == 3, (
             f"Expected 3 lines (header and 2 genomes) in ena_accessions.tsv, got {len(accession_lines)}: {accession_lines}"
         )
+
+    def test_submit_genome_upload_resume_skips_existing_aliases(self, tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
+        manifest_dir = tmp_path / "resume_manifests"
+        manifest_dir.mkdir()
+        output_accessions = tmp_path / "resume_accessions.tsv"
+        outdir = tmp_path / "resume_output"
+        skipped_alias = f"test_{timestamp_genomes}_resume_existing"
+        new_alias = f"test_{timestamp_genomes}_resume_new"
+
+        with open(manifest_dir / "existing_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+            for line in file_in:
+                if "ASSEMBLYNAME" in line:
+                    line = f"ASSEMBLYNAME\t{skipped_alias}\n"
+                file_out.write(line)
+
+        with open(manifest_dir / "new_genome.manifest", "w") as file_out, open(test_manifest, "r") as file_in:
+            for line in file_in:
+                if "ASSEMBLYNAME" in line:
+                    line = f"ASSEMBLYNAME\t{new_alias}\n"
+                file_out.write(line)
+
+        with open(output_accessions, "w") as file_out:
+            file_out.write("alias\taccession\n")
+            file_out.write(f"{skipped_alias}\tERZ123456\n")
+
+        command = [
+            "webin_cli_handler",
+            "-c",
+            "genome",
+            "-m",
+            str(manifest_dir),
+            "--mode",
+            "submit",
+            "--test",
+            "--resume",
+            "--output-accessions",
+            str(output_accessions),
+            "--outdir",
+            str(outdir),
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+
+        assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert f"Skipping {skipped_alias}: already present in accessions file with accession ERZ123456" in result.stderr
+        assert "Submission/validation done for" in result.stderr
+
+        skipped_output_dir = outdir / skipped_alias
+        new_output_dir = outdir / new_alias
+        assert not skipped_output_dir.exists(), f"Skipped alias unexpectedly created output directory: {skipped_output_dir}"
+        assert new_output_dir.exists(), f"Expected output directory for resumed submission: {new_output_dir}"
+
+        with open(output_accessions) as f:
+            accession_lines = [line.strip() for line in f if line.strip()]
+
+        assert len(accession_lines) == 3, f"Expected header and 2 genome lines in resume accessions file, got {accession_lines}"
+        assert f"{skipped_alias}\tERZ123456" in accession_lines
+        assert any(line.startswith(f"{new_alias}\tERZ") for line in accession_lines), accession_lines

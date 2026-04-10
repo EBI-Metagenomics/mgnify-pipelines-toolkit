@@ -87,10 +87,12 @@ def parse_arguments() -> argparse.Namespace:
             - manifest (str): Path to a manifest file or a directory of manifest files
             - context (str): Submission context: genome, transcriptome, etc.
             - mode (str): 'submit' or 'validate'
+            - resume (bool): Whether to resume previous run by skipping already processed aliases
             - test (bool): Whether to use Webin test server
             - fasta_dir (Optional[str]): Path to the FASTA files declared in the manifest file(s),
               required if manifest(s) reference file(s) that cannot be accessed from the execution directory
             - outdir (Optional[str]): Base output directory for webin-cli files
+            - output_accessions (str): File to write assigned accessions to (TSV, default: ena_accessions.tsv)
             - download_webin_cli (bool): Whether to download Webin-CLI jar
             - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
             - download_webin_cli_version (Optional[str]): Specific Webin-CLI version

@@ -170,7 +170,6 @@ class TestWebinCliHandler:
             test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
-            "--debug",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
@@ -226,7 +225,6 @@ class TestWebinCliHandler:
             test_output_dir,
             "--webin-cli-jar",
             f"webin-cli-{webin_version}.jar",
-            "--debug",
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"

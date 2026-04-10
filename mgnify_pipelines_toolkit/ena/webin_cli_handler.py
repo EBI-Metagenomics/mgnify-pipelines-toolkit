@@ -181,6 +181,12 @@ def parse_arguments() -> argparse.Namespace:
         help="Java maximum heap size in GB (-Xmx); only added when explicitly provided",
     )
     parser.add_argument("--debug", required=False, action="store_true", help="Enable debug logging")
+    parser.add_argument(
+        "--resume",
+        required=False,
+        action="store_true",
+        help="Resume previous webin_cli_handler run: skip aliases already present in accessions output file",
+    )
     return parser.parse_args()
 
 
@@ -850,6 +856,36 @@ def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str
     logger.debug(f"Assigned accessions written to {output_file}")
 
 
+def load_assigned_accessions(output_accessions: str) -> Dict[str, str]:
+    """
+    Load previously written accessions TSV, if present.
+
+    Args:
+        output_accessions (str): Path to the TSV file containing previously assigned accessions.
+
+    Returns:
+        Dict[str, str]: Mapping of assembly name to accession.
+    """
+    output_file = Path(output_accessions)
+    if not output_file.exists():
+        return {}
+
+    loaded: Dict[str, str] = {}
+    try:
+        with open(output_file, "r", newline="") as tsv_in:
+            reader = csv.DictReader(tsv_in, delimiter="\t")
+            for row in reader:
+                alias = row["alias"]
+                accession = row["accession"]
+                loaded[alias] = accession
+    except Exception as exc:
+        logger.warning(f"Failed to read existing accessions file {output_file}: {exc}")
+        return {}
+
+    logger.info(f"Loaded {len(loaded)} previously written accession(s) from {output_file}")
+    return loaded
+
+
 def main() -> int:
     """
     Main entry point for the webin-cli handler.
@@ -885,9 +921,16 @@ def main() -> int:
 
         failed_manifests = []
         accessions_to_write: Dict[str, str] = {}
+        if args.mode == "submit" and args.resume:
+            accessions_to_write = load_assigned_accessions(args.output_accessions)
+            aliases_to_skip = set(accessions_to_write.keys())
+
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
             assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir)
+            if args.mode == "submit" and args.resume and assembly_name in aliases_to_skip:
+                logger.info(f"Skipping {assembly_name}: already present in accessions file with accession {accessions_to_write[assembly_name]}")
+                continue
             output_dir = prepare_output_dir(manifest_for_submission, assembly_name, args.outdir)
             run_webin_cli(
                 manifest=manifest_for_submission,

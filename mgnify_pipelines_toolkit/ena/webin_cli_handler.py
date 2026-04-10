@@ -428,22 +428,33 @@ def get_webin_cli_command(
 
 
 def prepare_output_dir(manifest: str, assembly_name: str, outdir: Optional[str] = None) -> str:
-    """Prepare webin-cli output directory named after assembly name."""
+    """
+    Creates a timestamped output directory for each submission made by webin-cli.
+
+    Args:
+        manifest (str): Path to manifest file.
+        assembly_name (str): Assembly name from manifest ASSEMBLYNAME field.
+        outdir (Optional[str]): Base output directory. Defaults to manifest parent directory.
+
+    Returns:
+        str: Path to the created output directory.
+
+    Raises:
+        ValueError: If output path exists but is not a directory.
+    """
+    # If outdir is not provided, use the parent directory of the manifest because it is a default behaviour of webin-cli
     output_root = Path(outdir) if outdir else Path(manifest).parent
-    output_dir = output_root / assembly_name
-    if output_dir.exists():
-        # TODO: deleting folder is not ideal and should be replaced with a more robust solution
-        # Hovewer, webin-cli may produce no output files when resubmitting an existing assembly
-        # if output folder already exists and contains files
-        if output_dir.is_dir() and any(output_dir.iterdir()):
-            logger.warning(f"Output directory exists and is not empty; removing its contents: {output_dir}")
-            shutil.rmtree(output_dir)
-            output_dir.mkdir(parents=True, exist_ok=True)
-        elif not output_dir.is_dir():
-            raise ValueError(f"Output path exists and is not a directory: {output_dir}")
-    else:
-        output_dir.mkdir(parents=True, exist_ok=True)
-        logger.debug(f"Created output directory for webin-cli: {output_dir}")
+
+    # We need to have separate folder for each submission, otherwise webin-cli may produce no output files
+    # when resubmitting an existing assembly and if output folder already exists and contains files
+    timestamp = time.strftime("%d-%b-%y_%H%M%S")  # Format: 10-Apr-26_142315
+    output_dir = output_root / f"{assembly_name}_{timestamp}"
+
+    if output_dir.exists() and output_dir.is_dir():
+        logger.warning(f"Output directory already exists: {output_dir}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    logger.debug(f"Created output directory for webin-cli: {output_dir}")
     return str(output_dir)
 
 
@@ -897,8 +908,8 @@ def main() -> int:
         args = parse_arguments()
         configure_logging(debug=args.debug)
         logger.debug(
-            f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, "
-            f"fasta_dir={args.fasta_dir}, outdir={args.outdir}, download_webin_cli={args.download_webin_cli}, "
+            f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, resume={args.resume}, "
+            f"fasta_dir={args.fasta_dir}, outdir={args.outdir}, output_accessions={args.output_accessions}, download_webin_cli={args.download_webin_cli}, "
             f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
             f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
             f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"

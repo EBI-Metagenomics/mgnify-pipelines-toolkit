@@ -270,10 +270,13 @@ class TestWebinCliHandler:
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "first_genome.manifest" in result.stderr
         assert "second_genome.manifest" in result.stderr
-        first_output_dir = test_output_dir / f"test_{timestamp_genomes}_g1"
-        second_output_dir = test_output_dir / f"test_{timestamp_genomes}_g2"
-        first_report = first_output_dir / "webin-cli.report"
-        second_report = second_output_dir / "webin-cli.report"
+        first_output_dirs = list(test_output_dir.glob(f"test_{timestamp_genomes}_g1_*"))
+        second_output_dirs = list(test_output_dir.glob(f"test_{timestamp_genomes}_g2_*"))
+        assert first_output_dirs, f"No timestamped output directory found for g1 in {test_output_dir}"
+        assert second_output_dirs, f"No timestamped output directory found for g2 in {test_output_dir}"
+
+        first_report = first_output_dirs[0] / "webin-cli.report"
+        second_report = second_output_dirs[0] / "webin-cli.report"
 
         assert first_report.exists(), f"webin-cli.report for g1 not found after submission: {first_report}"
         assert second_report.exists(), f"webin-cli.report for g2 not found after submission: {second_report}"
@@ -336,9 +339,11 @@ class TestWebinCliHandler:
         assert "Submission/validation done for" in result.stderr
 
         skipped_output_dir = outdir / skipped_alias
-        new_output_dir = outdir / new_alias
+        new_output_dirs = list(outdir.glob(f"{new_alias}_*"))
+        skipped_output_dirs = list(outdir.glob(f"{skipped_alias}_*"))
         assert not skipped_output_dir.exists(), f"Skipped alias unexpectedly created output directory: {skipped_output_dir}"
-        assert new_output_dir.exists(), f"Expected output directory for resumed submission: {new_output_dir}"
+        assert not skipped_output_dirs, f"Skipped alias unexpectedly created timestamped output directory: {skipped_output_dirs}"
+        assert new_output_dirs, f"Expected timestamped output directory for resumed submission in: {outdir}"
 
         with open(output_accessions) as f:
             accession_lines = [line.strip() for line in f if line.strip()]

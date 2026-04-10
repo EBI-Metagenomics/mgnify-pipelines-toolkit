@@ -426,10 +426,15 @@ def prepare_output_dir(manifest: str, assembly_name: str, outdir: Optional[str] 
     output_root = Path(outdir) if outdir else Path(manifest).parent
     output_dir = output_root / assembly_name
     if output_dir.exists():
-        if output_dir.is_dir():
-            logger.warning(f"Output directory already exists and will be reused: {output_dir}")
-        else:
-            raise ManifestValidationError(f"Output path exists and is not a directory: {output_dir}")
+        # TODO: deleting folder is not ideal and should be replaced with a more robust solution
+        # Hovewer, webin-cli may produce no output files when resubmitting an existing assembly
+        # if output folder already exists and contains files
+        if output_dir.is_dir() and any(output_dir.iterdir()):
+            logger.warning(f"Output directory exists and is not empty; removing its contents: {output_dir}")
+            shutil.rmtree(output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
+        elif not output_dir.is_dir():
+            raise ValueError(f"Output path exists and is not a directory: {output_dir}")
     else:
         output_dir.mkdir(parents=True, exist_ok=True)
         logger.debug(f"Created output directory for webin-cli: {output_dir}")

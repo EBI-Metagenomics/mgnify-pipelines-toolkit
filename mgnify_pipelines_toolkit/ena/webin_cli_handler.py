@@ -849,6 +849,12 @@ def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str
     """
     Write assigned assembly accessions for all successful submissions to a TSV file.
 
+    This implementation rewrites the full TSV on each call using an atomic replace pattern (write to .tmp, then replace).
+    It is safer than writing in "append" mode and keeps a complete table of successful submissions for resume safety.
+    The tradeoff is redundant I/O growth (O(n²) complexity) over long runs (about 5 seconds cumulative write time
+    and about 600 MB redundant writes for 5000 submissions).
+    TODO: consider switching to buffered checkpoints (flush every N successes) or other more efficient persistence method.
+
     Args:
         accessions (Dict[str, str]): Mapping of assembly name to accession.
         output_accessions (str): Path to output TSV file (overwritten each run).

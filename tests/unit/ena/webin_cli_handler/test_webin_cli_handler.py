@@ -145,7 +145,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions for" in result.stderr
+        assert "Assigned accession for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done" in result.stderr
 
@@ -200,7 +200,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions for" in result.stderr
+        assert "Assigned accession for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "Submission/validation done for new_genome.manifest" in result.stderr
 
@@ -264,7 +264,7 @@ class TestWebinCliHandler:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Assigned accessions for" in result.stderr
+        assert "Assigned accession for" in result.stderr
         assert "Successfully submitted object for the first time on TEST server" in result.stderr
         assert "first_genome.manifest" in result.stderr
         assert "second_genome.manifest" in result.stderr

@@ -975,7 +975,7 @@ def main() -> int:
                 if args.mode == "submit":
                     accession = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
                     if accession:
-                        logger.info(f"Assigned accessions for {assembly_name}: {accession}")
+                        logger.info(f"Assigned accession for {assembly_name}: {accession}")
                         accessions_to_write[assembly_name] = accession
                         # Persist progress immediately so long-running runs can resume after interruption
                         write_assigned_accessions(accessions_to_write, args.output_accessions)

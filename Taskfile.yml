@@ -34,7 +34,6 @@ tasks:
   lint-fix:
     desc: Run linters and fix issues automatically
     cmds:
-      - uv run black .
       - uv run ruff check --fix .
 
   pre-commit:

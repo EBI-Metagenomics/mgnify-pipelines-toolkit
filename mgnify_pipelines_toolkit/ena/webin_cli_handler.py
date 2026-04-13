@@ -26,7 +26,7 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 
 # Custom Exceptions
@@ -70,8 +70,12 @@ INSDC_CENTRE_PREFIXES = "EDS"
 ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 
 
-logging.basicConfig(level=logging.INFO, format="[%(asctime)s] - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+def configure_logging(debug: bool = False) -> None:
+    """Configure process-wide logging level and format."""
+    logging.basicConfig(level=logging.DEBUG if debug else logging.INFO, format="[%(asctime)s] - %(levelname)s - %(message)s", force=True)
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -80,11 +84,15 @@ def parse_arguments() -> argparse.Namespace:
 
     Returns:
         argparse.Namespace: Parsed arguments object containing attributes:
-            - manifest (str): Path to manifest file
+            - manifest (str): Path to a manifest file or a directory of manifest files
             - context (str): Submission context: genome, transcriptome, etc.
             - mode (str): 'submit' or 'validate'
+            - resume (bool): Whether to resume previous run by skipping already processed aliases
             - test (bool): Whether to use Webin test server
-            - workdir (Optional[str]): Working directory for temporary output
+            - fasta_dir (Optional[str]): Path to the FASTA files declared in the manifest file(s),
+              required if manifest(s) reference file(s) that cannot be accessed from the execution directory
+            - outdir (Optional[str]): Base output directory for webin-cli files
+            - output_accessions (str): File to write assigned accessions to (TSV, default: ena_accessions.tsv)
             - download_webin_cli (bool): Whether to download Webin-CLI jar
             - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
             - download_webin_cli_version (Optional[str]): Specific Webin-CLI version
@@ -93,6 +101,7 @@ def parse_arguments() -> argparse.Namespace:
             - retry_delay (int): Initial retry delay in seconds
             - java_heap_size_initial (Optional[int]): Java initial heap size in GB
             - java_heap_size_max (Optional[int]): Java maximum heap size in GB
+            - debug (bool): Enable verbose debug logging
     """
 
     def positive_int(value: str) -> int:
@@ -115,7 +124,7 @@ def parse_arguments() -> argparse.Namespace:
         "--manifest",
         required=True,
         type=str,
-        help="Manifest text file containing file and metadata fields",
+        help="Path to a single manifest file or a directory containing manifest files",
     )
     parser.add_argument(
         "-o",
@@ -135,7 +144,12 @@ def parse_arguments() -> argparse.Namespace:
     )
     parser.add_argument("--mode", required=True, type=str, help="submit or validate", choices=["submit", "validate"])
     parser.add_argument("--test", required=False, action="store_true", help="Specify to use test server instead of live")
-    parser.add_argument("--workdir", required=False, help="Path to working directory")
+    parser.add_argument(
+        "--fasta-dir",
+        required=False,
+        help="Path to the FASTA files declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
+    )
+    parser.add_argument("--outdir", required=False, help="Base output directory for webin-cli files")
     parser.add_argument("--download-webin-cli", required=False, action="store_true", help="Specify if you do not have ena-webin-cli installed")
     parser.add_argument("--download-webin-cli-directory", required=False, default=".", type=str, help="Path to save webin-cli into")
     parser.add_argument("--download-webin-cli-version", required=False, type=str, help="Version of ena-webin-cli to download, default: latest")
@@ -167,6 +181,13 @@ def parse_arguments() -> argparse.Namespace:
         type=positive_int,
         default=None,
         help="Java maximum heap size in GB (-Xmx); only added when explicitly provided",
+    )
+    parser.add_argument("--debug", required=False, action="store_true", help="Enable debug logging")
+    parser.add_argument(
+        "--resume",
+        required=False,
+        action="store_true",
+        help="Resume previous webin_cli_handler run: skip aliases already present in accessions output file",
     )
     return parser.parse_args()
 
@@ -224,6 +245,7 @@ def ensure_webin_credentials_exist() -> None:
     Raises:
         WebinCredentialsError: If credentials are missing.
     """
+    logger.debug("Checking required Webin credential environment variables")
     if ENA_WEBIN not in os.environ:
         raise WebinCredentialsError(f"The variable {ENA_WEBIN} is missing from the environment.")
     if ENA_WEBIN_PASSWORD not in os.environ:
@@ -245,6 +267,7 @@ def get_webin_credentials() -> str:
     password = os.environ.get(ENA_WEBIN_PASSWORD)
     if not password:
         raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing password.")
+    logger.debug(f"Webin credentials retrieved from environment: {webin}")
     return webin
 
 
@@ -283,20 +306,21 @@ def parse_manifest(manifest_path: Path) -> dict[str, str]:
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str]:
+def check_manifest(manifest_file: str, fasta_root: Optional[str]) -> Tuple[str, str]:
     """
-    Validate a manifest file and create an update one with absolute paths if needed.
+    Validate a manifest file and ensure referenced FASTA file is accessible.
     Args:
         manifest_file (str): Path to the original manifest.
-        workdir (str or None): Optional working directory to prefix FASTA paths.
+        fasta_root (str or None): Optional root directory for relative FASTA paths.
     Returns:
         Tuple[str, str]:
             - assembly_name (str): Parsed value of ASSEMBLYNAME.
-            - manifest_for_submission (str): Path to the (possibly updated) manifest file.
+            - manifest_for_submission (str): Path to the manifest file.
     Raises:
         ManifestValidationError: If manifest validation fails or FASTA file not found.
     """
     manifest_path = Path(manifest_file)
+    logger.debug(f"Checking manifest file {manifest_path} with fasta_root={fasta_root}")
     if not manifest_path.exists():
         logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
@@ -309,25 +333,19 @@ def check_manifest(manifest_file: str, workdir: Optional[str]) -> Tuple[str, str
     if not fasta_path:
         logger.error(f"FASTA field not found in {manifest_path}")
         raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
-    # Validate FASTA file exists (if absolute path or workdir provided)
+    # Validate FASTA file exists when the manifest uses an absolute path or fasta_root is provided
     if fasta_path.is_absolute():
+        logger.debug(f"FASTA path is absolute: {fasta_path}")
         if not fasta_path.exists():
             logger.error(f"FASTA file not found: {fasta_path}")
             raise ManifestValidationError(f"FASTA file not found: {fasta_path}")
-    elif workdir:
-        # Check if FASTA exists relative to workdir
-        full_fasta_path = Path(workdir) / fasta_path
+    elif fasta_root:
+        full_fasta_path = Path(fasta_root) / fasta_path
+        logger.debug(f"Resolved FASTA path using fasta_root: {full_fasta_path}")
         if not full_fasta_path.exists():
             logger.error(f"FASTA file not found: {full_fasta_path}")
             raise ManifestValidationError(f"FASTA file not found: {full_fasta_path}")
-
-        manifest_dict["FASTA"] = str(full_fasta_path)
-        updated_manifest_path = manifest_path.parent / f"updated_{manifest_path.name}"
-        with open(updated_manifest_path, "w") as f:
-            for key, value in manifest_dict.items():
-                f.write(f"{key}\t{value}\n")
-        logger.info(f"New manifest {updated_manifest_path} was created with absolute paths")
-        return assembly_name, str(updated_manifest_path)
+    logger.debug(f"Manifest check complete: {manifest_file}")
     return assembly_name, manifest_file
 
 
@@ -337,6 +355,8 @@ def get_webin_cli_command(
     webin: str,
     mode: str,
     test: bool,
+    output_dir: str,
+    fasta_root: Optional[str] = None,
     jar: Optional[str] = None,
     java_heap_size_initial: Optional[int] = None,
     java_heap_size_max: Optional[int] = None,
@@ -351,6 +371,8 @@ def get_webin_cli_command(
         password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
+        output_dir (str): Directory where webin-cli writes output files.
+        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
         java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
@@ -389,12 +411,53 @@ def get_webin_cli_command(
             )
 
     # Add webin-cli arguments
-    cmd += [f"-context={context}", f"-manifest={manifest}", f"-userName={webin}", f"-passwordEnv={ENA_WEBIN_PASSWORD}", f"-{mode}"]
+    cmd += [
+        f"-context={context}",
+        f"-manifest={manifest}",
+        f"-userName={webin}",
+        f"-passwordEnv={ENA_WEBIN_PASSWORD}",
+        f"-outputDir={output_dir}",
+        f"-{mode}",
+    ]
 
     if test:
         cmd.append("-test")
 
+    if fasta_root:
+        cmd.append(f"-inputDir={fasta_root}")
+
     return cmd
+
+
+def prepare_output_dir(manifest: str, assembly_name: str, outdir: Optional[str] = None) -> str:
+    """
+    Creates a timestamped output directory for each submission made by webin-cli.
+
+    Args:
+        manifest (str): Path to manifest file.
+        assembly_name (str): Assembly name from manifest ASSEMBLYNAME field.
+        outdir (Optional[str]): Base output directory. Defaults to manifest parent directory.
+
+    Returns:
+        str: Path to the created output directory.
+
+    Raises:
+        ValueError: If output path exists but is not a directory.
+    """
+    # If outdir is not provided, use the parent directory of the manifest because it is a default behaviour of webin-cli
+    output_root = Path(outdir) if outdir else Path(manifest).parent
+
+    # We need to have separate folder for each submission, otherwise webin-cli may produce no output files
+    # when resubmitting an existing assembly and if output folder already exists and contains files
+    timestamp = time.strftime("%d-%b-%y_%H%M%S")  # Format: 10-Apr-26_142315
+    output_dir = output_root / f"{assembly_name}_{timestamp}"
+
+    if output_dir.exists() and output_dir.is_dir():
+        logger.warning(f"Output directory already exists: {output_dir}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    logger.debug(f"Created output directory for webin-cli: {output_dir}")
+    return str(output_dir)
 
 
 def run_webin_cli(
@@ -403,6 +466,8 @@ def run_webin_cli(
     webin: str,
     mode: str,
     test: bool,
+    output_dir: str,
+    fasta_root: Optional[str] = None,
     jar: Optional[str] = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
@@ -419,6 +484,8 @@ def run_webin_cli(
         password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
+        output_dir (str): Directory where webin-cli writes output files.
+        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
@@ -455,7 +522,7 @@ def run_webin_cli(
                 redacted.append(token)
         return " ".join(redacted)
 
-    cmd = get_webin_cli_command(manifest, context, webin, mode, test, jar, java_heap_size_initial, java_heap_size_max)
+    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, fasta_root, jar, java_heap_size_initial, java_heap_size_max)
     logger.info(f"Command: {redact_command(cmd)}")
 
     for attempt in range(1, retries + 1):
@@ -468,13 +535,17 @@ def run_webin_cli(
             text=True,
             env=os.environ.copy(),
         )
+        combined_log = get_combined_log(result)
+        logger.debug(
+            f"webin-cli process finished with return code {result.returncode}, stdout_len={len(result.stdout or '')}, stderr_len={len(result.stderr or '')}"
+        )
+        logger.debug("ena-webin-cli output:\n" + combined_log)
 
         if result.returncode == 0:
             logger.info("✅ Command completed successfully")
             return result  # success
 
         logger.warning(f"❌ ena-webin-cli exited with non-zero code {result.returncode}")
-        combined_log = get_combined_log(result)
 
         if "Invalid submission account user name or password." in combined_log:
             logger.error("💥 Invalid credentials for Webin account - not retrying")
@@ -490,6 +561,7 @@ def run_webin_cli(
         if attempt < retries:
             sleep_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
             logger.warning(f"🔁 Retrying in {sleep_time} seconds...")
+            logger.debug(f"Retry backoff details: attempt={attempt}, max_retries={retries}, sleep_time={sleep_time}")
             time.sleep(sleep_time)
         else:
             logger.error("💥 All retries failed.")
@@ -527,9 +599,15 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
         check_submission_status_test("Error: validation failed")
         (False, False)
     """
+    logger.debug("Evaluating TEST server submission report content")
     if "This was a TEST submission(s)." not in report_text:
         logger.info("Submission failed on TEST server")
         return False, False
+
+    # TODO: discuss with ENA team if test server should return consistent messaging for resubmissions
+    if "object being added already exists in the submission account with accession" in report_text.lower():
+        logger.info("Submitted object already exists on TEST server")
+        return True, True
 
     # Check for resubmission: minimal report with only success message
     # For resubmissions, report contains only "This was a TEST submission(s)." without details
@@ -580,6 +658,7 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         (False, False)
     """
     is_resubmission = False
+    logger.debug("Evaluating MAIN server submission report content")
     if "submission has been completed successfully" in report_text:
         logger.info("Successfully submitted object on MAIN server")
         return True, is_resubmission
@@ -590,6 +669,32 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
     else:
         logger.info("Submission failed on MAIN server")
         return False, is_resubmission
+
+
+def parse_accession_from_report(report_filepath: Path) -> Optional[str]:
+    """Extract a unique assembly accession from a webin-cli report file.
+
+    Args:
+        report_filepath (Path): Path to a webin-cli report file.
+
+    Returns:
+        Optional[str]:
+            - A single unique accession when exactly one unique match is present.
+            - None when there are no matches or multiple unique matches.
+    """
+    report_text = report_filepath.read_text()
+    unique_matches = sorted(set(re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)))
+
+    if not unique_matches:
+        logger.warning(f"No accession found in {report_filepath}")
+        return None
+
+    if len(unique_matches) > 1:
+        logger.warning(f"Multiple accessions found in {report_filepath}: {','.join(unique_matches)}")
+        return None
+
+    accession = unique_matches[0]
+    return accession
 
 
 def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool]:
@@ -624,16 +729,17 @@ def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool
     logger.info(f"Checking webin report {report_path}")
 
     if not report_path.exists():
-        logger.warning(f"⚠️ Report file not found: {report_path}")
+        logger.error(f"⚠️ Report file not found: {report_path}")
         return False, False
 
     report_text = report_path.read_text()
-
-    assembly_accession_match_list = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-    if assembly_accession_match_list:
-        logger.info(f"Assigned accessions: {','.join(assembly_accession_match_list)}")
+    logger.debug(f"Report content:\n{report_text}")
 
     if mode == "submit":
+        accession = parse_accession_from_report(report_path)
+        if not accession:
+            logger.error(f"No accession found in report: {report_path}")
+            return False, False
         if test:
             return check_submission_status_test(report_text)
         else:
@@ -671,6 +777,7 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
         status and don't verify output files, since webin-cli may not regenerate them.
     """
     success, is_resubmission = check_report(result_location, mode, test)
+    logger.debug(f"Result status after report parsing: success={success}, is_resubmission={is_resubmission}, mode={mode}, context={context}")
 
     if not success:
         logger.info("Command failed. Check logs")
@@ -708,28 +815,94 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
     return True
 
 
-def write_assigned_accessions(result_location: str, output_accessions: str, assembly_name: str) -> None:
+def resolve_manifests(manifest_input: str) -> List[str]:
     """
-    Write assigned assembly accession(s) from webin-cli report into a TSV file.
+    Resolve a manifest argument to a list of manifest file paths.
+
+    Accepts either a single manifest file or a directory containing manifest files
+    (matched by the ``*.manifest`` glob pattern).
 
     Args:
-        result_location (str): Directory where webin-cli.report is located.
-        output_accessions (str): Path to output TSV file.
-        assembly_name (str): Assembly alias/name to write in the TSV.
+        manifest_input (str): Path to a manifest file or a directory of manifests.
+
+    Returns:
+        List[str]: Sorted list of manifest file paths.
+
+    Raises:
+        ManifestValidationError: If the input is neither a file nor a directory,
+            or if a directory contains no ``*.manifest`` files.
     """
-    report_path = Path(result_location) / REPORT_FILE
-    report_text = report_path.read_text()
-    accessions = re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)
-    if accessions and len(accessions) == 1:
-        output_file = Path(output_accessions)
-        with open(output_file, "w", newline="") as tsv_out:
-            writer = csv.writer(tsv_out, delimiter="\t")
-            writer.writerow(["alias", "accession"])
-            for accession in accessions:
-                writer.writerow([assembly_name, accession])
-        logger.info(f"Assigned accession written to {output_file}")
+    path = Path(manifest_input)
+    logger.debug(f"Resolving manifest input: {manifest_input}")
+    if path.is_file():
+        return [str(path)]
+    elif path.is_dir():
+        manifests = sorted(path.glob("*.manifest"))
+        if not manifests:
+            raise ManifestValidationError(f"No .manifest files found in directory: {path}")
+        return [str(m) for m in manifests]
     else:
-        logger.warning(f"No accession found in {REPORT_FILE} or multiple accessions assigned, skipping writing output file.")
+        raise ManifestValidationError(f"Invalid manifest input '{manifest_input}': must be a single manifest file or a directory of manifest files.")
+
+
+def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str) -> None:
+    """
+    Write assigned assembly accessions for all successful submissions to a TSV file.
+
+    This implementation rewrites the full TSV on each call using an atomic replace pattern (write to .tmp, then replace).
+    It is safer than writing in "append" mode and keeps a complete table of successful submissions for resume safety.
+    The tradeoff is redundant I/O growth (O(n²) complexity) over long runs (about 5 seconds cumulative write time
+    and about 600 MB redundant writes for 5000 submissions).
+    TODO: consider switching to buffered checkpoints (flush every N successes) or other more efficient persistence method.
+
+    Args:
+        accessions (Dict[str, str]): Mapping of assembly name to accession.
+        output_accessions (str): Path to output TSV file (overwritten each run).
+    """
+    logger.debug(f"Preparing to write accessions table to {output_accessions}")
+    if not accessions:
+        logger.warning("No accessions to write.")
+        return
+    output_file = Path(output_accessions)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    tmp_output = output_file.with_suffix(output_file.suffix + ".tmp")
+    with open(tmp_output, "w", newline="") as tsv_out:
+        writer = csv.writer(tsv_out, delimiter="\t")
+        writer.writerow(["alias", "accession"])
+        for assembly_name, accession in accessions.items():
+            writer.writerow([assembly_name, accession])
+    tmp_output.replace(output_file)
+    logger.debug(f"Assigned accessions written to {output_file}")
+
+
+def load_assigned_accessions(output_accessions: str) -> Dict[str, str]:
+    """
+    Load previously written accessions TSV, if present.
+
+    Args:
+        output_accessions (str): Path to the TSV file containing previously assigned accessions.
+
+    Returns:
+        Dict[str, str]: Mapping of assembly name to accession.
+    """
+    output_file = Path(output_accessions)
+    if not output_file.exists():
+        return {}
+
+    loaded: Dict[str, str] = {}
+    try:
+        with open(output_file, "r", newline="") as tsv_in:
+            reader = csv.DictReader(tsv_in, delimiter="\t")
+            for row in reader:
+                alias = row["alias"]
+                accession = row["accession"]
+                loaded[alias] = accession
+    except Exception as exc:
+        logger.warning(f"Failed to read existing accessions file {output_file}: {exc}")
+        return {}
+
+    logger.info(f"Loaded {len(loaded)} previously written accession(s) from {output_file}")
+    return loaded
 
 
 def main() -> int:
@@ -741,13 +914,19 @@ def main() -> int:
     """
     try:
         args = parse_arguments()
+        configure_logging(debug=args.debug)
+        logger.debug(
+            f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, resume={args.resume}, "
+            f"fasta_dir={args.fasta_dir}, outdir={args.outdir}, output_accessions={args.output_accessions}, download_webin_cli={args.download_webin_cli}, "
+            f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
+            f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
+            f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"
+        )
 
         if args.download_webin_cli:
             download_webin_cli(version=args.download_webin_cli_version, dest_dir=args.download_webin_cli_directory)
 
         webin = get_webin_credentials()
-
-        assembly_name, manifest_for_submission = check_manifest(args.manifest, args.workdir)
 
         # pick execution method for webin-cli
         execute_jar = None
@@ -756,36 +935,62 @@ def main() -> int:
         elif args.webin_cli_jar:
             execute_jar = args.webin_cli_jar
 
-        run_webin_cli(
-            manifest=manifest_for_submission,
-            context=args.context,
-            webin=webin,
-            mode=args.mode,
-            test=args.test,
-            jar=execute_jar,
-            retries=args.retries,
-            retry_delay=args.retry_delay,
-            java_heap_size_initial=args.java_heap_size_initial,
-            java_heap_size_max=args.java_heap_size_max,
-        )
+        manifests = resolve_manifests(args.manifest)
+        logger.info(f"Resolved {len(manifests)} manifest(s) for processing")
 
-        result_location = str(Path(manifest_for_submission).parent)
-        result_status = check_result(
-            result_location=result_location, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
-        )
+        failed_manifests = []
+        accessions_to_write: Dict[str, str] = {}
+        if args.mode == "submit" and args.resume:
+            accessions_to_write = load_assigned_accessions(args.output_accessions)
+            aliases_to_skip = set(accessions_to_write.keys())
 
-        if result_status:
-            if args.mode == "submit":
-                write_assigned_accessions(
-                    result_location=result_location,
-                    output_accessions=args.output_accessions,
-                    assembly_name=assembly_name,
-                )
-            logger.info(f"Submission/validation done for {manifest_for_submission}")
-            return 0
-        else:
-            logger.error(f"Submission/validation failed for {manifest_for_submission}")
+        for manifest in manifests:
+            logger.debug(f"Starting submission loop for manifest: {manifest}")
+            assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir)
+            if args.mode == "submit" and args.resume and assembly_name in aliases_to_skip:
+                logger.info(f"Skipping {assembly_name}: already present in accessions file with accession {accessions_to_write[assembly_name]}")
+                continue
+            output_dir = prepare_output_dir(manifest_for_submission, assembly_name, args.outdir)
+            run_webin_cli(
+                manifest=manifest_for_submission,
+                context=args.context,
+                webin=webin,
+                mode=args.mode,
+                test=args.test,
+                output_dir=output_dir,
+                fasta_root=args.fasta_dir,
+                jar=execute_jar,
+                retries=args.retries,
+                retry_delay=args.retry_delay,
+                java_heap_size_initial=args.java_heap_size_initial,
+                java_heap_size_max=args.java_heap_size_max,
+            )
+
+            logger.debug(f"Result location for manifest {manifest_for_submission}: {output_dir}")
+            result_status = check_result(
+                result_location=output_dir, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
+            )
+
+            if result_status:
+                if args.mode == "submit":
+                    accession = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
+                    if accession:
+                        logger.info(f"Assigned accession for {assembly_name}: {accession}")
+                        accessions_to_write[assembly_name] = accession
+                        # Persist progress immediately so long-running runs can resume after interruption
+                        write_assigned_accessions(accessions_to_write, args.output_accessions)
+                logger.info(f"Submission/validation done for {manifest_for_submission}")
+            else:
+                logger.error(f"Submission/validation failed for {manifest_for_submission}")
+                failed_manifests.append(manifest_for_submission)
+
+        if args.mode == "submit":
+            logger.debug(f"Submission mode complete with {len(accessions_to_write)} accession(s) captured")
+
+        if failed_manifests:
+            logger.error(f"There are failed submissions for manifests: {','.join(failed_manifests)}")
             return 1
+        return 0
 
     except WebinCredentialsError as e:
         logger.error(f"Credentials error: {e}")

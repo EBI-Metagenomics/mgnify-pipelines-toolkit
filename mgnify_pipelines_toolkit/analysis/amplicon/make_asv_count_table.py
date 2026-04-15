@@ -308,7 +308,6 @@ def main():
         if f"seq_{line_fwd}" not in asv_list:
             if not skip_unclassified and headers[counter] in amp_reads:
                 unclassified_count += 1
-            continue
 
         if headers[counter] in amp_reads:
             asv_dict[f"seq_{line_fwd}"] += 1

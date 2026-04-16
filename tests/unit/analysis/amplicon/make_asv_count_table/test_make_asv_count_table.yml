@@ -11,8 +11,29 @@
     - make_asv_count_table
   command: make_asv_count_table -t tests/fixtures/asv_count_table/test_taxa.tsv -f tests/fixtures/asv_count_table/test_1_map.txt -a tests/fixtures/asv_count_table/test.concat.txt -hd tests/fixtures/asv_count_table/headers.txt -s sample
   files:
-    - path: "sample_concat.txt_PR2_asv_krona_counts.txt"
-      md5sum: 5b9ee7fe1109d728ab18a95c232b0c1b
     - path: "sample_concat.txt_asv_read_counts.tsv"
       contains:
       - "seq_2\t641"
+- name: make_asv_count_table test_unclassified_default
+  tags:
+    - make_asv_count_table
+  command: make_asv_count_table -t tests/fixtures/asv_count_table_unclassified/mini_taxa.tsv -f tests/fixtures/asv_count_table_unclassified/mini_map.txt -a tests/fixtures/asv_count_table_unclassified/mini.concat.txt -hd tests/fixtures/asv_count_table_unclassified/mini_headers.txt -s sample_unc
+  files:
+    - path: "sample_unc_concat.txt_asv_read_counts.tsv"
+      contains:
+        - "seq_3\t1"
+        - "seq_4\t1"
+    - path: "sample_unc_concat.txt_PR2_asv_krona_counts.txt"
+      contains:
+        - "3\tunclassified"
+      must_not_contain:
+        - "seq_3"
+        - "seq_4"
+- name: make_asv_count_table test_skip_unclassified
+  tags:
+    - make_asv_count_table
+  command: make_asv_count_table -t tests/fixtures/asv_count_table_unclassified/mini_taxa.tsv -f tests/fixtures/asv_count_table_unclassified/mini_map.txt -a tests/fixtures/asv_count_table_unclassified/mini.concat.txt -hd tests/fixtures/asv_count_table_unclassified/mini_headers.txt -s sample_skip --skip-unclassified
+  files:
+    - path: "sample_skip_concat.txt_PR2_asv_krona_counts.txt"
+      must_not_contain:
+        - "unclassified"

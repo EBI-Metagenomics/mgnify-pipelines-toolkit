@@ -43,6 +43,13 @@ def parse_args():
     parser.add_argument("-hd", "--headers", required=True, type=str, help="Path to fastq headers")
     parser.add_argument("-s", "--sample", required=True, type=str, help="Sample ID")
 
+    parser.add_argument(
+        "--skip-unclassified",
+        action="store_true",
+        default=False,
+        help="Do not include an unclassified entry for ASVs with no taxonomy assignment",
+    )
+
     args = parser.parse_args()
 
     taxa = args.taxa
@@ -50,8 +57,9 @@ def parse_args():
     amp = args.amp
     headers = args.headers
     sample = args.sample
+    skip_unclassified = args.skip_unclassified
 
-    return taxa, fwd, amp, headers, sample
+    return taxa, fwd, amp, headers, sample, skip_unclassified
 
 
 def order_df(taxa_df: pd.DataFrame, ref_db: str) -> pd.DataFrame:
@@ -64,8 +72,9 @@ def order_df(taxa_df: pd.DataFrame, ref_db: str) -> pd.DataFrame:
     return taxa_df
 
 
-def make_tax_assignment_dict_silva(taxa_df: pd.DataFrame, asv_dict: defaultdict) -> defaultdict:
+def make_tax_assignment_dict_silva(taxa_df: pd.DataFrame, asv_dict: defaultdict, skip_unclassified: bool = False) -> tuple[defaultdict, int]:
     tax_assignment_dict = defaultdict(int)
+    unclassified_count = 0
 
     for i in range(len(taxa_df)):
         sorted_index = taxa_df.index[i]
@@ -137,15 +146,18 @@ def make_tax_assignment_dict_silva(taxa_df: pd.DataFrame, asv_dict: defaultdict)
             break
 
         if tax_assignment == "":
+            if not skip_unclassified:
+                unclassified_count += asv_count
             continue
 
         tax_assignment_dict[tax_assignment] += asv_count
 
-    return tax_assignment_dict
+    return tax_assignment_dict, unclassified_count
 
 
-def make_tax_assignment_dict_pr2(taxa_df: pd.DataFrame, asv_dict: defaultdict) -> defaultdict:
+def make_tax_assignment_dict_pr2(taxa_df: pd.DataFrame, asv_dict: defaultdict, skip_unclassified: bool = False) -> tuple[defaultdict, int]:
     tax_assignment_dict = defaultdict(int)
+    unclassified_count = 0
 
     for i in range(len(taxa_df)):
         sorted_index = taxa_df.index[i]
@@ -222,11 +234,13 @@ def make_tax_assignment_dict_pr2(taxa_df: pd.DataFrame, asv_dict: defaultdict) -
             break
 
         if tax_assignment == "":
+            if not skip_unclassified:
+                unclassified_count += asv_count
             continue
 
         tax_assignment_dict[tax_assignment] += asv_count
 
-    return tax_assignment_dict
+    return tax_assignment_dict, unclassified_count
 
 
 def generate_asv_count_df(asv_dict: defaultdict) -> pd.DataFrame:
@@ -247,7 +261,7 @@ def generate_asv_count_df(asv_dict: defaultdict) -> pd.DataFrame:
 
 
 def main():
-    taxa, fwd, amp, headers, sample = parse_args()
+    taxa, fwd, amp, headers, sample, skip_unclassified = parse_args()
 
     fwd_fr = open(fwd, "r")
 
@@ -281,6 +295,7 @@ def main():
     amp_region = ".".join(amp.split(".")[1:3])
 
     asv_dict = defaultdict(int)
+    unclassified_count = 0
 
     counter = -1
     for line_fwd in fwd_fr:
@@ -288,20 +303,29 @@ def main():
         counter += 1
         line_fwd = line_fwd.strip()
 
-        if line_fwd == "0" or f"seq_{line_fwd}" not in asv_list:
+        if line_fwd == "0":
             continue
+        if f"seq_{line_fwd}" not in asv_list:
+            if not skip_unclassified and headers[counter] in amp_reads:
+                unclassified_count += 1
 
         if headers[counter] in amp_reads:
             asv_dict[f"seq_{line_fwd}"] += 1
 
     fwd_fr.close()
 
-    if asv_dict:  # if there are matches between taxonomic and ASV annotations
+    if asv_dict or unclassified_count:  # if there are matches between taxonomic and ASV annotations
         logging.info(f"Number of ASVs after matching to amp region reads: {len(asv_dict)}")
+        tax_assignment_dict: defaultdict = defaultdict(int)
+        unclassified_from_taxa = 0
         if ref_db == "SILVA":
-            tax_assignment_dict = make_tax_assignment_dict_silva(taxa_df, asv_dict)
+            tax_assignment_dict, unclassified_from_taxa = make_tax_assignment_dict_silva(taxa_df, asv_dict, skip_unclassified)
         elif ref_db == "PR2":
-            tax_assignment_dict = make_tax_assignment_dict_pr2(taxa_df, asv_dict)
+            tax_assignment_dict, unclassified_from_taxa = make_tax_assignment_dict_pr2(taxa_df, asv_dict, skip_unclassified)
+
+        total_unclassified = unclassified_count + unclassified_from_taxa
+        if not skip_unclassified and total_unclassified > 0:
+            tax_assignment_dict["unclassified"] = total_unclassified
 
         logging.info(f"Number of unique taxa being written to output: {len(tax_assignment_dict)}")
 

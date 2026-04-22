@@ -17,6 +17,7 @@
 import argparse
 import csv
 import hashlib
+import io
 import logging
 import re
 import sys
@@ -54,9 +55,9 @@ def get_contig_id(protein_id):
 def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
     writer = csv.writer(output_handler, delimiter="\t")
     writer.writerow(["contig_id", "protein_id", "protein_hash", "rhea_id", "chebi_reaction", "reaction", "top_hit"])
+    reader = csv.reader(lines, delimiter="\t")
     current_protein = None
-    for line in lines:
-        parts = line.strip().split("\t")
+    for parts in reader:
         protein_id = parts[0]
         if protein_id != current_protein:
             current_protein = protein_id
@@ -138,11 +139,12 @@ def main():
     rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
 
     logging.info(f"Step 3/3: Read DIAMOND results from {'STDIN' if diamond_hits == '-' else Path(diamond_hits).resolve()} and write output")
-    with open(output, "w") as output_handler:
+    with open(output, "w", newline="") as output_handler:
         if diamond_hits == "-":
-            process_lines(sys.stdin, output_handler, rhea2reaction_dict, protein_hashes)
+            stdin = io.TextIOWrapper(sys.stdin.buffer, newline="")
+            process_lines(stdin, output_handler, rhea2reaction_dict, protein_hashes)
         else:
-            with open(diamond_hits, "r") as input_file:
+            with open(diamond_hits, "r", newline="") as input_file:
                 process_lines(input_file, output_handler, rhea2reaction_dict, protein_hashes)
 
     logging.info("Processed successfully. Exiting.")

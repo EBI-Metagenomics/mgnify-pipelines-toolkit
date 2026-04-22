@@ -10,7 +10,7 @@
   exit_code: 0
   files:
     - path: "short_test.tsv"
-      md5sum: 9daf1e1ece3250d3174b414ac33a2045
+      md5sum: 9d46b9f35bcd6ab86eeec429bb86b860
 
 - name: Add Rhea and CHEBI annotation test (STDIN)
   tags:
@@ -25,7 +25,7 @@
   exit_code: 0
   files:
     - path: "short_test.tsv"
-      md5sum: 9daf1e1ece3250d3174b414ac33a2045
+      md5sum: 9d46b9f35bcd6ab86eeec429bb86b860
 
 - name: Add Rhea and CHEBI annotation ValueError on unparseable protein ID
   tags:

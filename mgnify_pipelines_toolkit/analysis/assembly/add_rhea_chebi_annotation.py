@@ -19,12 +19,13 @@ import csv
 import hashlib
 import io
 import logging
-import re
 import sys
 from pathlib import Path
 
 from Bio import SeqIO
 import pandas as pd
+
+from mgnify_pipelines_toolkit.analysis.shared.proteins.parsers import FGS_PROTEIN_ID_REGEX, PRODIGAL_PROTEIN_ID_REGEX
 
 
 logging.basicConfig(
@@ -32,11 +33,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler()],
 )
-
-# Prodigal: e.g. ERZ23299386_269_1  -> contig ERZ23299386_269
-PRODIGAL_PROTEIN_ID_REGEX = re.compile(r"^(?P<contig_id>.+)_\d+$")
-# FragGeneScan: e.g. ERZ23299386_51568_313_771_+  -> contig ERZ23299386_51568
-FGS_PROTEIN_ID_REGEX = re.compile(r"^(?P<contig_id>.+)_\d+_\d+_[+-]$")
 
 
 def get_contig_id(protein_id):

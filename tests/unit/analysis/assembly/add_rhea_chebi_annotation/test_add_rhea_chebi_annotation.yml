@@ -10,7 +10,7 @@
   exit_code: 0
   files:
     - path: "short_test.tsv"
-      md5sum: cbc725c9af469858b8ed48eb23ebbd40
+      md5sum: 9d46b9f35bcd6ab86eeec429bb86b860
 
 - name: Add Rhea and CHEBI annotation test (STDIN)
   tags:
@@ -25,4 +25,16 @@
   exit_code: 0
   files:
     - path: "short_test.tsv"
-      md5sum: cbc725c9af469858b8ed48eb23ebbd40
+      md5sum: 9d46b9f35bcd6ab86eeec429bb86b860
+
+- name: Add Rhea and CHEBI annotation ValueError on unparseable protein ID
+  tags:
+    - add_rhea_chebi_annotation
+  command: >
+    bash -c "printf '>BADFORMAT\nMKT\n' > proteins_bad.faa;
+    printf 'BADFORMAT\tUniRef90_X\t1e-5\t90\tUniRef90_X foo RheaID=RHEA:11708\n' > diamond_bad.tsv;
+    add_rhea_chebi_annotation -p proteins_bad.faa -o bad_out.tsv -d diamond_bad.tsv --rhea2chebi tests/fixtures/diamond/rhea2chebi_short.tsv"
+  exit_code: 1
+  stderr:
+    contains:
+      - "Could not parse contig_id from protein_id 'BADFORMAT'"

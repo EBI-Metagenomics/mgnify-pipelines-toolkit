@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+# Copyright 2025-2026 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
 # limitations under the License.
 
 import argparse
+import csv
 import hashlib
+import io
 import logging
 import sys
 from pathlib import Path
 
 from Bio import SeqIO
 import pandas as pd
+
+from mgnify_pipelines_toolkit.analysis.shared.proteins.parsers import FGS_PROTEIN_ID_REGEX, PRODIGAL_PROTEIN_ID_REGEX
 
 
 logging.basicConfig(
@@ -31,33 +35,49 @@ logging.basicConfig(
 )
 
 
+def get_contig_id(protein_id):
+    for regex in (FGS_PROTEIN_ID_REGEX, PRODIGAL_PROTEIN_ID_REGEX):
+        match = regex.match(protein_id)
+        if match:
+            return match.group("contig_id")
+
+    raise ValueError(
+        f"Could not parse contig_id from protein_id '{protein_id}': "
+        f"does not match Prodigal pattern '{PRODIGAL_PROTEIN_ID_REGEX.pattern}' "
+        f"or FragGeneScan pattern '{FGS_PROTEIN_ID_REGEX.pattern}'."
+    )
+
+
 def process_lines(lines, output_handler, rhea2reaction_dict, protein_hashes):
+    writer = csv.writer(output_handler, delimiter="\t")
+    writer.writerow(["contig_id", "protein_id", "protein_hash", "rhea_id", "chebi_reaction", "reaction", "top_hit"])
+    reader = csv.reader(lines, delimiter="\t")
     current_protein = None
-    for line in lines:
-        parts = line.strip().split("\t")
+    for parts in reader:
         protein_id = parts[0]
         if protein_id != current_protein:
             current_protein = protein_id
             protein_rheas = set()
-        rhea_list = parts[-1].split("RheaID=")[1].split()
-        top_hit = "top hit" if rhea_list and not protein_rheas else ""
+        rhea_list = parts[-1].split("RheaID=")[1].strip('"').split()
+        # Top hit is True if the current match is the first (most significant) one according to DIAMOND
+        top_hit = rhea_list and not protein_rheas
 
         for rhea in rhea_list:
             if rhea not in protein_rheas:
                 chebi_reaction, reaction = rhea2reaction_dict[rhea]
-                contig_id = protein_id.split("_")[0]
+                contig_id = get_contig_id(protein_id)
                 protein_hash = protein_hashes[protein_id]
 
-                print(
-                    contig_id,
-                    protein_id,
-                    protein_hash,
-                    rhea,
-                    chebi_reaction,
-                    reaction,
-                    top_hit,
-                    sep="\t",
-                    file=output_handler,
+                writer.writerow(
+                    [
+                        contig_id,
+                        protein_id,
+                        protein_hash,
+                        rhea,
+                        chebi_reaction,
+                        reaction,
+                        top_hit,
+                    ]
                 )
                 protein_rheas.add(rhea)
 
@@ -78,8 +98,8 @@ def main():
         type=Path,
         help=(
             "Output TSV file with columns: contig_id, protein_id, protein hash, "
-            "Rhea IDs, CHEBI reaction, reaction definition, 'top hit' if it is "
-            "the first hit for the protein"
+            "Rhea IDs, CHEBI reaction, reaction definition, 'True' if it is the top hit according to DIAMOND, "
+            "'False' otherwise"
         ),
     )
     parser.add_argument(
@@ -115,11 +135,12 @@ def main():
     rhea2reaction_dict = dict(zip(df["ENTRY"], zip(df["EQUATION"], df["DEFINITION"])))
 
     logging.info(f"Step 3/3: Read DIAMOND results from {'STDIN' if diamond_hits == '-' else Path(diamond_hits).resolve()} and write output")
-    with open(output, "w") as output_handler:
+    with open(output, "w", newline="") as output_handler:
         if diamond_hits == "-":
-            process_lines(sys.stdin, output_handler, rhea2reaction_dict, protein_hashes)
+            stdin = io.TextIOWrapper(sys.stdin.buffer, newline="")
+            process_lines(stdin, output_handler, rhea2reaction_dict, protein_hashes)
         else:
-            with open(diamond_hits, "r") as input_file:
+            with open(diamond_hits, "r", newline="") as input_file:
                 process_lines(input_file, output_handler, rhea2reaction_dict, protein_hashes)
 
     logging.info("Processed successfully. Exiting.")

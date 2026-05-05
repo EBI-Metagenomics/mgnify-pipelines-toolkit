@@ -438,6 +438,9 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         else:
             logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with mapseq file missing. Skipping.")
             continue
+        if mapseq_file.stat().st_size == 0:
+            logging.info(f"Run {run_acc}'s mapseq file {mapseq_file} exists but is empty. Skipping.")
+            continue
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
@@ -448,6 +451,10 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         else:
             logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with asv tax file missing. Skipping.")
             continue
+        if tax_file.stat().st_size == 0:
+            logging.info(f"Run {run_acc}'s tax file {tax_file} exists but is empty. Skipping.")
+            continue
+
         run_tax_df = pd.read_csv(tax_file, sep="\t")
 
         # ASV read count files
@@ -463,6 +470,10 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         else:
             logging.info(f"Run {run_acc} does not seem to have ASV FASTA sequence file. Skipping.")
             continue
+        if asv_fasta_file.stat().st_size == 0:
+            logging.info(f"Run {run_acc}'s asv_fasta file {asv_fasta_file} exists but is empty. Skipping.")
+            continue
+
         fasta = pyfastx.Fasta(str(asv_fasta_file), build_index=False)
         asv_fasta_dict = {name: seq for name, seq in fasta}
         asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
@@ -471,10 +482,16 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         count_dfs = []
 
         for count_file in count_files:
+            if count_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s count file {count_files} exists but is empty. Skipping.")
+                continue
             amp_region = count_file.stem.split("_")[1]
             count_df = pd.read_csv(count_file, sep="\t")
             count_df["amplifiedRegion"] = [amp_region] * len(count_df)
             count_dfs.append(count_df)
+        if not count_dfs:
+            logging.info(f"Run {run_acc}'s count dataframe {count_files} is empty. Skipping.")
+            continue
 
         # Merge counts into one DF in case there are multiple amplified regions...
         all_amplified_regions_count_df = pd.concat(count_dfs)
@@ -545,6 +562,9 @@ def get_closedref_dict(
             kronatxt_file = kronatxt_file[0]
         else:
             logging.info(f"Run {run_acc} doesn't have closed-reference results for DB {db}, skipping it.")
+            continue
+        if kronatxt_file.stat().st_size == 0:
+            logging.info(f"Run {run_acc}'s krona txt file {kronatxt_file} exists but is empty. Skipping.")
             continue
 
         column_names = ["count"] + ranks

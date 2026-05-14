@@ -63,11 +63,13 @@ class DownloadError(Exception):
 ENA_WEBIN = "ENA_WEBIN"
 ENA_WEBIN_PASSWORD = "ENA_WEBIN_PASSWORD"
 REPORT_FILE = "webin-cli.report"
-WEBIN_SUBMISSION_RESULT_FILES = ["analysis.xml", "receipt.xml", "submission.xml", "webin-submission.xml"]
+WEBIN_SUBMISSION_RESULT_FILES = ["receipt.xml", "submission.xml", "webin-submission.xml"]
 RETRIES = 3
 RETRY_DELAY = 5
 INSDC_CENTRE_PREFIXES = "EDS"
 ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
+ENA_RUN_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RR[0-9]{{6,}})"
+ENA_EXPERIMENT_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RX[0-9]{{6,}})"
 
 
 logger = logging.getLogger(__name__)
@@ -271,7 +273,7 @@ def get_webin_credentials() -> str:
     return webin
 
 
-def parse_manifest(manifest_path: Path) -> dict[str, str]:
+def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
     """
     Parse manifest file to extract ASSEMBLYNAME, FASTA file path, and other fields into dict.
     Example:
@@ -288,7 +290,7 @@ def parse_manifest(manifest_path: Path) -> dict[str, str]:
     Args:
         manifest_path (Path): Path to the manifest file.
     Returns:
-        Dict[str, str]:
+        Dict[str, str | list[str]]:
             - keys: field names from the manifest
             - values: corresponding values from the manifest
     """
@@ -302,51 +304,64 @@ def parse_manifest(manifest_path: Path) -> dict[str, str]:
             if len(parts) != 2:
                 continue  # skip malformed lines
             field, value = parts
-            manifest_dict[field] = value
+            # For reads manifest, we can have multiple FASTQ lines, so we store them in a list
+            if field == "FASTQ":
+                if "FASTQ" not in manifest_dict:
+                    manifest_dict["FASTQ"] = []
+                manifest_dict["FASTQ"].append(value)
+            else:
+                manifest_dict[field] = value
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, fasta_root: Optional[str]) -> Tuple[str, str]:
+def check_manifest(manifest_file: str, fasta_root: Optional[str], context: str) -> Tuple[str, str]:
     """
-    Validate a manifest file and ensure referenced FASTA file is accessible.
+    Validate a manifest file and ensure referenced data file(s) are accessible.
     Args:
         manifest_file (str): Path to the original manifest.
         fasta_root (str or None): Optional root directory for relative FASTA paths.
+        context (str): Submission context (e.g. genome, reads).
     Returns:
         Tuple[str, str]:
-            - assembly_name (str): Parsed value of ASSEMBLYNAME.
+            - alias (str): Alias used for output folder naming and accessions tracking.
             - manifest_for_submission (str): Path to the manifest file.
     Raises:
-        ManifestValidationError: If manifest validation fails or FASTA file not found.
+        ManifestValidationError: If manifest validation fails or data file(s) are not found.
     """
     manifest_path = Path(manifest_file)
-    logger.debug(f"Checking manifest file {manifest_path} with fasta_root={fasta_root}")
+    logger.debug(f"Checking manifest file {manifest_path} with fasta_root={fasta_root}, context={context}")
     if not manifest_path.exists():
         logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
     manifest_dict = parse_manifest(manifest_path)
-    assembly_name = manifest_dict.get("ASSEMBLYNAME")
-    fasta_path = Path(manifest_dict.get("FASTA")) if manifest_dict.get("FASTA") else None
-    if not assembly_name:
-        logger.error(f"ASSEMBLYNAME field not found in {manifest_path}")
-        raise ManifestValidationError(f"ASSEMBLYNAME field not found in {manifest_path}")
-    if not fasta_path:
-        logger.error(f"FASTA field not found in {manifest_path}")
-        raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
-    # Validate FASTA file exists when the manifest uses an absolute path or fasta_root is provided
-    if fasta_path.is_absolute():
-        logger.debug(f"FASTA path is absolute: {fasta_path}")
-        if not fasta_path.exists():
-            logger.error(f"FASTA file not found: {fasta_path}")
-            raise ManifestValidationError(f"FASTA file not found: {fasta_path}")
-    elif fasta_root:
-        full_fasta_path = Path(fasta_root) / fasta_path
-        logger.debug(f"Resolved FASTA path using fasta_root: {full_fasta_path}")
-        if not full_fasta_path.exists():
-            logger.error(f"FASTA file not found: {full_fasta_path}")
-            raise ManifestValidationError(f"FASTA file not found: {full_fasta_path}")
+    alias = manifest_dict.get("ASSEMBLYNAME") or manifest_dict.get("NAME")
+    if not alias:
+        raise ManifestValidationError(f"Neither ASSEMBLYNAME, nor NAME field found in {manifest_path}")
+
+    if context == "reads":
+        data_files = [Path(value) for value in manifest_dict.get("FASTQ", [])]
+        if not data_files:
+            raise ManifestValidationError(f"FASTQ field not found in {manifest_path}")
+    else:
+        fasta_value = manifest_dict.get("FASTA")
+        if not fasta_value:
+            raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
+        data_files = [Path(fasta_value)]
+
+    # Validate files only when absolute paths are used or a root directory is provided.
+    for data_file in data_files:
+        if data_file.is_absolute():
+            logger.debug(f"Manifest data file path is absolute: {data_file}")
+            if not data_file.exists():
+                raise ManifestValidationError(f"Data file not found: {data_file}")
+        elif fasta_root:
+            full_data_path = Path(fasta_root) / data_file
+            logger.debug(f"Resolved data file path using fasta_root: {full_data_path}")
+            if not full_data_path.exists():
+                raise ManifestValidationError(f"Data file not found: {full_data_path}")
+
     logger.debug(f"Manifest check complete: {manifest_file}")
-    return assembly_name, manifest_file
+    return alias, manifest_file
 
 
 def get_webin_cli_command(
@@ -671,33 +686,42 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         return False, is_resubmission
 
 
-def parse_accession_from_report(report_filepath: Path) -> Optional[str]:
-    """Extract a unique assembly accession from a webin-cli report file.
+def parse_accession_from_report(report_filepath: Path) -> Dict[str, Optional[str]]:
+    """Extract accessions from a webin-cli report file.
 
     Args:
         report_filepath (Path): Path to a webin-cli report file.
 
     Returns:
-        Optional[str]:
-            - A single unique accession when exactly one unique match is present.
-            - None when there are no matches or multiple unique matches.
+        Dict[str, Optional[str]]: Dictionary with keys 'assembly', 'experiment', 'run'.
+            Each value is the matched accession string, or None if not found or ambiguous.
     """
+    result: Dict[str, Optional[str]] = {"assembly": None, "experiment": None, "run": None}
     report_text = report_filepath.read_text()
-    unique_matches = sorted(set(re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)))
 
-    if not unique_matches:
-        logger.warning(f"No accession found in {report_filepath}")
-        return None
+    run_matches = sorted(set(re.findall(ENA_RUN_ACCESSION_REGEX, report_text)))
+    experiment_matches = sorted(set(re.findall(ENA_EXPERIMENT_ACCESSION_REGEX, report_text)))
+    assembly_matches = sorted(set(re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)))
 
-    if len(unique_matches) > 1:
-        logger.warning(f"Multiple accessions found in {report_filepath}: {','.join(unique_matches)}")
-        return None
+    if len(run_matches) == 1:
+        result["run"] = run_matches[0]
+    elif len(run_matches) > 1:
+        logger.warning(f"Multiple run accessions found in {report_filepath}: {','.join(run_matches)}")
 
-    accession = unique_matches[0]
-    return accession
+    if len(experiment_matches) == 1:
+        result["experiment"] = experiment_matches[0]
+    elif len(experiment_matches) > 1:
+        logger.warning(f"Multiple experiment accessions found in {report_filepath}: {','.join(experiment_matches)}")
+
+    if len(assembly_matches) == 1:
+        result["assembly"] = assembly_matches[0]
+    elif len(assembly_matches) > 1:
+        logger.warning(f"Multiple assembly accessions found in {report_filepath}: {','.join(assembly_matches)}")
+
+    return result
 
 
-def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool]:
+def check_report(fasta_location: str, mode: str, test: bool, context: str) -> Tuple[bool, bool]:
     """
     Parse and validate the webin-cli report file to determine operation outcome.
 
@@ -711,6 +735,7 @@ def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool
         mode (str): Operation mode - either 'submit' or 'validate'.
         test (bool): Whether operation was run against test server (True) or
             live server (False).
+        context (str): Submission context used to choose accession parsing logic.
 
     Returns:
         Tuple[bool, bool]: (success, is_resubmission)
@@ -736,8 +761,12 @@ def check_report(fasta_location: str, mode: str, test: bool) -> Tuple[bool, bool
     logger.debug(f"Report content:\n{report_text}")
 
     if mode == "submit":
-        accession = parse_accession_from_report(report_path)
-        if not accession:
+        accessions = parse_accession_from_report(report_path)
+        if context == "reads":
+            has_accession = accessions["experiment"] and accessions["run"]
+        else:
+            has_accession = accessions["assembly"]
+        if not has_accession:
             logger.error(f"No accession found in report: {report_path}")
             return False, False
         if test:
@@ -776,7 +805,7 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
         For resubmissions (when object already exists), we only check the report
         status and don't verify output files, since webin-cli may not regenerate them.
     """
-    success, is_resubmission = check_report(result_location, mode, test)
+    success, is_resubmission = check_report(result_location, mode, test, context)
     logger.debug(f"Result status after report parsing: success={success}, is_resubmission={is_resubmission}, mode={mode}, context={context}")
 
     if not success:
@@ -946,7 +975,7 @@ def main() -> int:
 
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
-            assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir)
+            assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir, args.context)
             if args.mode == "submit" and args.resume and assembly_name in aliases_to_skip:
                 logger.info(f"Skipping {assembly_name}: already present in accessions file with accession {accessions_to_write[assembly_name]}")
                 continue
@@ -973,7 +1002,11 @@ def main() -> int:
 
             if result_status:
                 if args.mode == "submit":
-                    accession = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
+                    accessions_dict = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
+                    if args.context == "reads":
+                        accession = ",".join([accessions_dict["experiment"], accessions_dict["run"]])
+                    else:
+                        accession = accessions_dict["assembly"]
                     if accession:
                         logger.info(f"Assigned accession for {assembly_name}: {accession}")
                         accessions_to_write[assembly_name] = accession

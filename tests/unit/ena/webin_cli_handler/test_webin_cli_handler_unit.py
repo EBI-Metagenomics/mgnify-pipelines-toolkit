@@ -1,3 +1,7 @@
+import subprocess
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from mgnify_pipelines_toolkit.ena.webin_cli_handler import (
@@ -7,6 +11,7 @@ from mgnify_pipelines_toolkit.ena.webin_cli_handler import (
     check_report,
     check_submission_status_live,
     check_submission_status_test,
+    main,
     parse_accession_from_report,
     parse_manifest,
 )
@@ -372,3 +377,181 @@ def test_check_submission_status_live(report_text, expected_success, expected_re
     success, is_resub = check_submission_status_live(report_text)
     assert success is expected_success
     assert is_resub is expected_resub
+
+
+# ---------------------------------------------------------------------------
+# Integration tests for main()
+# ---------------------------------------------------------------------------
+
+_FAKE_JAR = "/fake/webin-cli.jar"
+_FAKE_WEBIN = "Webin-99999"
+_FAKE_PASSWORD = "testpassword"
+
+
+def _make_subprocess_side_effect(report_text, context=None, alias=None, mode=None):
+    """Side-effect for subprocess.run that writes webin-cli artifacts to outputDir.
+
+    For validate mode or resubmission reports only the report file is needed.
+    For first-time submit, pass context/alias/mode to also create the result
+    directory structure that check_result expects.
+    """
+
+    def side_effect(cmd, **_):
+        output_dir = next(
+            (Path(a.split("=", 1)[1]) for a in cmd if a.startswith("-outputDir=")),
+            None,
+        )
+        if output_dir:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            (output_dir / REPORT_FILE).write_text(report_text)
+            if context and alias and mode:
+                result_dir = output_dir / context / alias / mode
+                result_dir.mkdir(parents=True, exist_ok=True)
+                for fname in ["receipt.xml", "submission.xml", "webin-submission.xml"]:
+                    (result_dir / fname).touch()
+        result = MagicMock(spec=subprocess.CompletedProcess)
+        result.returncode = 0
+        result.stdout = ""
+        result.stderr = ""
+        return result
+
+    return side_effect
+
+
+class TestMain:
+    def _argv(self, manifest_path, context, mode, outdir, extra=None):
+        argv = [
+            "webin_cli_handler",
+            "-m",
+            str(manifest_path),
+            "-c",
+            context,
+            "--mode",
+            mode,
+            "--webin-cli-jar",
+            _FAKE_JAR,
+            "--outdir",
+            str(outdir),
+        ]
+        if extra:
+            argv.extend(extra)
+        return argv
+
+    def _genome_manifest(self, tmp_path, alias="ASM1"):
+        fasta = tmp_path / "asm.fasta.gz"
+        fasta.touch()
+        manifest = tmp_path / "genome.manifest"
+        manifest.write_text(f"ASSEMBLYNAME\t{alias}\nFASTA\t{fasta}\n")
+        return manifest
+
+    def _reads_manifest(self, tmp_path, alias="RUN1"):
+        fq = tmp_path / "reads.fq.gz"
+        fq.touch()
+        manifest = tmp_path / "run.manifest"
+        manifest.write_text(f"NAME\t{alias}\nFASTQ\t{fq}\n")
+        return manifest
+
+    # --- validate mode ---
+
+    def test_validate_genome_success(self, tmp_path, monkeypatch):
+        manifest = self._genome_manifest(tmp_path)
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
+        report = "Submission(s) validated successfully."
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
+            assert main() == 0
+
+    def test_validate_reads_success(self, tmp_path, monkeypatch):
+        manifest = self._reads_manifest(tmp_path)
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(manifest, "reads", "validate", tmp_path / "out")
+        report = "Submission(s) validated successfully."
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
+            assert main() == 0
+
+    def test_validate_failure_returns_1(self, tmp_path, monkeypatch):
+        manifest = self._genome_manifest(tmp_path)
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
+        report = "Error: validation failed."
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
+            assert main() == 1
+
+    # --- submit mode ---
+
+    def test_submit_genome_resubmission(self, tmp_path, monkeypatch):
+        manifest = self._genome_manifest(tmp_path)
+        accessions_file = tmp_path / "accessions.tsv"
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(
+            manifest,
+            "genome",
+            "submit",
+            tmp_path / "out",
+            extra=["--output-accessions", str(accessions_file)],
+        )
+        # Resubmission report: accession in text + already-exists message
+        report = "object being added already exists in the submission account with accession ERZ123456"
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
+            assert main() == 0
+        content = accessions_file.read_text()
+        assert "ASM1" in content
+        assert "ERZ123456" in content
+
+    def test_submit_reads_first_time(self, tmp_path, monkeypatch):
+        manifest = self._reads_manifest(tmp_path, alias="RUN1")
+        accessions_file = tmp_path / "accessions.tsv"
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(
+            manifest,
+            "reads",
+            "submit",
+            tmp_path / "out",
+            extra=["--output-accessions", str(accessions_file)],
+        )
+        report = "ERX111111 ERR654321\nsubmission has been completed successfully"
+        side_effect = _make_subprocess_side_effect(
+            report,
+            context="reads",
+            alias="RUN1",
+            mode="submit",
+        )
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=side_effect):
+            assert main() == 0
+        content = accessions_file.read_text()
+        assert "RUN1" in content
+        assert "ERX111111" in content
+        assert "ERR654321" in content
+
+    def test_submit_failure_returns_1(self, tmp_path, monkeypatch):
+        manifest = self._genome_manifest(tmp_path)
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(manifest, "genome", "submit", tmp_path / "out")
+        report = "Error: submission failed."
+        with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
+            assert main() == 1
+
+    # --- error handling ---
+
+    def test_missing_credentials_returns_2(self, tmp_path, monkeypatch):
+        manifest = self._genome_manifest(tmp_path)
+        monkeypatch.delenv("ENA_WEBIN", raising=False)
+        monkeypatch.delenv("ENA_WEBIN_PASSWORD", raising=False)
+        argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
+        with patch("sys.argv", argv):
+            assert main() == 2
+
+    def test_invalid_manifest_returns_3(self, tmp_path, monkeypatch):
+        manifest = tmp_path / "bad.manifest"
+        manifest.write_text("STUDY\tPRJ1\n")  # no NAME or ASSEMBLYNAME
+        monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
+        monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
+        argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
+        with patch("sys.argv", argv):
+            assert main() == 3

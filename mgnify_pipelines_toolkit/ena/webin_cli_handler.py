@@ -26,7 +26,6 @@ import sys
 import time
 import urllib.request
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 
 # Custom Exceptions
@@ -91,18 +90,18 @@ def parse_arguments() -> argparse.Namespace:
             - mode (str): 'submit' or 'validate'
             - resume (bool): Whether to resume previous run by skipping already processed aliases
             - test (bool): Whether to use Webin test server
-            - input_dir (Optional[str]): Path to the data files (FASTA or FASTQ) declared in the manifest file(s),
+            - input_dir (str | None): Path to the data files (FASTA or FASTQ) declared in the manifest file(s),
               required if manifest(s) reference file(s) that cannot be accessed from the execution directory
-            - outdir (Optional[str]): Base output directory for webin-cli files
+            - outdir (str | None): Base output directory for webin-cli files
             - output_accessions (str): File to write assigned accessions to (TSV, default: ena_accessions.tsv)
             - download_webin_cli (bool): Whether to download Webin-CLI jar
             - download_webin_cli_directory (str): Path to store downloaded Webin-CLI
-            - download_webin_cli_version (Optional[str]): Specific Webin-CLI version
-            - webin_cli_jar (Optional[str]): Path to pre-downloaded jar file
+            - download_webin_cli_version (str | None): Specific Webin-CLI version
+            - webin_cli_jar (str | None): Path to pre-downloaded jar file
             - retries (int): Number of retry attempts
             - retry_delay (int): Initial retry delay in seconds
-            - java_heap_size_initial (Optional[int]): Java initial heap size in GB
-            - java_heap_size_max (Optional[int]): Java maximum heap size in GB
+            - java_heap_size_initial (int | None): Java initial heap size in GB
+            - java_heap_size_max (int | None): Java maximum heap size in GB
             - debug (bool): Enable verbose debug logging
     """
 
@@ -214,7 +213,7 @@ def get_latest_webin_cli_version() -> str:
         raise DownloadError(f"Failed to fetch latest webin-cli version: {e}")
 
 
-def download_webin_cli(version: Optional[str] = None, dest_dir: str = "") -> None:
+def download_webin_cli(version: str | None = None, dest_dir: str = "") -> None:
     """
     Download the Webin-CLI `.jar` file.
 
@@ -290,7 +289,7 @@ def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
     Args:
         manifest_path (Path): Path to the manifest file.
     Returns:
-        Dict[str, str | list[str]]:
+        dict[str, str | list[str]]:
             - keys: field names from the manifest
             - values: corresponding values from the manifest
     """
@@ -314,7 +313,7 @@ def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, input_dir: Optional[str], context: str) -> Tuple[str, str]:
+def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> tuple[str, str]:
     """
     Validate a manifest file and ensure referenced data file(s) are accessible.
     Args:
@@ -322,7 +321,7 @@ def check_manifest(manifest_file: str, input_dir: Optional[str], context: str) -
         input_dir (str or None): Optional root directory for relative data file paths.
         context (str): Submission context (e.g. genome, reads).
     Returns:
-        Tuple[str, str]:
+        tuple[str, str]:
             - alias (str): Alias used for output folder naming and accessions tracking.
             - manifest_for_submission (str): Path to the manifest file.
     Raises:
@@ -371,11 +370,11 @@ def get_webin_cli_command(
     mode: str,
     test: bool,
     output_dir: str,
-    input_dir: Optional[str] = None,
-    jar: Optional[str] = None,
-    java_heap_size_initial: Optional[int] = None,
-    java_heap_size_max: Optional[int] = None,
-) -> List[str]:
+    input_dir: str | None = None,
+    jar: str | None = None,
+    java_heap_size_initial: int | None = None,
+    java_heap_size_max: int | None = None,
+) -> list[str]:
     """
     Build the webin-cli command list based on execution method.
 
@@ -387,13 +386,13 @@ def get_webin_cli_command(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
-        input_dir (Optional[str]): Root directory for relative data file paths declared in the manifest.
-        jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
-        java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
-        java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
+        input_dir (str | None): Root directory for relative data file paths declared in the manifest.
+        jar (str | None): Path to webin-cli jar file, if using jar execution.
+        java_heap_size_initial (int | None): Java initial heap size in GB (-Xms).
+        java_heap_size_max (int | None): Java maximum heap size in GB (-Xmx).
 
     Returns:
-        List[str]: Complete command list ready for execution.
+        list[str]: Complete command list ready for execution.
 
     Raises:
         WebinCLINotFoundError: If neither jar is provided nor ena-webin-cli is installed.
@@ -444,14 +443,14 @@ def get_webin_cli_command(
     return cmd
 
 
-def prepare_output_dir(manifest: str, assembly_name: str, outdir: Optional[str] = None) -> str:
+def prepare_output_dir(manifest: str, assembly_name: str, outdir: str | None = None) -> str:
     """
     Creates a timestamped output directory for each submission made by webin-cli.
 
     Args:
         manifest (str): Path to manifest file.
         assembly_name (str): Assembly name from manifest ASSEMBLYNAME field.
-        outdir (Optional[str]): Base output directory. Defaults to manifest parent directory.
+        outdir (str | None): Base output directory. Defaults to manifest parent directory.
 
     Returns:
         str: Path to the created output directory.
@@ -482,12 +481,12 @@ def run_webin_cli(
     mode: str,
     test: bool,
     output_dir: str,
-    input_dir: Optional[str] = None,
-    jar: Optional[str] = None,
+    input_dir: str | None = None,
+    jar: str | None = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
-    java_heap_size_initial: Optional[int] = None,
-    java_heap_size_max: Optional[int] = None,
+    java_heap_size_initial: int | None = None,
+    java_heap_size_max: int | None = None,
 ) -> subprocess.CompletedProcess:
     """
     Execute webin-cli with retry logic and error handling.
@@ -500,12 +499,12 @@ def run_webin_cli(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
-        input_dir (Optional[str]): Root directory for relative data file paths declared in the manifest.
-        jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
+        input_dir (str | None): Root directory for relative data file paths declared in the manifest.
+        jar (str | None): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
-        java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
-        java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
+        java_heap_size_initial (int | None): Java initial heap size in GB (-Xms).
+        java_heap_size_max (int | None): Java maximum heap size in GB (-Xmx).
 
     Returns:
         subprocess.CompletedProcess: Result of successful webin-cli execution.
@@ -526,7 +525,7 @@ def run_webin_cli(
             return "webin-cli produced no stdout/stderr output"
         return "\n".join(output_parts)
 
-    def redact_command(command: List[str]) -> str:
+    def redact_command(command: list[str]) -> str:
         """Return a shell-quoted command string with credential values replaced by ***."""
         redacted = []
         for token in command:
@@ -583,7 +582,7 @@ def run_webin_cli(
             raise WebinCLIExecutionError(f"Webin-CLI execution failed after {retries} attempts. See logs for details.")
 
 
-def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
+def check_submission_status_test(report_text: str) -> tuple[bool, bool]:
     """
     Check the test Webin-CLI submission report and determine submission status.
 
@@ -596,7 +595,7 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
         report_text (str): Contents of the webin-cli.report file.
 
     Returns:
-        Tuple[bool, bool]: (success, is_resubmission)
+        tuple[bool, bool]: (success, is_resubmission)
             - success (bool): True if submission/validation succeeded, False otherwise.
             - is_resubmission (bool): True if object was previously submitted to test
               server (duplicate submission), False if this is first-time submission.
@@ -641,7 +640,7 @@ def check_submission_status_test(report_text: str) -> Tuple[bool, bool]:
         return False, False
 
 
-def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
+def check_submission_status_live(report_text: str) -> tuple[bool, bool]:
     """
     Check the live Webin-CLI submission report and determine submission status.
 
@@ -653,7 +652,7 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         report_text (str): Contents of the webin-cli.report file.
 
     Returns:
-        Tuple[bool, bool]: (success, is_resubmission)
+        tuple[bool, bool]: (success, is_resubmission)
             - success (bool): True if submission succeeded (either new or duplicate),
               False if submission failed.
             - is_resubmission (bool): True if object was previously submitted to live
@@ -686,17 +685,17 @@ def check_submission_status_live(report_text: str) -> Tuple[bool, bool]:
         return False, is_resubmission
 
 
-def parse_accession_from_report(report_filepath: Path) -> Dict[str, Optional[str]]:
+def parse_accession_from_report(report_filepath: Path) -> dict[str, str | None]:
     """Extract accessions from a webin-cli report file.
 
     Args:
         report_filepath (Path): Path to a webin-cli report file.
 
     Returns:
-        Dict[str, Optional[str]]: Dictionary with keys 'assembly', 'experiment', 'run'.
+        dict[str, str | None]: Dictionary with keys 'assembly', 'experiment', 'run'.
             Each value is the matched accession string, or None if not found or ambiguous.
     """
-    result: Dict[str, Optional[str]] = {"assembly": None, "experiment": None, "run": None}
+    result: dict[str, str | None] = {"assembly": None, "experiment": None, "run": None}
     report_text = report_filepath.read_text()
 
     run_matches = sorted(set(re.findall(ENA_RUN_ACCESSION_REGEX, report_text)))
@@ -721,7 +720,7 @@ def parse_accession_from_report(report_filepath: Path) -> Dict[str, Optional[str
     return result
 
 
-def check_report(output_dir: str, mode: str, test: bool, context: str) -> Tuple[bool, bool]:
+def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[bool, bool]:
     """
     Parse and validate the webin-cli report file to determine operation outcome.
 
@@ -738,7 +737,7 @@ def check_report(output_dir: str, mode: str, test: bool, context: str) -> Tuple[
         context (str): Submission context used to choose accession parsing logic.
 
     Returns:
-        Tuple[bool, bool]: (success, is_resubmission)
+        tuple[bool, bool]: (success, is_resubmission)
             - success (bool): True if the operation (submit/validate) succeeded,
               False otherwise.
             - is_resubmission (bool): True if this was a duplicate submission
@@ -855,7 +854,7 @@ def check_result(result_location: str, context: str, assembly_name: str, mode: s
     return True
 
 
-def resolve_manifests(manifest_input: str) -> List[str]:
+def resolve_manifests(manifest_input: str) -> list[str]:
     """
     Resolve a manifest argument to a list of manifest file paths.
 
@@ -866,7 +865,7 @@ def resolve_manifests(manifest_input: str) -> List[str]:
         manifest_input (str): Path to a manifest file or a directory of manifests.
 
     Returns:
-        List[str]: Sorted list of manifest file paths.
+        list[str]: Sorted list of manifest file paths.
 
     Raises:
         ManifestValidationError: If the input is neither a file nor a directory,
@@ -885,7 +884,7 @@ def resolve_manifests(manifest_input: str) -> List[str]:
         raise ManifestValidationError(f"Invalid manifest input '{manifest_input}': must be a single manifest file or a directory of manifest files.")
 
 
-def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str) -> None:
+def write_assigned_accessions(accessions: dict[str, str], output_accessions: str) -> None:
     """
     Write assigned accessions for all successful submissions to a TSV file.
 
@@ -896,7 +895,7 @@ def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str
     TODO: consider switching to buffered checkpoints (flush every N successes) or other more efficient persistence method.
 
     Args:
-        accessions (Dict[str, str]): Mapping of assembly name to accession.
+        accessions (dict[str, str]): Mapping of assembly name to accession.
         output_accessions (str): Path to output TSV file (overwritten each run).
     """
     logger.debug(f"Preparing to write accessions table to {output_accessions}")
@@ -915,7 +914,7 @@ def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str
     logger.debug(f"Assigned accessions written to {output_file}")
 
 
-def load_assigned_accessions(output_accessions: str) -> Dict[str, str]:
+def load_assigned_accessions(output_accessions: str) -> dict[str, str]:
     """
     Load previously written accessions TSV, if present.
 
@@ -923,13 +922,13 @@ def load_assigned_accessions(output_accessions: str) -> Dict[str, str]:
         output_accessions (str): Path to the TSV file containing previously assigned accessions.
 
     Returns:
-        Dict[str, str]: Mapping of assembly name to accession.
+        dict[str, str]: Mapping of assembly name to accession.
     """
     output_file = Path(output_accessions)
     if not output_file.exists():
         return {}
 
-    loaded: Dict[str, str] = {}
+    loaded: dict[str, str] = {}
     try:
         with open(output_file, "r", newline="") as tsv_in:
             reader = csv.DictReader(tsv_in, delimiter="\t")
@@ -979,7 +978,7 @@ def main() -> int:
         logger.info(f"Resolved {len(manifests)} manifest(s) for processing")
 
         failed_manifests = []
-        accessions_to_write: Dict[str, str] = {}
+        accessions_to_write: dict[str, str] = {}
         if args.mode == "submit" and args.resume:
             accessions_to_write = load_assigned_accessions(args.output_accessions)
             aliases_to_skip = set(accessions_to_write.keys())

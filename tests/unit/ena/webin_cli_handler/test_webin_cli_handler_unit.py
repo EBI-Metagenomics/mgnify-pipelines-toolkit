@@ -313,6 +313,22 @@ class TestCheckReport:
         assert success is True
         assert is_resub is False
 
+    # --- Submit + test + genome resubmission (regression: accession check must not block) ---
+
+    def test_submit_test_genome_resubmission_minimal_report(self, tmp_path):
+        """Test-server genome resubmission: minimal report with no accession must still succeed."""
+        self._write_report(tmp_path, "This was a TEST submission(s).")
+        success, is_resub = check_report(str(tmp_path), "submit", True, "genome")
+        assert success is True
+        assert is_resub is True
+
+    def test_submit_test_reads_resubmission_minimal_report(self, tmp_path):
+        """Test-server reads resubmission: minimal report with no ERX/ERR must still succeed."""
+        self._write_report(tmp_path, "This was a TEST submission(s).")
+        success, is_resub = check_report(str(tmp_path), "submit", True, "reads")
+        assert success is True
+        assert is_resub is True
+
     # --- Report file absent ---
 
     def test_report_file_missing_returns_false(self, tmp_path):

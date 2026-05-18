@@ -91,7 +91,7 @@ def parse_arguments() -> argparse.Namespace:
             - mode (str): 'submit' or 'validate'
             - resume (bool): Whether to resume previous run by skipping already processed aliases
             - test (bool): Whether to use Webin test server
-            - fasta_dir (Optional[str]): Path to the FASTA files declared in the manifest file(s),
+            - input_dir (Optional[str]): Path to the data files (FASTA or FASTQ) declared in the manifest file(s),
               required if manifest(s) reference file(s) that cannot be accessed from the execution directory
             - outdir (Optional[str]): Base output directory for webin-cli files
             - output_accessions (str): File to write assigned accessions to (TSV, default: ena_accessions.tsv)
@@ -147,9 +147,9 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--mode", required=True, type=str, help="submit or validate", choices=["submit", "validate"])
     parser.add_argument("--test", required=False, action="store_true", help="Specify to use test server instead of live")
     parser.add_argument(
-        "--fasta-dir",
+        "--input-dir",
         required=False,
-        help="Path to the FASTA files declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
+        help="Path to the data files (FASTA or FASTQ) declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
     )
     parser.add_argument("--outdir", required=False, help="Base output directory for webin-cli files")
     parser.add_argument("--download-webin-cli", required=False, action="store_true", help="Specify if you do not have ena-webin-cli installed")
@@ -314,12 +314,12 @@ def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, fasta_root: Optional[str], context: str) -> Tuple[str, str]:
+def check_manifest(manifest_file: str, input_dir: Optional[str], context: str) -> Tuple[str, str]:
     """
     Validate a manifest file and ensure referenced data file(s) are accessible.
     Args:
         manifest_file (str): Path to the original manifest.
-        fasta_root (str or None): Optional root directory for relative FASTA paths.
+        input_dir (str or None): Optional root directory for relative data file paths.
         context (str): Submission context (e.g. genome, reads).
     Returns:
         Tuple[str, str]:
@@ -329,7 +329,7 @@ def check_manifest(manifest_file: str, fasta_root: Optional[str], context: str) 
         ManifestValidationError: If manifest validation fails or data file(s) are not found.
     """
     manifest_path = Path(manifest_file)
-    logger.debug(f"Checking manifest file {manifest_path} with fasta_root={fasta_root}, context={context}")
+    logger.debug(f"Checking manifest file {manifest_path} with input_dir={input_dir}, context={context}")
     if not manifest_path.exists():
         logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
@@ -354,9 +354,9 @@ def check_manifest(manifest_file: str, fasta_root: Optional[str], context: str) 
             logger.debug(f"Manifest data file path is absolute: {data_file}")
             if not data_file.exists():
                 raise ManifestValidationError(f"Data file not found: {data_file}")
-        elif fasta_root:
-            full_data_path = Path(fasta_root) / data_file
-            logger.debug(f"Resolved data file path using fasta_root: {full_data_path}")
+        elif input_dir:
+            full_data_path = Path(input_dir) / data_file
+            logger.debug(f"Resolved data file path using input_dir: {full_data_path}")
             if not full_data_path.exists():
                 raise ManifestValidationError(f"Data file not found: {full_data_path}")
 
@@ -371,7 +371,7 @@ def get_webin_cli_command(
     mode: str,
     test: bool,
     output_dir: str,
-    fasta_root: Optional[str] = None,
+    input_dir: Optional[str] = None,
     jar: Optional[str] = None,
     java_heap_size_initial: Optional[int] = None,
     java_heap_size_max: Optional[int] = None,
@@ -387,7 +387,7 @@ def get_webin_cli_command(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
-        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
+        input_dir (Optional[str]): Root directory for relative data file paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         java_heap_size_initial (Optional[int]): Java initial heap size in GB (-Xms).
         java_heap_size_max (Optional[int]): Java maximum heap size in GB (-Xmx).
@@ -438,8 +438,8 @@ def get_webin_cli_command(
     if test:
         cmd.append("-test")
 
-    if fasta_root:
-        cmd.append(f"-inputDir={fasta_root}")
+    if input_dir:
+        cmd.append(f"-inputDir={input_dir}")
 
     return cmd
 
@@ -482,7 +482,7 @@ def run_webin_cli(
     mode: str,
     test: bool,
     output_dir: str,
-    fasta_root: Optional[str] = None,
+    input_dir: Optional[str] = None,
     jar: Optional[str] = None,
     retries: int = RETRIES,
     retry_delay: int = RETRY_DELAY,
@@ -500,7 +500,7 @@ def run_webin_cli(
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
-        fasta_root (Optional[str]): Root directory for relative FASTA paths declared in the manifest.
+        input_dir (Optional[str]): Root directory for relative data file paths declared in the manifest.
         jar (Optional[str]): Path to webin-cli jar file, if using jar execution.
         retries (int): Number of retry attempts.
         retry_delay (int): Initial retry delay in seconds.
@@ -537,7 +537,7 @@ def run_webin_cli(
                 redacted.append(token)
         return " ".join(redacted)
 
-    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, fasta_root, jar, java_heap_size_initial, java_heap_size_max)
+    cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, input_dir, jar, java_heap_size_initial, java_heap_size_max)
     logger.info(f"Command: {redact_command(cmd)}")
 
     for attempt in range(1, retries + 1):
@@ -721,7 +721,7 @@ def parse_accession_from_report(report_filepath: Path) -> Dict[str, Optional[str
     return result
 
 
-def check_report(fasta_location: str, mode: str, test: bool, context: str) -> Tuple[bool, bool]:
+def check_report(output_dir: str, mode: str, test: bool, context: str) -> Tuple[bool, bool]:
     """
     Parse and validate the webin-cli report file to determine operation outcome.
 
@@ -730,8 +730,8 @@ def check_report(fasta_location: str, mode: str, test: bool, context: str) -> Tu
     the operation succeeded and whether this was a resubmission of existing data.
 
     Args:
-        fasta_location (str): Directory path where webin-cli.report is located
-            (typically the directory containing the FASTA file).
+        output_dir (str): Directory path where webin-cli.report is located
+            (the webin-cli output directory).
         mode (str): Operation mode - either 'submit' or 'validate'.
         test (bool): Whether operation was run against test server (True) or
             live server (False).
@@ -750,7 +750,7 @@ def check_report(fasta_location: str, mode: str, test: bool, context: str) -> Tu
         See check_submission_status_test() and check_submission_status_live()
         for detailed explanations of server-specific behaviors.
     """
-    report_path = Path(fasta_location) / REPORT_FILE
+    report_path = Path(output_dir) / REPORT_FILE
     logger.info(f"Checking webin report {report_path}")
 
     if not report_path.exists():
@@ -761,20 +761,31 @@ def check_report(fasta_location: str, mode: str, test: bool, context: str) -> Tu
     logger.debug(f"Report content:\n{report_text}")
 
     if mode == "submit":
-        accessions = parse_accession_from_report(report_path)
-        if context == "reads":
-            has_accession = accessions["experiment"] and accessions["run"]
-        else:
-            has_accession = accessions["assembly"]
-        if not has_accession:
-            logger.error(f"No accession found in report: {report_path}")
-            return False, False
+        # Check submission status first — resubmissions on the test server produce a
+        # minimal report with no accession, so the accession check must come after.
         if test:
-            return check_submission_status_test(report_text)
+            success, is_resubmission = check_submission_status_test(report_text)
         else:
-            return check_submission_status_live(report_text)
+            success, is_resubmission = check_submission_status_live(report_text)
 
-    elif mode == "validate":
+        if not success:
+            return False, False
+
+        # Resubmissions may have no accession in the report — only require one for
+        # first-time submissions.
+        if not is_resubmission:
+            accessions = parse_accession_from_report(report_path)
+            if context == "reads":
+                has_accession = accessions["experiment"] and accessions["run"]
+            else:
+                has_accession = accessions["assembly"]
+            if not has_accession:
+                logger.error(f"No accession found in report: {report_path}")
+                return False, False
+
+        return success, is_resubmission
+
+    else:  # mode == "validate"
         if "Submission(s) validated successfully." in report_text:
             logger.info("Submission validation succeeded")
             return True, False
@@ -876,7 +887,7 @@ def resolve_manifests(manifest_input: str) -> List[str]:
 
 def write_assigned_accessions(accessions: Dict[str, str], output_accessions: str) -> None:
     """
-    Write assigned assembly accessions for all successful submissions to a TSV file.
+    Write assigned accessions for all successful submissions to a TSV file.
 
     This implementation rewrites the full TSV on each call using an atomic replace pattern (write to .tmp, then replace).
     It is safer than writing in "append" mode and keeps a complete table of successful submissions for resume safety.
@@ -946,7 +957,7 @@ def main() -> int:
         configure_logging(debug=args.debug)
         logger.debug(
             f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, resume={args.resume}, "
-            f"fasta_dir={args.fasta_dir}, outdir={args.outdir}, output_accessions={args.output_accessions}, download_webin_cli={args.download_webin_cli}, "
+            f"input_dir={args.input_dir}, outdir={args.outdir}, output_accessions={args.output_accessions}, download_webin_cli={args.download_webin_cli}, "
             f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
             f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
             f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"
@@ -975,7 +986,7 @@ def main() -> int:
 
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
-            assembly_name, manifest_for_submission = check_manifest(manifest, args.fasta_dir, args.context)
+            assembly_name, manifest_for_submission = check_manifest(manifest, args.input_dir, args.context)
             if args.mode == "submit" and args.resume and assembly_name in aliases_to_skip:
                 logger.info(f"Skipping {assembly_name}: already present in accessions file with accession {accessions_to_write[assembly_name]}")
                 continue
@@ -987,7 +998,7 @@ def main() -> int:
                 mode=args.mode,
                 test=args.test,
                 output_dir=output_dir,
-                fasta_root=args.fasta_dir,
+                input_dir=args.input_dir,
                 jar=execute_jar,
                 retries=args.retries,
                 retry_delay=args.retry_delay,
@@ -1004,7 +1015,8 @@ def main() -> int:
                 if args.mode == "submit":
                     accessions_dict = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
                     if args.context == "reads":
-                        accession = ",".join([accessions_dict["experiment"], accessions_dict["run"]])
+                        parts = [v for v in [accessions_dict["experiment"], accessions_dict["run"]] if v is not None]
+                        accession = ",".join(parts) if parts else None
                     else:
                         accession = accessions_dict["assembly"]
                     if accession:

@@ -167,7 +167,7 @@ class TestGenomeE2E:
             str(manifest_path),
             "--mode",
             "validate",
-            "--fasta-dir",
+            "--input-dir",
             str(fasta_dir),
             "--outdir",
             test_output_dir,

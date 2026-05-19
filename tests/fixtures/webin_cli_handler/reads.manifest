@@ -1,0 +1,10 @@
+STUDY	PRJEB98843
+SAMPLE	SAMEA8247020
+NAME	test_reads_1
+PLATFORM	ILLUMINA
+INSTRUMENT	Illumina HiSeq 2000
+LIBRARY_SOURCE	METAGENOMIC
+LIBRARY_SELECTION	RANDOM
+LIBRARY_STRATEGY	WGS
+FASTQ	tests/fixtures/webin_cli_handler/fastq_1.fastq.gz
+FASTQ	tests/fixtures/webin_cli_handler/fastq_2.fastq.gz

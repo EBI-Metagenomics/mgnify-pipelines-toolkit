@@ -1,6 +1,6 @@
 [project]
 name = "mgnify_pipelines_toolkit"
-version = "1.5.0"
+version = "1.5.1"
 readme = "README.md"
 license = { text = "Apache Software License 2.0" }
 authors = [
@@ -99,6 +99,7 @@ get_mpt_version = "mgnify_pipelines_toolkit.utils.get_mpt_version:main"
 
 # ena
 webin_cli_handler = "mgnify_pipelines_toolkit.ena.webin_cli_handler:main"
+create_reads_manifest = "mgnify_pipelines_toolkit.ena.create_reads_manifest:main"
 
 [project.optional-dependencies]
 test = [

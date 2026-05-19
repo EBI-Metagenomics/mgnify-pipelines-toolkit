@@ -572,14 +572,13 @@ def run_webin_cli(
 
         logger.error("ena-webin-cli output:\n" + combined_log)
 
-        if attempt < retries:
-            sleep_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
-            logger.warning(f"🔁 Retrying in {sleep_time} seconds...")
-            logger.debug(f"Retry backoff details: attempt={attempt}, max_retries={retries}, sleep_time={sleep_time}")
-            time.sleep(sleep_time)
-        else:
+        if attempt == retries:
             logger.error("💥 All retries failed.")
             raise WebinCLIExecutionError(f"Webin-CLI execution failed after {retries} attempts. See logs for details.")
+        sleep_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
+        logger.warning(f"🔁 Retrying in {sleep_time} seconds...")
+        logger.debug(f"Retry backoff details: attempt={attempt}, max_retries={retries}, sleep_time={sleep_time}")
+        time.sleep(sleep_time)
 
 
 def check_submission_status_test(report_text: str) -> tuple[bool, bool]:
@@ -671,18 +670,15 @@ def check_submission_status_live(report_text: str) -> tuple[bool, bool]:
         check_submission_status_live("Error: validation failed")
         (False, False)
     """
-    is_resubmission = False
     logger.debug("Evaluating MAIN server submission report content")
+    if "object being added already exists in the submission account with accession" in report_text:
+        logger.info("Submitted object already exists on MAIN server")
+        return True, True
     if "submission has been completed successfully" in report_text:
         logger.info("Successfully submitted object on MAIN server")
-        return True, is_resubmission
-    elif "object being added already exists in the submission account with accession" in report_text:
-        logger.info("Submitted object already exists on MAIN server")
-        is_resubmission = True
-        return True, is_resubmission
-    else:
-        logger.info("Submission failed on MAIN server")
-        return False, is_resubmission
+        return True, False
+    logger.info("Submission failed on MAIN server")
+    return False, False
 
 
 def parse_accession_from_report(report_filepath: Path) -> dict[str, str | None]:
@@ -759,38 +755,28 @@ def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[
     report_text = report_path.read_text()
     logger.debug(f"Report content:\n{report_text}")
 
-    if mode == "submit":
-        # Check submission status first — resubmissions on the test server produce a
-        # minimal report with no accession, so the accession check must come after.
-        if test:
-            success, is_resubmission = check_submission_status_test(report_text)
-        else:
-            success, is_resubmission = check_submission_status_live(report_text)
+    if mode == "validate":
+        success = "Submission(s) validated successfully." in report_text
+        logger.info("Submission validation succeeded" if success else "Submission validation failed")
+        return success, False
 
-        if not success:
-            return False, False
-
-        # Resubmissions may have no accession in the report — only require one for
-        # first-time submissions.
-        if not is_resubmission:
-            accessions = parse_accession_from_report(report_path)
-            if context == "reads":
-                has_accession = accessions["experiment"] and accessions["run"]
-            else:
-                has_accession = accessions["assembly"]
-            if not has_accession:
-                logger.error(f"No accession found in report: {report_path}")
-                return False, False
-
+    # submit path
+    # Check submission status first — resubmissions on the test server produce a
+    # minimal report with no accession, so the accession check must come after.
+    check_status = check_submission_status_test if test else check_submission_status_live
+    success, is_resubmission = check_status(report_text)
+    if not success:
+        return False, False
+    if is_resubmission:
         return success, is_resubmission
 
-    else:  # mode == "validate"
-        if "Submission(s) validated successfully." in report_text:
-            logger.info("Submission validation succeeded")
-            return True, False
-        else:
-            logger.info("Submission validation failed")
-            return False, False
+    # First-time submission: require an accession in the report
+    accessions = parse_accession_from_report(report_path)
+    has_accession = (accessions["experiment"] and accessions["run"]) if context == "reads" else accessions["assembly"]
+    if not has_accession:
+        logger.error(f"No accession found in report: {report_path}")
+        return False, False
+    return success, is_resubmission
 
 
 def check_result(result_location: str, context: str, assembly_name: str, mode: str, test: bool) -> bool:
@@ -944,6 +930,15 @@ def load_assigned_accessions(output_accessions: str) -> dict[str, str]:
     return loaded
 
 
+def _extract_accession(report_path: Path, context: str) -> str | None:
+    """Extract a displayable accession string from a webin-cli report."""
+    accessions = parse_accession_from_report(report_path)
+    if context == "reads":
+        parts = [v for v in [accessions["experiment"], accessions["run"]] if v is not None]
+        return ",".join(parts) if parts else None
+    return accessions["assembly"]
+
+
 def main() -> int:
     """
     Main entry point for the webin-cli handler.
@@ -1010,23 +1005,19 @@ def main() -> int:
                 result_location=output_dir, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
             )
 
-            if result_status:
-                if args.mode == "submit":
-                    accessions_dict = parse_accession_from_report(Path(output_dir) / REPORT_FILE)
-                    if args.context == "reads":
-                        parts = [v for v in [accessions_dict["experiment"], accessions_dict["run"]] if v is not None]
-                        accession = ",".join(parts) if parts else None
-                    else:
-                        accession = accessions_dict["assembly"]
-                    if accession:
-                        logger.info(f"Assigned accession for {assembly_name}: {accession}")
-                        accessions_to_write[assembly_name] = accession
-                        # Persist progress immediately so long-running runs can resume after interruption
-                        write_assigned_accessions(accessions_to_write, args.output_accessions)
-                logger.info(f"Submission/validation done for {manifest_for_submission}")
-            else:
+            if not result_status:
                 logger.error(f"Submission/validation failed for {manifest_for_submission}")
                 failed_manifests.append(manifest_for_submission)
+                continue
+
+            if args.mode == "submit":
+                accession = _extract_accession(Path(output_dir) / REPORT_FILE, args.context)
+                if accession:
+                    logger.info(f"Assigned accession for {assembly_name}: {accession}")
+                    accessions_to_write[assembly_name] = accession
+                    # Persist progress immediately so long-running runs can resume after interruption
+                    write_assigned_accessions(accessions_to_write, args.output_accessions)
+            logger.info(f"Submission/validation done for {manifest_for_submission}")
 
         if args.mode == "submit":
             logger.debug(f"Submission mode complete with {len(accessions_to_write)} accession(s) captured")

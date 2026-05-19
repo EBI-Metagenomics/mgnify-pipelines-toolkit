@@ -435,9 +435,13 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         mapseq_file = sorted(list((Path(root_path) / run_acc / "taxonomy-summary" / db).glob(f"*_{db}.mseq")))
         if mapseq_file:
             mapseq_file = mapseq_file[0]
+            if mapseq_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s mapseq file {mapseq_file} exists but is empty. Skipping.")
+                continue
         else:
             logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with mapseq file missing. Skipping.")
             continue
+
         mapseq_df = pd.read_csv(mapseq_file, sep="\t", usecols=[0, 1, 3, 9, 10])
         mapseq_df.columns = ["asv", "dbhit", "dbhitIdentity", "dbhitStart", "dbhitEnd"]
 
@@ -445,10 +449,30 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         tax_file = sorted(list((Path(root_path) / run_acc / "asv").glob(f"*_{db}_asv_tax.tsv")))
         if tax_file:
             tax_file = tax_file[0]
+            if tax_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s tax file {tax_file} exists but is empty. Skipping.")
+                continue
         else:
             logging.info(f"Run {run_acc} does not seem to have ASV results for DB {db}, with asv tax file missing. Skipping.")
             continue
+
         run_tax_df = pd.read_csv(tax_file, sep="\t")
+
+        # ASV sequence FASTA files
+        asv_fasta_file = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))
+        if asv_fasta_file:
+            asv_fasta_file = asv_fasta_file[0]
+            if asv_fasta_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s asv_fasta file {asv_fasta_file} exists but is empty. Skipping.")
+                continue
+        else:
+            logging.info(f"Run {run_acc} does not seem to have ASV FASTA sequence file. Skipping.")
+            continue
+
+        fasta = pyfastx.Fasta(str(asv_fasta_file), build_index=False)
+        asv_fasta_dict = {name: seq for name, seq in fasta}
+        asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
+        asv_fasta_df["asv"] = asv_fasta_df.index
 
         # ASV read count files
         count_files = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*S-V*/*.tsv")))
@@ -456,25 +480,18 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
             logging.info(f"Run {run_acc} missing count files for some reason, cannot generate ASV summaries. Skipping.")
             continue
 
-        # ASV sequence FASTA files
-        asv_fasta_file = sorted(list(Path(f"{root_path}/{run_acc}/asv").glob("*_asv_seqs.fasta")))
-        if asv_fasta_file:
-            asv_fasta_file = asv_fasta_file[0]
-        else:
-            logging.info(f"Run {run_acc} does not seem to have ASV FASTA sequence file. Skipping.")
-            continue
-        fasta = pyfastx.Fasta(str(asv_fasta_file), build_index=False)
-        asv_fasta_dict = {name: seq for name, seq in fasta}
-        asv_fasta_df = pd.DataFrame(asv_fasta_dict, index=["ASVSeq"]).transpose()
-        asv_fasta_df["asv"] = asv_fasta_df.index
-
         count_dfs = []
-
         for count_file in count_files:
+            if count_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s count file {count_files} exists but is empty. Skipping.")
+                continue
             amp_region = count_file.stem.split("_")[1]
             count_df = pd.read_csv(count_file, sep="\t")
             count_df["amplifiedRegion"] = [amp_region] * len(count_df)
             count_dfs.append(count_df)
+        if not count_dfs:
+            logging.info(f"Run {run_acc}'s count dataframe {count_files} is empty. Skipping.")
+            continue
 
         # Merge counts into one DF in case there are multiple amplified regions...
         all_amplified_regions_count_df = pd.concat(count_dfs)
@@ -543,6 +560,9 @@ def get_closedref_dict(
         kronatxt_file = sorted(list((pathlib.Path(root_path) / run_acc / "taxonomy-summary" / f"{db}").glob("*.txt")))
         if kronatxt_file:
             kronatxt_file = kronatxt_file[0]
+            if kronatxt_file.stat().st_size == 0:
+                logging.info(f"Run {run_acc}'s krona txt file {kronatxt_file} exists but is empty. Skipping.")
+                continue
         else:
             logging.info(f"Run {run_acc} doesn't have closed-reference results for DB {db}, skipping it.")
             continue

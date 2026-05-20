@@ -133,12 +133,16 @@ def process_blank_tax_ends(res_df, ranks):
 def main():
     input_path, label, sample = parse_args()
 
+    mapseq_to_asv_table(input_path, label, sample)
+
+
+def mapseq_to_asv_table(input_path: Path, label: str, sample: str):
     res_tsv_name = f"./{sample}_{label}_asv_taxa.tsv"
 
     if input_path.stat().st_size == 0:
         logging.info(f"Run {sample}'s mapseq file {input_path} exists but is empty. Skipping.")
         open(res_tsv_name, "w").close()
-        exit(0)
+        return
 
     mseq_df = pd.read_csv(input_path, header=0, delim_whitespace=True, usecols=[0, 12])
 

@@ -30,7 +30,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_args():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
@@ -58,7 +57,6 @@ def parse_args():
 
 
 def get_read_count(read_path):
-
     fasta = pyfastx.Fasta(read_path, build_index=False)
     read_count = sum(1 for _ in fasta)
 
@@ -66,9 +64,7 @@ def get_read_count(read_path):
 
 
 def add_markergene(root_path, run_acc, markergene_dict, markergene):
-
     if markergene != "ITS":
-
         bacterial_ssu = list(pathlib.Path(f"{root_path}/{run_acc}/sequence-categorisation").glob(f"*{markergene}*bacteria*"))
         archaeal_ssu = list(pathlib.Path(f"{root_path}/{run_acc}/sequence-categorisation").glob(f"*{markergene}*archaea*"))
         eukarya_ssu = list(pathlib.Path(f"{root_path}/{run_acc}/sequence-categorisation").glob(f"*{markergene}*eukarya*"))
@@ -91,7 +87,6 @@ def add_markergene(root_path, run_acc, markergene_dict, markergene):
 
 
 def add_read_count_to_markergene(marker_gene_dict, marker, label):
-
     if marker:
         read_count = get_read_count(str(marker[0]))
         marker_gene_dict[label]["read_count"] = read_count
@@ -102,7 +97,6 @@ def add_read_count_to_markergene(marker_gene_dict, marker, label):
 
 
 def main():
-
     input_path, runs, prefix = parse_args()
 
     root_path = pathlib.Path(input_path)
@@ -158,7 +152,12 @@ def main():
             marker_gene = amp_region.split("-")[0]
             amp_region = "-".join(amp_region.split("-")[1:])
 
-            amp_region_df = pd.read_csv(amp_region_path, sep="\t")
+            try:
+                amp_region_df = pd.read_csv(amp_region_path, sep="\t")
+            except pd.errors.EmptyDataError:
+                logging.warning(f"ASV TSV is empty, skipping: {amp_region_path}")
+                continue
+
             asv_count = len(amp_region_df)
             read_count = amp_region_df.loc[:, "count"].sum()
 

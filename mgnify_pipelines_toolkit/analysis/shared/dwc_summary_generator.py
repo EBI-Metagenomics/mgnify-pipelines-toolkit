@@ -490,7 +490,7 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
             count_df["amplifiedRegion"] = [amp_region] * len(count_df)
             count_dfs.append(count_df)
         if not count_dfs:
-            logging.info(f"Run {run_acc}'s count dataframe {count_files} is empty. Skipping.")
+            logging.info(f"Run {run_acc}'s count file {count_file} exists but is empty. Skipping.")
             continue
 
         # Merge counts into one DF in case there are multiple amplified regions...
@@ -676,7 +676,15 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
                 run_merged_result = run_metadata.merge(run_asv_data, on="RunID")
                 all_merged_df.append(run_merged_result)
 
+        if not all_merged_df:
+            logging.info(f"No ASV results found for DB {db} across runs; skipping generation of *_dwcready.csv.")
+            continue
+
         final_df = pd.concat(all_merged_df, ignore_index=True)
+        if final_df.empty:
+            logging.info(f"Concatenated ASV dataframe for DB {db} is empty; skipping generation of *_dwcready.csv.")
+            continue
+
         final_df = cleanup_asv_taxa(final_df, db)
 
         # get all amplified regions present in the study
@@ -695,6 +703,10 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     closedref_dbs = ["SILVA-SSU", "PR2", "SILVA-LSU", "ITSoneDB", "UNITE"]
     for db in closedref_dbs:
         closedref_dict = get_closedref_dict(runs_df, root_path, db, otu_dir)
+        if not closedref_dict:
+            logging.info(f"No closed-reference data found for DB {db}, skipping generation of *_closedref_{db}_dwcready.csv.")
+            continue
+
         all_merged_df = []
 
         for run in all_runs:
@@ -710,7 +722,7 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
 
             final_df.to_csv(f"{output_prefix}_closedref_{db}_dwcready.csv", index=False, na_rep="NA")
         else:
-            logging.info(f"No results at all for DB {db} in entire analysis, won't generate summary for it.")
+            logging.info(f"No results at all for DB {db} in entire study, won't generate *_closedref_{db}_dwcready.csv.")
 
 
 def organise_dwcr_summaries(all_study_summaries: List[Path]) -> defaultdict[List]:

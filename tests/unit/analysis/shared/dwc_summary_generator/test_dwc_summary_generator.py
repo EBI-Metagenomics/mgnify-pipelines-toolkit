@@ -18,6 +18,8 @@ import pandas as pd
 import shutil
 from pathlib import Path
 from mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator import get_asv_dict, get_closedref_dict
+from click.testing import CliRunner
+from mgnify_pipelines_toolkit.analysis.shared.dwc_summary_generator import cli
 
 
 def test_get_asv_dict_empty_files(tmp_path: Path):
@@ -126,3 +128,68 @@ def test_get_closedref_dict_empty_files(tmp_path: Path):
     res = get_closedref_dict(runs_df, root_path, db, otu_dir)
     assert run_acc in res
     assert res[run_acc].iloc[0]["count"] == 10
+
+
+def test_generate_dwcready_summaries_single_run_empty_asv(tmp_path: Path):
+    """
+    Test generate_dwcready_summaries when there is a single run but ASV parsing
+    returns an empty dict due to empty critical files.
+
+    Mimics real pipeline structure with minimal required files only.
+    """
+    run_acc = "SRR3612607"
+    # Runs table
+    runs_df = pd.DataFrame([{"run": run_acc, "status": "all_results"}])
+    runs_csv = tmp_path / "runs.csv"
+    runs_df.to_csv(runs_csv, index=False, header=False)
+    # Root structure
+    root_path = tmp_path / "results"
+    run_dir = root_path / run_acc
+    db = "DADA2-SILVA"
+    tax_summary_dir = run_dir / "taxonomy-summary" / db
+    asv_dir = run_dir / "asv"
+    count_dir = asv_dir / "16S-V4"
+    tax_summary_dir.mkdir(parents=True)
+    count_dir.mkdir(parents=True)
+    # Empty mseq file → should cause get_asv_dict to skip run
+    (tax_summary_dir / f"{run_acc}_{db}.mseq").touch()
+    # Other required files exist but are valid
+    (asv_dir / f"{run_acc}_{db}_asv_tax.tsv").write_text("ASV\tKingdom\nASV1\tBacteria\n")
+    (asv_dir / f"{run_acc}_asv_seqs.fasta").write_text(">ASV1\nATGC\n")
+    (count_dir / f"{run_acc}_16S-V4_asv_read_counts.tsv").write_text("asv\tcount\nASV1\t10\n")
+    # OTU dir (required by function)
+    otu_dir = tmp_path / "otu"
+    otu_dir.mkdir()
+    fixture_otu = Path("tests/fixtures/refdb_otus/SILVA-SSU.otu")
+    shutil.copy(fixture_otu, otu_dir / "SILVA-SSU.otu")
+    # Closed-reference files
+    db_closed = "SILVA-SSU"
+    # Closedref minimal structure (empty krona file → should be skipped)
+    closedref_dir = root_path / run_acc / "taxonomy-summary" / db_closed
+    closedref_dir.mkdir(parents=True, exist_ok=True)
+    krona_file = closedref_dir / "empty.txt"
+    krona_file.touch()  # empty → triggers skip in get_closedref_dict
+    # Output dir
+    output_dir = tmp_path / "output"
+    # Run script
+    runner = CliRunner()
+
+    result = runner.invoke(
+        cli,
+        [
+            "summarise",
+            "-r",
+            str(runs_csv),
+            "-a",
+            str(root_path),
+            "-otu",
+            str(otu_dir),
+            "-p",
+            str(output_dir),
+        ],
+    )
+    # --- Assertions ---
+    # Since get_asv_dict returns empty dict, no ASV-based outputs should be created
+    assert result.exit_code == 0
+    output_files = list(output_dir.glob("*"))
+    assert output_files == [], "Expected no output summaries when ASV dict and closed-reference dict are empty"

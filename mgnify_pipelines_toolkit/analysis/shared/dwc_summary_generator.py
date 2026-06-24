@@ -21,12 +21,12 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 from shutil import SameFileError
-from typing import Dict, List, Literal, Union
+from typing import Dict, List, Literal
 
 import click
 import pandas as pd
 import pyfastx
-import requests
+import json
 
 from mgnify_pipelines_toolkit.constants.tax_ranks import (
     PR2_TAX_RANKS,
@@ -36,9 +36,6 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 )
 
 logging.basicConfig(level=logging.DEBUG)
-
-URL = "https://www.ebi.ac.uk/ena/portal/api/search"
-HEADERS = {"Accept": "application/json"}
 
 
 @click.group()
@@ -71,120 +68,6 @@ def parse_args():
     output = args.output
 
     return input_path, runs, output
-
-
-def get_ena_metadata_from_run_acc(run_acc: str) -> Union[pd.DataFrame, bool]:
-    """
-    Fetches and processes metadata from ENA using the provided run accession.
-
-    This function queries the European Nucleotide Archive (ENA) API to retrieve
-    metadata related to the specified run accession. Once the metadata is
-    retrieved, it performs cleaning and formatting to return the data in a
-    structured pandas DataFrame.
-
-    Parameters:
-    run_acc: str
-        Accession identifier for the run to query from ENA.
-
-    Returns:
-    Union[pd.DataFrame, bool]
-        A pandas DataFrame containing the retrieved and processed metadata
-        if the query is successful, or False if the data for the given run
-        accession is not found.
-    """
-
-    run_fields_list = [
-        "secondary_study_accession",
-        "sample_accession",
-        "instrument_model",
-    ]
-    run_query_args = {
-        "result": "read_run",
-        "includeAccessions": run_acc,
-        "fields": ",".join(run_fields_list),
-        "limit": 10,
-        "format": "json",
-        "download": "false",
-    }
-    res_run = requests.get(URL, headers=HEADERS, params=run_query_args)
-
-    if res_run.status_code != 200:
-        logging.error(f"Data not found for run {run_acc}")
-        return False
-
-    sample_acc = res_run.json()[0]["sample_accession"]
-    sample_fields_list = [
-        "lat",
-        "lon",
-        "collection_date",
-        "depth",
-        "center_name",
-        "temperature",
-        "salinity",
-        "country",
-    ]
-    sample_query_args = {
-        "result": "sample",
-        "includeAccessions": sample_acc,
-        "fields": ",".join(sample_fields_list),
-        "limit": 10,
-        "format": "json",
-        "download": "false",
-    }
-    res_sample = requests.get(URL, headers=HEADERS, params=sample_query_args)
-
-    full_res_dict = res_run.json()[0] | res_sample.json()[0]
-
-    # Turn empty values into NA
-    full_res_dict = {field: "NA" if val == "" else val for field, val in full_res_dict.items()}
-
-    if full_res_dict["collection_date"] == "":
-        full_res_dict["collectionDate"] = "NA"
-    else:
-        full_res_dict["collectionDate"] = full_res_dict["collection_date"]
-
-    del full_res_dict["collection_date"]
-
-    res_df = pd.DataFrame(full_res_dict, index=[0])
-    res_df = res_df.rename(
-        columns={
-            "run_accession": "RunID",
-            "sample_accession": "SampleID",
-            "secondary_study_accession": "StudyID",
-            "lon": "decimalLongitude",
-            "lat": "decimalLatitude",
-            "instrument_model": "seq_meth",
-        }
-    )
-
-    return res_df
-
-
-def get_all_ena_metadata_from_runs(runs: List[str]) -> Dict[str, pd.DataFrame]:
-    """
-    Fetches ENA metadata for a list of run accessions.
-
-    This function retrieves metadata from the European Nucleotide Archive (ENA)
-    for the provided list of run accessions. For each valid run accession, the
-    metadata is parsed and stored in a dictionary, where the key is the run
-    accession and the value is a DataFrame containing the metadata.
-
-    Parameters:
-        runs (List[str]): A list of strings representing run accessions for which
-            the metadata needs to be retrieved.
-
-    Returns:
-        Dict[str, pd.DataFrame]: A dictionary where keys are run accessions and
-        values are DataFrames containing the corresponding ENA metadata.
-    """
-    run_metadata_dict = defaultdict(pd.DataFrame)
-
-    for run in runs:
-        res_df = get_ena_metadata_from_run_acc(run)
-        if res_df is not False:
-            run_metadata_dict[run] = res_df
-
-    return run_metadata_dict
 
 
 def cleanup_asv_taxa(df: pd.DataFrame, db: Literal["DADA2-SILVA", "DADA2-PR2"]) -> pd.DataFrame:
@@ -333,6 +216,46 @@ def cleanup_closedref_taxa(df: pd.DataFrame, db: Literal["SILVA-SSU", "PR2", "SI
     ]
 
     return cleaned_df
+
+
+def load_run_metadata_from_json(metadata_path: Path, runs: List[str]) -> Dict[str, pd.DataFrame]:
+    """
+    Load per-run metadata from a JSON file and return a mapping of run -> DataFrame.
+
+    Expected JSON file example:
+
+    {
+      "ERR000001": {
+        "RunID": "ERR000001",
+        "SampleID": "SAME1",
+        "StudyID": "PRJXXXX",
+        "decimalLatitude": "51.5",
+        "decimalLongitude": "-0.12",
+        "collectionDate": "2020-01-01",
+        "seq_meth": "Illumina MiSeq",
+        "country": "United Kingdom",
+        "InstitutionCode": "EMBL-EBI"
+      },
+      "ERR000002": { ... }
+    }
+
+    The function ensures each metadata dict contains a `RunID` (defaults to the
+    run accession key if missing) and converts each entry to a single-row
+    pandas DataFrame, replacing nulls with the string "NA".
+    """
+    with metadata_path.open("r") as fh:
+        metadata_json = json.load(fh)
+
+    run_metadata: Dict[str, pd.DataFrame] = {}
+    for run in runs:
+        if run in metadata_json:
+            md = metadata_json[run]
+            if "RunID" not in md:
+                md["RunID"] = run
+            run_df = pd.DataFrame(md, index=[0]).fillna("NA")
+            run_metadata[run] = run_df
+
+    return run_metadata
 
 
 def concatenate_taxa_row(taxa_row: pd.Series, separator: str = ";") -> str:
@@ -613,8 +536,15 @@ def get_closedref_dict(
     help="Input directory containing the OTU files for the taxonomic reference databases to extract taxonomic IDs",
     type=click.Path(exists=True, path_type=Path, file_okay=False),
 )
+@click.option(
+    "-m",
+    "--metadata",
+    required=True,
+    help="Path to JSON file containing per-run metadata (mapping run -> metadata dict)",
+    type=click.Path(exists=True, path_type=Path, dir_okay=False),
+)
 @click.option("-p", "--output_prefix", required=True, help="Prefix to summary files", type=str)
-def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: str, otu_dir: Path) -> None:
+def generate_dwcready_summaries(runs: Path, analyses_dir: Path, otu_dir: Path, metadata: Path, output_prefix: str) -> None:
     """
     Generate Darwin Core-ready study-level summaries of amplicon analysis results.
 
@@ -661,7 +591,12 @@ def generate_dwcready_summaries(runs: Path, analyses_dir: Path, output_prefix: s
     runs_df = pd.read_csv(runs, names=["run", "status"])
 
     all_runs = runs_df.run.to_list()
-    run_metadata_dict = get_all_ena_metadata_from_runs(all_runs)
+
+    try:
+        run_metadata_dict = load_run_metadata_from_json(metadata, all_runs)
+    except Exception as exc:
+        logging.error(f"Failed to load metadata from {metadata}: {exc}")
+        exit(1)
 
     # Generate DwC-ready files for ASV results
     asv_dbs = ["DADA2-SILVA", "DADA2-PR2"]

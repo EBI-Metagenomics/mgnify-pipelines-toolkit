@@ -174,6 +174,11 @@ def test_generate_dwcready_summaries_single_run_empty_asv(tmp_path: Path):
     # Run script
     runner = CliRunner()
 
+    # Create minimal metadata JSON mapping for the run and pass via -m
+    metadata = {run_acc: {"RunID": run_acc, "SampleID": "SAMPLE1"}}
+    metadata_file = tmp_path / "metadata.json"
+    metadata_file.write_text(pd.io.json.dumps(metadata))
+
     result = runner.invoke(
         cli,
         [
@@ -184,6 +189,8 @@ def test_generate_dwcready_summaries_single_run_empty_asv(tmp_path: Path):
             str(root_path),
             "-otu",
             str(otu_dir),
+            "-m",
+            str(metadata_file),
             "-p",
             str(output_dir),
         ],

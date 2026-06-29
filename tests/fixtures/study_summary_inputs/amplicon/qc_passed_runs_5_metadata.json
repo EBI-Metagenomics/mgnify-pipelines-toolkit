@@ -1,0 +1,30 @@
+{
+  "ERR4334351": {
+    "RunID": "ERR4334351",
+    "StudyID": "ERP122862",
+    "SampleID": "SAMEA7057179",
+    "seq_meth": "Illumina MiSeq",
+    "decimalLatitude": 51.112278,
+    "decimalLongitude": 10.408889,
+    "depth": 0.1,
+    "center_name": "FRIEDRICH SCHILLER UNIVERSITY JENA",
+    "temperature": null,
+    "salinity": null,
+    "country": "Germany",
+    "collectionDate": "2018-05-02"
+  },
+  "SRR17062740": {
+    "RunID": "SRR17062740",
+    "StudyID": "SRP348338",
+    "SampleID": "SAMN23489005",
+    "seq_meth": "Illumina MiSeq",
+    "decimalLatitude": 56.184167,
+    "decimalLongitude": 10.239167,
+    "depth": null,
+    "center_name": "University of Southern Denmark",
+    "temperature": null,
+    "salinity": null,
+    "country": "Denmark: Arhus Arhus Bay",
+    "collectionDate": "2017-01-18"
+  }
+}

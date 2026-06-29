@@ -9,7 +9,7 @@
 - name: dwc_summary_generator_summarise test_correct_args
   tags:
     - dwc_summary_generator
-  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1 -otu tests/fixtures/refdb_otus
+  command: dwc_summary_generator summarise -a tests/fixtures/study_summary_inputs/amplicon -r tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5.csv -p chunk1 -otu tests/fixtures/refdb_otus --metadata tests/fixtures/study_summary_inputs/amplicon/qc_passed_runs_5_metadata.json
   files:
     - path: "chunk1_DADA2-PR2_16S-V3-V4_dwcready.csv"
       md5sum: 7ba4911b221dc18db850d46a89341eb2

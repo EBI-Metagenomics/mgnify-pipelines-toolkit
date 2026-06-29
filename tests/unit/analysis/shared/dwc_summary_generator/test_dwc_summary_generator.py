@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import pandas as pd
 import shutil
 from pathlib import Path
@@ -177,7 +178,7 @@ def test_generate_dwcready_summaries_single_run_empty_asv(tmp_path: Path):
     # Create minimal metadata JSON mapping for the run and pass via -m
     metadata = {run_acc: {"RunID": run_acc, "SampleID": "SAMPLE1"}}
     metadata_file = tmp_path / "metadata.json"
-    metadata_file.write_text(pd.io.json.dumps(metadata))
+    metadata_file.write_text(json.dumps(metadata))
 
     result = runner.invoke(
         cli,

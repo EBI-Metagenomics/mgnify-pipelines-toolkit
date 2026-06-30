@@ -406,14 +406,14 @@ def get_asv_dict(runs_df: pd.DataFrame, root_path: Path, db: Literal["DADA2-SILV
         count_dfs = []
         for count_file in count_files:
             if count_file.stat().st_size == 0:
-                logging.info(f"Run {run_acc}'s count file {count_files} exists but is empty. Skipping.")
+                logging.info(f"Run {run_acc}'s count file {count_file} exists but is empty. Skipping.")
                 continue
             amp_region = count_file.stem.split("_")[1]
             count_df = pd.read_csv(count_file, sep="\t")
             count_df["amplifiedRegion"] = [amp_region] * len(count_df)
             count_dfs.append(count_df)
         if not count_dfs:
-            logging.info(f"Run {run_acc}'s count file {count_file} exists but is empty. Skipping.")
+            logging.info(f"Run {run_acc} does not seem to have any ASV count data. Skipping.")
             continue
 
         # Merge counts into one DF in case there are multiple amplified regions...

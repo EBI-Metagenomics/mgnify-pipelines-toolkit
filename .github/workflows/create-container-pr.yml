@@ -1,0 +1,99 @@
+name: Create Container Update PR
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  create-pr:
+    name: Create PR for Container Update
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout mgnify-pipelines-toolkit
+        uses: actions/checkout@v4
+
+      - name: Extract version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Checkout containers repository
+        uses: actions/checkout@v4
+        with:
+          repository: EBI-Metagenomics/containers
+          token: ${{ secrets.CONTAINERS_REPO_TOKEN }}
+          path: containers-repo
+          fetch-depth: 0
+
+      - name: Create new version directory and files
+        run: |
+          cd containers-repo
+          VERSION="${{ steps.version.outputs.version }}"
+          NEW_DIR="mgnify-pipelines-toolkit/$VERSION"
+
+          # Create directory for new version
+          mkdir -p "$NEW_DIR"
+
+          # Create Dockerfile
+          cat > "$NEW_DIR/Dockerfile" << 'EOF'
+          FROM mambaorg/micromamba:2.5.0
+
+          COPY --chown=$MAMBA_USER:$MAMBA_USER env.yaml /tmp/env.yaml
+
+          RUN micromamba install -y -n base -f /tmp/env.yaml \
+              && micromamba install -y -n base conda-forge::procps-ng \
+              && micromamba env export --name base --explicit > environment.lock \
+              && echo ">> CONDA_LOCK_START" \
+              && cat environment.lock \
+              && echo "<< CONDA_LOCK_END" \
+              && micromamba clean -a -y
+
+          USER root
+
+          ENV PATH="$MAMBA_ROOT_PREFIX/bin:$PATH"
+          EOF
+
+          # Create env.yaml
+          cat > "$NEW_DIR/env.yaml" << EOF
+          channels:
+          - conda-forge
+          - bioconda
+          dependencies:
+          - pyfastx=2.2.0
+          - python=3.12
+          - pip
+          - pip:
+            - mgnify-pipelines-toolkit==$VERSION
+          EOF
+
+          echo "Created files in $NEW_DIR"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.CONTAINERS_REPO_TOKEN }}
+          path: containers-repo
+          commit-message: "Update mgnify-pipelines-toolkit to version ${{ steps.version.outputs.version }}"
+          branch: mgnify-pipelines-toolkit-${{ steps.version.outputs.version }}
+          title: "Update mgnify-pipelines-toolkit to version ${{ steps.version.outputs.version }}"
+          body: |
+            ## Automated Container Update
+
+            This PR updates the mgnify-pipelines-toolkit container to version **${{ steps.version.outputs.version }}**.
+
+            ### Changes
+            - Created new version directory: `mgnify-pipelines-toolkit/${{ steps.version.outputs.version }}`
+            - Updated Dockerfile with new version
+            - Updated env.yaml with new version dependencies
+
+            ### Release Information
+            Release: ${{ github.event.release.html_url }}
+
+            ---
+            🤖 This PR was automatically created by the mgnify-pipelines-toolkit release workflow.
+          labels: |
+            automated
+            container-update

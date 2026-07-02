@@ -3,6 +3,7 @@ name: Create Container Update PR
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   create-pr:

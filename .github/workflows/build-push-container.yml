@@ -1,27 +1,22 @@
 name: Build and Push Container to Quay.io
 
 on:
-  # TEMPORARY: Testing trigger - REMOVE BEFORE MERGING TO MAIN
-  push:
+  pull_request:
+    types: [closed]
     branches:
-      - feature/automated-docker-container
-  # Production triggers (restore these)
-  # pull_request:
-  #   types: [closed]
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'container/**'
+      - main
+    paths:
+      - 'container/**'
   workflow_dispatch:
 
 jobs:
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    # TEMPORARY: Removed condition for testing - RESTORE BEFORE MERGING
-    # if: |
-    #   github.event.pull_request.merged == true &&
-    #   contains(github.event.pull_request.labels.*.name, 'container-update')
+    # Only run if PR was merged (not just closed) and has container-update label
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'container-update')
 
     steps:
       - name: Checkout

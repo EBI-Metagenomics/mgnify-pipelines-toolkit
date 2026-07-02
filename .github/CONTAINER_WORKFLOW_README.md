@@ -31,7 +31,7 @@ No additional secrets required - uses the default `GITHUB_TOKEN` for PR creation
 **Location**: `.github/workflows/build-push-container.yml`
 
 **Triggers**:
-- New release is published
+- When a PR with the `container-update` label is merged to main (affecting `container/**` files)
 - Manual workflow dispatch
 
 **Actions**:
@@ -79,10 +79,10 @@ Both workflows can be manually triggered if needed:
 ## Complete Workflow Flow
 
 1. **Developer creates a release** in GitHub
-2. **Both workflows trigger simultaneously**:
-   - **Workflow 1** creates a PR with updated `container/Dockerfile` and `container/env.yaml`
-   - **Workflow 2** builds and pushes the container to Quay.io
-3. **Review and merge the PR** (this updates the container files in the repository for future builds)
+2. **Workflow 1 triggers** and creates a PR with updated `container/Dockerfile` and `container/env.yaml` (labeled with `container-update`)
+3. **Review and merge the PR** (verify the container configuration looks correct)
+4. **Workflow 2 automatically triggers** when the PR is merged to main
+5. **Container is built and pushed** to Quay.io with version tag and `latest` tag
 
 ## Troubleshooting
 

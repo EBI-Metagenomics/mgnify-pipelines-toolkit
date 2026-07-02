@@ -61,12 +61,38 @@ This workflow requires the following GitHub secrets to be configured:
 
 ## Manual Workflow Dispatch
 
-Both workflows can be manually triggered if needed:
+Both workflows can be manually triggered for testing or special cases:
 
-1. Navigate to the Actions tab in the respective repository
-2. Select the workflow
-3. Click "Run workflow"
-4. Fill in any required inputs
+### Manually Triggering "Create Container Update PR"
+
+1. Navigate to Actions → "Create Container Update PR"
+2. Click "Run workflow"
+3. Select the branch to run from
+4. Optional inputs:
+   - **`version`**: Override the version from `pyproject.toml` (e.g., `1.5.2-dev`)
+     - Leave empty to use the version from `pyproject.toml`
+     - Useful for testing without modifying the file
+5. Click "Run workflow"
+
+### Manually Triggering "Build and Push Container"
+
+1. Navigate to Actions → "Build and Push Container to Quay.io"
+2. Click "Run workflow"
+3. Select the branch to run from (must have `container/` directory)
+4. Optional inputs:
+   - **`tag`**: Override the container tag from `pyproject.toml` (e.g., `dev`, `test`)
+     - Leave empty to use the version from `pyproject.toml`
+     - Useful for creating test builds
+   - **`push`**: Whether to push to Quay.io (default: `true`)
+     - Set to `false` for dry-run builds (build only, no push)
+     - Useful for testing the build process
+5. Click "Run workflow"
+
+**Use Cases for Manual Dispatch:**
+- Testing workflows before a release
+- Creating development/test containers with custom tags
+- Dry-run builds to verify container builds successfully
+- Re-building a container without creating a new release
 
 ## Security Best Practices
 
@@ -107,15 +133,32 @@ Both workflows can be manually triggered if needed:
 
 Before relying on the automation:
 
-1. **Test PR creation**: Use the manual workflow dispatch to test the PR creation workflow
-2. **Review generated files**: Manually verify the generated `container/Dockerfile` and `container/env.yaml`
+1. **Test PR creation**: Use the manual workflow dispatch with a custom version
+   - Go to Actions → "Create Container Update PR" → Run workflow
+   - Set `version` to something like `1.5.1-test`
+   - Verify the PR is created with correct files
+
+2. **Test container build**: Use the manual workflow dispatch with dry-run
+   - Go to Actions → "Build and Push Container to Quay.io" → Run workflow
+   - Set `tag` to `test`
+   - Set `push` to `false` (dry-run)
+   - Verify the build completes successfully
+
 3. **Test locally**: Build the container locally before merging:
    ```bash
    cd container
    docker build -t test-mgnify-pipelines-toolkit .
    docker run -it test-mgnify-pipelines-toolkit bash
    ```
+
 4. **Verify functionality**: Test that the tools work correctly in the container
+   ```bash
+   # Inside the container
+   python --version  # Should be 3.11
+   pip list | grep mgnify-pipelines-toolkit
+   # Test some commands
+   get_mpt_version
+   ```
 
 ## Maintenance
 

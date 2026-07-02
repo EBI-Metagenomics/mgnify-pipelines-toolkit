@@ -8,15 +8,26 @@ on:
     paths:
       - 'container/**'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Container tag to use (overrides pyproject.toml version)"
+        required: false
+        type: string
+      push:
+        description: "Push to Quay.io (false for dry-run)"
+        required: true
+        default: true
+        type: boolean
 
 jobs:
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    # Only run if PR was merged (not just closed) and has container-update label
+    # Only run if PR was merged (not just closed) and has container-update label, OR if manually dispatched
     if: |
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.labels.*.name, 'container-update')
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       contains(github.event.pull_request.labels.*.name, 'container-update'))
 
     steps:
       - name: Checkout
@@ -25,7 +36,13 @@ jobs:
       - name: Extract version from pyproject.toml
         id: version
         run: |
-          VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          if [ -n "${{ inputs.tag }}" ]; then
+            VERSION="${{ inputs.tag }}"
+            echo "Using manual tag: $VERSION"
+          else
+            VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+            echo "Extracted version from pyproject.toml: $VERSION"
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building version: $VERSION"
 
@@ -52,7 +69,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./container
-          push: true
+          push: ${{ inputs.push != false }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

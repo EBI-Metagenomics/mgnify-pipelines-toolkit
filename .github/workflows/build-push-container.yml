@@ -1,8 +1,13 @@
 name: Build and Push Container to Quay.io
 
 on:
-  release:
-    types: [published]
+  # TEMPORARY: Testing trigger - REMOVE BEFORE MERGING TO MAIN
+  push:
+    branches:
+      - feature/automated-docker-container
+  # Production trigger (restore this)
+  # release:
+  #   types: [published]
   workflow_dispatch:
     inputs:
       tag:

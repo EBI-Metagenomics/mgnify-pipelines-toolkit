@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - feature/automated-docker-container
-    paths:
-      - 'pyproject.toml'
   # Production trigger (restore this)
   # release:
   #   types: [published]

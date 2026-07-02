@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - feature/automated-docker-container
-    paths:
-      - 'container/**'
   # Production triggers (restore these)
   # pull_request:
   #   types: [closed]

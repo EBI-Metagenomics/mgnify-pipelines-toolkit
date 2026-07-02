@@ -12,12 +12,6 @@ RUN micromamba install -y -n base -f /tmp/env.yaml \
 # Install the local wheel package (with its dependencies)
 RUN micromamba run -n base pip install /tmp/*.whl
 
-# Export environment for reference
-RUN micromamba env export --name base --explicit > /environment.lock \
-    && echo ">> CONDA_LOCK_START" \
-    && cat /environment.lock \
-    && echo "<< CONDA_LOCK_END"
-
 USER root
 
 ENV PATH="$MAMBA_ROOT_PREFIX/bin:$PATH"

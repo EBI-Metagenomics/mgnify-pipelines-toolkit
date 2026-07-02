@@ -1,8 +1,15 @@
 name: Create Container Update PR
 
 on:
-  release:
-    types: [published]
+  # TEMPORARY: Testing trigger - REMOVE BEFORE MERGING TO MAIN
+  push:
+    branches:
+      - feature/automated-docker-container
+    paths:
+      - 'pyproject.toml'
+  # Production trigger (restore this)
+  # release:
+  #   types: [published]
   workflow_dispatch:
 
 jobs:

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import argparse
+from pathlib import Path
 import logging
 from collections import defaultdict
 
@@ -30,9 +31,9 @@ from mgnify_pipelines_toolkit.constants.tax_ranks import (
 logging.basicConfig(level=logging.DEBUG)
 
 
-def parse_args():
+def parse_args() -> tuple[Path, str, str]:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, type=str, help="Input from MAPseq output")
+    parser.add_argument("-i", "--input", required=True, type=Path, help="Input from MAPseq output")
     parser.add_argument(
         "-l",
         "--label",
@@ -45,11 +46,11 @@ def parse_args():
 
     args = parser.parse_args()
 
-    input = args.input
+    input_path = args.input
     label = args.label
     sample = args.sample
 
-    return input, label, sample
+    return input_path, label, sample
 
 
 def parse_label(label: str) -> tuple[list[str], list[str]]:
@@ -130,9 +131,21 @@ def process_blank_tax_ends(res_df, ranks):
 
 
 def main():
-    input, label, sample = parse_args()
+    input_path, label, sample = parse_args()
 
-    mseq_df = pd.read_csv(input, header=0, delim_whitespace=True, usecols=[0, 12])
+    mapseq_to_asv_table(input_path, label, sample)
+
+
+def mapseq_to_asv_table(input_path: Path, label: str, sample: str):
+    res_tsv_name = f"./{sample}_{label}_asv_taxa.tsv"
+
+    if input_path.stat().st_size == 0:
+        logging.info(f"Run {sample}'s mapseq file {input_path} exists but is empty. Skipping.")
+        open(res_tsv_name, "w").close()
+        return
+
+    mseq_df = pd.read_csv(input_path, header=0, delim_whitespace=True, usecols=[0, 12])
+
     logging.info(f"Number of ASVs at start: {len(mseq_df)}")
 
     short_ranks, long_ranks = parse_label(label)
@@ -140,7 +153,6 @@ def main():
     final_res_df = process_blank_tax_ends(res_df, short_ranks)
     logging.info(f"Number of ASVs at end: {len(final_res_df)}")
 
-    res_tsv_name = f"./{sample}_{label}_asv_taxa.tsv"
     final_res_df.to_csv(res_tsv_name, sep="\t", index=False) if not final_res_df.empty else open(res_tsv_name, "w").close()
 
 

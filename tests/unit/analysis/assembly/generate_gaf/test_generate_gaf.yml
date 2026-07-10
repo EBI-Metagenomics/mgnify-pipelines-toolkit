@@ -5,7 +5,7 @@
   command: generate_gaf --chromosome X
   stderr:
     contains:
-      - "generate_gaf: error: the following arguments are required: -i/--ips_input, -o/--output"
+      - "Error: No such option: --chromosome"
 - name: generate_gaf test_correct_args
   tags:
     - generate_gaf

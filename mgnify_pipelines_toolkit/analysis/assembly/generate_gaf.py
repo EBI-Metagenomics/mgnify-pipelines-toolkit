@@ -14,25 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
 import os
 import logging
 
+import click
+
 from mgnify_pipelines_toolkit.analysis.assembly.go_utils import parse_interproscan_tsv
-
-
-def parse_args():
-
-    description = "Go slim pipeline for processing InterProScan results"
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("-i", "--ips_input", help="InterProScan result file", required=True)
-    parser.add_argument("-o", "--output", help="GO summary output file", required=True)
-    args = parser.parse_args()
-
-    ips_input = args.ips_input
-    output = args.output
-
-    return ips_input, output
 
 
 # Constants
@@ -85,12 +72,13 @@ def write_gaf_file(gaf_input_file_path: str, go_id_set: set[str]) -> None:
     logging.info(f"GAF file created successfully: {gaf_input_file_path}")
 
 
-def main():
+@click.command()
+@click.option("-i", "--ips_input", required=True, type=click.Path(), help="InterProScan result file.")
+@click.option("-o", "--output", required=True, type=click.Path(), help="GO summary output file.")
+def main(ips_input, output):
     """
     Process the InterProScan TSV output and generate a GO annotation file (GAF)).
     """
-
-    ips_input, output = parse_args()
 
     # Validate input file
     if not os.path.exists(ips_input):

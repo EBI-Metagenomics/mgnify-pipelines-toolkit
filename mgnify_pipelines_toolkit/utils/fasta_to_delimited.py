@@ -15,18 +15,13 @@
 # limitations under the License.
 
 import argparse
+import fileinput
 import sys
 import re
 import csv
 import hashlib
-import gzip
 from Bio import SeqIO
 from mgnify_pipelines_toolkit.constants.regex_fasta_header import FORMAT_REGEX_MAP
-
-
-def is_gzipped(filepath):
-    with open(filepath, "rb") as test_f:
-        return test_f.read(2) == b"\x1f\x8b"
 
 
 def guess_header_format(header):
@@ -85,10 +80,7 @@ def parse_args():
 def main():
     path, output, format, delimiter, with_hash, no_header = parse_args()
 
-    if is_gzipped(path):
-        input_fh = gzip.open(path, mode="rt")
-    else:
-        input_fh = open(path, mode="rt")
+    input_fh = fileinput.hook_compressed(path, "r", encoding="utf-8")
 
     if output is None:
         output_fh = sys.stdout

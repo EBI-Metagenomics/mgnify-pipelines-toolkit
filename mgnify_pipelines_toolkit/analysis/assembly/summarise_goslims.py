@@ -127,6 +127,10 @@ def get_full_go_summary(core_gene_ontology, go2protein_count_dict, top_level_go_
 @click.option("-i", "--ips_input", required=True, type=click.Path(), help="InterProScan result file.")
 @click.option("-o", "--output", required=True, type=click.Path(), help="GO summary output file.")
 def main(go_obo, go_banding, gaf_input, ips_input, output):
+    """Generate full and GO slim summaries from InterProScan annotations.
+
+    The full summary is written to OUTPUT and the GO slim summary to OUTPUT_slim.
+    """
     logging.info("Parsing the InterProScan input: " + ips_input)
     go2protein_count_dict = parse_interproscan_tsv(ips_input)
     logging.info("Finished parsing.")

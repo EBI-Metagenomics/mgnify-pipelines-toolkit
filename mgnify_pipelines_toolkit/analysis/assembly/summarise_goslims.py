@@ -16,6 +16,7 @@
 
 import argparse
 import csv
+import fileinput
 import logging
 import os
 from collections import defaultdict
@@ -53,7 +54,7 @@ def parse_args():
 def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
     mapped_go_dict = defaultdict(set)
     if os.path.exists(gaf_file):
-        with open(gaf_file, "r") as handle:
+        with fileinput.hook_compressed(gaf_file, "r", encoding="utf-8") as handle:
             for line in handle:
                 if not line.startswith("!"):
                     line = line.strip()
@@ -67,7 +68,7 @@ def parse_mapped_gaf_file(gaf_file: Path) -> defaultdict[set]:
 def get_go_slim_summary(go_slim_banding_file, goslims2_protein_count):
     summary = []
 
-    with open(go_slim_banding_file, "r") as fr:
+    with fileinput.hook_compressed(go_slim_banding_file, "r", encoding="utf-8") as fr:
         for line in fr:
             if line.startswith("GO"):
                 line = line.strip()
@@ -110,7 +111,7 @@ def parse_gene_ontology(obo_file):
     :return:
     """
     go_term_tuples = []
-    with open(obo_file, "r") as fr:
+    with fileinput.hook_compressed(obo_file, "r", encoding="utf-8") as fr:
         id, term, category = "", "", ""
         for line in fr:
             line = line.strip()

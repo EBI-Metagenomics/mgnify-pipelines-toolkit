@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from collections import defaultdict
+import fileinput
 import logging
 import os
 from pathlib import Path
@@ -84,7 +85,7 @@ def parse_interproscan_tsv(ips_file: Path, mapped_go_terms: dict = None) -> dict
 
     go_pattern = re.compile("GO:\\d+")
 
-    with open(ips_file, "r") as fr:
+    with fileinput.hook_compressed(ips_file, "r", encoding="utf-8") as fr:
 
         for line in fr:
             # IPS files are parsed line by line - the same protein accession will appear multiple lines in a row with different annotation

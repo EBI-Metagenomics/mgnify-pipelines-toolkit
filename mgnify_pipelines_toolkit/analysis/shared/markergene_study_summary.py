@@ -87,14 +87,16 @@ def add_markergene(root_path, run_acc, markergene_dict, markergene):
 
 
 def add_read_count_to_markergene(marker_gene_dict, marker, label):
-    if marker and marker[0].stat().st_size > 0:
-        read_count = get_read_count(str(marker[0]))
-        marker_gene_dict[label]["read_count"] = read_count
-    else:
-        if marker:
-            logging.debug(f"File {marker[0]} exists but is empty, so will be treating its read count as 0.")
-        marker_gene_dict[label]["read_count"] = 0
+    read_count = 0
 
+    if marker:
+        file_path = marker[0]
+        if file_path.stat().st_size > 0:
+            read_count = get_read_count(str(file_path))
+        else:
+            logging.debug(f"File {file_path} exists but is empty, so will be treating its read count as 0.")
+
+    marker_gene_dict[label]["read_count"] = read_count
     return marker_gene_dict
 
 

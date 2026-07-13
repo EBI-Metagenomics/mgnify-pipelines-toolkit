@@ -254,6 +254,10 @@ def load_run_metadata_from_json(metadata_path: Path, runs: List[str]) -> Dict[st
                 md["RunID"] = run
             run_df = pd.DataFrame(md, index=[0]).fillna("NA")
             run_metadata[run] = run_df
+        else:
+            raise ValueError(
+                f"Run {run} not found in metadata JSON file {metadata_path}. Please ensure all runs have corresponding metadata entries."
+            )
 
     return run_metadata
 

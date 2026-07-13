@@ -87,12 +87,16 @@ def add_markergene(root_path, run_acc, markergene_dict, markergene):
 
 
 def add_read_count_to_markergene(marker_gene_dict, marker, label):
-    if marker:
-        read_count = get_read_count(str(marker[0]))
-        marker_gene_dict[label]["read_count"] = read_count
-    else:
-        marker_gene_dict[label]["read_count"] = 0
+    read_count = 0
 
+    if marker:
+        file_path = marker[0]
+        if file_path.stat().st_size > 0:
+            read_count = get_read_count(str(file_path))
+        else:
+            logging.debug(f"File {file_path} exists but is empty, so will be treating its read count as 0.")
+
+    marker_gene_dict[label]["read_count"] = read_count
     return marker_gene_dict
 
 
@@ -124,7 +128,7 @@ def main():
             read_count = 0
             for domain in markergene_dict[run_acc]["marker_genes"][markergene].keys():
                 read_count += markergene_dict[run_acc]["marker_genes"][markergene][domain]["read_count"]
-                proportion = read_count / float(total_read_counts)
+                proportion = read_count / float(total_read_counts) if total_read_counts else 0.0
                 markergene_dict[run_acc]["marker_genes"][markergene][domain]["majority_marker"] = proportion >= MAJORITY_MARKER_PROPORTION
 
     if markergene_dict:

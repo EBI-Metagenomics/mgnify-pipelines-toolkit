@@ -87,7 +87,14 @@ def get_tax_file(run_acc: str, analyses_dir: Path, db_label: str) -> Union[Path,
         asv_tax_files = glob.glob(f"{analyses_dir}/{run_acc}/taxonomy-summary/{db_label}/*.txt")
         asv_tax_files = [Path(file) for file in asv_tax_files if "concat" not in file]  # Have to filter out concatenated file if it exists
 
-        tax_file = asv_tax_files
+        non_empty_asv_tax_files = []
+        for file in asv_tax_files:
+            if file.stat().st_size == 0:  # Pipeline can generate ASV files that are empty, so need to skip those.
+                logging.debug(f"File {file} exists but is empty, skipping it.")
+                continue
+            non_empty_asv_tax_files.append(file)
+
+        tax_file = non_empty_asv_tax_files
 
     return tax_file
 

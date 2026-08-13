@@ -16,6 +16,7 @@
 
 import argparse
 import csv
+import fileinput
 import json
 import logging
 import re
@@ -41,7 +42,7 @@ def parse_gff(gff_file):
             also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
-    with open(gff_file, "r") as gff_in:
+    with fileinput.hook_compressed(gff_file, "r", encoding="utf-8") as gff_in:
         for line in gff_in:
             if line.startswith("#"):
                 continue
@@ -75,7 +76,7 @@ def parse_pyrodigal_output(file):
             also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
-    with open(file) as file_in:
+    with fileinput.hook_compressed(file, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if line.startswith("# Model Data"):
                 continue
@@ -112,7 +113,7 @@ def parse_fgsrs_output(file):
             also stores the protein ID.
     """
     predictions = defaultdict(lambda: defaultdict(list))
-    with open(file) as file_in:
+    with fileinput.hook_compressed(file, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if line.startswith(">"):
                 seq_id = line.split()[0][1:]
@@ -137,7 +138,7 @@ def parse_cmsearch_output(mask_file):
         dict: A dictionary with sequence IDs as keys, and a list of Intervals representing masked regions.
     """
     regions = defaultdict(list)
-    with open(mask_file) as file_in:
+    with fileinput.hook_compressed(mask_file, "r", encoding="utf-8") as file_in:
         for line in file_in:
             if line.startswith("#"):
                 continue
@@ -275,13 +276,14 @@ def output_fasta_files(predictions, files_dict, output_faa, output_ffn):
                 (files_dict[caller]["transcripts"], output_ffn_fh),
             ]:
                 sequences = []
-                for record in SeqIO.parse(input_file, "fasta"):
-                    if record.id in proteins:
-                        # Prodigal appends * to the end of a truncated sequence
-                        # FGS uses * to mark an ambiguous amino acid
-                        # Replace ending * and replace any other "*" with "X"
-                        record.seq = record.seq.rstrip("*").replace("*", "X")
-                        sequences.append(record)
+                with fileinput.hook_compressed(input_file, "r", encoding="utf-8") as input_fh:
+                    for record in SeqIO.parse(input_fh, "fasta"):
+                        if record.id in proteins:
+                            # Prodigal appends * to the end of a truncated sequence
+                            # FGS uses * to mark an ambiguous amino acid
+                            # Replace ending * and replace any other "*" with "X"
+                            record.seq = record.seq.rstrip("*").replace("*", "X")
+                            sequences.append(record)
                 # To mitigate a pyhmmer/hmmer bug with alphabet determination
                 # that arises when a FASTA file starts with short repetitive sequences
                 # in the downstream protein annotation step,

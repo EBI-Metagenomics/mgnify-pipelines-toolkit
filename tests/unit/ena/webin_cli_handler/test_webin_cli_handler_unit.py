@@ -126,15 +126,29 @@ class TestCheckManifest:
         alias, _ = check_manifest(str(manifest), None, "reads")
         assert alias == "RUN1"
 
+    def test_reads_valid_bams(self, tmp_path):
+        bam = tmp_path / "reads.bam"
+        bam.touch()
+        manifest = tmp_path / "run.manifest"
+        manifest.write_text(f"NAME\tRUN1\nBAM\t{bam}\n")
+        alias, _ = check_manifest(str(manifest), None, "reads")
+        assert alias == "RUN1"
+
     def test_reads_missing_fastq_field_raises(self, tmp_path):
         manifest = tmp_path / "run.manifest"
         manifest.write_text("NAME\tRUN1\nSTUDY\tPRJ1\n")
-        with pytest.raises(ManifestValidationError, match="FASTQ field not found"):
+        with pytest.raises(ManifestValidationError, match="Neither FASTQ nor BAM field found"):
             check_manifest(str(manifest), None, "reads")
 
     def test_reads_fastq_file_not_found_raises(self, tmp_path):
         manifest = tmp_path / "run.manifest"
         manifest.write_text(f"NAME\tRUN1\nFASTQ\t{tmp_path / 'missing.fq.gz'}\n")
+        with pytest.raises(ManifestValidationError, match="Data file not found"):
+            check_manifest(str(manifest), None, "reads")
+
+    def test_reads_bam_file_not_found_raises(self, tmp_path):
+        manifest = tmp_path / "run.manifest"
+        manifest.write_text(f"NAME\tRUN1\nBAM\t{tmp_path / 'missing.bam'}\n")
         with pytest.raises(ManifestValidationError, match="Data file not found"):
             check_manifest(str(manifest), None, "reads")
 
@@ -144,6 +158,16 @@ class TestCheckManifest:
         manifest = tmp_path / "run.manifest"
         manifest.write_text(f"NAME\tRUN1\nFASTQ\t{fq1}\nFASTQ\t{tmp_path / 'missing_2.fq.gz'}\n")
         with pytest.raises(ManifestValidationError, match="Data file not found"):
+            check_manifest(str(manifest), None, "reads")
+
+    def test_bam_and_fastq_both_present_raises(self, tmp_path):
+        fq = tmp_path / "reads.fq.gz"
+        fq.touch()
+        bam = tmp_path / "reads.bam"
+        bam.touch()
+        manifest = tmp_path / "run.manifest"
+        manifest.write_text(f"NAME\tRUN1\nBAM\t{bam}\nFASTQ\t{fq}\n")
+        with pytest.raises(ManifestValidationError, match="Both FASTQ and BAM fields found"):
             check_manifest(str(manifest), None, "reads")
 
     def test_reads_name_used_when_assemblyname_absent(self, tmp_path):

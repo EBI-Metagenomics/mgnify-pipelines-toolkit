@@ -90,7 +90,7 @@ def parse_arguments() -> argparse.Namespace:
             - mode (str): 'submit' or 'validate'
             - resume (bool): Whether to resume previous run by skipping already processed aliases
             - test (bool): Whether to use Webin test server
-            - input_dir (str | None): Path to the data files (FASTA or FASTQ) declared in the manifest file(s),
+            - input_dir (str | None): Path to the data files (FASTA, FASTQ or BAM) declared in the manifest file(s),
               required if manifest(s) reference file(s) that cannot be accessed from the execution directory
             - outdir (str | None): Base output directory for webin-cli files
             - output_accessions (str): File to write assigned accessions to (TSV, default: ena_accessions.tsv)
@@ -148,7 +148,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--input-dir",
         required=False,
-        help="Path to the data files (FASTA or FASTQ) declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
+        help="Path to the data files (FASTA, FASTQ or BAM) declared in the manifest file(s), required if manifest(s) reference file(s) that cannot be accessed from the execution directory",
     )
     parser.add_argument("--outdir", required=False, help="Base output directory for webin-cli files")
     parser.add_argument("--download-webin-cli", required=False, action="store_true", help="Specify if you do not have ena-webin-cli installed")
@@ -338,9 +338,17 @@ def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> t
         raise ManifestValidationError(f"Neither ASSEMBLYNAME, nor NAME field found in {manifest_path}")
 
     if context == "reads":
-        data_files = [Path(value) for value in manifest_dict.get("FASTQ", [])]
-        if not data_files:
-            raise ManifestValidationError(f"FASTQ field not found in {manifest_path}")
+        # Reads can be submitted either as FASTQ file(s) or as a single BAM file (e.g. long reads), not both
+        fastq_values = manifest_dict.get("FASTQ", [])
+        bam_value = manifest_dict.get("BAM")
+        if fastq_values and bam_value:
+            raise ManifestValidationError(f"Both FASTQ and BAM fields found in {manifest_path}, only one file type is allowed")
+        if bam_value:
+            data_files = [Path(bam_value)]
+        elif fastq_values:
+            data_files = [Path(value) for value in fastq_values]
+        else:
+            raise ManifestValidationError(f"Neither FASTQ nor BAM field found in {manifest_path}")
     else:
         fasta_value = manifest_dict.get("FASTA")
         if not fasta_value:

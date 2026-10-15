@@ -19,7 +19,7 @@ def _read_fields(manifest_path: Path) -> dict[str, list[str]]:
 
 
 class TestGenerateReadsManifest:
-    def test_required_fields_present(self, tmp_path):
+    def test_required_fastq_fields_present(self, tmp_path):
         out = tmp_path / "run.manifest"
         generate_reads_manifest(
             output_path=out,
@@ -97,6 +97,24 @@ class TestGenerateReadsManifest:
         )
         fields = _read_fields(out)
         assert fields["FASTQ"] == [full_path]
+
+    def test_single_bam_line(self, tmp_path):
+        out = tmp_path / "run.manifest"
+        generate_reads_manifest(
+            output_path=out,
+            study="PRJEB1",
+            sample="SAMEA1",
+            name="ont",
+            platform="OXFORD_NANOPORE",
+            instrument="MinION",
+            library_source="METAGENOMIC",
+            library_selection="RANDOM",
+            library_strategy="WGS",
+            bam_file="reads.bam",
+        )
+        fields = _read_fields(out)
+        assert fields["BAM"] == ["reads.bam"]
+        assert "FASTQ" not in fields
 
     def test_optional_insert_size(self, tmp_path):
         out = tmp_path / "run.manifest"
@@ -278,3 +296,31 @@ class TestCLI:
         assert main(argv) == 0
         fields = _read_fields(tmp_path / "out.manifest")
         assert fields["FASTQ"] == ["/full/path/to/reads.fq.gz"]
+
+    def test_cli_bam(self, tmp_path):
+        argv = [
+            "--study",
+            "PRJEB1",
+            "--sample",
+            "SAMEA1",
+            "--name",
+            "ont",
+            "--platform",
+            "OXFORD_NANOPORE",
+            "--instrument",
+            "MinION",
+            "--library-source",
+            "METAGENOMIC",
+            "--library-selection",
+            "RANDOM",
+            "--library-strategy",
+            "WGS",
+            "--bam",
+            "reads.bam",
+            "--output",
+            str(tmp_path / "out.manifest"),
+        ]
+        assert main(argv) == 0
+        fields = _read_fields(tmp_path / "out.manifest")
+        assert fields["BAM"] == ["reads.bam"]
+        assert "FASTQ" not in fields

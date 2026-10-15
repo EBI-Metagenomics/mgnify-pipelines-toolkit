@@ -481,3 +481,80 @@ class TestReadsE2E:
         assert len(accession_lines) == 3, f"Expected header and 2 reads lines in resume accessions file, got {accession_lines}"
         assert f"{skipped_alias}\tERX999999" in accession_lines
         assert any(line.startswith(f"{new_alias}\tERX") for line in accession_lines), accession_lines
+
+
+@pytest.mark.webin_cli
+class TestBamReadsE2E:
+    timestamp = int(time.time())
+
+    def test_validate_bam(self):
+        command = [
+            "webin_cli_handler",
+            "-c",
+            "reads",
+            "-m",
+            "tests/fixtures/webin_cli_handler/bam_reads.manifest",
+            "--mode",
+            "validate",
+            "--outdir",
+            test_output_dir,
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Submission validation succeeded" in result.stderr
+        assert "Submission/validation done for" in result.stderr
+
+    def test_submit_first_time_test_server(self, tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/bam_reads.manifest"
+        with open("new_bam_reads.manifest", "w") as file_out, open(test_manifest) as file_in:
+            for line in file_in:
+                if "NAME" in line:
+                    line = f"NAME\ttest_{self.timestamp}_bam\n"
+                file_out.write(line)
+        command = [
+            "webin_cli_handler",
+            "-c",
+            "reads",
+            "-m",
+            "new_bam_reads.manifest",
+            "--mode",
+            "submit",
+            "--test",
+            "--outdir",
+            test_output_dir,
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Assigned accession for" in result.stderr
+        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Submission/validation done" in result.stderr
+
+    def test_submit_second_time_test_server(self, tmp_path):
+        test_manifest = "tests/fixtures/webin_cli_handler/bam_reads.manifest"
+        with open("repeat_bam_reads.manifest", "w") as file_out, open(test_manifest) as file_in:
+            for line in file_in:
+                if "NAME" in line:
+                    line = f"NAME\ttest_{self.timestamp}_bam\n"
+                file_out.write(line)
+        command = [
+            "webin_cli_handler",
+            "-c",
+            "reads",
+            "-m",
+            "repeat_bam_reads.manifest",
+            "--mode",
+            "submit",
+            "--test",
+            "--outdir",
+            test_output_dir,
+            "--webin-cli-jar",
+            f"webin-cli-{webin_version}.jar",
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Run failed: {result.stderr}"
+        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submission/validation done" in result.stderr

@@ -130,17 +130,17 @@ def test_print_gff_substrate_parsing(fixtures_path: Path) -> None:
         Path(output_path).unlink(missing_ok=True)
 
 
-def test_legacy_fixtures_checksum(fixtures_path: Path) -> None:
-    """Test that legacy fixtures still produce expected output.
+def test_dbcan_5_1_2_fixtures_checksum(fixtures_path: Path) -> None:
+    """Test that the original dbCAN 5.1.2 fixtures still produce expected output.
 
-    This ensures backwards compatibility with older dbcan versions.
+    This ensures compatibility with the original dbCAN 5.1.2 examples.
 
     :param fixtures_path: Path to the fixtures directory
     :type fixtures_path: Path
     """
-    hmm_file = fixtures_path / "dbCANsub_hmm_results.tsv"
-    overview_file = fixtures_path / "overview.tsv"
-    input_gff = fixtures_path / "input_cgc.gff"
+    hmm_file = fixtures_path / "5.1.2" / "dbCANsub_hmm_results.tsv"
+    overview_file = fixtures_path / "5.1.2" / "overview.tsv"
+    input_gff = fixtures_path / "5.1.2" / "input_cgc.gff"
 
     substrates = load_substrates(hmm_file)
     genome_gff_lines = load_gff(input_gff)
@@ -149,13 +149,13 @@ def test_legacy_fixtures_checksum(fixtures_path: Path) -> None:
         output_path = outfile.name
 
     try:
-        print_gff(overview_file, output_path, "4.6", substrates, genome_gff_lines)
+        print_gff(overview_file, output_path, "5.1.2", substrates, genome_gff_lines)
 
         with open(output_path, "rb") as f:
             content = f.read()
             md5 = hashlib.md5(content).hexdigest()
 
-        assert md5 == "00b2c1d3f1024163099086d70ff12d50"
+        assert md5 == "ec3a63a98c94bd3730242131fbfe4c37"
 
     finally:
         Path(output_path).unlink(missing_ok=True)
@@ -231,15 +231,15 @@ def test_load_substrates_filters_missing_tokens(tmp_path: Path, raw_substrate: s
 
 
 @pytest.mark.parametrize(
-    "run, dbcan_version, expected_ec",
+    "dbcan_version, expected_ec",
     [
-        ("6.0", "5.1.2", "3.2.1.-|3.2.1.113|3.2.1.114|3.2.1.24"),
-        ("6.1", "5.2.9", "3.2.1.24|3.2.1.113|3.2.1.114|3.2.1.-"),
+        ("5.1.2", "3.2.1.-|3.2.1.113|3.2.1.114|3.2.1.24"),
+        ("5.2.9", "3.2.1.24|3.2.1.113|3.2.1.114|3.2.1.-"),
     ],
 )
-def test_pipeline_comparison_preserves_all_ecs(fixtures_path: Path, tmp_path: Path, run: str, dbcan_version: str, expected_ec: str) -> None:
-    """Preserve every EC in real dbCAN records from the 6.0 and 6.1 runs."""
-    example = fixtures_path / "pipeline_comparison" / run
+def test_dbcan_versions_preserve_all_ecs(fixtures_path: Path, tmp_path: Path, dbcan_version: str, expected_ec: str) -> None:
+    """Preserve every EC in assembly-analysis pipeline records from both dbCAN versions."""
+    example = fixtures_path / dbcan_version / "assembly-analysis-pipeline"
     output = tmp_path / "cazys.gff"
     print_gff(
         example / "overview.tsv",

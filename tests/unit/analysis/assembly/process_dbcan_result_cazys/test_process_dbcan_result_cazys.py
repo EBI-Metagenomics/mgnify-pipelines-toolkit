@@ -159,3 +159,98 @@ def test_legacy_fixtures_checksum(fixtures_path: Path) -> None:
 
     finally:
         Path(output_path).unlink(missing_ok=True)
+
+
+@pytest.mark.parametrize(
+    "raw_ec, expected_ec",
+    [
+        ("3.2.1.24:1|3.2.1.113:1|3.2.1.-:8", "3.2.1.24|3.2.1.113|3.2.1.-"),
+        ("3.2.1.24:1;3.2.1.113:1;3.2.1.-:8", "3.2.1.24|3.2.1.113|3.2.1.-"),
+        ("3.2.1.4:1;3.2.1.8:1|3.2.1.4:2;3.2.1.78:2", "3.2.1.4|3.2.1.8|3.2.1.4|3.2.1.78"),
+        (" - | N/A ; ; 3.2.1.-:8 ; 3.2.1.24 ", "3.2.1.-|3.2.1.24"),
+        ("-|N/A;; ", None),
+    ],
+)
+def test_print_gff_ec_formats(tmp_path: Path, raw_ec: str, expected_ec: str | None) -> None:
+    """Preserve complete EC lists from old, new and mixed dbCAN formats."""
+    gene = "ERZ19210871_100019_1"
+    overview = tmp_path / "overview.tsv"
+    # Reorder columns and add the new Substrate column to exercise header-based reading.
+    overview.write_text(f"Substrate\tRecommend Results\t#ofTools\tEC#\tGene ID\nhost glycan\tGH92_e0\t2\t{raw_ec}\t{gene}\n")
+    output = tmp_path / "output.gff"
+    print_gff(overview, str(output), "5.2.9", {}, {gene: [f"contig\t.\tCDS\t1\t501\t.\t+\t.\tID={gene}\n"]})
+    content = output.read_text()
+    if expected_ec is None:
+        assert "eC_number=" not in content
+    else:
+        assert f"eC_number={expected_ec};" in content
+    assert "protein_family=GH92_e0;" in content
+    assert "num_tools=2;" in content
+    # The overview's substrate column must not replace the HMM-derived substrate.
+    assert "substrate_dbcan-sub=N/A;" in content
+
+
+@pytest.mark.parametrize(
+    "content, message",
+    [
+        ("Gene ID\tEC#\t#ofTools\n", "Missing required dbCAN overview columns: Recommend Results"),
+        ("", "Missing required dbCAN overview columns:"),
+        ("Gene ID\tEC#\t#ofTools\tRecommend Results\nERZ1\t-\t2\n", "Incomplete dbCAN overview row 2: Recommend Results"),
+    ],
+)
+def test_print_gff_rejects_incomplete_overview(tmp_path: Path, content: str, message: str) -> None:
+    """Reject unsupported schemas and truncated rows rather than misassigning columns."""
+    overview = tmp_path / "overview.tsv"
+    overview.write_text(content)
+    with pytest.raises(ValueError, match=message):
+        print_gff(overview, str(tmp_path / "output.gff"), "5.2.9", {}, {})
+
+
+@pytest.mark.parametrize(
+    "raw_substrate, expected",
+    [
+        ("alpha-glucan;alpha-glucan;-", {"alpha-glucan"}),
+        (" host glycan ; - , N/A , chitin ", {"host glycan", "chitin"}),
+        ("-;N/A, ; -", None),
+        ("", None),
+    ],
+)
+def test_load_substrates_filters_missing_tokens(tmp_path: Path, raw_substrate: str, expected: set[str] | None) -> None:
+    """Filter missing values inside mixed lists and preserve the N/A fallback."""
+    gene = "ERZ19210871_61249_1"
+    hmm = tmp_path / "hmm.tsv"
+    hmm.write_text(f"Substrate\tTarget Name\ti-Evalue\n{raw_substrate}\t{gene}\t1e-29\n")
+    substrates = load_substrates(hmm)
+    assert substrates.get(gene) == expected
+    overview = tmp_path / "overview.tsv"
+    overview.write_text(f"Gene ID\tEC#\t#ofTools\tRecommend Results\n{gene}\t-\t2\tCBM48_e3\n")
+    output = tmp_path / "output.gff"
+    print_gff(overview, str(output), "5.2.9", substrates, {gene: [f"contig\t.\tCDS\t1\t78\t.\t+\t.\tID={gene}\n"]})
+    expected_text = ",".join(sorted(expected)) if expected else "N/A"
+    assert f"substrate_dbcan-sub={expected_text};" in output.read_text()
+
+
+@pytest.mark.parametrize(
+    "run, dbcan_version, expected_ec",
+    [
+        ("6.0", "5.1.2", "3.2.1.-|3.2.1.113|3.2.1.114|3.2.1.24"),
+        ("6.1", "5.2.9", "3.2.1.24|3.2.1.113|3.2.1.114|3.2.1.-"),
+    ],
+)
+def test_pipeline_comparison_preserves_all_ecs(fixtures_path: Path, tmp_path: Path, run: str, dbcan_version: str, expected_ec: str) -> None:
+    """Preserve every EC in real dbCAN records from the 6.0 and 6.1 runs."""
+    example = fixtures_path / "pipeline_comparison" / run
+    output = tmp_path / "cazys.gff"
+    print_gff(
+        example / "overview.tsv",
+        str(output),
+        dbcan_version,
+        load_substrates(example / "sub_hmm.tsv"),
+        load_gff(example / "annotation_summary.gff"),
+    )
+    assert output.read_text() == (
+        "##gff-version 3\n"
+        f"ERZ19210871_100019\tdbCAN:{dbcan_version}\tCAZyme\t1\t501\t.\t+\t.\t"
+        "ID=ERZ19210871_100019_1;protein_family=GH92_e0;substrate_dbcan-sub=host glycan;"
+        f"eC_number={expected_ec};num_tools=2;\n"
+    )

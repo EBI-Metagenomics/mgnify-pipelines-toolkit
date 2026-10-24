@@ -16,6 +16,7 @@
 #
 
 import argparse
+import csv
 import fileinput
 import logging
 import re
@@ -53,6 +54,11 @@ def main():
 
 
 def load_gff(gff):
+    """Group CDS lines by Parent (mettannotator) or ID (assembly analysis).
+
+    Ignore other feature types and stop before an embedded FASTA section.
+    Keep a list because one transcript can have several CDS lines.
+    """
     genome_gff_lines = dict()
     with fileinput.hook_compressed(gff, "r", encoding="utf-8") as gff:
         for line in gff:
@@ -80,48 +86,64 @@ def load_gff(gff):
 
 def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates: dict, genome_gff_lines: dict):
     """
-    Writes a GFF3 file with the cleaned and merged data from dbcan output files.
+    Write recommended CAZyme annotations using the original CDS coordinates.
+
+    Overview columns are matched by name, so added or reordered columns are safe.
+    EC evidence counts are removed; empty values, '-' and 'N/A' are omitted.
+    Substrates come from the HMM-derived mapping, not the overview's Substrate column.
+    Tool counts are retained for downstream filtering by gff_toolkit.
 
     :param overview_file: Path to the input overview file containing annotations and dbCAN tool information.
     :param outfile: Path to the output GFF3 file to be generated.
     :param dbcan_version: Version of the dbCAN tool used to annotate.
-    :param substrates: A dictionary where keys are transcript identifiers and values are substrate annotation strings.
+    :param substrates: A dictionary mapping transcript identifiers to sets of substrate names.
     :param genome_gff_lines: A dictionary where keys are transcript identifiers and values are lists of GFF3 lines corresponding to those transcripts.
     """
     with open(outfile, "w") as file_out:
         file_out.write("##gff-version 3\n")
         with fileinput.hook_compressed(overview_file, "r", encoding="utf-8") as file_in:
-            for line in file_in:
+            # Only these named columns are needed; extra columns are ignored.
+            reader = csv.DictReader(file_in, delimiter="\t")
+            required_columns = {"Gene ID", "EC#", "#ofTools", "Recommend Results"}
+            missing_columns = required_columns - set(reader.fieldnames or [])
+            if missing_columns:
+                raise ValueError(f"Missing required dbCAN overview columns: {', '.join(sorted(missing_columns))}")
+            for row in reader:
+                # DictReader uses None for cells absent from a truncated row, unlike an empty cell ('').
+                missing_values = [column for column in sorted(required_columns) if row[column] is None]
+                if missing_values:
+                    raise ValueError(f"Incomplete dbCAN overview row {reader.line_num}: {', '.join(missing_values)}")
+                transcript = row["Gene ID"].strip()
                 # TODO: why do we have such strict rule?
-                if not line.startswith("MGYG") and not line.startswith("ERZ"):
+                if not transcript.startswith("MGYG") and not transcript.startswith("ERZ"):
                     continue
 
-                line = line.strip()
-                temp_list = line.split("\t")
-                transcript = temp_list[0]
-                ec_number_raw = temp_list[1]
-                num_of_tools = temp_list[5]
-                recc_subfamily = temp_list[6]
+                ec_number_raw = row["EC#"]
+                num_of_tools = row["#ofTools"].strip()
+                recommended_family = row["Recommend Results"].strip()
 
-                # EC is reported as 2.4.99.-:5 with :5 meaning 5 proteins in the subfamily have EC 2.4.99.-
-
-                ec_number = ""
-                ec_list = ec_number_raw.split("|")
-                for ec in ec_list:
-                    if ec != "-":
-                        ec_number += ec.split(":")[0] + "|"
-
-                ec_number = ec_number.strip("|")
-
-                # Assemble information to add to the 9th column
-                if recc_subfamily == "-":
+                # No recommended family means no CAZyme feature should be written.
+                if recommended_family in {"", "-", "N/A"}:
                     continue
 
+                # dbCAN 5.1.2 uses '|'; dbCAN 5.2.9 may mix ';' within groups and '|' between groups.
+                # "3.2.1.24:1;3.2.1.113:2" -> "3.2.1.24|3.2.1.113"
+                # The suffix ':2' counts proteins with that EC in the subfamily; it is not part of the EC.
+                ec_list = []
+                for entry in re.split(r"[|;]", ec_number_raw):
+                    ec = entry.split(":", 1)[0].strip()
+                    # A standalone '-' is missing; a partial EC such as '3.2.1.-' must be kept.
+                    if ec not in {"", "-", "N/A"}:
+                        ec_list.append(ec)
+                # Preserve the original order and repeated ECs for compatibility with dbCAN 5.1.2 output.
+                ec_number = "|".join(ec_list)
+
+                # Sorted, deduplicated HMM substrates become a comma-separated GFF value.
+                # Genes without a named substrate get N/A, rather than an empty attribute.
                 substrates_str = ",".join(sorted(substrates.get(transcript, ["N/A"])))
 
                 col9_parts = [
-                    f"protein_family={recc_subfamily}",
-                    # The N/A is added when there are no substrates
+                    f"protein_family={recommended_family}",
                     f"substrate_dbcan-sub={substrates_str}",
                 ]
 
@@ -149,14 +171,14 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
 
 def load_substrates(hmm_path: Path) -> dict:
     """
-    Loads substrate prediction data from the dbcan - hmmer output file. This function processes the tsv to
-    extract substrate information for each gene/transcript, filters results based on e-value 1e-15 (default in dbcan).
-    The result dictionary is keyed by gene ID, and the values are set deduplicated substrate predictions.
+    Collect named substrates from subfamily HMM hits with i-Evalue < 1e-15.
+
+    Read columns by header name. Split substrate lists on ';' or ',', discard
+    missing-value tokens, and combine all qualifying hits for each gene into a set.
+    Genes with no named substrates are absent, so print_gff can supply N/A.
 
     :param hmm_path: The path to the HMM output file. The file must be in a tab-delimited format and may be compressed.
-    :return: A dictionary where keys are gene IDs and values are substrate predictions.
-             If multiple substrates are associated with a gene, they will be concatenated
-             into a single string separated by commas.
+    :return: A dictionary mapping gene IDs to sets of substrate names.
     """
     substrates = dict()
     with fileinput.hook_compressed(hmm_path, "r", encoding="utf-8") as file_in:
@@ -166,18 +188,17 @@ def load_substrates(hmm_path: Path) -> dict:
         gene_idx = header_fields.index("Target Name")
         evalue_idx = header_fields.index("i-Evalue")
         for line in file_in:
-            fields = line.strip().split("\t")
-            if float(fields[evalue_idx]) < HMM_HIT_EVALUE:  # evalue is the default from dbcan
-                substrate_str = fields[substrate_idx]
-                if substrate_str != "-":
-                    # The substrate string may have multiple values separated by ';' (in previous versions ',')
-                    # Example: "cellulose;chitin;xylan", we try with both (';' and ',') just in case
-                    raw_parts = re.split(r"[;,]\s*", substrate_str)
-                    stripped_parts = [s.strip() for s in raw_parts]
-                    substrate_parts = [s for s in stripped_parts if s and s != "N/A"]
-                    gene_id = fields[gene_idx]
-                    # Use set to automatically deduplicate substrates for each gene
-                    substrates.setdefault(gene_id, set()).update(substrate_parts)
+            # Preserve empty TSV cells; stripping tabs would shift the remaining columns.
+            fields = line.rstrip("\r\n").split("\t")
+            if float(fields[evalue_idx]) < HMM_HIT_EVALUE:
+                gene_id = fields[gene_idx]
+                # "host glycan;-;N/A,host glycan" -> {"host glycan"}
+                # Filter each token, since '-' can appear alongside a named substrate.
+                for entry in re.split(r"[;,]", fields[substrate_idx]):
+                    substrate = entry.strip()
+                    if substrate not in {"", "-", "N/A"}:
+                        # Sets also remove duplicates across multiple hits for the same gene.
+                        substrates.setdefault(gene_id, set()).add(substrate)
     return substrates
 
 

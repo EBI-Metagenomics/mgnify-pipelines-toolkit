@@ -1,0 +1,2 @@
+##gff-version 3
+ERZ19210871_100019	Pyrodigal_v3.6.3	CDS	1	501	.	+	.	ID=ERZ19210871_100019_1;eggNOG=1235803.C825_01755;cog=G;pfam=PF07971;interpro=IPR012939;dbcan_prot_type=CAZyme;dbcan_prot_family=GH92_e0;substrate_dbcan-sub=host glycan;eC_number=3.2.1.24

@@ -155,7 +155,7 @@ def test_dbcan_5_1_2_fixtures_checksum(fixtures_path: Path) -> None:
             content = f.read()
             md5 = hashlib.md5(content).hexdigest()
 
-        assert md5 == "ec3a63a98c94bd3730242131fbfe4c37"
+        assert md5 == "0733fe38c2034d0c70cbb63d9604bf1e"
 
     finally:
         Path(output_path).unlink(missing_ok=True)
@@ -166,7 +166,7 @@ def test_dbcan_5_1_2_fixtures_checksum(fixtures_path: Path) -> None:
     [
         ("3.2.1.24:1|3.2.1.113:1|3.2.1.-:8", "3.2.1.24|3.2.1.113|3.2.1.-"),
         ("3.2.1.24:1;3.2.1.113:1;3.2.1.-:8", "3.2.1.24|3.2.1.113|3.2.1.-"),
-        ("3.2.1.4:1;3.2.1.8:1|3.2.1.4:2;3.2.1.78:2", "3.2.1.4|3.2.1.8|3.2.1.4|3.2.1.78"),
+        ("3.2.1.4:1;3.2.1.8:1|3.2.1.4:2;3.2.1.78:2", "3.2.1.4|3.2.1.8|3.2.1.78"),
         (" - | N/A ; ; 3.2.1.-:8 ; 3.2.1.24 ", "3.2.1.-|3.2.1.24"),
         ("-|N/A;; ", None),
     ],

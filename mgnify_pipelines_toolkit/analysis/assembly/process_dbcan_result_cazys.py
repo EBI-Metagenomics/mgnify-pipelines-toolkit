@@ -89,7 +89,7 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
     Write recommended CAZyme annotations using the original CDS coordinates.
 
     Overview columns are matched by name, so added or reordered columns are safe.
-    EC evidence counts are removed; empty values, '-' and 'N/A' are omitted.
+    EC evidence counts are removed; empty values, '-', 'N/A' and repeated ECs are omitted.
     Substrates come from the HMM-derived mapping, not the overview's Substrate column.
     Tool counts are retained for downstream filtering by gff_toolkit.
 
@@ -135,8 +135,9 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
                     # A standalone '-' is missing; a partial EC such as '3.2.1.-' must be kept.
                     if ec not in {"", "-", "N/A"}:
                         ec_list.append(ec)
-                # Preserve the original order and repeated ECs for compatibility with dbCAN 5.1.2 output.
-                ec_number = "|".join(ec_list)
+                # Several subfamily hits can report the same EC; once counts and groups are dropped,
+                # a repeat no longer says which hit it came from, so keep only the first occurrence.
+                ec_number = "|".join(dict.fromkeys(ec_list))
 
                 # Sorted, deduplicated HMM substrates become a comma-separated GFF value.
                 # Genes without a named substrate get N/A, rather than an empty attribute.

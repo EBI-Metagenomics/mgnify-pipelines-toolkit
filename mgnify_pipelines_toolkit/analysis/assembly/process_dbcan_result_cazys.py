@@ -114,9 +114,10 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
                 if missing_values:
                     raise ValueError(f"Incomplete dbCAN overview row {reader.line_num}: {', '.join(missing_values)}")
                 transcript = row["Gene ID"].strip()
-                # TODO: why do we have such strict rule?
+                # TODO: remove or review this rule. It is kept for now (038703a) because MGnify analyses
+                # and MGnify Genomes pipelines use this script. It used to skip the row silently; now it fails.
                 if not transcript.startswith("MGYG") and not transcript.startswith("ERZ"):
-                    continue
+                    raise ValueError(f"Unexpected dbCAN overview Gene ID on row {reader.line_num}: {transcript} (expected an MGYG or ERZ prefix)")
 
                 ec_number_raw = row["EC#"]
                 num_of_tools = row["#ofTools"].strip()

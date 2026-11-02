@@ -196,6 +196,7 @@ def test_print_gff_ec_formats(tmp_path: Path, raw_ec: str, expected_ec: str | No
         ("Gene ID\tEC#\t#ofTools\n", "Missing required dbCAN overview columns: Recommend Results"),
         ("", "Missing required dbCAN overview columns:"),
         ("Gene ID\tEC#\t#ofTools\tRecommend Results\nERZ1\t-\t2\n", "Incomplete dbCAN overview row 2: Recommend Results"),
+        ("Gene ID\tEC#\t#ofTools\tRecommend Results\ncontig_1_1\t-\t2\tGH92\n", "Unexpected dbCAN overview Gene ID on row 2: contig_1_1"),
     ],
 )
 def test_print_gff_rejects_incomplete_overview(tmp_path: Path, content: str, message: str) -> None:

@@ -89,7 +89,7 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
     Write recommended CAZyme annotations using the original CDS coordinates.
 
     Overview columns are matched by name, so added or reordered columns are safe.
-    EC evidence counts are removed; empty values, '-', 'N/A' and repeated ECs are omitted.
+    EC evidence counts are removed; empty values, '-' and 'N/A' are omitted, and repeated ECs are retained.
     Substrates come from the HMM-derived mapping, not the overview's Substrate column.
     Tool counts are retained for downstream filtering by gff_toolkit.
 

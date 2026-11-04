@@ -70,7 +70,7 @@ def main():
             if tax in tax_counter:
                 tax_counter[tax]["count"] += 1
             else:
-                tax_counter[tax] = {"count": 1, "otu": 1, "taxid": ""}
+                tax_counter[tax] = {"count": 1, "otu": None, "taxid": ""}
 
     with open(args.otu_table, "r") as otu_table_fh:
         csv_reader = csv.reader(otu_table_fh, delimiter="\t")
@@ -92,6 +92,12 @@ def main():
 
     output_header = []
     notaxidfile_header = []
+
+    # UNITE/PR2 OTU tables carry no taxids, so the taxid column must be omitted
+    # from both the header and the data rows for the output to stay consistent.
+    include_taxid_col = args.taxid and not (
+        args.label.startswith("UNITE") or args.label.startswith("PR2")
+    )
 
     if args.taxid:
         if args.label.startswith("UNITE") or args.label.startswith("PR2"):
@@ -134,7 +140,7 @@ def main():
                 f"{float(tax_counter[tax]['count']):.1f}",
                 tax,
             ]
-            if args.taxid:
+            if include_taxid_col:
                 row.append(tax_counter[tax]["taxid"])
             output_csv.writerow(row)
 

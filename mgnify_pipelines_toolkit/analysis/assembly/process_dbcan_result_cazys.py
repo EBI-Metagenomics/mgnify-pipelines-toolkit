@@ -136,9 +136,12 @@ def print_gff(overview_file: Path, outfile: str, dbcan_version: str, substrates:
                     # A standalone '-' is missing; a partial EC such as '3.2.1.-' must be kept.
                     if ec not in {"", "-", "N/A"}:
                         ec_list.append(ec)
-                # Several subfamily hits can report the same EC; once counts and groups are dropped,
-                # a repeat no longer says which hit it came from, so keep only the first occurrence.
-                ec_number = "|".join(dict.fromkeys(ec_list))
+                # Preserve order and repeated ECs: repeats can represent separate domain hits.
+                # For example, ERZ19210871_1076_7 has EC# 2.4.1.25:4|2.4.1.25:4|2.4.1.25:5
+                # for CBM20(2-76)+CBM20(132-216)+GH77(244-889). Deduplicating would lose
+                # that distinction. Apart from removing counts and normalizing separators,
+                # keep dbCAN output intact rather than making assumptions about its meaning.
+                ec_number = "|".join(ec_list)
 
                 # Sorted, deduplicated HMM substrates become a comma-separated GFF value.
                 # Genes without a named substrate get N/A, rather than an empty attribute.

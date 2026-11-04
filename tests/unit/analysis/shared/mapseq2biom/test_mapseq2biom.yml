@@ -11,7 +11,26 @@
     - mapseq2biom
   command: mapseq2biom --out-file sample.tsv --krona sample.txt --no-tax-id sample.notaxid.tsv --taxid --label sample --query tests/fixtures/misc/test.mseq --otu-table tests/fixtures/misc/silva_ssu.otu
   files:
+    - path: "sample.tsv"
+      md5sum: 8c4b56d1a1babae605bf2c0d5550cbf1
     - path: "sample.txt"
       md5sum: 8f5b16db9a82e4f2cc200d65ff500083
     - path: "sample.notaxid.tsv"
-      md5sum: 3b79bb013dcceaaace095e5d5fd32505
+      md5sum: 752e0a48f06175c6fc8f17c6a5ae7593
+- name: mapseq2biom test_unite_label_with_taxid
+  tags:
+    - mapseq2biom
+  command: mapseq2biom --out-file unite.tsv --krona unite.txt --no-tax-id unite.notaxid.tsv --taxid --label UNITE --query tests/fixtures/misc/test.mseq --otu-table tests/fixtures/misc/unite_otu.tsv
+  files:
+    - path: "unite.tsv"
+      md5sum: 02dbe06924e8fee373837479aa2c7bc6
+    - path: "unite.notaxid.tsv"
+      md5sum: 02dbe06924e8fee373837479aa2c7bc6
+- name: mapseq2biom test_taxonomy_not_in_otu_table
+  tags:
+    - mapseq2biom
+  exit_code: 1
+  command: mapseq2biom --out-file fail.tsv --no-tax-id fail.notaxid.tsv --label sample --query tests/fixtures/misc/test.mseq --otu-table tests/fixtures/misc/silva_ssu_partial.otu
+  stderr:
+    contains:
+      - "has not got an OTU code assigned"

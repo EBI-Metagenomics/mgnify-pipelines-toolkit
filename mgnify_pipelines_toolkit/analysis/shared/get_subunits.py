@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2024-2025 EMBL - European Bioinformatics Institute
+# Copyright 2024-2026 EMBL - European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 import argparse
 import os
+from contextlib import ExitStack
 from Bio import SeqIO
 from mgnify_pipelines_toolkit.constants.ncrna import (
     DIRECTORY_SEQ_CAT,
@@ -98,35 +99,31 @@ def main():
     print("Start fasta mode")
     pattern_dict = set_model_names(prefix, name, directory, args.separate_subunits_by_models)
 
-    open_files = {}
-    for record in SeqIO.parse(args.input, "fasta"):
-        model = "-".join("/".join(record.id.split("/")[:-1]).split("-")[-1:])
-        if model in SSU_MODELS:
-            if SSU not in open_files:
-                file_out = open(pattern_dict[SSU], "w")
-                open_files[SSU] = file_out
-            SeqIO.write(record, open_files[SSU], "fasta")
-        elif model in LSU_MODELS:
-            if LSU not in open_files:
-                file_out = open(pattern_dict[LSU], "w")
-                open_files[LSU] = file_out
-            SeqIO.write(record, open_files[LSU], "fasta")
+    # Multiple RNA models can share one output filename.
+    # Separate buffered handles can overwrite records in that file.
+    # Reuse one handle per filename to prevent overlapping writes.
+    # ExitStack closes every handle, including after an exception.
+    with ExitStack() as stack:
+        open_files = {}
+        for record in SeqIO.parse(args.input, "fasta"):
+            model = "-".join("/".join(record.id.split("/")[:-1]).split("-")[-1:])
+            filenames = []
+            if model in SSU_MODELS:
+                filenames.append(pattern_dict[SSU])
+            elif model in LSU_MODELS:
+                filenames.append(pattern_dict[LSU])
 
-        if model in NON_CODING_RNA:
-            if model in pattern_dict:
-                filename = pattern_dict[model]
+            if model in NON_CODING_RNA:
+                if model in pattern_dict:
+                    filenames.append(pattern_dict[model])
             else:
-                filename = None
-        else:
-            filename = os.path.join(directory, f"{name}_other_ncRNA.fasta")
-        if filename:
-            if model not in open_files:
-                file_out = open(filename, "w")
-                open_files[model] = file_out
-            SeqIO.write(record, open_files[model], "fasta")
+                filenames.append(os.path.join(directory, f"{name}_other_ncRNA.fasta"))
 
-    for item in open_files:
-        open_files[item].close()
+            for filename in filenames:
+                # Several RNA models share the same output file.
+                if filename not in open_files:
+                    open_files[filename] = stack.enter_context(open(filename, "w"))
+                SeqIO.write(record, open_files[filename], "fasta")
 
 
 if __name__ == "__main__":

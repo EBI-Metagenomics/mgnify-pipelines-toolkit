@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2026-11-16
+
+### Fixed
+
+- Fix corrupted FASTA output in `get_subunits` when several RNA models write to the same file (for example `other_ncRNA.fasta`). Records were lost or merged into invalid sequences. [#168](https://github.com/EBI-Metagenomics/mgnify-pipelines-toolkit/pull/168)
+
 ## [1.5.6] - 2026-11-04
 
 ### Added

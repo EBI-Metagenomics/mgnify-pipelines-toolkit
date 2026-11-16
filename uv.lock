@@ -489,7 +489,7 @@ wheels = [
 
 [[package]]
 name = "mgnify-pipelines-toolkit"
-version = "1.5.6"
+version = "1.5.7"
 source = { editable = "." }
 dependencies = [
     { name = "bcbio-gff" },

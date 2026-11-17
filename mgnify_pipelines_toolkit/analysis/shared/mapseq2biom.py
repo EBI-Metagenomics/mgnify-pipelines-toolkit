@@ -70,7 +70,7 @@ def main():
             if tax in tax_counter:
                 tax_counter[tax]["count"] += 1
             else:
-                tax_counter[tax] = {"count": 1, "otu": None, "taxid": ""}
+                tax_counter[tax] = {"count": 1, "otu": 1, "taxid": ""}
 
     with open(args.otu_table, "r") as otu_table_fh:
         csv_reader = csv.reader(otu_table_fh, delimiter="\t")

@@ -8,12 +8,15 @@ from mgnify_pipelines_toolkit.ena.webin_cli_handler import (
     ManifestValidationError,
     REPORT_FILE,
     check_manifest,
+    WebinAbsConsentError,
+    WebinCLIExecutionError,
+    WebinCredentialsError,
     check_report,
-    check_submission_status_live,
-    check_submission_status_test,
+    check_submission_status,
     main,
     parse_accession_from_report,
     parse_manifest,
+    run_webin_cli,
 )
 
 
@@ -259,6 +262,69 @@ class TestParseAccessionFromReport:
         assert result == {"assembly": None, "experiment": None, "run": None}
 
 
+# Reports produced by webin-cli 11.0.0 (paths shortened). Validate and genome reports were captured from
+# ENA test server runs; reads reports are constructed in the same format.
+VALIDATE_REPORT = "2026-11-18T11:36:33 INFO : Submission(s) validated successfully.\n"
+
+VALIDATE_FAILED_REPORT = (
+    "2026-11-18T11:35:49 ERROR: Submission validation failed because of a user error. "
+    "Manifest name : ASM1. See reports for details : out/genome/ASM1/validate.\n"
+)
+
+GENOME_FIRST_SUBMIT_TEST_REPORT = """\
+2026-11-18T11:36:43 INFO : Submission has not been validated previously.
+2026-11-18T11:36:44 INFO : Submission(s) validated successfully.
+2026-11-18T11:36:44 INFO : Connecting to FTP server : webin2.ebi.ac.uk
+2026-11-18T11:36:46 INFO : Uploading file: /data/bin.fa.gz
+2026-11-18T11:36:46 INFO : Files have been successfully uploaded.
+2026-11-18T11:36:47 INFO : The submission has been completed successfully. The following analysis accession was assigned to the submission: ERZ30663524
+2026-11-18T11:36:47 INFO : This submission is a TEST submission and will be discarded within 24 hours
+"""
+
+GENOME_RESUBMIT_TEST_REPORT = """\
+2026-11-18T11:36:49 INFO : Submission has not been validated previously.
+2026-11-18T11:36:50 INFO : Submission(s) validated successfully.
+2026-11-18T11:36:50 INFO : Connecting to FTP server : webin2.ebi.ac.uk
+2026-11-18T11:36:51 INFO : Uploading file: /data/bin.fa.gz
+2026-11-18T11:36:51 INFO : Files have been successfully uploaded.
+2026-11-18T11:36:51 INFO : This submission is a TEST submission and will be discarded within 24 hours
+2026-11-18T11:36:51 ERROR: In analysis, alias: "webin-genome-ASM1". The object being added already exists in the submission account with accession: "ERZ30663524". The submission has failed because of a system error.
+uk.ac.ebi.ena.webin.cli.WebinCliException: In analysis, alias: "webin-genome-ASM1". The object being added already exists in the submission account with accession: "ERZ30663524". The submission has failed because of a system error.
+Caused by: uk.ac.ebi.ena.webin.cli.WebinCliException: In analysis, alias: "webin-genome-ASM1". The object being added already exists in the submission account with accession: "ERZ30663524".
+\t... 11 common frames omitted
+2026-11-18T11:36:51 ERROR: Some or all submissions failed. Please see application logs.
+uk.ac.ebi.ena.webin.cli.WebinCliException: Some or all submissions failed. Please see application logs.
+"""
+
+# Live server reports have the same format, without the TEST submission line
+GENOME_FIRST_SUBMIT_LIVE_REPORT = GENOME_FIRST_SUBMIT_TEST_REPORT.replace(
+    "2026-11-18T11:36:47 INFO : This submission is a TEST submission and will be discarded within 24 hours\n", ""
+)
+GENOME_RESUBMIT_LIVE_REPORT = GENOME_RESUBMIT_TEST_REPORT.replace(
+    "2026-11-18T11:36:51 INFO : This submission is a TEST submission and will be discarded within 24 hours\n", ""
+)
+
+READS_FIRST_SUBMIT_TEST_REPORT = """\
+2026-11-18T11:36:44 INFO : Submission(s) validated successfully.
+2026-11-18T11:36:46 INFO : Files have been successfully uploaded.
+2026-11-18T11:36:47 INFO : The submission has been completed successfully. The following experiment accession was assigned to the submission: ERX111111
+2026-11-18T11:36:47 INFO : The submission has been completed successfully. The following run accession was assigned to the submission: ERR654321
+2026-11-18T11:36:47 INFO : This submission is a TEST submission and will be discarded within 24 hours
+"""
+
+READS_RESUBMIT_TEST_REPORT = """\
+2026-11-18T11:36:50 INFO : Submission(s) validated successfully.
+2026-11-18T11:36:51 INFO : This submission is a TEST submission and will be discarded within 24 hours
+2026-11-18T11:36:51 ERROR: In experiment, alias: "webin-reads-RUN1". The object being added already exists in the submission account with accession: "ERX111111".In run, alias: "webin-reads-RUN1". The object being added already exists in the submission account with accession: "ERR654321". The submission has failed because of a system error.
+2026-11-18T11:36:51 ERROR: Some or all submissions failed. Please see application logs.
+"""
+
+SUBMIT_NO_ACCESSION_REPORT = (
+    "2026-11-18T11:36:47 INFO : The submission has been completed successfully. "
+    "No accession was assigned to the analysis submission. Please contact the helpdesk.\n"
+)
+
+
 class TestCheckReport:
     def _write_report(self, tmp_path, text):
         (tmp_path / REPORT_FILE).write_text(text)
@@ -266,92 +332,75 @@ class TestCheckReport:
     # --- Validate mode ---
 
     def test_validate_success(self, tmp_path):
-        self._write_report(tmp_path, "Submission(s) validated successfully.")
-        success, is_resub = check_report(str(tmp_path), "validate", False, "genome")
+        self._write_report(tmp_path, VALIDATE_REPORT)
+        success, is_resub = check_report(str(tmp_path), "validate", True, "genome")
         assert success is True
         assert is_resub is False
 
     def test_validate_failure(self, tmp_path):
-        self._write_report(tmp_path, "Error: validation failed.")
-        success, is_resub = check_report(str(tmp_path), "validate", False, "genome")
+        self._write_report(tmp_path, VALIDATE_FAILED_REPORT)
+        success, is_resub = check_report(str(tmp_path), "validate", True, "genome")
         assert success is False
         assert is_resub is False
 
-    # --- Submit + live + genome (regression) ---
+    # --- Submit + genome (test and live servers report the same way since webin-cli 10.0.0) ---
 
-    def test_submit_live_genome_first_time(self, tmp_path):
-        self._write_report(tmp_path, "ERZ123456\nsubmission has been completed successfully")
-        success, is_resub = check_report(str(tmp_path), "submit", False, "genome")
+    @pytest.mark.parametrize(
+        "report, test",
+        [(GENOME_FIRST_SUBMIT_TEST_REPORT, True), (GENOME_FIRST_SUBMIT_LIVE_REPORT, False)],
+        ids=["test_server", "live_server"],
+    )
+    def test_submit_genome_first_time(self, tmp_path, report, test):
+        self._write_report(tmp_path, report)
+        success, is_resub = check_report(str(tmp_path), "submit", test, "genome")
         assert success is True
         assert is_resub is False
 
-    def test_submit_live_genome_resubmission(self, tmp_path):
-        self._write_report(
-            tmp_path,
-            "object being added already exists in the submission account with accession ERZ123456",
-        )
-        success, is_resub = check_report(str(tmp_path), "submit", False, "genome")
+    @pytest.mark.parametrize(
+        "report, test",
+        [(GENOME_RESUBMIT_TEST_REPORT, True), (GENOME_RESUBMIT_LIVE_REPORT, False)],
+        ids=["test_server", "live_server"],
+    )
+    def test_submit_genome_resubmission(self, tmp_path, report, test):
+        self._write_report(tmp_path, report)
+        success, is_resub = check_report(str(tmp_path), "submit", test, "genome")
         assert success is True
         assert is_resub is True
 
-    def test_submit_live_genome_no_accession_fails(self, tmp_path):
-        self._write_report(tmp_path, "submission has been completed successfully")
-        success, _ = check_report(str(tmp_path), "submit", False, "genome")
+    def test_submit_genome_no_accession_fails(self, tmp_path):
+        self._write_report(tmp_path, SUBMIT_NO_ACCESSION_REPORT)
+        success, _ = check_report(str(tmp_path), "submit", True, "genome")
         assert success is False
 
-    # --- Submit + live + reads ---
+    # --- Submit + reads ---
 
-    def test_submit_live_reads_first_time(self, tmp_path):
-        self._write_report(
-            tmp_path,
-            "ERX111111 ERR654321\nsubmission has been completed successfully",
-        )
-        success, is_resub = check_report(str(tmp_path), "submit", False, "reads")
+    def test_submit_reads_first_time(self, tmp_path):
+        self._write_report(tmp_path, READS_FIRST_SUBMIT_TEST_REPORT)
+        success, is_resub = check_report(str(tmp_path), "submit", True, "reads")
         assert success is True
         assert is_resub is False
 
-    def test_submit_live_reads_missing_both_accessions(self, tmp_path):
-        self._write_report(tmp_path, "submission has been completed successfully")
-        success, _ = check_report(str(tmp_path), "submit", False, "reads")
-        assert success is False
-
-    def test_submit_live_reads_only_run_accession_fails(self, tmp_path):
-        # Needs both experiment (ERX) and run (ERR)
-        self._write_report(tmp_path, "ERR654321\nsubmission has been completed successfully")
-        success, _ = check_report(str(tmp_path), "submit", False, "reads")
-        assert success is False
-
-    def test_submit_live_reads_only_experiment_accession_fails(self, tmp_path):
-        self._write_report(tmp_path, "ERX111111\nsubmission has been completed successfully")
-        success, _ = check_report(str(tmp_path), "submit", False, "reads")
-        assert success is False
-
-    # --- Submit + test + genome ---
-
-    def test_submit_test_genome_first_time(self, tmp_path):
-        self._write_report(
-            tmp_path,
-            "ERZ123456\nThis was a TEST submission(s).\nsubmission has been completed successfully",
-        )
-        success, is_resub = check_report(str(tmp_path), "submit", True, "genome")
-        assert success is True
-        assert is_resub is False
-
-    # --- Submit + test + genome resubmission (regression: accession check must not block) ---
-
-    def test_submit_test_genome_resubmission_minimal_report(self, tmp_path):
-        """Test-server genome resubmission: minimal report with no accession must still succeed."""
-        self._write_report(tmp_path, "This was a TEST submission(s).")
-        success, is_resub = check_report(str(tmp_path), "submit", True, "genome")
-        assert success is True
-        assert is_resub is True
-
-    def test_submit_test_reads_resubmission_minimal_report(self, tmp_path):
-        """Test-server reads resubmission: minimal report with no ERX/ERR must still succeed."""
-        self._write_report(tmp_path, "This was a TEST submission(s).")
+    def test_submit_reads_resubmission(self, tmp_path):
+        self._write_report(tmp_path, READS_RESUBMIT_TEST_REPORT)
         success, is_resub = check_report(str(tmp_path), "submit", True, "reads")
         assert success is True
         assert is_resub is True
+
+    def test_submit_reads_missing_both_accessions(self, tmp_path):
+        self._write_report(tmp_path, SUBMIT_NO_ACCESSION_REPORT)
+        success, _ = check_report(str(tmp_path), "submit", True, "reads")
+        assert success is False
+
+    def test_submit_reads_only_run_accession_fails(self, tmp_path):
+        # Needs both experiment (ERX) and run (ERR)
+        self._write_report(tmp_path, READS_FIRST_SUBMIT_TEST_REPORT.replace("ERX111111", "-"))
+        success, _ = check_report(str(tmp_path), "submit", True, "reads")
+        assert success is False
+
+    def test_submit_reads_only_experiment_accession_fails(self, tmp_path):
+        self._write_report(tmp_path, READS_FIRST_SUBMIT_TEST_REPORT.replace("ERR654321", "-"))
+        success, _ = check_report(str(tmp_path), "submit", True, "reads")
+        assert success is False
 
     # --- Report file absent ---
 
@@ -361,62 +410,106 @@ class TestCheckReport:
         assert is_resub is False
 
 
+@pytest.mark.parametrize("test", [True, False], ids=["test_server", "live_server"])
 @pytest.mark.parametrize(
     "report_text, expected_success, expected_resub",
     [
-        (
-            "This was a TEST submission(s).\nsubmission has been completed successfully",
-            True,
-            False,
-        ),
-        ("This was a TEST submission(s).", True, True),
-        ("This was a TEST submission(s).\n", True, True),
-        (
-            "This was a TEST submission(s).\nobject being added already exists in the submission account with accession ERZ123",
-            True,
-            True,
-        ),
-        ("Error: validation failed", False, False),
+        (GENOME_FIRST_SUBMIT_TEST_REPORT, True, False),
+        (GENOME_RESUBMIT_TEST_REPORT, True, True),
+        (READS_RESUBMIT_TEST_REPORT, True, True),
+        (VALIDATE_FAILED_REPORT, False, False),
         ("", False, False),
     ],
     ids=[
         "first_time_success",
-        "resubmission_exact_minimal",
-        "resubmission_one_trailing_newline",
-        "resubmission_explicit_exists_message",
-        "failure_no_test_marker",
-        "empty_report",
-    ],
-)
-def test_check_submission_status_test(report_text, expected_success, expected_resub):
-    success, is_resub = check_submission_status_test(report_text)
-    assert success is expected_success
-    assert is_resub is expected_resub
-
-
-@pytest.mark.parametrize(
-    "report_text, expected_success, expected_resub",
-    [
-        ("submission has been completed successfully", True, False),
-        (
-            "object being added already exists in the submission account with accession ERZ123456",
-            True,
-            True,
-        ),
-        ("Error: validation failed", False, False),
-        ("", False, False),
-    ],
-    ids=[
-        "first_time_success",
-        "resubmission",
+        "genome_resubmission",
+        "reads_resubmission",
         "failure",
         "empty_report",
     ],
 )
-def test_check_submission_status_live(report_text, expected_success, expected_resub):
-    success, is_resub = check_submission_status_live(report_text)
+def test_check_submission_status(report_text, expected_success, expected_resub, test):
+    success, is_resub = check_submission_status(report_text, test)
     assert success is expected_success
     assert is_resub is expected_resub
+
+
+# ---------------------------------------------------------------------------
+# run_webin_cli retry and error handling
+# ---------------------------------------------------------------------------
+
+
+def _completed(returncode, stdout=""):
+    return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr="")
+
+
+class TestRunWebinCli:
+    def _run(self, tmp_path, results, retries=3):
+        with patch("subprocess.run", side_effect=results) as mock_run, patch("time.sleep") as mock_sleep:
+            outcome = run_webin_cli(
+                manifest="x.manifest",
+                context="genome",
+                webin="Webin-99999",
+                mode="submit",
+                test=True,
+                output_dir=str(tmp_path),
+                jar="/fake/webin-cli.jar",
+                retries=retries,
+                retry_delay=1,
+            )
+        return outcome, mock_run, mock_sleep
+
+    def test_success_first_attempt(self, tmp_path):
+        result, mock_run, _ = self._run(tmp_path, [_completed(0)])
+        assert result.returncode == 0
+        assert mock_run.call_count == 1
+
+    def test_system_error_is_retried_then_succeeds(self, tmp_path):
+        result, mock_run, mock_sleep = self._run(tmp_path, [_completed(1, "ERROR: Connection reset"), _completed(0)])
+        assert result.returncode == 0
+        assert mock_run.call_count == 2
+        mock_sleep.assert_called_once_with(1)
+
+    def test_system_error_fails_after_all_retries(self, tmp_path):
+        with pytest.raises(WebinCLIExecutionError, match="after 3 attempts"):
+            self._run(tmp_path, [_completed(1, "ERROR: Connection reset")] * 3)
+
+    @pytest.mark.parametrize(
+        "returncode, output",
+        [
+            (2, "ERROR: Unknown sample ERS32871415 or the sample cannot be referenced by your submission account."),
+            (3, VALIDATE_FAILED_REPORT),
+        ],
+        ids=["user_error", "validation_error"],
+    )
+    def test_user_and_validation_errors_are_not_retried(self, tmp_path, returncode, output):
+        with patch("subprocess.run", return_value=_completed(returncode, output)) as mock_run, patch("time.sleep") as mock_sleep:
+            with pytest.raises(WebinCLIExecutionError, match=f"exit code {returncode}"):
+                run_webin_cli("x.manifest", "genome", "Webin-99999", "submit", True, str(tmp_path), jar="/fake/webin-cli.jar")
+        assert mock_run.call_count == 1
+        mock_sleep.assert_not_called()
+
+    def test_invalid_credentials_not_retried(self, tmp_path):
+        output = "ERROR: Invalid submission account user name or password. Please try enclosing your password in single quotes."
+        with patch("subprocess.run", return_value=_completed(2, output)) as mock_run, patch("time.sleep"):
+            with pytest.raises(WebinCredentialsError):
+                run_webin_cli("x.manifest", "genome", "Webin-99999", "submit", True, str(tmp_path), jar="/fake/webin-cli.jar")
+        assert mock_run.call_count == 1
+
+    def test_abs_consent_not_retried(self, tmp_path):
+        output = (
+            "ERROR: Failed submission: Incomplete Access and Benefit Sharing (ABS) acknowledgement. "
+            "Please login to Webin Submissions Portal to complete."
+        )
+        with patch("subprocess.run", return_value=_completed(1, output)) as mock_run, patch("time.sleep"):
+            with pytest.raises(WebinAbsConsentError):
+                run_webin_cli("x.manifest", "genome", "Webin-99999", "submit", True, str(tmp_path), jar="/fake/webin-cli.jar")
+        assert mock_run.call_count == 1
+
+    def test_already_exists_returns_result(self, tmp_path):
+        result, mock_run, _ = self._run(tmp_path, [_completed(1, GENOME_RESUBMIT_TEST_REPORT)])
+        assert result.returncode == 1
+        assert mock_run.call_count == 1
 
 
 # ---------------------------------------------------------------------------
@@ -498,7 +591,7 @@ class TestMain:
         monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
         monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
         argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
-        report = "Submission(s) validated successfully."
+        report = VALIDATE_REPORT
         with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
             assert main() == 0
 
@@ -507,7 +600,7 @@ class TestMain:
         monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
         monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
         argv = self._argv(manifest, "reads", "validate", tmp_path / "out")
-        report = "Submission(s) validated successfully."
+        report = VALIDATE_REPORT
         with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
             assert main() == 0
 
@@ -516,7 +609,7 @@ class TestMain:
         monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
         monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
         argv = self._argv(manifest, "genome", "validate", tmp_path / "out")
-        report = "Error: validation failed."
+        report = VALIDATE_FAILED_REPORT
         with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
             assert main() == 1
 
@@ -534,13 +627,12 @@ class TestMain:
             tmp_path / "out",
             extra=["--output-accessions", str(accessions_file)],
         )
-        # Resubmission report: accession in text + already-exists message
-        report = "object being added already exists in the submission account with accession ERZ123456"
+        report = GENOME_RESUBMIT_TEST_REPORT
         with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
             assert main() == 0
         content = accessions_file.read_text()
         assert "ASM1" in content
-        assert "ERZ123456" in content
+        assert "ERZ30663524" in content
 
     def test_submit_reads_first_time(self, tmp_path, monkeypatch):
         manifest = self._reads_manifest(tmp_path, alias="RUN1")
@@ -554,7 +646,7 @@ class TestMain:
             tmp_path / "out",
             extra=["--output-accessions", str(accessions_file)],
         )
-        report = "ERX111111 ERR654321\nsubmission has been completed successfully"
+        report = READS_FIRST_SUBMIT_TEST_REPORT
         side_effect = _make_subprocess_side_effect(
             report,
             context="reads",
@@ -573,7 +665,7 @@ class TestMain:
         monkeypatch.setenv("ENA_WEBIN", _FAKE_WEBIN)
         monkeypatch.setenv("ENA_WEBIN_PASSWORD", _FAKE_PASSWORD)
         argv = self._argv(manifest, "genome", "submit", tmp_path / "out")
-        report = "Error: submission failed."
+        report = VALIDATE_FAILED_REPORT
         with patch("sys.argv", argv), patch("subprocess.run", side_effect=_make_subprocess_side_effect(report)):
             assert main() == 1
 

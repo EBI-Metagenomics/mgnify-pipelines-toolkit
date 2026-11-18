@@ -59,6 +59,12 @@ class DownloadError(Exception):
     pass
 
 
+class WebinAbsConsentError(Exception):
+    """Raised when the Webin account has not completed the Access and Benefit Sharing (ABS) acknowledgement."""
+
+    pass
+
+
 ENA_WEBIN = "ENA_WEBIN"
 ENA_WEBIN_PASSWORD = "ENA_WEBIN_PASSWORD"
 REPORT_FILE = "webin-cli.report"
@@ -69,6 +75,18 @@ INSDC_CENTRE_PREFIXES = "EDS"
 ENA_ASSEMBLY_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RZ[0-9]{{6,}})"
 ENA_RUN_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RR[0-9]{{6,}})"
 ENA_EXPERIMENT_ACCESSION_REGEX = f"([{INSDC_CENTRE_PREFIXES}]RX[0-9]{{6,}})"
+
+WEBIN_CLI_EXIT_SYSTEM_ERROR = 1  # server/network problems, receipt errors, ABS consent - may be transient
+WEBIN_CLI_EXIT_USER_ERROR = 2  # invalid credentials, invalid manifest - retrying will not help
+WEBIN_CLI_EXIT_VALIDATION_ERROR = 3  # data validation failed - retrying will not help
+WEBIN_CLI_NON_RETRYABLE_EXIT_CODES = {WEBIN_CLI_EXIT_USER_ERROR, WEBIN_CLI_EXIT_VALIDATION_ERROR}
+
+# webin-cli (>= 10.0.0) messages
+MSG_VALIDATE_SUCCESS = "Submission(s) validated successfully."
+MSG_SUBMIT_SUCCESS = "The submission has been completed successfully."
+MSG_ALREADY_EXISTS = "The object being added already exists in the submission account with accession:"
+MSG_INVALID_CREDENTIALS = "Invalid submission account user name or password."
+MSG_ABS_CONSENT = "Incomplete Access and Benefit Sharing (ABS) acknowledgement"
 
 
 logger = logging.getLogger(__name__)
@@ -517,9 +535,13 @@ def run_webin_cli(
     Returns:
         subprocess.CompletedProcess: Result of successful webin-cli execution.
 
+    Only webin-cli SYSTEM_ERROR failures (exit code 1) are retried. USER_ERROR (2) and
+    VALIDATION_ERROR (3) failures are deterministic, so they fail immediately.
+
     Raises:
         WebinCredentialsError: If credentials are invalid.
-        WebinCLIExecutionError: If all retry attempts fail.
+        WebinAbsConsentError: If the account has not completed the ABS acknowledgement.
+        WebinCLIExecutionError: If webin-cli fails with a non-retryable error or all retry attempts fail.
     """
 
     def get_combined_log(run_result: subprocess.CompletedProcess) -> str:
@@ -569,16 +591,28 @@ def run_webin_cli(
 
         logger.warning(f"❌ ena-webin-cli exited with non-zero code {result.returncode}")
 
-        if "Invalid submission account user name or password." in combined_log:
+        if MSG_INVALID_CREDENTIALS in combined_log:
             logger.error("💥 Invalid credentials for Webin account - not retrying")
             raise WebinCredentialsError("Invalid credentials for Webin account")
 
-        if "The object being added already exists in the submission account with accession:" in combined_log:
+        if MSG_ABS_CONSENT in combined_log:
+            logger.error("💥 Webin account has not completed the ABS acknowledgement - not retrying")
+            raise WebinAbsConsentError(
+                "Incomplete Access and Benefit Sharing (ABS) acknowledgement for Webin account. "
+                "Log in to the Webin Submissions Portal to complete it."
+            )
+
+        if MSG_ALREADY_EXISTS in combined_log:
             logger.info("📦 Submission already exists")
             logger.info("✅ Command completed successfully")
             return result
 
         logger.error("ena-webin-cli output:\n" + combined_log)
+
+        if result.returncode in WEBIN_CLI_NON_RETRYABLE_EXIT_CODES:
+            error_type = "user" if result.returncode == WEBIN_CLI_EXIT_USER_ERROR else "validation"
+            logger.error(f"💥 ena-webin-cli failed with a {error_type} error - not retrying")
+            raise WebinCLIExecutionError(f"Webin-CLI failed with a {error_type} error (exit code {result.returncode}). See logs for details.")
 
         if attempt == retries:
             logger.error("💥 All retries failed.")
@@ -589,103 +623,33 @@ def run_webin_cli(
         time.sleep(sleep_time)
 
 
-def check_submission_status_test(report_text: str) -> tuple[bool, bool]:
+def check_submission_status(report_text: str, test: bool) -> tuple[bool, bool]:
     """
-    Check the test Webin-CLI submission report and determine submission status.
+    Determine submission status from a webin-cli submission report.
 
-    On ENA's test server, when an object is resubmitted (already exists), webin-cli
-    returns a minimal report containing only "This was a TEST submission(s)." with
-    no additional details. For first-time submissions, the report contains this
-    message plus additional submission details.
+    The test and live servers report submissions the same way:
+    first-time submissions log the "completed successfully" message with the assigned
+    accession, and resubmissions log the receipt error "The object being added already
+    exists in the submission account with accession: ..." (webin-cli exits with code 1).
 
     Args:
         report_text (str): Contents of the webin-cli.report file.
+        test (bool): Whether the submission was made to the test server (used for logging only).
 
     Returns:
         tuple[bool, bool]: (success, is_resubmission)
-            - success (bool): True if submission/validation succeeded, False otherwise.
-            - is_resubmission (bool): True if object was previously submitted to test
-              server (duplicate submission), False if this is first-time submission.
-
-    Examples:
-        First-time successful submission
-        check_submission_status_test("This was a TEST submission(s).\\nsubmission has been completed successfully")
-        (True, False)
-
-        Resubmission (object already exists)
-        check_submission_status_test("This was a TEST submission(s).")
-        (True, True)
-
-        Failed submission
-        check_submission_status_test("Error: validation failed")
-        (False, False)
+            - success (bool): True if submission succeeded (either new or duplicate), False otherwise.
+            - is_resubmission (bool): True if the object already existed in the account, False otherwise.
     """
-    logger.debug("Evaluating TEST server submission report content")
-    if "This was a TEST submission(s)." not in report_text:
-        logger.info("Submission failed on TEST server")
-        return False, False
-
-    # TODO: discuss with ENA team if test server should return consistent messaging for resubmissions
-    if "object being added already exists in the submission account with accession" in report_text.lower():
-        logger.info("Submitted object already exists on TEST server")
+    server = "TEST" if test else "MAIN"
+    logger.debug(f"Evaluating {server} server submission report content")
+    if MSG_ALREADY_EXISTS in report_text:
+        logger.info(f"Submitted object already exists on {server} server")
         return True, True
-
-    # Check for resubmission: minimal report with only success message
-    # For resubmissions, report contains only "This was a TEST submission(s)." without details
-    is_minimal_report = report_text.strip() == "This was a TEST submission(s)." or (
-        report_text.count("\n") <= 2 and "submission has been completed successfully" not in report_text
-    )
-
-    if is_minimal_report:
-        logger.info("Submitted object already exists on TEST server")
-        return True, True
-    elif "submission has been completed successfully" in report_text:
-        logger.info("Successfully submitted object for the first time on TEST server")
+    if MSG_SUBMIT_SUCCESS in report_text:
+        logger.info(f"Successfully submitted object for the first time on {server} server")
         return True, False
-    else:
-        logger.info("Submission failed on TEST server")
-        return False, False
-
-
-def check_submission_status_live(report_text: str) -> tuple[bool, bool]:
-    """
-    Check the live Webin-CLI submission report and determine submission status.
-
-    On ENA's live server, the webin-cli report explicitly indicates when an object
-    being submitted already exists in the account. Unlike the test server, the live
-    server provides clear messaging in both first-time and duplicate submissions.
-
-    Args:
-        report_text (str): Contents of the webin-cli.report file.
-
-    Returns:
-        tuple[bool, bool]: (success, is_resubmission)
-            - success (bool): True if submission succeeded (either new or duplicate),
-              False if submission failed.
-            - is_resubmission (bool): True if object was previously submitted to live
-              server (duplicate), False if this is first-time submission.
-
-    Examples:
-        First-time successful submission
-        check_submission_status_live("submission has been completed successfully")
-        (True, False)
-
-        Resubmission (object already exists)
-        check_submission_status_live("object being added already exists in the submission account with accession ERZ123456")
-        (True, True)
-
-        Failed submission
-        check_submission_status_live("Error: validation failed")
-        (False, False)
-    """
-    logger.debug("Evaluating MAIN server submission report content")
-    if "object being added already exists in the submission account with accession" in report_text:
-        logger.info("Submitted object already exists on MAIN server")
-        return True, True
-    if "submission has been completed successfully" in report_text:
-        logger.info("Successfully submitted object on MAIN server")
-        return True, False
-    logger.info("Submission failed on MAIN server")
+    logger.info(f"Submission failed on {server} server")
     return False, False
 
 
@@ -737,7 +701,7 @@ def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[
             (the webin-cli output directory).
         mode (str): Operation mode - either 'submit' or 'validate'.
         test (bool): Whether operation was run against test server (True) or
-            live server (False).
+            live server (False). Only used for logging.
         context (str): Submission context used to choose accession parsing logic.
 
     Returns:
@@ -747,11 +711,6 @@ def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[
             - is_resubmission (bool): True if this was a duplicate submission
               (object already existed), False if first-time submission. Always
               False for validation mode.
-
-    Note:
-        For submit mode, the behavior differs between test and live servers.
-        See check_submission_status_test() and check_submission_status_live()
-        for detailed explanations of server-specific behaviors.
     """
     report_path = Path(output_dir) / REPORT_FILE
     logger.info(f"Checking webin report {report_path}")
@@ -764,15 +723,12 @@ def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[
     logger.debug(f"Report content:\n{report_text}")
 
     if mode == "validate":
-        success = "Submission(s) validated successfully." in report_text
+        success = MSG_VALIDATE_SUCCESS in report_text
         logger.info("Submission validation succeeded" if success else "Submission validation failed")
         return success, False
 
     # submit path
-    # Check submission status first — resubmissions on the test server produce a
-    # minimal report with no accession, so the accession check must come after.
-    check_status = check_submission_status_test if test else check_submission_status_live
-    success, is_resubmission = check_status(report_text)
+    success, is_resubmission = check_submission_status(report_text, test)
     if not success:
         return False, False
     if is_resubmission:
@@ -1050,6 +1006,9 @@ def main() -> int:
     except DownloadError as e:
         logger.error(f"Download error: {e}")
         return 6
+    except WebinAbsConsentError as e:
+        logger.error(f"Webin account error: {e}")
+        return 7
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return 99

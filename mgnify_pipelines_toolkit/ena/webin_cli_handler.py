@@ -65,10 +65,15 @@ class WebinAbsConsentError(Exception):
     pass
 
 
+class WebinReportValidationError(Exception):
+    """Raised when the webin-cli report is missing, does not confirm a successful submission or does not contain accession(s)."""
+
+    pass
+
+
 ENA_WEBIN = "ENA_WEBIN"
 ENA_WEBIN_PASSWORD = "ENA_WEBIN_PASSWORD"
 REPORT_FILE = "webin-cli.report"
-WEBIN_SUBMISSION_RESULT_FILES = ["receipt.xml", "submission.xml", "webin-submission.xml"]
 RETRIES = 3
 RETRY_DELAY = 5
 INSDC_CENTRE_PREFIXES = "EDS"
@@ -206,9 +211,20 @@ def parse_arguments() -> argparse.Namespace:
         "--resume",
         required=False,
         action="store_true",
-        help="Resume previous webin_cli_handler run: skip aliases already present in accessions output file",
+        help="Resume previous webin_cli_handler run: skip aliases already present in accessions output file (submit mode only)",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if args.resume and args.mode != "submit":
+        parser.error("--resume can only be used with --mode submit")
+
+    if args.mode == "submit" and not args.resume and Path(args.output_accessions).exists():
+        parser.error(
+            f"Accessions file {args.output_accessions} already exists; use --resume to continue the previous run, "
+            "or pass a different --output-accessions"
+        )
+
+    return args
 
 
 def get_latest_webin_cli_version() -> str:
@@ -227,17 +243,19 @@ def get_latest_webin_cli_version() -> str:
             data = json.load(response)
             return data["tag_name"]
     except (urllib.error.URLError, KeyError, json.JSONDecodeError) as e:
-        logger.error(f"Failed to fetch latest webin-cli version: {e}")
         raise DownloadError(f"Failed to fetch latest webin-cli version: {e}")
 
 
-def download_webin_cli(version: str | None = None, dest_dir: str = "") -> None:
+def download_webin_cli(version: str | None = None, dest_dir: str = ".") -> str:
     """
     Download the Webin-CLI `.jar` file.
 
     Args:
         version (str, optional): Version to download. If None, fetch latest.
         dest_dir (str): Directory to save the jar file.
+
+    Returns:
+        str: Path to the downloaded jar file.
 
     Raises:
         DownloadError: If download fails.
@@ -253,41 +271,24 @@ def download_webin_cli(version: str | None = None, dest_dir: str = "") -> None:
         urllib.request.urlretrieve(jar_url, str(dest_path))
         logger.info(f"Successfully downloaded webin-cli.jar to {dest_path}")
     except (urllib.error.URLError, OSError) as e:
-        logger.error(f"Failed to download webin-cli.jar: {e}")
         raise DownloadError(f"Failed to download webin-cli.jar: {e}")
-
-
-def ensure_webin_credentials_exist() -> None:
-    """
-    Verify that required Webin credentials are present in environment variables.
-
-    Raises:
-        WebinCredentialsError: If credentials are missing.
-    """
-    logger.debug("Checking required Webin credential environment variables")
-    if ENA_WEBIN not in os.environ:
-        raise WebinCredentialsError(f"The variable {ENA_WEBIN} is missing from the environment.")
-    if ENA_WEBIN_PASSWORD not in os.environ:
-        raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing from the environment.")
+    return str(dest_path)
 
 
 def get_webin_credentials() -> str:
     """
-    Retrieve Webin credentials from environment variables.
+    Get the Webin username from the environment and check that the password is set.
 
     Returns:
         str: Webin username.
 
     Raises:
-        WebinCredentialsError: If credentials are missing.
+        WebinCredentialsError: If the username or password environment variable is missing or empty.
     """
-    ensure_webin_credentials_exist()
-    webin = os.environ.get(ENA_WEBIN)
-    password = os.environ.get(ENA_WEBIN_PASSWORD)
-    if not password:
-        raise WebinCredentialsError(f"The variable {ENA_WEBIN_PASSWORD} is missing password.")
-    logger.debug(f"Webin credentials retrieved from environment: {webin}")
-    return webin
+    for variable in (ENA_WEBIN, ENA_WEBIN_PASSWORD):
+        if not os.environ.get(variable):
+            raise WebinCredentialsError(f"The variable {variable} is missing from the environment.")
+    return os.environ[ENA_WEBIN]
 
 
 def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
@@ -323,15 +324,13 @@ def parse_manifest(manifest_path: Path) -> dict[str, str | list[str]]:
             field, value = parts
             # For reads manifest, we can have multiple FASTQ lines, so we store them in a list
             if field == "FASTQ":
-                if "FASTQ" not in manifest_dict:
-                    manifest_dict["FASTQ"] = []
-                manifest_dict["FASTQ"].append(value)
+                manifest_dict.setdefault("FASTQ", []).append(value)
             else:
                 manifest_dict[field] = value
     return manifest_dict
 
 
-def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> tuple[str, str]:
+def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> str:
     """
     Validate a manifest file and ensure referenced data file(s) are accessible.
     Args:
@@ -339,16 +338,13 @@ def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> t
         input_dir (str or None): Optional root directory for relative data file paths.
         context (str): Submission context (e.g. genome, reads).
     Returns:
-        tuple[str, str]:
-            - alias (str): Alias used for output folder naming and accessions tracking.
-            - manifest_for_submission (str): Path to the manifest file.
+        str: Alias (ASSEMBLYNAME or NAME) used for output folder naming and accessions tracking.
     Raises:
         ManifestValidationError: If manifest validation fails or data file(s) are not found.
     """
     manifest_path = Path(manifest_file)
     logger.debug(f"Checking manifest file {manifest_path} with input_dir={input_dir}, context={context}")
     if not manifest_path.exists():
-        logger.error(f"Manifest file does not exist: {manifest_path}")
         raise ManifestValidationError(f"Manifest file does not exist: {manifest_path}")
     manifest_dict = parse_manifest(manifest_path)
     alias = manifest_dict.get("ASSEMBLYNAME") or manifest_dict.get("NAME")
@@ -373,7 +369,7 @@ def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> t
             raise ManifestValidationError(f"FASTA field not found in {manifest_path}")
         data_files = [Path(fasta_value)]
 
-    # Validate files only when absolute paths are used or a root directory is provided.
+    # Validate files only when absolute paths are used or a root directory is provided
     for data_file in data_files:
         if data_file.is_absolute():
             logger.debug(f"Manifest data file path is absolute: {data_file}")
@@ -386,7 +382,7 @@ def check_manifest(manifest_file: str, input_dir: str | None, context: str) -> t
                 raise ManifestValidationError(f"Data file not found: {full_data_path}")
 
     logger.debug(f"Manifest check complete: {manifest_file}")
-    return alias, manifest_file
+    return alias
 
 
 def get_webin_cli_command(
@@ -408,7 +404,6 @@ def get_webin_cli_command(
         manifest (str): Path to manifest file.
         context (str): Submission context (genome, assembly, etc.).
         webin (str): ENA Webin username.
-        password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
@@ -441,14 +436,12 @@ def get_webin_cli_command(
     else:
         # Use mamba/conda installation
         webin_cli_path = shutil.which("ena-webin-cli")
-        if webin_cli_path:
-            logger.info(f"Using ena-webin-cli from: {webin_cli_path}")
-            cmd = ["ena-webin-cli"]
-        else:
-            logger.error("ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options.")
+        if not webin_cli_path:
             raise WebinCLINotFoundError(
                 "ena-webin-cli was not found in PATH. Install it with mamba/conda or use --download-webin-cli / --webin-cli-jar options."
             )
+        logger.info(f"Using ena-webin-cli from: {webin_cli_path}")
+        cmd = ["ena-webin-cli"]
 
     # Add webin-cli arguments
     cmd += [
@@ -480,9 +473,6 @@ def prepare_output_dir(manifest: str, assembly_name: str, outdir: str | None = N
 
     Returns:
         str: Path to the created output directory.
-
-    Raises:
-        ValueError: If output path exists but is not a directory.
     """
     # If outdir is not provided, use the parent directory of the manifest because it is a default behaviour of webin-cli
     output_root = Path(outdir) if outdir else Path(manifest).parent
@@ -513,7 +503,7 @@ def run_webin_cli(
     retry_delay: int = RETRY_DELAY,
     java_heap_size_initial: int | None = None,
     java_heap_size_max: int | None = None,
-) -> subprocess.CompletedProcess:
+) -> None:
     """
     Execute webin-cli with retry logic and error handling.
 
@@ -521,7 +511,6 @@ def run_webin_cli(
         manifest (str): Path to manifest file.
         context (str): Submission context (genome, assembly, etc.).
         webin (str): ENA Webin username.
-        password (str): ENA Webin password.
         mode (str): Execution mode ('submit' or 'validate').
         test (bool): Whether to use test server.
         output_dir (str): Directory where webin-cli writes output files.
@@ -532,9 +521,7 @@ def run_webin_cli(
         java_heap_size_initial (int | None): Java initial heap size in GB (-Xms).
         java_heap_size_max (int | None): Java maximum heap size in GB (-Xmx).
 
-    Returns:
-        subprocess.CompletedProcess: Result of successful webin-cli execution.
-
+    Returns normally when webin-cli succeeds, or when the submitted object already exists.
     Only webin-cli SYSTEM_ERROR failures (exit code 1) are retried. USER_ERROR (2) and
     VALIDATION_ERROR (3) failures are deterministic, so they fail immediately.
 
@@ -544,78 +531,47 @@ def run_webin_cli(
         WebinCLIExecutionError: If webin-cli fails with a non-retryable error or all retry attempts fail.
     """
 
-    def get_combined_log(run_result: subprocess.CompletedProcess) -> str:
-        """Combine stdout and stderr from the subprocess result for logging."""
-        output_parts = []
-        if run_result.stdout and run_result.stdout.strip():
-            output_parts.append(run_result.stdout.strip())
-        if run_result.stderr and run_result.stderr.strip():
-            output_parts.append(run_result.stderr.strip())
-        if not output_parts:
-            return "webin-cli produced no stdout/stderr output"
-        return "\n".join(output_parts)
-
-    def redact_command(command: list[str]) -> str:
-        """Return a shell-quoted command string with credential values replaced by ***."""
-        redacted = []
-        for token in command:
-            if token.startswith("-userName=") or token.startswith("-passwordEnv="):
-                key, _ = token.split("=", 1)
-                redacted.append(f"{key}=***")
-            else:
-                redacted.append(token)
-        return " ".join(redacted)
-
     cmd = get_webin_cli_command(manifest, context, webin, mode, test, output_dir, input_dir, jar, java_heap_size_initial, java_heap_size_max)
-    logger.info(f"Command: {redact_command(cmd)}")
+    logger.info(f"Command: {' '.join(cmd)}")
 
     for attempt in range(1, retries + 1):
         logger.info(f"🚀 Running ena-webin-cli (attempt {attempt}/{retries})...")
 
-        result = subprocess.run(
-            cmd,
-            shell=False,
-            capture_output=True,
-            text=True,
-            env=os.environ.copy(),
-        )
-        combined_log = get_combined_log(result)
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        output_parts = [part.strip() for part in (result.stdout, result.stderr) if part and part.strip()]
+        combined_log = "\n".join(output_parts) or "webin-cli produced no stdout/stderr output"
         logger.debug(
             f"webin-cli process finished with return code {result.returncode}, stdout_len={len(result.stdout or '')}, stderr_len={len(result.stderr or '')}"
         )
         logger.debug("ena-webin-cli output:\n" + combined_log)
 
         if result.returncode == 0:
-            logger.info("✅ Command completed successfully")
-            return result  # success
+            logger.info("✅ Submission validation succeeded" if mode == "validate" else "✅ Successfully submitted object for the first time")
+            return
+
+        # Resubmission: webin-cli exits with a system error, but the object is already in the account
+        if MSG_ALREADY_EXISTS in combined_log:
+            logger.info("✅ Submitted object already exists")
+            return
 
         logger.warning(f"❌ ena-webin-cli exited with non-zero code {result.returncode}")
 
         if MSG_INVALID_CREDENTIALS in combined_log:
-            logger.error("💥 Invalid credentials for Webin account - not retrying")
             raise WebinCredentialsError("Invalid credentials for Webin account")
 
         if MSG_ABS_CONSENT in combined_log:
-            logger.error("💥 Webin account has not completed the ABS acknowledgement - not retrying")
             raise WebinAbsConsentError(
                 "Incomplete Access and Benefit Sharing (ABS) acknowledgement for Webin account. "
                 "Log in to the Webin Submissions Portal to complete it."
             )
 
-        if MSG_ALREADY_EXISTS in combined_log:
-            logger.info("📦 Submission already exists")
-            logger.info("✅ Command completed successfully")
-            return result
-
         logger.error("ena-webin-cli output:\n" + combined_log)
 
         if result.returncode in WEBIN_CLI_NON_RETRYABLE_EXIT_CODES:
             error_type = "user" if result.returncode == WEBIN_CLI_EXIT_USER_ERROR else "validation"
-            logger.error(f"💥 ena-webin-cli failed with a {error_type} error - not retrying")
             raise WebinCLIExecutionError(f"Webin-CLI failed with a {error_type} error (exit code {result.returncode}). See logs for details.")
 
         if attempt == retries:
-            logger.error("💥 All retries failed.")
             raise WebinCLIExecutionError(f"Webin-CLI execution failed after {retries} attempts. See logs for details.")
         sleep_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
         logger.warning(f"🔁 Retrying in {sleep_time} seconds...")
@@ -623,185 +579,79 @@ def run_webin_cli(
         time.sleep(sleep_time)
 
 
-def check_submission_status(report_text: str, test: bool) -> tuple[bool, bool]:
+def parse_accessions_from_report(report_text: str, context: str) -> str | None:
     """
-    Determine submission status from a webin-cli submission report.
+    Get the accession assigned to the submitted object from a webin-cli report.
 
-    The test and live servers report submissions the same way:
-    first-time submissions log the "completed successfully" message with the assigned
-    accession, and resubmissions log the receipt error "The object being added already
-    exists in the submission account with accession: ..." (webin-cli exits with code 1).
+    Reads submissions need both an experiment and a run accession, returned as "ERX...,ERR...".
+    Other contexts need an assembly (analysis) accession.
 
     Args:
-        report_text (str): Contents of the webin-cli.report file.
-        test (bool): Whether the submission was made to the test server (used for logging only).
+        report_text (str): Contents of a webin-cli report file.
+        context (str): Submission context (genome, reads, etc.).
 
     Returns:
-        tuple[bool, bool]: (success, is_resubmission)
-            - success (bool): True if submission succeeded (either new or duplicate), False otherwise.
-            - is_resubmission (bool): True if the object already existed in the account, False otherwise.
+        str | None: The accession string, or None if a required accession is missing or ambiguous.
     """
-    server = "TEST" if test else "MAIN"
-    logger.debug(f"Evaluating {server} server submission report content")
-    if MSG_ALREADY_EXISTS in report_text:
-        logger.info(f"Submitted object already exists on {server} server")
-        return True, True
-    if MSG_SUBMIT_SUCCESS in report_text:
-        logger.info(f"Successfully submitted object for the first time on {server} server")
-        return True, False
-    logger.info(f"Submission failed on {server} server")
-    return False, False
+    if context == "reads":
+        patterns = {"experiment": ENA_EXPERIMENT_ACCESSION_REGEX, "run": ENA_RUN_ACCESSION_REGEX}
+    else:
+        patterns = {"assembly": ENA_ASSEMBLY_ACCESSION_REGEX}
+
+    accessions = []
+    for kind, pattern in patterns.items():
+        matches = sorted(set(re.findall(pattern, report_text)))
+        if len(matches) > 1:
+            logger.warning(f"Multiple {kind} accessions found in report: {','.join(matches)}")
+        if len(matches) != 1:
+            return None
+        accessions.append(matches[0])
+    return ",".join(accessions)
 
 
-def parse_accession_from_report(report_filepath: Path) -> dict[str, str | None]:
-    """Extract accessions from a webin-cli report file.
+def check_report(output_dir: str, mode: str, context: str) -> str | None:
+    """
+    Parse the webin-cli report file to confirm the operation outcome and get the assigned accession.
 
     Args:
-        report_filepath (Path): Path to a webin-cli report file.
-
-    Returns:
-        dict[str, str | None]: Dictionary with keys 'assembly', 'experiment', 'run'.
-            Each value is the matched accession string, or None if not found or ambiguous.
-    """
-    result: dict[str, str | None] = {"assembly": None, "experiment": None, "run": None}
-    report_text = report_filepath.read_text()
-
-    run_matches = sorted(set(re.findall(ENA_RUN_ACCESSION_REGEX, report_text)))
-    experiment_matches = sorted(set(re.findall(ENA_EXPERIMENT_ACCESSION_REGEX, report_text)))
-    assembly_matches = sorted(set(re.findall(ENA_ASSEMBLY_ACCESSION_REGEX, report_text)))
-
-    if len(run_matches) == 1:
-        result["run"] = run_matches[0]
-    elif len(run_matches) > 1:
-        logger.warning(f"Multiple run accessions found in {report_filepath}: {','.join(run_matches)}")
-
-    if len(experiment_matches) == 1:
-        result["experiment"] = experiment_matches[0]
-    elif len(experiment_matches) > 1:
-        logger.warning(f"Multiple experiment accessions found in {report_filepath}: {','.join(experiment_matches)}")
-
-    if len(assembly_matches) == 1:
-        result["assembly"] = assembly_matches[0]
-    elif len(assembly_matches) > 1:
-        logger.warning(f"Multiple assembly accessions found in {report_filepath}: {','.join(assembly_matches)}")
-
-    return result
-
-
-def check_report(output_dir: str, mode: str, test: bool, context: str) -> tuple[bool, bool]:
-    """
-    Parse and validate the webin-cli report file to determine operation outcome.
-
-    This function reads the webin-cli.report file generated after a submission or
-    validation attempt, extracts any assigned accessions, and determines whether
-    the operation succeeded and whether this was a resubmission of existing data.
-
-    Args:
-        output_dir (str): Directory path where webin-cli.report is located
-            (the webin-cli output directory).
+        output_dir (str): The webin-cli output directory, containing webin-cli.report.
         mode (str): Operation mode - either 'submit' or 'validate'.
-        test (bool): Whether operation was run against test server (True) or
-            live server (False). Only used for logging.
         context (str): Submission context used to choose accession parsing logic.
 
     Returns:
-        tuple[bool, bool]: (success, is_resubmission)
-            - success (bool): True if the operation (submit/validate) succeeded,
-              False otherwise.
-            - is_resubmission (bool): True if this was a duplicate submission
-              (object already existed), False if first-time submission. Always
-              False for validation mode.
+        str | None: Accession assigned to the submitted object (see parse_accessions_from_report()),
+            for both first-time submissions and resubmissions. None in validate mode.
+
+    Raises:
+        WebinReportValidationError: If the report is missing, has no success message,
+            or (in submit mode) does not contain exactly one accession of each expected kind.
+            The report content is logged before raising.
     """
     report_path = Path(output_dir) / REPORT_FILE
     logger.info(f"Checking webin report {report_path}")
 
     if not report_path.exists():
-        logger.error(f"⚠️ Report file not found: {report_path}")
-        return False, False
+        raise WebinReportValidationError(f"Report file not found: {report_path}")
 
     report_text = report_path.read_text()
-    logger.debug(f"Report content:\n{report_text}")
 
-    if mode == "validate":
-        success = MSG_VALIDATE_SUCCESS in report_text
-        logger.info("Submission validation succeeded" if success else "Submission validation failed")
-        return success, False
+    success_messages = [MSG_VALIDATE_SUCCESS] if mode == "validate" else [MSG_SUBMIT_SUCCESS, MSG_ALREADY_EXISTS]
+    accession = None
+    error = None
+    if not any(msg in report_text for msg in success_messages):
+        error = f"{mode.capitalize()} success message not found in report"
+        logger.error(error)
 
-    # submit path
-    success, is_resubmission = check_submission_status(report_text, test)
-    if not success:
-        return False, False
-    if is_resubmission:
-        return success, is_resubmission
+    elif mode == "submit":
+        accession = parse_accessions_from_report(report_text, context)
+        if not accession:
+            error = "Expected exactly one accession of each kind in report"
+            logger.error(error)
 
-    # First-time submission: require an accession in the report
-    accessions = parse_accession_from_report(report_path)
-    has_accession = (accessions["experiment"] and accessions["run"]) if context == "reads" else accessions["assembly"]
-    if not has_accession:
-        logger.error(f"No accession found in report: {report_path}")
-        return False, False
-    return success, is_resubmission
-
-
-def check_result(result_location: str, context: str, assembly_name: str, mode: str, test: bool) -> bool:
-    """
-    Verify that webin-cli execution completed successfully and produced expected outputs.
-
-    For first-time submissions (not resubmissions), this function validates that
-    webin-cli created the expected directory structure and output files.
-
-    Args:
-        result_location (str): Directory where webin-cli was executed (contains report).
-        context (str): Submission context (genome, assembly, etc.).
-        assembly_name (str): Name of the assembly from manifest ASSEMBLYNAME field.
-        mode (str): Operation mode - 'submit' or 'validate'.
-        test (bool): Whether operation was against test server.
-
-    Returns:
-        bool: True if operation succeeded and all expected outputs exist,
-              False if operation failed or outputs are missing.
-
-    Note:
-        For resubmissions (when object already exists), we only check the report
-        status and don't verify output files, since webin-cli may not regenerate them.
-    """
-    success, is_resubmission = check_report(result_location, mode, test, context)
-    logger.debug(f"Result status after report parsing: success={success}, is_resubmission={is_resubmission}, mode={mode}, context={context}")
-
-    if not success:
-        logger.info("Command failed. Check logs")
-        return False
-
-    # For validation mode or resubmissions, report status is sufficient
-    if mode == "validate" or is_resubmission:
-        return True
-
-    # For first-time submissions, verify output directory structure and files exist
-    result_path = Path(result_location)
-    assembly_dir = result_path / context / assembly_name
-
-    if not assembly_dir.exists():
-        logger.info(f"No result directory found for {assembly_name} at {assembly_dir}")
-        return False
-
-    submission_dir = assembly_dir / mode
-    if not submission_dir.exists():
-        logger.info(f"No submission result directory found at {submission_dir}")
-        return False
-
-    # Verify all expected result files are present
-    missing_files = []
-    for filename in WEBIN_SUBMISSION_RESULT_FILES:
-        file_path = submission_dir / filename
-        if not file_path.exists():
-            missing_files.append(filename)
-
-    if missing_files:
-        logger.info(f"Missing required files in {submission_dir}: {', '.join(missing_files)}")
-        return False
-
-    logger.info(f"Result directory {submission_dir} contains all expected files")
-    return True
+    if error:
+        logger.error(f"Report content ({report_path}):\n{report_text}")
+        raise WebinReportValidationError(f"{error}: {report_path}")
+    return accession
 
 
 def resolve_manifests(manifest_input: str) -> list[str]:
@@ -894,15 +744,6 @@ def load_assigned_accessions(output_accessions: str) -> dict[str, str]:
     return loaded
 
 
-def _extract_accession(report_path: Path, context: str) -> str | None:
-    """Extract a displayable accession string from a webin-cli report."""
-    accessions = parse_accession_from_report(report_path)
-    if context == "reads":
-        parts = [v for v in [accessions["experiment"], accessions["run"]] if v is not None]
-        return ",".join(parts) if parts else None
-    return accessions["assembly"]
-
-
 def main() -> int:
     """
     Main entry point for the webin-cli handler.
@@ -913,44 +754,32 @@ def main() -> int:
     try:
         args = parse_arguments()
         configure_logging(debug=args.debug)
-        logger.debug(
-            f"Parsed arguments: manifest={args.manifest}, context={args.context}, mode={args.mode}, test={args.test}, resume={args.resume}, "
-            f"input_dir={args.input_dir}, outdir={args.outdir}, output_accessions={args.output_accessions}, download_webin_cli={args.download_webin_cli}, "
-            f"download_webin_cli_directory={args.download_webin_cli_directory}, download_webin_cli_version={args.download_webin_cli_version}, "
-            f"webin_cli_jar={args.webin_cli_jar}, retries={args.retries}, retry_delay={args.retry_delay}, "
-            f"java_heap_size_initial={args.java_heap_size_initial}, java_heap_size_max={args.java_heap_size_max}, debug={args.debug}"
-        )
-
-        if args.download_webin_cli:
-            download_webin_cli(version=args.download_webin_cli_version, dest_dir=args.download_webin_cli_directory)
+        logger.debug(f"Parsed arguments: {vars(args)}")
 
         webin = get_webin_credentials()
 
-        # pick execution method for webin-cli
-        execute_jar = None
         if args.download_webin_cli:
-            execute_jar = str(Path(args.download_webin_cli_directory) / "webin-cli.jar")
-        elif args.webin_cli_jar:
+            execute_jar = download_webin_cli(version=args.download_webin_cli_version, dest_dir=args.download_webin_cli_directory)
+        else:
             execute_jar = args.webin_cli_jar
 
         manifests = resolve_manifests(args.manifest)
         logger.info(f"Resolved {len(manifests)} manifest(s) for processing")
 
-        failed_manifests = []
         accessions_to_write: dict[str, str] = {}
-        if args.mode == "submit" and args.resume:
+        if args.resume:
             accessions_to_write = load_assigned_accessions(args.output_accessions)
             aliases_to_skip = set(accessions_to_write.keys())
 
         for manifest in manifests:
             logger.debug(f"Starting submission loop for manifest: {manifest}")
-            assembly_name, manifest_for_submission = check_manifest(manifest, args.input_dir, args.context)
-            if args.mode == "submit" and args.resume and assembly_name in aliases_to_skip:
+            assembly_name = check_manifest(manifest, args.input_dir, args.context)
+            if args.resume and assembly_name in aliases_to_skip:
                 logger.info(f"Skipping {assembly_name}: already present in accessions file with accession {accessions_to_write[assembly_name]}")
                 continue
-            output_dir = prepare_output_dir(manifest_for_submission, assembly_name, args.outdir)
+            output_dir = prepare_output_dir(manifest, assembly_name, args.outdir)
             run_webin_cli(
-                manifest=manifest_for_submission,
+                manifest=manifest,
                 context=args.context,
                 webin=webin,
                 mode=args.mode,
@@ -964,31 +793,18 @@ def main() -> int:
                 java_heap_size_max=args.java_heap_size_max,
             )
 
-            logger.debug(f"Result location for manifest {manifest_for_submission}: {output_dir}")
-            result_status = check_result(
-                result_location=output_dir, context=args.context, assembly_name=assembly_name, mode=args.mode, test=args.test
-            )
-
-            if not result_status:
-                logger.error(f"Submission/validation failed for {manifest_for_submission}")
-                failed_manifests.append(manifest_for_submission)
-                continue
+            logger.debug(f"Result location for manifest {manifest}: {output_dir}")
+            accession = check_report(output_dir, args.mode, args.context)
 
             if args.mode == "submit":
-                accession = _extract_accession(Path(output_dir) / REPORT_FILE, args.context)
-                if accession:
-                    logger.info(f"Assigned accession for {assembly_name}: {accession}")
-                    accessions_to_write[assembly_name] = accession
-                    # Persist progress immediately so long-running runs can resume after interruption
-                    write_assigned_accessions(accessions_to_write, args.output_accessions)
-            logger.info(f"Submission/validation done for {manifest_for_submission}")
+                logger.info(f"Assigned accession for {assembly_name}: {accession}")
+                accessions_to_write[assembly_name] = accession
+                # Persist progress immediately so long-running runs can resume after interruption
+                write_assigned_accessions(accessions_to_write, args.output_accessions)
+            logger.info(f"Submission/validation done for {manifest}")
 
         if args.mode == "submit":
             logger.debug(f"Submission mode complete with {len(accessions_to_write)} accession(s) captured")
-
-        if failed_manifests:
-            logger.error(f"There are failed submissions for manifests: {','.join(failed_manifests)}")
-            return 1
         return 0
 
     except WebinCredentialsError as e:
@@ -1009,6 +825,9 @@ def main() -> int:
     except WebinAbsConsentError as e:
         logger.error(f"Webin account error: {e}")
         return 7
+    except WebinReportValidationError as e:
+        logger.error(f"Webin-CLI report error: {e}")
+        return 8
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return 99

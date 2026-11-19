@@ -16,7 +16,7 @@ jobs:
     env:
       ENA_WEBIN: ${{ secrets.ENA_WEBIN }}
       ENA_WEBIN_PASSWORD: ${{ secrets.ENA_WEBIN_PASSWORD }}
-      WEBIN_CLI_VERSION: 9.0.3
+      WEBIN_CLI_VERSION: 11.0.0
 
     steps:
       - uses: actions/checkout@v6.0.1

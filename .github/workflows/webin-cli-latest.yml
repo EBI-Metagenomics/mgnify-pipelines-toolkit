@@ -1,0 +1,96 @@
+name: Check webin_cli_handler against latest webin-cli
+
+# Catches new webin-cli releases that break webin_cli_handler (report format changes, new
+# messages...) before pipelines pick them up.
+# All submissions in the tests use --test (ENA test server only).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "webin-cli version to test (default: latest GitHub release)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: webin-cli-latest
+  cancel-in-progress: false
+
+jobs:
+  webin-cli-latest:
+    name: webin_cli_handler with latest webin-cli
+    runs-on: ubuntu-latest
+    env:
+      ENA_WEBIN: ${{ secrets.ENA_WEBIN }}
+      ENA_WEBIN_PASSWORD: ${{ secrets.ENA_WEBIN_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v6.0.1
+
+      - name: Resolve webin-cli version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION}"
+          else
+            VERSION=$(gh api repos/enasequence/webin-cli/releases/latest --jq .tag_name)
+          fi
+          if [ -z "${VERSION}" ]; then
+            echo "::error::Could not resolve webin-cli version"
+            exit 1
+          fi
+          PINNED=$(grep -oP 'WEBIN_CLI_VERSION:\s*\K\S+' .github/workflows/pytest-workflow.yml || true)
+          echo "Testing webin-cli ${VERSION} (version pinned in pytest-workflow.yml: ${PINNED:-none})"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "WEBIN_CLI_VERSION=${VERSION}" >> "$GITHUB_ENV"
+          {
+            echo "### webin-cli ${VERSION}"
+            echo "Pinned in pytest-workflow.yml: \`${PINNED:-none}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Download ena-webin-cli
+        run: |
+          wget -q "https://github.com/enasequence/webin-cli/releases/download/${WEBIN_CLI_VERSION}/webin-cli-${WEBIN_CLI_VERSION}.jar"
+
+      - name: Run webin_cli_handler tests
+        run: uv run pytest -v tests/unit/ena/webin_cli_handler/
+
+      - name: Open or update an issue on failure
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="webin_cli_handler fails with webin-cli ${VERSION}"
+          BODY="The scheduled check against webin-cli \`${VERSION}\` failed: ${RUN_URL}"
+          EXISTING=$(gh issue list --state open --search "\"${TITLE}\" in:title" --json number --jq '.[0].number')
+          if [ -n "${EXISTING}" ]; then
+            gh issue comment "${EXISTING}" --body "${BODY}"
+          else
+            gh issue create --title "${TITLE}" --body "${BODY}"
+          fi

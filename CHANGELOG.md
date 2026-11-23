@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.8] - 2026-11-23
+
+### Added
+
+- `webin_cli_handler`: support webin-cli >= 10.0.0 report format (ENA stops supporting 9.x after 30 Nov 2026); webin-cli 9.x reports are no longer supported. CI uses webin-cli 11.0.0.
+- `webin_cli_handler`: fail without retrying when the Webin account has not completed the Access and Benefit Sharing (ABS) acknowledgement (new exit code 7).
+
 ## [1.5.7] - 2026-11-16
 
 ### Fixed

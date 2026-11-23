@@ -50,6 +50,8 @@ class TestAssemblyE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -58,7 +60,7 @@ class TestAssemblyE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accession for" in result.stderr
-        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Successfully submitted object for the first time" in result.stderr
         assert "Submission/validation done" in result.stderr
 
     def test_submit_second_time_test_server(self, tmp_path):
@@ -77,6 +79,8 @@ class TestAssemblyE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -84,8 +88,7 @@ class TestAssemblyE2E:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Command completed successfully" in result.stderr
-        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submitted object already exists" in result.stderr
 
 
 @pytest.mark.webin_cli
@@ -195,6 +198,8 @@ class TestGenomeE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -203,7 +208,7 @@ class TestGenomeE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accession for" in result.stderr
-        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Successfully submitted object for the first time" in result.stderr
         assert "Submission/validation done for new_genome.manifest" in result.stderr
 
     def test_submit_second_time_test_server(self, tmp_path):
@@ -222,6 +227,8 @@ class TestGenomeE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -230,7 +237,7 @@ class TestGenomeE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         print(result.stderr)
-        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submitted object already exists" in result.stderr
         assert "Submission/validation done for repeat_genome.manifest" in result.stderr
 
     def test_submit_multiple_manifests_test_server(self, tmp_path):
@@ -257,6 +264,8 @@ class TestGenomeE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -265,7 +274,7 @@ class TestGenomeE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accession for" in result.stderr
-        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Successfully submitted object for the first time" in result.stderr
         assert "first_genome.manifest" in result.stderr
         assert "second_genome.manifest" in result.stderr
         first_output_dirs = list(test_output_dir.glob(f"test_{self.timestamp}_g1_*"))
@@ -280,12 +289,10 @@ class TestGenomeE2E:
         with open(first_report) as f:
             webin_report_lines = "\n".join(f.readlines())
         assert "ERZ" in webin_report_lines, f"No ERZ found in {first_report}, got {webin_report_lines}"
-        assert os.path.exists("ena_accessions.tsv"), "ena_accessions.tsv not found after submission"
-        with open("ena_accessions.tsv") as f:
+        assert (tmp_path / "accessions.tsv").exists(), "accessions.tsv not found after submission"
+        with open(tmp_path / "accessions.tsv") as f:
             accession_lines = [line for line in f if line.strip()]
-        assert len(accession_lines) == 3, (
-            f"Expected 3 lines (header + 2 genomes) in ena_accessions.tsv, got {len(accession_lines)}: {accession_lines}"
-        )
+        assert len(accession_lines) == 3, f"Expected 3 lines (header + 2 genomes) in accessions.tsv, got {len(accession_lines)}: {accession_lines}"
 
     def test_submit_resume_skips_existing_aliases(self, tmp_path):
         test_manifest = "tests/fixtures/webin_cli_handler/genome.manifest"
@@ -387,6 +394,8 @@ class TestReadsE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -395,7 +404,7 @@ class TestReadsE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accession for" in result.stderr
-        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Successfully submitted object for the first time" in result.stderr
         assert "Submission/validation done" in result.stderr
 
     def test_submit_second_time_test_server(self, tmp_path):
@@ -414,6 +423,8 @@ class TestReadsE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -421,7 +432,7 @@ class TestReadsE2E:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submitted object already exists" in result.stderr
         assert "Submission/validation done" in result.stderr
 
     def test_submit_resume_skips_existing_aliases(self, tmp_path):
@@ -522,6 +533,8 @@ class TestBamReadsE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -530,7 +543,7 @@ class TestBamReadsE2E:
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
         assert "Assigned accession for" in result.stderr
-        assert "Successfully submitted object for the first time on TEST server" in result.stderr
+        assert "Successfully submitted object for the first time" in result.stderr
         assert "Submission/validation done" in result.stderr
 
     def test_submit_second_time_test_server(self, tmp_path):
@@ -549,6 +562,8 @@ class TestBamReadsE2E:
             "--mode",
             "submit",
             "--test",
+            "--output-accessions",
+            str(tmp_path / "accessions.tsv"),
             "--outdir",
             test_output_dir,
             "--webin-cli-jar",
@@ -556,5 +571,5 @@ class TestBamReadsE2E:
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         assert result.returncode == 0, f"Run failed: {result.stderr}"
-        assert "Submitted object already exists on TEST server" in result.stderr
+        assert "Submitted object already exists" in result.stderr
         assert "Submission/validation done" in result.stderr
